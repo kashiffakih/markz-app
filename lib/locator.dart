@@ -1,0 +1,32 @@
+import 'package:get_it/get_it.dart';
+import 'package:sales_app/core/providers/config_pr.dart';
+import 'package:sales_app/core/services/analytics_s.dart';
+import 'package:sales_app/core/services/attendance_s.dart';
+import 'package:sales_app/core/services/auth_s.dart';
+import 'package:sales_app/core/services/config_s.dart';
+import 'package:sales_app/core/services/device_info_s.dart';
+import 'package:sales_app/core/services/location_s.dart';
+import 'package:sales_app/core/services/my_order_s.dart';
+import 'package:sales_app/core/services/notice_s.dart';
+import 'package:sales_app/core/services/order_s.dart';
+import 'package:sales_app/core/services/profile_s.dart';
+import 'package:sales_app/core/services/reference_plan_s.dart';
+import 'package:sales_app/core/services/sku_s.dart';
+
+GetIt locator = GetIt.instance;
+
+void setupLocator() {
+  locator.registerLazySingleton(() => ConfigService());
+  locator.registerLazySingleton(() => ConfigModel());
+  locator.registerLazySingleton(() => AuthService());
+  locator.registerLazySingleton(() => AttendanceService());
+  locator.registerLazySingleton(() => LocationService());
+  locator.registerLazySingleton(() => DeviceInfoService());
+  locator.registerLazySingleton(() => ReferencePlanService());
+  locator.registerLazySingleton(() => SkuService());
+  locator.registerLazySingleton(() => OrderService());
+  locator.registerLazySingleton(() => MyOrderService());
+  locator.registerLazySingleton(() => AnalyticsService());
+  locator.registerLazySingleton(() => NoticeService());
+  locator.registerLazySingleton(() => ProfileService());
+}
