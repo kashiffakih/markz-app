@@ -12,13 +12,13 @@ class OrderService {
   final ConfigModel _configModel = locator<ConfigModel>();
 
   // List of reasons
-  List<Reason> _reasons;
+  late List<Reason> _reasons;
 
   Future<List<Reason>> getReasons() async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
     http.Response _response = await http.get(
-      '${_apiConfig['baseURL']}/reasons',
+      Uri.parse('${_apiConfig['baseURL']}/reasons'),
       headers: _apiConfig['headers'],
     );
 
@@ -42,11 +42,13 @@ class OrderService {
     User user = _configModel.user;
 
     http.Response _response = await http.get(
-      '${_apiConfig['baseURL']}/orders?userId=${user.id}&date=$date',
+      Uri.parse('${_apiConfig['baseURL']}/orders?userId=${user.id}&date=$date'),
       headers: _apiConfig['headers'],
     );
 
     Map<String, dynamic> _responseData = json.decode(_response.body);
+
+    print(_responseData['data']);
 
     if (_responseData['success']) {
       _orders = [];

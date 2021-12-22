@@ -1,11 +1,11 @@
 class DaySummary {
-  List<String> beatNames;
-  int totalOutlets;
-  int ordersNotTaken;
-  int ordersTaken;
-  int totalOrderValue;
-  Coverage coverage;
-  Coverage productivity;
+  List<String>? beatNames;
+  int? totalOutlets;
+  int? ordersNotTaken;
+  int? ordersTaken;
+  int? totalOrderValue;
+  Coverage? coverage;
+  Coverage? productivity;
 
   DaySummary(
       {this.beatNames,
@@ -38,19 +38,19 @@ class DaySummary {
     data['orders_taken'] = this.ordersTaken;
     data['total_order_value'] = this.totalOrderValue;
     if (this.coverage != null) {
-      data['coverage'] = this.coverage.toJson();
+      data['coverage'] = this.coverage!.toJson();
     }
     if (this.productivity != null) {
-      data['productivity'] = this.productivity.toJson();
+      data['productivity'] = this.productivity!.toJson();
     }
     return data;
   }
 }
 
 class Coverage {
-  int percent;
-  int value;
-  int total;
+  int? percent;
+  int? value;
+  int? total;
 
   Coverage({this.percent, this.value, this.total});
 

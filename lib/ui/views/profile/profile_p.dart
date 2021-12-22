@@ -32,7 +32,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (_configModel.user.imagePath == null)
       showDialog(
         context: context,
-        child: AlertDialog(
+        builder: (BuildContext context) => AlertDialog(
           title: Text('Please upload photo'),
           actions: [
             FlatButton(
@@ -47,7 +47,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (_configModel.user.phone == 0)
       showDialog(
         context: context,
-        child: AlertDialog(
+        builder: (BuildContext context) => AlertDialog(
           title: Text('Please enter your phone no'),
           actions: [
             FlatButton(
@@ -87,25 +87,35 @@ class _ProfilePageState extends State<ProfilePage> {
               Card(
                 child: Column(
                   children: [
-                    InkWell(
-                      onTap: () {},
-                      child: Hero(
-                        tag: '123',
-                        child: CircleAvatar(
-                          radius: 70,
-                          backgroundImage: _configModel.user.imagePath != null
-                              ? NetworkImage(
-                                  _configModel.apiConfig['mediaURL'] +
-                                      _configModel.user.imagePath,
-                                )
-                              : AssetImage(Images.avatar),
+                    if (_configModel.user.imagePath != null)
+                      InkWell(
+                        onTap: () {},
+                        child: Hero(
+                          tag: '123',
+                          child: CircleAvatar(
+                            radius: 70,
+                            backgroundImage: NetworkImage(
+                              _configModel.apiConfig['mediaURL'] +
+                                  _configModel.user.imagePath,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    if (_configModel.user.imagePath == null)
+                      InkWell(
+                        onTap: () {},
+                        child: Hero(
+                          tag: '123',
+                          child: CircleAvatar(
+                            radius: 70,
+                            backgroundImage: AssetImage(Images.avatar),
+                          ),
+                        ),
+                      ),
                     Row(
                       children: [
                         Expanded(
-                          child: TakeImageWidget(imagePath: null),
+                          child: TakeImageWidget(imagePath: ''),
                         ),
                         Expanded(
                           flex: 2,
@@ -115,7 +125,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               if (_configModel.file == null) {
                                 showDialog(
                                   context: context,
-                                  child: AlertDialog(
+                                  builder: (BuildContext context) =>
+                                      AlertDialog(
                                     title: Text('Please upload image'),
                                     actions: [
                                       FlatButton(
@@ -153,9 +164,10 @@ class _ProfilePageState extends State<ProfilePage> {
                               decoration: InputDecoration(
                                 labelText: 'Enter name',
                               ),
+                              enabled: false,
                               initialValue: user.name,
                               validator: (value) {
-                                if (value.isEmpty) return 'Please enter name';
+                                if (value!.isEmpty) return 'Please enter name';
                                 return null;
                               },
                               onSaved: (value) {
@@ -166,9 +178,10 @@ class _ProfilePageState extends State<ProfilePage> {
                               decoration: InputDecoration(
                                 labelText: 'Enter email',
                               ),
+                              enabled: false,
                               initialValue: user.email,
                               validator: (value) {
-                                if (value.isEmpty) return 'Please enter email';
+                                if (value!.isEmpty) return 'Please enter email';
                                 return null;
                               },
                               onSaved: (value) {
@@ -179,100 +192,104 @@ class _ProfilePageState extends State<ProfilePage> {
                               decoration: InputDecoration(
                                 labelText: 'Enter phone',
                               ),
+                              enabled: false,
                               keyboardType: TextInputType.number,
                               initialValue: user.phone.toString(),
                               validator: (value) {
-                                if (value.isEmpty) return 'Please enter phone';
+                                if (value!.isEmpty) return 'Please enter phone';
                                 return null;
                               },
                               onSaved: (value) {
-                                user.phone = int.parse(value);
+                                user.phone = int.parse(value.toString());
                               },
                             ),
                             SizedBox(
                               height: 10,
                             ),
-                            RaisedButton(
-                              color: Theme.of(context).primaryColor,
-                              onPressed: () {
-                                if (_userKey.currentState.validate()) {
-                                  _userKey.currentState.save();
-                                  _profileService.sendOTP(
-                                    otp: otp,
-                                  );
-                                  showDialog(
-                                    context: context,
-                                    child: AlertDialog(
-                                      title: Column(
-                                        children: [
-                                          Text('Please enter otp'),
-                                          TextFormField(
-                                            decoration: InputDecoration(
-                                              labelText: 'Enter otp',
-                                            ),
-                                            controller: _otpController,
-                                          ),
-                                        ],
-                                      ),
-                                      actions: [
-                                        FlatButton(
-                                          onPressed: () async {
-                                            if (_otpController.text ==
-                                                otp.toString()) {
-                                              setState(() {
-                                                _loading = true;
-                                              });
-                                              await _profileService
-                                                  .updateProfile(
-                                                userData: user,
-                                              );
-                                              setState(() {
-                                                _loading = false;
-                                              });
-                                              Navigator.pop(context);
-                                              Navigator.pushReplacementNamed(
-                                                context,
-                                                '/home',
-                                              );
-                                            } else {
-                                              showDialog(
-                                                context: context,
-                                                child: AlertDialog(
-                                                  title: Text('Incorrect OTP'),
-                                                  actions: [
-                                                    FlatButton(
-                                                      onPressed: () {
-                                                        Navigator.pop(context);
-                                                      },
-                                                      child: Text('Ok'),
-                                                    )
-                                                  ],
-                                                ),
-                                              );
-                                            }
-                                          },
-                                          child: _loading
-                                              ? CircularProgressIndicator()
-                                              : Text('Save'),
-                                        ),
-                                        FlatButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: Text('Cancel'),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }
-                              },
-                              child: Text(
-                                'Update',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: Font.primaryFont),
-                              ),
-                            ),
+                            // RaisedButton(
+                            //   color: Theme.of(context).primaryColor,
+                            //   onPressed: () {
+                            //     if (_userKey.currentState.validate()) {
+                            //       _userKey.currentState.save();
+                            //       _profileService.sendOTP(
+                            //         otp: otp,
+                            //       );
+                            //       showDialog(
+                            //         context: context,
+                            //         builder: (BuildContext context) =>
+                            //             AlertDialog(
+                            //           title: Column(
+                            //             children: [
+                            //               Text('Please enter otp'),
+                            //               TextFormField(
+                            //                 decoration: InputDecoration(
+                            //                   labelText: 'Enter otp',
+                            //                 ),
+                            //                 controller: _otpController,
+                            //               ),
+                            //             ],
+                            //           ),
+                            //           actions: [
+                            //             FlatButton(
+                            //               onPressed: () async {
+                            //                 if (_otpController.text ==
+                            //                     otp.toString()) {
+                            //                   setState(() {
+                            //                     _loading = true;
+                            //                   });
+                            //                   await _profileService
+                            //                       .updateProfile(
+                            //                     userData: user,
+                            //                   );
+                            //                   setState(() {
+                            //                     _loading = false;
+                            //                   });
+                            //                   Navigator.pop(context);
+                            //                   Navigator.pushReplacementNamed(
+                            //                     context,
+                            //                     '/home',
+                            //                   );
+                            //                 } else {
+                            //                   showDialog(
+                            //                     context: context,
+                            //                     builder:
+                            //                         (BuildContext context) =>
+                            //                             AlertDialog(
+                            //                       title: Text('Incorrect OTP'),
+                            //                       actions: [
+                            //                         FlatButton(
+                            //                           onPressed: () {
+                            //                             Navigator.pop(context);
+                            //                           },
+                            //                           child: Text('Ok'),
+                            //                         )
+                            //                       ],
+                            //                     ),
+                            //                   );
+                            //                 }
+                            //               },
+                            //               child: _loading
+                            //                   ? CircularProgressIndicator()
+                            //                   : Text('Save'),
+                            //             ),
+                            //             FlatButton(
+                            //               onPressed: () {
+                            //                 Navigator.pop(context);
+                            //               },
+                            //               child: Text('Cancel'),
+                            //             ),
+                            //           ],
+                            //         ),
+                            //       );
+                            //     }
+                            //   },
+                            //   child: Text(
+                            //     'Update',
+                            //     style: TextStyle(
+                            //         color: Colors.white,
+                            //         fontFamily: Font.primaryFont),
+                            //   ),
+                            // ),
                           ],
                         ),
                       ),
@@ -288,160 +305,432 @@ class _ProfilePageState extends State<ProfilePage> {
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              'Employee Code',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                color: Colors.orange,
+                              ),
+                              child: Text(
+                                'Employee Code',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
                           Expanded(
-                            child: Text(user.employeeCode ?? ''),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                color: Colors.cyan,
+                              ),
+                              child: Text(
+                                user.employeeCode ?? '',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              'Name',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                color: Colors.orange,
+                              ),
+                              child: Text(
+                                'Name',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
                           Expanded(
-                            child: Text(user.name),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                color: Colors.cyan,
+                              ),
+                              child: Text(
+                                user.name.toString(),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              'Email',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                color: Colors.orange,
+                              ),
+                              child: Text(
+                                'Email',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
                           Expanded(
-                            child: Text(user.email),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                color: Colors.cyan,
+                              ),
+                              child: Text(
+                                user.email.toString(),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              'Phone',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                color: Colors.orange,
+                              ),
+                              child: Text(
+                                'Phone',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
                           Expanded(
-                            child: Text(user.phone.toString()),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                color: Colors.cyan,
+                              ),
+                              child: Text(
+                                user.phone.toString(),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              'Address',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                color: Colors.orange,
+                              ),
+                              child: Text(
+                                'Address',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
                           Expanded(
-                            child: Text(user.address ?? ''),
+                            child: Container(
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  border: Border.all(),
+                                  color: Colors.cyan,
+                                ),
+                                child: Text(
+                                  user.address ?? '',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                )),
                           ),
                         ],
                       ),
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              'DOJ',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                color: Colors.orange,
+                              ),
+                              child: Text(
+                                'DOJ',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
                           Expanded(
-                            child: Text(user.doj != null
-                                ? _dateFormat.format(DateTime.parse(user.doj))
-                                : ''),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                color: Colors.cyan,
+                              ),
+                              child: Text(
+                                user.doj != null
+                                    ? _dateFormat.format(
+                                        DateTime.parse(user.doj.toString()))
+                                    : '',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              'DOB',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                color: Colors.orange,
+                              ),
+                              child: Text(
+                                'DOB',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
                           Expanded(
-                            child: Text(user.dob != null
-                                ? _dateFormat.format(DateTime.parse(user.dob))
-                                : ''),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                color: Colors.cyan,
+                              ),
+                              child: Text(
+                                user.dob != null
+                                    ? _dateFormat.format(
+                                        DateTime.parse(user.dob.toString()))
+                                    : '',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              'Designation',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                color: Colors.orange,
+                              ),
+                              child: Text(
+                                'Designation',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
                           Expanded(
-                            child: Text(user.dob != null ? 'SSM' : ''),
+                            child: Container(
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  border: Border.all(),
+                                  color: Colors.cyan,
+                                ),
+                                child: Text(
+                                  user.dob != null ? 'SSM' : '',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                )),
                           ),
                         ],
                       ),
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              'PF No',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                color: Colors.orange,
+                              ),
+                              child: Text(
+                                'PF No',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
                           Expanded(
-                            child: Text(user.pfNo ?? ''),
+                            child: Container(
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  border: Border.all(),
+                                  color: Colors.cyan,
+                                ),
+                                child: Text(
+                                  user.pfNo ?? '',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                )),
                           ),
                         ],
                       ),
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              'UAN No',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                color: Colors.orange,
+                              ),
+                              child: Text(
+                                'UAN No',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
                           Expanded(
-                            child: Text(user.uanNo ?? ''),
+                            child: Container(
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  border: Border.all(),
+                                  color: Colors.cyan,
+                                ),
+                                child: Text(
+                                  user.uanNo ?? '',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                )),
                           ),
                         ],
                       ),
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              'ESI No',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                color: Colors.orange,
+                              ),
+                              child: Text(
+                                'ESI No',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
                           Expanded(
-                            child: Text(user.esiNo ?? ''),
+                            child: Container(
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  border: Border.all(),
+                                  color: Colors.cyan,
+                                ),
+                                child: Text(
+                                  user.esiNo ?? '',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                )),
                           ),
                         ],
                       ),
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              'UID No',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                color: Colors.orange,
+                              ),
+                              child: Text(
+                                'UID No',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
                           Expanded(
-                            child: Text(user.uidNo ?? ''),
+                            child: Container(
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  border: Border.all(),
+                                  color: Colors.cyan,
+                                ),
+                                child: Text(
+                                  user.uidNo ?? '',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                )),
                           ),
                         ],
                       ),

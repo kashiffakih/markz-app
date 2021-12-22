@@ -1,6 +1,6 @@
 class File {
-  String file;
-  String fileName;
+  String? file;
+  String? fileName;
 
   File({this.file, this.fileName});
 

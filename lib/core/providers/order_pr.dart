@@ -9,7 +9,7 @@ class OrderModel with ChangeNotifier {
   final OrderService _orderService = locator<OrderService>();
 
   // List of reasons
-  List<Reason> _reasons;
+  late List<Reason> _reasons;
 
   set reasons(List<Reason> newReasons) {
     _reasons = newReasons;
@@ -23,10 +23,13 @@ class OrderModel with ChangeNotifier {
   }
 
   // List of orders of a user of today
-  List<Order> _orders;
+  bool ordersLoader = true;
+
+  late List<Order> _orders = [];
 
   set orders(List<Order> newOrders) {
     _orders = newOrders;
+    ordersLoader = false;
     notifyListeners();
   }
 

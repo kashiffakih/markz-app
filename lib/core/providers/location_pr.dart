@@ -6,7 +6,7 @@ class LocationModel with ChangeNotifier {
   final LocationService _locationService = LocationService();
 
   // Current Location
-  Location _currentLocation;
+  late Location _currentLocation = Location();
 
   set currentLocation(Location newLocation) {
     _currentLocation = newLocation;
@@ -20,7 +20,7 @@ class LocationModel with ChangeNotifier {
   }
 
   // Current Address
-  String _address;
+  late String _address = '';
 
   set address(String newAddress) {
     _address = newAddress;

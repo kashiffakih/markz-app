@@ -6,7 +6,7 @@ class DeviceInfoModel with ChangeNotifier {
   final _deviceInfoService = locator<DeviceInfoService>();
 
   // Battery Level
-  int _batteryLevel;
+  late int _batteryLevel;
 
   set batteryLevel(int newBatteryLevel) {
     _batteryLevel = newBatteryLevel;
@@ -16,6 +16,6 @@ class DeviceInfoModel with ChangeNotifier {
   int get batteryLevel => _batteryLevel;
 
   Future<void> getBatteryLevel() async {
-    batteryLevel = await _deviceInfoService.getBatteryLevel();
+    // batteryLevel = await _deviceInfoService.getBatteryLevel();
   }
 }

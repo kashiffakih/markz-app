@@ -25,16 +25,19 @@ class ProductsMasterPage extends StatelessWidget {
                   child: SingleChildScrollView(),
                 )
               : Column(
-                  children: _skuModel.skus
+                  children: _skuModel.skus!
                       .map(
                         (_sku) => Card(
                           child: Container(
+                            decoration: _skuModel.skus!.indexOf(_sku) % 2 != 0
+                                ? BoxDecoration(color: Colors.grey[400])
+                                : BoxDecoration(color: Colors.white),
                             padding: EdgeInsets.all(8.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  _sku.name,
+                                  _sku.name.toString(),
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),

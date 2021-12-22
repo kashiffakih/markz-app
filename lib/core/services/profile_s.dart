@@ -14,18 +14,19 @@ class ProfileService {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
     await http.get(
-      '${_apiConfig['baseURL']}/send_otp?phone=${_configModel.user.phone}&otp=$otp',
+      Uri.parse(
+          '${_apiConfig['baseURL']}/send_otp?phone=${_configModel.user.phone}&otp=$otp'),
       headers: _apiConfig['headers'],
     );
   }
 
   // Update Profile
-  updateProfile({@required User userData}) async {
+  updateProfile({@required User? userData}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
     http.Response _response = await http.patch(
-      '${_apiConfig['baseURL']}/users/${_configModel.user.id}',
-      body: json.encode(userData.toJson()),
+      Uri.parse('${_apiConfig['baseURL']}/users/${_configModel.user.id}'),
+      body: json.encode(userData!.toJson()),
       headers: _apiConfig['headers'],
     );
 
@@ -44,11 +45,11 @@ class ProfileService {
       Uri.parse('${_apiConfig['baseURL']}/upload_user_image'),
     )
       ..fields['userid'] = _configModel.user.id.toString()
-      ..fields['filename'] = _configModel.file.fileName
+      ..fields['filename'] = _configModel.file.fileName.toString()
       ..files.add(
         await http.MultipartFile.fromPath(
           'imagepath',
-          _configModel.file.file,
+          _configModel.file.file.toString(),
         ),
       )
       ..headers.addAll(_apiConfig['headers']);

@@ -1,20 +1,20 @@
 class BilledOutlet {
-  List<Outlets> outlets;
-  List<Months> months;
+  List<Outlets>? outlets;
+  List<Months>? months;
 
   BilledOutlet({this.outlets, this.months});
 
   BilledOutlet.fromJson(Map<String, dynamic> json) {
     if (json['outlets'] != null) {
-      outlets = new List<Outlets>();
+      outlets = [];
       json['outlets'].forEach((v) {
-        outlets.add(new Outlets.fromJson(v));
+        outlets!.add(new Outlets.fromJson(v));
       });
     }
     if (json['months'] != null) {
-      months = new List<Months>();
+      months = [];
       json['months'].forEach((v) {
-        months.add(new Months.fromJson(v));
+        months!.add(new Months.fromJson(v));
       });
     }
   }
@@ -22,19 +22,19 @@ class BilledOutlet {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.outlets != null) {
-      data['outlets'] = this.outlets.map((v) => v.toJson()).toList();
+      data['outlets'] = this.outlets!.map((v) => v.toJson()).toList();
     }
     if (this.months != null) {
-      data['months'] = this.months.map((v) => v.toJson()).toList();
+      data['months'] = this.months!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Outlets {
-  String outlet;
-  int noOfInv;
-  int value;
+  String? outlet;
+  int? noOfInv;
+  int? value;
 
   Outlets({this.outlet, this.noOfInv, this.value});
 
@@ -54,8 +54,8 @@ class Outlets {
 }
 
 class Months {
-  String month;
-  int value;
+  String? month;
+  int? value;
 
   Months({this.month, this.value});
 

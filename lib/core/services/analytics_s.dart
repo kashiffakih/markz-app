@@ -24,7 +24,7 @@ class AnalyticsService {
   }
 
   // Day Summary
-  DaySummary _daySummary;
+  late DaySummary _daySummary;
 
   daySummary({@required date}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
@@ -34,7 +34,8 @@ class AnalyticsService {
     int day = DateTime.now().weekday;
 
     http.Response _response = await http.get(
-      '${_apiConfig['baseURL']}/daySummary?userId=${user.id}&date=$date&weekNo=$weekNo&day=$day',
+      Uri.parse(
+          '${_apiConfig['baseURL']}/daySummary?userId=${user.id}&date=$date&weekNo=$weekNo&day=$day'),
       headers: _apiConfig['headers'],
     );
 
@@ -47,14 +48,15 @@ class AnalyticsService {
   }
 
   // KPI Report
-  KpiReport _kpiReport;
+  late KpiReport _kpiReport;
 
   kpiReport({@required month}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
     User user = _configModel.user;
 
     http.Response _response = await http.get(
-      '${_apiConfig['baseURL']}/kpiReport?userId=${user.id}&month=$month',
+      Uri.parse(
+          '${_apiConfig['baseURL']}/kpiReport?userId=${user.id}&month=$month'),
       headers: _apiConfig['headers'],
     );
 
@@ -67,7 +69,7 @@ class AnalyticsService {
   }
 
   // Target Vs Achieved
-  TargetVsAchieved _targetVsAchieved;
+  late TargetVsAchieved _targetVsAchieved;
 
   targetVsAchieved({@required month, @required beatIds}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
@@ -76,7 +78,8 @@ class AnalyticsService {
     String beatIdsString = beatIds.join(', ');
 
     http.Response _response = await http.get(
-      '${_apiConfig['baseURL']}/targetVsAchieved?userId=${user.id}&month=$month&beatIds=$beatIdsString',
+      Uri.parse(
+          '${_apiConfig['baseURL']}/targetVsAchieved?userId=${user.id}&month=$month&beatIds=$beatIdsString'),
       headers: _apiConfig['headers'],
     );
 
@@ -89,7 +92,7 @@ class AnalyticsService {
   }
 
   // Sales Trend
-  SalesTrend _salesTrend;
+  late SalesTrend _salesTrend;
 
   salesTrend({@required month, @required beatIds}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
@@ -98,7 +101,8 @@ class AnalyticsService {
     String beatIdsString = beatIds.join(', ');
 
     http.Response _response = await http.get(
-      '${_apiConfig['baseURL']}/salesTrend?userId=${user.id}&month=$month&beatIds=$beatIdsString',
+      Uri.parse(
+          '${_apiConfig['baseURL']}/salesTrend?userId=${user.id}&month=$month&beatIds=$beatIdsString'),
       headers: _apiConfig['headers'],
     );
 
@@ -111,7 +115,7 @@ class AnalyticsService {
   }
 
   // Billed Outlets
-  BilledOutlet _billedOutlet;
+  late BilledOutlet _billedOutlet;
 
   billedOutlet({@required month, @required beatIds}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
@@ -120,7 +124,8 @@ class AnalyticsService {
     String beatIdsString = beatIds.join(', ');
 
     http.Response _response = await http.get(
-      '${_apiConfig['baseURL']}/billedOutlet?userId=${user.id}&month=$month&beatIds=$beatIdsString',
+      Uri.parse(
+          '${_apiConfig['baseURL']}/billedOutlet?userId=${user.id}&month=$month&beatIds=$beatIdsString'),
       headers: _apiConfig['headers'],
     );
 
@@ -133,14 +138,15 @@ class AnalyticsService {
   }
 
   // Invoice Details
-  InvoiceDetail _invoiceDetail;
+  late InvoiceDetail _invoiceDetail;
 
   invoiceDetail({@required month}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
     User user = _configModel.user;
 
     http.Response _response = await http.get(
-      '${_apiConfig['baseURL']}/invoiceDetail?userId=${user.id}&month=$month',
+      Uri.parse(
+          '${_apiConfig['baseURL']}/invoiceDetail?userId=${user.id}&month=$month'),
       headers: _apiConfig['headers'],
     );
 
@@ -153,18 +159,20 @@ class AnalyticsService {
   }
 
   // Attendance Calendar
-  AttendanceCalendar _attendanceCalendar;
+  late AttendanceCalendar _attendanceCalendar;
 
   attendanceCalendar({@required month}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
     User user = _configModel.user;
 
     http.Response _response = await http.get(
-      '${_apiConfig['baseURL']}/attendanceCalendar?userId=${user.id}&month=$month',
+      Uri.parse(
+          '${_apiConfig['baseURL']}/attendanceCalendar?userId=${user.id}&month=$month'),
       headers: _apiConfig['headers'],
     );
 
     Map<String, dynamic> _responseData = json.decode(_response.body);
+
     if (_responseData['success']) {
       _attendanceCalendar = AttendanceCalendar.fromJson(_responseData['data']);
     }

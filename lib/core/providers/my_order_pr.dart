@@ -12,11 +12,13 @@ class MyOrderModel with ChangeNotifier {
   final MyOrderService _myOrderService = locator<MyOrderService>();
 
   // Order
-  MyOrder order;
+  MyOrder? order;
 
   // Update Order
-  updateOrder({@required int retailerId}) {
+  updateOrder({@required int? retailerId}) {
     User user = _configModel.user;
+
+    print(1);
 
     order = MyOrder(
       userId: user.id,
@@ -28,32 +30,35 @@ class MyOrderModel with ChangeNotifier {
       reasonForNoOrder: '',
       orderDetails: [],
     );
+    print(order!.toJson());
     notifyListeners();
   }
 
   addNoOrderReason({@required reason}) {
-    order.isOrderTaken = 0;
-    order.reasonForNoOrder = reason;
+    order?.isOrderTaken = 0;
+    order?.reasonForNoOrder = reason;
   }
 
   addOrUpdateOrderDetail({
-    @required Sku sku,
-    @required int qty,
+    @required Sku? sku,
+    @required int? qty,
   }) {
     int value = 0;
-    if (sku.offerPrice != null)
-      value = qty * sku.offerPrice;
+    if (sku!.offerPrice != null)
+      value = qty! * int.parse(sku.offerPrice.toString());
     else
-      value = qty * sku.price;
+      value = qty! * int.parse(sku.price.toString());
 
     // Check if orderDetail is already there or not
-    OrderDetails _orderDetail = order.orderDetails.length > 0
-        ? order.orderDetails.firstWhere((_detail) => _detail.skuId == sku.id,
-            orElse: () => null)
+    OrderDetails? _orderDetail = (order!.orderDetails!.length > 0)
+        ? order!.orderDetails!.firstWhere((_detail) => _detail.skuId == sku.id,
+            orElse: () => OrderDetails())
         : null;
 
+    print(_orderDetail);
+
     // Add or update orderDetail
-    if (_orderDetail != null) {
+    if (_orderDetail != null && _orderDetail.skuId != null) {
       _orderDetail.qty = qty;
       _orderDetail.value = value;
     } else {
@@ -63,32 +68,33 @@ class MyOrderModel with ChangeNotifier {
         qty: qty,
         value: value,
       );
-      order.orderDetails.add(_orderDetail);
+      order!.orderDetails!.add(_orderDetail);
     }
 
     // Remove sku with 0 qty
     if (_orderDetail.value == 0) {
-      order.orderDetails = order.orderDetails
-          .where((_detail) => _detail.skuId != _orderDetail.skuId)
+      order!.orderDetails = order!.orderDetails!
+          .where((_detail) => _detail.skuId != _orderDetail!.skuId)
           .toList();
     }
 
     // Calculate total
-    order.total = 0;
-    order.orderDetails.forEach((_detail) {
-      order.total += _detail.value;
+    order!.total = 0;
+    order!.orderDetails!.forEach((_detail) {
+      order!.total = order!.total! + int.parse(_detail.value.toString());
     });
-    if (order.orderDetails.length == 0) order.total = 0;
+    if (order!.orderDetails!.length == 0) order!.total = 0;
     notifyListeners();
   }
 
-  saveOrder() {
-    _myOrderService.saveOrder(
+  saveOrder({required String orderType}) async {
+    await _myOrderService.saveOrder(
       order: order,
+      orderType: orderType,
     );
   }
 
-  updatePreviousOrder({@required or.Order order}) {
+  updatePreviousOrder({@required or.Order? order}) {
     _myOrderService.updatePreviousOrder(order: order);
   }
 

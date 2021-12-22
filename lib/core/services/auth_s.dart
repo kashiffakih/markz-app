@@ -8,11 +8,11 @@ class AuthService {
   final ConfigModel _configModel = locator<ConfigModel>();
 
   Future<void> getLoggedInUser(
-      {@required Map<String, dynamic> loginData}) async {
+      {@required Map<String, dynamic>? loginData}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
     http.Response _response = await http.post(
-      '${_apiConfig['baseURL']}/login',
+      Uri.parse('${_apiConfig['baseURL']}/login'),
       body: json.encode(loginData),
       headers: _apiConfig['headers'],
     );

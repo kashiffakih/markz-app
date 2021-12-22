@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/analytics_pr.dart';
+import 'package:sales_app/core/providers/config_pr.dart';
+import 'package:sales_app/locator.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class AttendanceCalendarPage extends StatefulWidget {
@@ -10,6 +12,8 @@ class AttendanceCalendarPage extends StatefulWidget {
 }
 
 class _AttendanceCalendarPageState extends State<AttendanceCalendarPage> {
+  final _configModel = locator<ConfigModel>();
+
   List<Map<String, dynamic>> _parameters = [
     {'name': 'Total Worked hrs / Day', 'value': ':    '},
     {'name': 'Avg. Working hrs', 'value': ':    '},
@@ -22,7 +26,7 @@ class _AttendanceCalendarPageState extends State<AttendanceCalendarPage> {
   @override
   Widget build(BuildContext context) {
     final _analyticsModel = Provider.of<AnalyticsModel>(context);
-    if (_analyticsModel.attendanceCalendar != null)
+    if (_analyticsModel.attendanceCalendar.present != null)
       setState(() {
         _parameters = [
           {
@@ -66,115 +70,174 @@ class _AttendanceCalendarPageState extends State<AttendanceCalendarPage> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: _analyticsModel.attendanceCalendar == null
-              ? Center(
-                  child: CircularProgressIndicator(),
+          child: _analyticsModel.attendanceCalendar.present == null
+              ? Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
                 )
               : Column(
                   children: [
-                    Container(
-                      height: 800,
-                      child: SfCalendar(
-                        view: CalendarView.month,
-                        dataSource: MeetingDataSource(_getDataSource(
-                          analyticsModel: _analyticsModel,
-                        )),
-                        monthViewSettings: MonthViewSettings(
-                          appointmentDisplayMode:
-                              MonthAppointmentDisplayMode.appointment,
+                    Card(
+                      child: Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Column(
+                          children: [
+                            Text(
+                              _configModel.user.email.toString(),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                            Text(
+                              _configModel.user.baName != null
+                                  ? _configModel.user.baName.toString()
+                                  : '',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            )
+                          ],
                         ),
                       ),
                     ),
-                    Divider(),
-                    Card(
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            ..._parameters
-                                .map(
-                                  (_parameter) => Padding(
-                                    padding: const EdgeInsets.all(5.0),
+                    Container(
+                      padding: EdgeInsets.all(5),
+                      height: 800,
+                      child: Card(
+                        child: SfCalendar(
+                          view: CalendarView.month,
+                          dataSource: MeetingDataSource(_getDataSource(
+                            analyticsModel: _analyticsModel,
+                          )),
+                          monthViewSettings: MonthViewSettings(
+                            appointmentDisplayMode:
+                                MonthAppointmentDisplayMode.appointment,
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Divider(),
+                    Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Card(
+                        elevation: 10,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              ..._parameters
+                                  .map(
+                                    (_parameter) => Container(
+                                      decoration: _parameters
+                                                      .indexOf(_parameter) %
+                                                  2 !=
+                                              0
+                                          ? BoxDecoration(
+                                              color: Colors.grey[400])
+                                          : BoxDecoration(color: Colors.white),
+                                      padding: const EdgeInsets.all(5.0),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              _parameter['name'],
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              _parameter['value'],
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                              Divider(),
+                              Row(
+                                children: [
+                                  Expanded(
                                     child: Row(
                                       children: [
-                                        Expanded(
-                                          child: Text(
-                                            _parameter['name'],
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                        Container(
+                                          margin: EdgeInsets.all(10),
+                                          padding: EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: Colors.green,
+                                            shape: BoxShape.circle,
                                           ),
                                         ),
                                         Expanded(
-                                          child: Text(
-                                            _parameter['value'],
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
+                                          child: Text('>=5 hrs'),
                                         ),
                                       ],
                                     ),
                                   ),
-                                )
-                                .toList(),
-                            Divider(),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.all(10),
-                                        padding: EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                          color: Colors.green,
-                                          shape: BoxShape.circle,
+                                  Expanded(
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.all(10),
+                                          padding: EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: Colors.blue,
+                                            shape: BoxShape.circle,
+                                          ),
                                         ),
-                                      ),
-                                      Expanded(
-                                        child: Text('>=5 hrs'),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.all(10),
-                                        padding: EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                          color: Colors.blue,
-                                          shape: BoxShape.circle,
+                                        Expanded(
+                                          child: Text('<5 hrs'),
                                         ),
-                                      ),
-                                      Expanded(
-                                        child: Text('<5 hrs'),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.all(10),
-                                        padding: EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                          color: Colors.red,
-                                          shape: BoxShape.circle,
+                                  Expanded(
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.all(10),
+                                          padding: EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: Colors.orange,
+                                            shape: BoxShape.circle,
+                                          ),
                                         ),
-                                      ),
-                                      Expanded(
-                                        child: Text('Absent'),
-                                      ),
-                                    ],
+                                        Expanded(
+                                          child: Text('Leave'),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
-                            )
-                          ],
+                                  Expanded(
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.all(10),
+                                          padding: EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text('Absent'),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     )
@@ -186,18 +249,18 @@ class _AttendanceCalendarPageState extends State<AttendanceCalendarPage> {
   }
 }
 
-List<Meeting> _getDataSource({@required AnalyticsModel analyticsModel}) {
+List<Meeting> _getDataSource({@required AnalyticsModel? analyticsModel}) {
   List<Meeting> meetings = <Meeting>[];
-  analyticsModel.attendanceCalendar.attendances.forEach((_attendance) {
-    DateTime date = DateTime.parse(_attendance.date);
+  analyticsModel!.attendanceCalendar.attendances!.forEach((_attendance) {
+    DateTime date = DateTime.parse(_attendance.date.toString());
     final DateTime startTime =
         DateTime(date.year, date.month, date.day, 9, 0, 0);
     final DateTime endTime = startTime.add(const Duration(hours: 2));
     meetings.add(Meeting(
-      _attendance.status,
+      _attendance.status.toString(),
       startTime,
       endTime,
-      HexColor(_attendance.color),
+      HexColor(_attendance.color.toString()),
       true,
     ));
   });
@@ -212,27 +275,27 @@ class MeetingDataSource extends CalendarDataSource {
 
   @override
   DateTime getStartTime(int index) {
-    return appointments[index].from;
+    return appointments![index].from;
   }
 
   @override
   DateTime getEndTime(int index) {
-    return appointments[index].to;
+    return appointments![index].to;
   }
 
   @override
   String getSubject(int index) {
-    return appointments[index].eventName;
+    return appointments![index].eventName;
   }
 
   @override
   Color getColor(int index) {
-    return appointments[index].background;
+    return appointments![index].background;
   }
 
   @override
   bool isAllDay(int index) {
-    return appointments[index].isAllDay;
+    return appointments![index].isAllDay;
   }
 }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sales_app/core/models/file.dart';
 import 'package:sales_app/core/models/reference_plan.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/location_pr.dart';
@@ -12,10 +13,13 @@ class ReferencePlanModel with ChangeNotifier {
   final ConfigModel _configModel = locator<ConfigModel>();
 
   // Get reference plans
-  List<ReferencePlan> _referencePlans;
+  bool referencePlansLoader = true;
+
+  late List<ReferencePlan> _referencePlans;
 
   set referencePlans(List<ReferencePlan> newReferencePlans) {
     _referencePlans = newReferencePlans;
+    referencePlansLoader = false;
     notifyListeners();
   }
 
@@ -26,9 +30,8 @@ class ReferencePlanModel with ChangeNotifier {
   }
 
   // Add retailer image
-  addRetailerImage({@required Retailers retailer}) async {
+  addRetailerImage({@required Retailers? retailer}) async {
     await _locationModel.getCurrentLocation();
-    print(_locationModel.currentLocation);
 
     await _referencePlanService.addRetailerImage(
       retailer: retailer,
@@ -36,7 +39,8 @@ class ReferencePlanModel with ChangeNotifier {
       lng: _locationModel.currentLocation.lng,
     );
     await this.getReferencePlans();
-    _configModel.file = null;
+    _configModel.file = File();
+    // _configModel.file = null;
     notifyListeners();
   }
 }

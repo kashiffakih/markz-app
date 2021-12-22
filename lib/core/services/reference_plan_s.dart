@@ -12,7 +12,7 @@ class ReferencePlanService {
   final ConfigModel _configModel = locator<ConfigModel>();
 
   // Get reference plans
-  List<ReferencePlan> _referencePlans;
+  late List<ReferencePlan> _referencePlans;
 
   int weekNumber() {
     DateTime date = DateTime.now();
@@ -28,7 +28,8 @@ class ReferencePlanService {
     int day = DateTime.now().weekday;
 
     http.Response _response = await http.get(
-      '${_apiConfig['baseURL']}/reference_plans?userId=${user.id}&weekNo=$weekNo&day=$day',
+      Uri.parse(
+          '${_apiConfig['baseURL']}/reference_plans?userId=${user.id}&weekNo=$weekNo&day=$day'),
       headers: _apiConfig['headers'],
     );
 
@@ -46,26 +47,26 @@ class ReferencePlanService {
 
   // Add retailer image
   addRetailerImage(
-      {@required Retailers retailer, @required lat, @required lng}) async {
+      {@required Retailers? retailer, @required lat, @required lng}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
     var request = http.MultipartRequest(
       'POST',
       Uri.parse('${_apiConfig['baseURL']}/upload_retailer_image'),
     )
-      ..fields['retailerid'] = retailer.id.toString()
-      ..fields['filename'] = _configModel.file.fileName
+      ..fields['retailerid'] = retailer!.id.toString()
+      ..fields['filename'] = _configModel.file.fileName.toString()
       ..fields['lat'] = lat
       ..fields['lng'] = lng
       ..files.add(
         await http.MultipartFile.fromPath(
           'imagepath',
-          _configModel.file.file,
+          _configModel.file.file.toString(),
         ),
       )
       ..headers.addAll(_apiConfig['headers']);
     http.StreamedResponse _response = await request.send();
     var response = await http.Response.fromStream(_response);
-    print(response);
+    print(response.body);
   }
 }

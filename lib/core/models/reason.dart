@@ -1,5 +1,5 @@
 class Reason {
-  String name;
+  String? name;
 
   Reason({this.name});
 

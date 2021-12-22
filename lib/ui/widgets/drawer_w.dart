@@ -19,21 +19,31 @@ class DrawerWidget extends StatelessWidget {
                     BoxDecoration(color: Theme.of(context).primaryColor),
                 child: Row(
                   children: <Widget>[
-                    InkWell(
-                      onTap: () {},
-                      child: Hero(
-                        tag: '123',
-                        child: CircleAvatar(
-                          radius: 32,
-                          backgroundImage: _configModel.user.imagePath != null
-                              ? NetworkImage(
-                                  _configModel.apiConfig['mediaURL'] +
-                                      _configModel.user.imagePath,
-                                )
-                              : AssetImage(Images.avatar),
+                    if (_configModel.user.imagePath != null)
+                      InkWell(
+                        onTap: () {},
+                        child: Hero(
+                          tag: '123',
+                          child: CircleAvatar(
+                            radius: 32,
+                            backgroundImage: NetworkImage(
+                              _configModel.apiConfig['mediaURL'] +
+                                  _configModel.user.imagePath,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    if (_configModel.user.imagePath == null)
+                      InkWell(
+                        onTap: () {},
+                        child: Hero(
+                          tag: '123',
+                          child: CircleAvatar(
+                            radius: 32,
+                            backgroundImage: AssetImage(Images.avatar),
+                          ),
+                        ),
+                      ),
                     SizedBox(
                       width: 10,
                     ),
@@ -42,14 +52,16 @@ class DrawerWidget extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _configModel.user.name,
+                          _configModel.user.name.toString(),
                           maxLines: 2,
                           style: TextStyle(
                             color: Colors.white,
                           ),
                         ),
                         Text(
-                          'SSM',
+                          _configModel.user.roles!.length > 0
+                              ? _configModel.user.roles![0].name.toString()
+                              : '',
                           style: TextStyle(
                             color: Colors.white,
                           ),
@@ -93,15 +105,15 @@ class DrawerWidget extends StatelessWidget {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, '/saleTrends');
               },
-              title: Text('Sales Trend'),
+              title: Text('Offtake Trend'),
             ),
-            ListTile(
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/billedOutlets');
-              },
-              title: Text('Billed Outlets'),
-            ),
+            // ListTile(
+            //   onTap: () {
+            //     Navigator.pop(context);
+            //     Navigator.pushNamed(context, '/billedOutlets');
+            //   },
+            //   title: Text('Billed Outlets'),
+            // ),
             ListTile(
               onTap: () {
                 Navigator.pop(context);
@@ -109,13 +121,13 @@ class DrawerWidget extends StatelessWidget {
               },
               title: Text('Daily Order Summary'),
             ),
-            ListTile(
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/invoiceDetails');
-              },
-              title: Text('Invoice Details'),
-            ),
+            // ListTile(
+            //   onTap: () {
+            //     Navigator.pop(context);
+            //     Navigator.pushNamed(context, '/invoiceDetails');
+            //   },
+            //   title: Text('Invoice Details'),
+            // ),
             ListTile(
               onTap: () {
                 Navigator.pop(context);
@@ -135,15 +147,15 @@ class DrawerWidget extends StatelessWidget {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, '/beats');
               },
-              title: Text('Order Booking'),
+              title: Text('Offtake Booking'),
             ),
-            ListTile(
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/damageStocks');
-              },
-              title: Text('Damage Stocks'),
-            ),
+            // ListTile(
+            //   onTap: () {
+            //     Navigator.pop(context);
+            //     Navigator.pushNamed(context, '/damageStocks');
+            //   },
+            //   title: Text('Damage Stocks'),
+            // ),
             // ListTile(
             //   onTap: () {
             //     Navigator.pop(context);
@@ -162,7 +174,7 @@ class DrawerWidget extends StatelessWidget {
               onTap: () {
                 showDialog(
                   context: context,
-                  child: AlertDialog(
+                  builder: (BuildContext context) => AlertDialog(
                     title: Text('Are you sure you want to logout?'),
                     actions: <Widget>[
                       FlatButton(

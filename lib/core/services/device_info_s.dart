@@ -1,9 +1,9 @@
-import 'package:battery/battery.dart';
+// import 'package:battery/battery.dart';
 
 class DeviceInfoService {
-  Future<int> getBatteryLevel() async {
-    var _battery = Battery();
+  // Future<int> getBatteryLevel() async {
+  // var _battery = Battery();
 
-    return await _battery.batteryLevel;
-  }
+  // return await _battery.batteryLevel;
+  // }
 }

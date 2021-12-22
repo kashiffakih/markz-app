@@ -3,23 +3,20 @@ import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/reference_plan_pr.dart';
 
 class BeatsPage extends StatelessWidget {
+  final arguments; // tag
+
+  BeatsPage({@required this.arguments});
   @override
   Widget build(BuildContext context) {
     final _referencePlanModel = Provider.of<ReferencePlanModel>(context);
 
     return Scaffold(
         appBar: AppBar(
-          title: Text('Beats'),
-          // actions: [
-          //   IconButton(
-          //     icon: Icon(Icons.search),
-          //     onPressed: () {},
-          //   ),
-          // ],
+          title: Text('Locations'),
         ),
         body: SafeArea(
           child: SingleChildScrollView(
-            child: _referencePlanModel.referencePlans == null
+            child: _referencePlanModel.referencePlansLoader
                 ? Padding(
                     padding: EdgeInsets.all(10),
                     child: Column(
@@ -38,6 +35,7 @@ class BeatsPage extends StatelessWidget {
                               Navigator.pushNamed(context, '/beatOutlets',
                                   arguments: {
                                     'beat': _referencePlan,
+                                    'tab': arguments['tab'], // tab
                                   });
                             },
                             child: Card(
@@ -52,9 +50,9 @@ class BeatsPage extends StatelessWidget {
                                       child: Column(
                                         children: [
                                           Text(
-                                            _referencePlan.name +
+                                            _referencePlan.name! +
                                                 ' | ' +
-                                                _referencePlan.town,
+                                                _referencePlan.town.toString(),
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               color: Colors.white,
@@ -66,54 +64,9 @@ class BeatsPage extends StatelessWidget {
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: Column(
-                                            children: [
-                                              Text(
-                                                '#Total Outlets',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              Text(_referencePlan.totalOutlets
-                                                  .toString()),
-                                            ],
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Column(
-                                            children: [
-                                              Text(
-                                                '#Billed Outlets',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              Text(_referencePlan.billedOutlets
-                                                  .toString()),
-                                            ],
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Column(
-                                            children: [
-                                              Text(
-                                                '#UnBilled Outlets',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              Text(_referencePlan
-                                                  .unbilledOutlets
-                                                  .toString()),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
+                                    Divider(
+                                      thickness: 3,
                                     ),
-                                    Divider(),
                                     Row(
                                       children: [
                                         Expanded(

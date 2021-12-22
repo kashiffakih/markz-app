@@ -18,7 +18,7 @@ class AnalyticsModel with ChangeNotifier {
       locator<ReferencePlanService>();
 
   // Day Summary
-  DaySummary _daySummary;
+  late DaySummary _daySummary;
 
   set daySummary(DaySummary newDaySummary) {
     _daySummary = newDaySummary;
@@ -35,7 +35,7 @@ class AnalyticsModel with ChangeNotifier {
   }
 
   // KPI Report
-  KpiReport _kpiReport;
+  late KpiReport _kpiReport = KpiReport();
 
   set kpiReport(KpiReport newKpiReport) {
     _kpiReport = newKpiReport;
@@ -52,7 +52,7 @@ class AnalyticsModel with ChangeNotifier {
   }
 
   // Target Vs Achieved
-  TargetVsAchieved _targetVsAchieved;
+  late TargetVsAchieved _targetVsAchieved;
 
   set targetVsAchieved(TargetVsAchieved newTargetVsAchieved) {
     _targetVsAchieved = newTargetVsAchieved;
@@ -78,7 +78,7 @@ class AnalyticsModel with ChangeNotifier {
   }
 
   // Sales Trend
-  SalesTrend _salesTrend;
+  late SalesTrend _salesTrend;
 
   set salesTrend(SalesTrend newSalesTrend) {
     _salesTrend = newSalesTrend;
@@ -104,7 +104,7 @@ class AnalyticsModel with ChangeNotifier {
   }
 
   // Billed Oulet
-  BilledOutlet _billedOutlet;
+  late BilledOutlet _billedOutlet;
 
   set billedOutlet(BilledOutlet newBilledOutlet) {
     _billedOutlet = newBilledOutlet;
@@ -130,7 +130,7 @@ class AnalyticsModel with ChangeNotifier {
   }
 
   // Invoice Detail
-  InvoiceDetail _invoiceDetail;
+  late InvoiceDetail _invoiceDetail;
 
   set invoiceDetail(InvoiceDetail newInvoiceDetail) {
     _invoiceDetail = newInvoiceDetail;
@@ -147,7 +147,7 @@ class AnalyticsModel with ChangeNotifier {
   }
 
   // Attendance Calendar
-  AttendanceCalendar _attendanceCalendar;
+  late AttendanceCalendar _attendanceCalendar = AttendanceCalendar();
 
   set attendanceCalendar(AttendanceCalendar newAttendanceCalendar) {
     _attendanceCalendar = newAttendanceCalendar;

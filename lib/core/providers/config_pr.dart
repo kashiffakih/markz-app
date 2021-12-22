@@ -8,7 +8,7 @@ class ConfigModel with ChangeNotifier {
   final ConfigService _configService = locator<ConfigService>();
 
   // File
-  File _file;
+  late File _file = File();
   set file(File newFile) {
     _file = newFile;
     notifyListeners();
@@ -16,12 +16,13 @@ class ConfigModel with ChangeNotifier {
 
   File get file => _file;
 
-  updateFile({@required File newFile}) {
+  updateFile({required File newFile}) {
     file = newFile;
+    notifyListeners();
   }
 
   // Api Config
-  Map<String, dynamic> _apiConfig;
+  late Map<String, dynamic> _apiConfig;
 
   set apiConfig(Map<String, dynamic> newApiConfig) {
     _apiConfig = newApiConfig;
@@ -30,7 +31,7 @@ class ConfigModel with ChangeNotifier {
 
   Map<String, dynamic> get apiConfig => _apiConfig;
 
-  void getApiConfig({@required String domain}) {
+  void getApiConfig({required String domain}) {
     apiConfig = _configService.getApiConfig(domain: domain);
   }
 
@@ -45,7 +46,7 @@ class ConfigModel with ChangeNotifier {
   Map<String, dynamic> get loginData => _loginData;
 
   Future<void> saveLoginData(
-      {@required Map<String, dynamic> newLoginData}) async {
+      {required Map<String, dynamic>? newLoginData}) async {
     await _configService.saveLoginData(newLoginData: newLoginData);
   }
 
@@ -58,9 +59,9 @@ class ConfigModel with ChangeNotifier {
   }
 
   // Logged in user
-  User _user;
-  bool _isLoggedIn;
-  String _loginFailedMessage;
+  late User _user;
+  late bool _isLoggedIn;
+  late String _loginFailedMessage;
 
   set user(User newUser) {
     _user = newUser;
@@ -83,7 +84,16 @@ class ConfigModel with ChangeNotifier {
 
   String get loginFailedMessage => _loginFailedMessage;
 
-  saveUserData({@required Map<String, dynamic> responseData}) {
+  String _currentAndroidVersionFromApi = '';
+
+  String get currentAndroidVersionFromApi => _currentAndroidVersionFromApi;
+
+  set currentAndroidVersionFromApi(String newCurrentAndroidVersionFromApi) {
+    _currentAndroidVersionFromApi = newCurrentAndroidVersionFromApi;
+    notifyListeners();
+  }
+
+  saveUserData({required Map<String, dynamic> responseData}) {
     if (responseData['success'] == null) {
       isLoggedIn = false;
       loginFailedMessage = responseData['message'];
@@ -92,8 +102,10 @@ class ConfigModel with ChangeNotifier {
       user = User.fromJson(responseData['data']);
       apiConfig = _configService.getApiConfig(
         token: user.apiToken,
-        companyId: user.companies.length > 0 ? user.companies[0].id : null,
+        companyId: user.companies!.length > 0 ? user.companies![0].id : null,
       );
+      currentAndroidVersionFromApi =
+          responseData['currentAndroidVersionFromApi'];
     }
     notifyListeners();
   }

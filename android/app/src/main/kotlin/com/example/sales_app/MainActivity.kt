@@ -1,4 +1,4 @@
-package org.pms.salesRegister
+package org.pms.mamaearth
 
 import io.flutter.embedding.android.FlutterActivity
 

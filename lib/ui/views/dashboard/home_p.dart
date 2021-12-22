@@ -7,6 +7,7 @@ import 'package:sales_app/core/providers/notice_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/images_sh.dart';
 import 'package:sales_app/ui/widgets/drawer_w.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -18,12 +19,12 @@ class _HomePageState extends State<HomePage> {
 
   final List<List<Map<String, dynamic>>> _menuItems = [
     [
-      {
-        'icon': Icons.dashboard,
-        'color': Colors.amber,
-        'name': 'Dashboard',
-        'url': '/dashboard',
-      },
+      // {
+      //   'icon': Icons.dashboard,
+      //   'color': Colors.amber,
+      //   'name': 'Dashboard',
+      //   'url': '/dashboard',
+      // },
       {
         'icon': Icons.note,
         'color': Colors.teal[200],
@@ -36,6 +37,12 @@ class _HomePageState extends State<HomePage> {
         'name': 'KPI Report',
         'url': '/kpiReport',
       },
+      {
+        'icon': Icons.location_history,
+        'color': Colors.green[200],
+        'name': 'Photos',
+        'url': '/dailyPhotos',
+      },
     ],
     [
       {
@@ -47,7 +54,7 @@ class _HomePageState extends State<HomePage> {
       {
         'icon': Icons.location_history,
         'color': Colors.green[200],
-        'name': 'Outlet Visit',
+        'name': 'Store',
         'url': '/beats',
       },
       {
@@ -55,6 +62,46 @@ class _HomePageState extends State<HomePage> {
         'color': Colors.cyan[200],
         'name': 'Attendance',
         'url': '/attendance',
+      },
+    ],
+    // [
+    //   {
+    //     'icon': Icons.shopping_basket,
+    //     'color': Colors.blue[200],
+    //     'name': 'SKU Tracking',
+    //     'url': '/skuBeats',
+    //   },
+    //   {
+    //     'icon': Icons.ac_unit,
+    //     'color': Colors.blue[200],
+    //     'name': 'Asset Tracking',
+    //     'url': '/assetBeats',
+    //   },
+    //   {
+    //     'icon': Icons.location_history,
+    //     'color': Colors.green[200],
+    //     'name': 'Photos',
+    //     'url': '/dailyPhotos',
+    //   },
+    // ],
+    [
+      {
+        'icon': Icons.production_quantity_limits,
+        'color': Colors.green[200],
+        'name': 'Stocks',
+        'url': '/stockBeats',
+      },
+      {
+        'icon': Icons.photo_album,
+        'color': Colors.green[200],
+        'name': 'Training Videos',
+        'url': '/trainingVideos',
+      },
+      {
+        'icon': Icons.people,
+        'color': Colors.amber[200],
+        'name': 'Visitors',
+        'url': '/beats',
       },
     ]
   ];
@@ -69,7 +116,29 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       drawer: DrawerWidget(),
       appBar: AppBar(
-        title: Text('Sales Register'),
+        title: Text('BA Channel'),
+        actions: [
+          IconButton(
+            color: Colors.white,
+            icon: Icon(Icons.sync),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: Text('Syncing data...'),
+                  actions: [
+                    FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('Ok'),
+                    )
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -89,61 +158,6 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     Divider(),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Center(
-                                  child: Text("Today's Beat"),
-                                ),
-                              ),
-                              Expanded(
-                                child: Center(
-                                  child: Text("Outlet to be covered"),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () {
-                                    Navigator.pushNamed(context, '/beats');
-                                  },
-                                  child: Center(
-                                    child: Text(
-                                      _analyticsModel.daySummary != null
-                                          ? _analyticsModel.daySummary.beatNames
-                                              .map((_beatName) => _beatName)
-                                              .toString()
-                                          : '-',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: Center(
-                                  child: Text(
-                                    "-",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
-                    )
                   ],
                 ),
               ),
@@ -183,12 +197,15 @@ class _HomePageState extends State<HomePage> {
                                       child: InkWell(
                                         onTap: () {
                                           Navigator.pushNamed(
-                                              context, _item['url']);
+                                              context, _item['url'],
+                                              arguments: {
+                                                'tab': _item,
+                                              });
                                         },
                                         child: Container(
                                           decoration: BoxDecoration(
                                             border: Border.all(
-                                                color: Colors.grey[300]),
+                                                color: Colors.grey[300]!),
                                           ),
                                           child: Column(
                                             children: [
@@ -248,59 +265,75 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     Divider(),
-                    if (_noticeModel.notices != null)
+                    if (_noticeModel.notices.length > 0)
                       ..._noticeModel.notices
                           .map(
-                            (_notice) => Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        children: [
-                                          if (_notice.imagepath != null)
-                                            Padding(
-                                              padding: EdgeInsets.all(5),
-                                              child: CircleAvatar(
-                                                radius: 32,
-                                                backgroundImage: _notice
-                                                            .imagepath ==
-                                                        null
-                                                    ? AssetImage(Images.product)
-                                                    : NetworkImage(
-                                                        _configModel.apiConfig[
-                                                                'mediaURL'] +
-                                                            _notice.imagepath,
-                                                      ),
-                                              ),
-                                            ),
-                                          if (_notice.name != null)
-                                            Text(
-                                              _notice.name,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(5.0),
+                            (_notice) => Container(
+                              decoration:
+                                  _noticeModel.notices.indexOf(_notice) % 2 != 0
+                                      ? BoxDecoration(color: Colors.grey[400])
+                                      : BoxDecoration(color: Colors.white),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
                                         child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
                                           children: [
-                                            Text(_notice.title),
-                                            Text(_notice.description),
+                                            if (_notice.imagepath != null)
+                                              Padding(
+                                                padding: EdgeInsets.all(5),
+                                                child: CircleAvatar(
+                                                  radius: 32,
+                                                  backgroundImage: NetworkImage(
+                                                    _configModel.apiConfig[
+                                                            'mediaURL'] +
+                                                        _notice.imagepath,
+                                                  ),
+                                                ),
+                                              ),
+                                            if (_notice.name != null)
+                                              Text(
+                                                _notice.name.toString(),
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
                                           ],
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                Divider(),
-                              ],
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(_notice.title.toString()),
+                                              Text(_notice.description
+                                                  .toString()),
+                                              if (_notice.link != null)
+                                                RaisedButton(
+                                                  color: Colors.blue,
+                                                  onPressed: () {
+                                                    launch(_notice.link
+                                                        .toString());
+                                                  },
+                                                  child: Text(
+                                                    'Visit Link',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  // Divider(),
+                                ],
+                              ),
                             ),
                           )
                           .toList(),
@@ -324,5 +357,13 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  launchUrl(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }

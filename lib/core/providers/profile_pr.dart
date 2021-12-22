@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sales_app/core/models/file.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/services/profile_s.dart';
 import 'package:sales_app/locator.dart';
@@ -13,7 +14,8 @@ class ProfileModel with ChangeNotifier {
     if (_responseData['success']) {
       _configModel.saveUserData(responseData: _responseData);
     }
-    _configModel.file = null;
+    _configModel.file = File();
+    // _configModel.file = null;
     notifyListeners();
   }
 }

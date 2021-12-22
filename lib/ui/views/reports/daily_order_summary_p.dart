@@ -6,7 +6,7 @@ class DailyOrderSummaryPage extends StatelessWidget {
     return Scaffold(
       appBar: PreferredSize(
         child: AppBar(
-          title: Text('Daily Order Summary'),
+          title: Text('Daily Offtake Summary'),
           actions: [
             IconButton(
               icon: Icon(Icons.search),

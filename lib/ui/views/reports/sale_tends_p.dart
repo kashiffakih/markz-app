@@ -19,7 +19,7 @@ class SaleTrendsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sales Trends | ' + month),
+        title: Text('Offtake Trends | ' + month),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -30,7 +30,7 @@ class SaleTrendsPage extends StatelessWidget {
               : Column(
                   children: [
                     SfCartesianChart(
-                      title: ChartTitle(text: 'Sale Trend'),
+                      title: ChartTitle(text: 'Offtake Trend'),
                       // Initialize category axis
                       primaryXAxis: CategoryAxis(
                         title: AxisTitle(
@@ -38,16 +38,14 @@ class SaleTrendsPage extends StatelessWidget {
                         ),
                       ),
                       primaryYAxis: NumericAxis(
-                        title: AxisTitle(
-                          text: 'Sale Value',
-                        ),
+                        isVisible: false,
                       ),
                       series: <ChartSeries>[
                         // Initialize line series
                         ColumnSeries<SalesData, String>(
-                          dataSource: _analyticsModel.salesTrend.months
+                          dataSource: _analyticsModel.salesTrend.months!
                               .map((_month) => SalesData(
-                                    _month.month,
+                                    _month.month.toString(),
                                     double.parse(_month.value.toString()),
                                   ))
                               .toList(),
@@ -115,24 +113,27 @@ class SaleTrendsPage extends StatelessWidget {
                                 padding: EdgeInsets.all(16),
                                 shape: CircleBorder(),
                               ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '₹ ' +
-                                        _analyticsModel.salesTrend.currentMonth
-                                            .toString(),
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '₹ ' +
+                                          _analyticsModel
+                                              .salesTrend.currentMonth
+                                              .toString(),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    'Current Month',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  )
-                                ],
+                                    Text(
+                                      'Current Month',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  ],
+                                ),
                               )
                             ],
                           ),
@@ -140,83 +141,91 @@ class SaleTrendsPage extends StatelessWidget {
                       ],
                     ),
                     Divider(),
-                    Container(
-                      color: Theme.of(context).primaryColor,
-                      padding: EdgeInsets.all(10),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Center(
-                              child: Text(
-                                'Outlets',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Center(
-                              child: Text(
-                                'Last Month',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Center(
-                              child: Text(
-                                'Current Month',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    ..._analyticsModel.salesTrend.outlets
-                        .map(
-                          (_outlet) => Column(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(7),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Center(
-                                        child: Text(_outlet.outlet),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Center(
-                                        child: Text(
-                                          '₹ ' + _outlet.lastMonth.toString(),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Center(
-                                        child: Text(
-                                          '₹ ' +
-                                              _outlet.currentMonth.toString(),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Divider()
-                            ],
-                          ),
-                        )
-                        .toList()
+                    // Container(
+                    //   color: Theme.of(context).primaryColor,
+                    //   padding: EdgeInsets.all(10),
+                    //   child: Row(
+                    //     children: [
+                    //       Expanded(
+                    //         child: Center(
+                    //           child: Text(
+                    //             'Outlets',
+                    //             style: TextStyle(
+                    //               color: Colors.white,
+                    //               fontWeight: FontWeight.bold,
+                    //             ),
+                    //           ),
+                    //         ),
+                    //       ),
+                    //       Expanded(
+                    //         child: Center(
+                    //           child: Text(
+                    //             'Last Month',
+                    //             style: TextStyle(
+                    //               color: Colors.white,
+                    //               fontWeight: FontWeight.bold,
+                    //             ),
+                    //           ),
+                    //         ),
+                    //       ),
+                    //       Expanded(
+                    //         child: Center(
+                    //           child: Text(
+                    //             'Current Month',
+                    //             style: TextStyle(
+                    //               color: Colors.white,
+                    //               fontWeight: FontWeight.bold,
+                    //             ),
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                    // ..._analyticsModel.salesTrend.outlets
+                    //     .map(
+                    //       (_outlet) => Container(
+                    //         decoration: _analyticsModel.salesTrend.outlets
+                    //                         .indexOf(_outlet) %
+                    //                     2 !=
+                    //                 0
+                    //             ? BoxDecoration(color: Colors.grey[400])
+                    //             : BoxDecoration(color: Colors.white),
+                    //         child: Column(
+                    //           children: [
+                    //             Container(
+                    //               padding: EdgeInsets.all(7),
+                    //               child: Row(
+                    //                 children: [
+                    //                   Expanded(
+                    //                     child: Center(
+                    //                       child: Text(_outlet.outlet),
+                    //                     ),
+                    //                   ),
+                    //                   Expanded(
+                    //                     child: Center(
+                    //                       child: Text(
+                    //                         '₹ ' + _outlet.lastMonth.toString(),
+                    //                       ),
+                    //                     ),
+                    //                   ),
+                    //                   Expanded(
+                    //                     child: Center(
+                    //                       child: Text(
+                    //                         '₹ ' +
+                    //                             _outlet.currentMonth.toString(),
+                    //                       ),
+                    //                     ),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //             ),
+                    //             // Divider()
+                    //           ],
+                    //         ),
+                    //       ),
+                    //     )
+                    //     .toList()
                   ],
                 ),
         ),

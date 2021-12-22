@@ -25,7 +25,7 @@ class _OrderDetailItemsPageState extends State<OrderDetailItemsPage> {
     return Scaffold(
       appBar: PreferredSize(
         child: AppBar(
-          title: Text('Order Details'),
+          title: Text('Details'),
           bottom: PreferredSize(
             child: Padding(
               padding: EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
@@ -99,98 +99,185 @@ class _OrderDetailItemsPageState extends State<OrderDetailItemsPage> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            children: _order == null
-                ? []
-                : _order.orderDetails
-                    .map(
-                      (_orderDetail) => Container(
-                        padding: EdgeInsets.all(5),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _orderDetail.sku.name,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 8,
-                            ),
-                            Row(
+          child: Container(
+            child: Card(
+              elevation: 10,
+              child: Column(
+                children: _order == null
+                    ? []
+                    : _order.orderDetails!
+                        .map(
+                          (_orderDetail) => Container(
+                            decoration:
+                                _order.orderDetails!.indexOf(_orderDetail) %
+                                            2 !=
+                                        0
+                                    ? BoxDecoration(color: Colors.grey[400])
+                                    : BoxDecoration(color: Colors.white),
+                            padding: EdgeInsets.all(5),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                  child: TextFormField(
-                                    initialValue: _orderDetail.qty.toString(),
-                                    keyboardType: TextInputType.number,
-                                    decoration: InputDecoration(
-                                      labelText: 'Enter Qty',
+                                if (_orderDetail.sku!.offerId == null)
+                                  Text(
+                                    _orderDetail.sku!.name.toString(),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        if (value != '' && value != '0') {
-                                          double pricePerUnit =
-                                              _orderDetail.value /
-                                                  _orderDetail.qty;
-                                          _orderDetail.qty = int.parse(value);
-                                          _orderDetail.value =
-                                              _orderDetail.qty *
-                                                  pricePerUnit.toInt();
-                                          _order.total = 0;
-                                          _order.orderDetails
-                                              .forEach((_detail) {
-                                            _order.total += _detail.value;
-                                          });
-                                        }
-                                      });
-                                    },
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    '*',
+                                  )
+                                else if (_orderDetail
+                                        .sku!.offer!.offerType!.name ==
+                                    'FLAT')
+                                  Text(
+                                    _orderDetail.sku!.name! +
+                                        ' (₹.' +
+                                        _orderDetail.sku!.offer!.offer
+                                            .toString() +
+                                        ' OFF)',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
+                                else if (_orderDetail
+                                        .sku!.offer!.offerType!.name ==
+                                    'PERCENT')
+                                  Text(
+                                    _orderDetail.sku!.name! +
+                                        ' (' +
+                                        _orderDetail.sku!.offer!.offer
+                                            .toString() +
+                                        '% OFF)',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
+                                else if (_orderDetail
+                                        .sku!.offer!.offerType!.name ==
+                                    'FREE GIFT')
+                                  Text(
+                                    _orderDetail.sku!.name! +
+                                        ' (' +
+                                        _orderDetail.sku!.offer!.itemName
+                                            .toString() +
+                                        ')',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
+                                else if (_orderDetail
+                                        .sku!.offer!.offerType!.name ==
+                                    'FREE QTY')
+                                  Text(
+                                    _orderDetail.sku!.name! +
+                                        ' (' +
+                                        _orderDetail.sku!.offer!.itemName
+                                            .toString() +
+                                        ')',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
+                                // Text(
+                                //   _orderDetail.sku.name,
+                                //   style: TextStyle(
+                                //     fontWeight: FontWeight.bold,
+                                //   ),
+                                // ),
+                                SizedBox(
+                                  height: 8,
                                 ),
-                                Expanded(
-                                  child: Text(
-                                    '₹. ' +
-                                        (_orderDetail.value / _orderDetail.qty)
-                                            .toString(),
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold,
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        // decoration: BoxDecoration(
+                                        //   border: Border.all(),
+                                        //   borderRadius: BorderRadius.all(
+                                        //     Radius.circular(5),
+                                        //   ),
+                                        // ),
+                                        child: TextFormField(
+                                          initialValue:
+                                              _orderDetail.qty.toString(),
+                                          keyboardType: TextInputType.number,
+                                          decoration: InputDecoration(
+                                            labelText: 'Enter Qty',
+                                            // border: InputBorder.none,
+                                          ),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              if (value != '' && value != '0') {
+                                                double pricePerUnit =
+                                                    _orderDetail.value! /
+                                                        int.parse(_orderDetail
+                                                            .qty
+                                                            .toString());
+                                                _orderDetail.qty =
+                                                    int.parse(value);
+                                                _orderDetail.value =
+                                                    _orderDetail.qty! *
+                                                        pricePerUnit.toInt();
+                                                _order.total = 0;
+                                                _order.orderDetails!
+                                                    .forEach((_detail) {
+                                                  _order.total = _order.total! +
+                                                      int.parse(_detail.value
+                                                          .toString());
+                                                });
+                                              }
+                                            });
+                                          },
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    ':',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
+                                    Expanded(
+                                      child: Text(
+                                        '*',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    '₹. ' + _orderDetail.value.toString(),
-                                    style: TextStyle(
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.bold,
+                                    Expanded(
+                                      child: Text(
+                                        '₹. ' +
+                                            (_orderDetail.value! /
+                                                    int.parse(_orderDetail.qty
+                                                        .toString()))
+                                                .toString(),
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    Expanded(
+                                      child: Text(
+                                        ':',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        '₹. ' + _orderDetail.value.toString(),
+                                        style: TextStyle(
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
+                                // Divider()
                               ],
                             ),
-                            Divider()
-                          ],
-                        ),
-                      ),
-                    )
-                    .toList(),
+                          ),
+                        )
+                        .toList(),
+              ),
+            ),
           ),
         ),
       ),
@@ -207,13 +294,14 @@ class _OrderDetailItemsPageState extends State<OrderDetailItemsPage> {
             _myOrderModel.updatePreviousOrder(order: _order);
             showDialog(
               context: context,
-              child: AlertDialog(
-                title: Text('Order updated successfully'),
+              builder: (BuildContext context) => AlertDialog(
+                title: Text('Offtake updated successfully'),
                 actions: [
                   FlatButton(
                     onPressed: () {
                       Navigator.pop(context);
-                      Navigator.pushReplacementNamed(context, '/orderDetails');
+                      Navigator.pop(context);
+                      // Navigator.pushReplacementNamed(context, '/orderDetails');
                     },
                     child: Text('Ok'),
                   ),
@@ -236,7 +324,7 @@ class _OrderDetailItemsPageState extends State<OrderDetailItemsPage> {
                         child: Text(
                           'Count: ' +
                               (_order != null
-                                  ? _order.orderDetails.length.toString()
+                                  ? _order.orderDetails!.length.toString()
                                   : ''),
                           style: TextStyle(color: Colors.white),
                         ),

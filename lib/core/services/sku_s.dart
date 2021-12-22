@@ -11,13 +11,14 @@ class SkuService {
   final ConfigModel _configModel = locator<ConfigModel>();
 
   // Get reference plans
-  List<Sku> _skus;
+  late List<Sku> _skus;
 
   Future<List<Sku>> getSkus() async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
     http.Response _response = await http.get(
-      '${_apiConfig['baseURL']}/products/1/skus?userId=${_configModel.user.id}',
+      Uri.parse(
+          '${_apiConfig['baseURL']}/products/1/skus?userId=${_configModel.user.id}'),
       headers: _apiConfig['headers'],
     );
 

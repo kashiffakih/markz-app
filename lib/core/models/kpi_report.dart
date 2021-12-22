@@ -1,8 +1,8 @@
 class KpiReport {
-  int target;
-  int achieved;
-  int percent;
-  List<Days> days;
+  int? target;
+  int? achieved;
+  int? percent;
+  List<Days>? days;
 
   KpiReport({this.target, this.achieved, this.percent, this.days});
 
@@ -11,9 +11,9 @@ class KpiReport {
     achieved = json['achieved'];
     percent = json['percent'];
     if (json['days'] != null) {
-      days = new List<Days>();
+      days = [];
       json['days'].forEach((v) {
-        days.add(new Days.fromJson(v));
+        days!.add(new Days.fromJson(v));
       });
     }
   }
@@ -24,15 +24,15 @@ class KpiReport {
     data['achieved'] = this.achieved;
     data['percent'] = this.percent;
     if (this.days != null) {
-      data['days'] = this.days.map((v) => v.toJson()).toList();
+      data['days'] = this.days!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Days {
-  String date;
-  int achieved;
+  String? date;
+  int? achieved;
 
   Days({this.date, this.achieved});
 

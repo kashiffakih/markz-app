@@ -7,7 +7,7 @@ class NoticeModel with ChangeNotifier {
   final NoticeService _noticeService = locator<NoticeService>();
 
   // Day Summary
-  List<Notice> _notices;
+  late List<Notice> _notices = [];
 
   set notices(List<Notice> newNotices) {
     _notices = newNotices;

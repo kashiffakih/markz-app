@@ -1,12 +1,13 @@
 class Notice {
-  int id;
-  int companyId;
-  String name;
-  String title;
-  String description;
-  String imagepath;
-  String createdAt;
-  String updatedAt;
+  int? id;
+  int? companyId;
+  String? name;
+  String? title;
+  String? description;
+  String? imagepath;
+  String? link;
+  String? createdAt;
+  String? updatedAt;
 
   Notice(
       {this.id,
@@ -15,6 +16,7 @@ class Notice {
       this.title,
       this.description,
       this.imagepath,
+      this.link,
       this.createdAt,
       this.updatedAt});
 
@@ -25,6 +27,7 @@ class Notice {
     title = json['title'];
     description = json['description'];
     imagepath = json['imagepath'];
+    link = json['link'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
   }
@@ -37,6 +40,7 @@ class Notice {
     data['title'] = this.title;
     data['description'] = this.description;
     data['imagepath'] = this.imagepath;
+    data['link'] = this.link;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
     return data;

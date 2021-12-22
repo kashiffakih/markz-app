@@ -1,14 +1,15 @@
 import 'package:sales_app/core/models/sku.dart';
 
 class MyOrder {
-  int distributorId;
-  int userId;
-  int retailerId;
-  int status;
-  int total;
-  int isOrderTaken;
-  String reasonForNoOrder;
-  List<OrderDetails> orderDetails;
+  int? distributorId;
+  int? userId;
+  int? retailerId;
+  int? status;
+  int? total;
+  int? isOrderTaken;
+  String? reasonForNoOrder;
+  var orderType;
+  List<OrderDetails>? orderDetails;
 
   MyOrder(
       {this.distributorId,
@@ -18,6 +19,7 @@ class MyOrder {
       this.total,
       this.isOrderTaken,
       this.reasonForNoOrder,
+      this.orderType,
       this.orderDetails});
 
   MyOrder.fromJson(Map<String, dynamic> json) {
@@ -28,10 +30,11 @@ class MyOrder {
     total = json['total'];
     isOrderTaken = json['is_order_taken'];
     reasonForNoOrder = json['reason_for_no_order'];
+    orderType = json['order_type'];
     if (json['order_details'] != null) {
-      orderDetails = new List<OrderDetails>();
+      orderDetails = [];
       json['order_details'].forEach((v) {
-        orderDetails.add(new OrderDetails.fromJson(v));
+        orderDetails!.add(new OrderDetails.fromJson(v));
       });
     }
   }
@@ -45,19 +48,21 @@ class MyOrder {
     data['total'] = this.total;
     data['is_order_taken'] = this.isOrderTaken;
     data['reason_for_no_order'] = this.reasonForNoOrder;
+    data['order_type'] = this.orderType;
     if (this.orderDetails != null) {
-      data['order_details'] = this.orderDetails.map((v) => v.toJson()).toList();
+      data['order_details'] =
+          this.orderDetails!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class OrderDetails {
-  int skuId;
-  int qty;
-  int value;
-  int qtyDelivered;
-  Sku sku;
+  int? skuId;
+  int? qty;
+  int? value;
+  int? qtyDelivered;
+  Sku? sku;
 
   OrderDetails({this.skuId, this.qty, this.value, this.qtyDelivered, this.sku});
 

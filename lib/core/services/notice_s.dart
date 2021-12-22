@@ -9,13 +9,13 @@ class NoticeService {
   final ConfigModel _configModel = locator<ConfigModel>();
 
   // Notice
-  List<Notice> _notices;
+  late List<Notice> _notices;
 
   getNotices() async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
     http.Response _response = await http.get(
-      '${_apiConfig['baseURL']}/notices',
+      Uri.parse('${_apiConfig['baseURL']}/notices'),
       headers: _apiConfig['headers'],
     );
 
@@ -23,7 +23,7 @@ class NoticeService {
     if (_responseData['success']) {
       _notices = [];
       _responseData['data'].forEach((_notice) {
-        _notices.add(Notice.fromJson(_notice));
+        // _notices.add(Notice.fromJson(_notice));
       });
     }
 

@@ -11,18 +11,18 @@ class DashboardPage extends StatelessWidget {
         'name': 'T Vs A',
         'url': '/targetVsAchieved',
       },
-      {
-        'icon': Icons.print,
-        'color': Colors.teal[200],
-        'name': 'Billed Outlets',
-        'url': '/billedOutlets',
-      },
-      {
-        'icon': Icons.book,
-        'color': Colors.red[200],
-        'name': 'Invoice Details',
-        'url': '/invoiceDetails',
-      },
+      // {
+      //   'icon': Icons.print,
+      //   'color': Colors.teal[200],
+      //   'name': 'Billed Stores',
+      //   'url': '/billedOutlets',
+      // },
+      // {
+      //   'icon': Icons.book,
+      //   'color': Colors.red[200],
+      //   'name': 'Invoice Details',
+      //   'url': '/invoiceDetails',
+      // },
     ],
   ];
 
@@ -75,7 +75,7 @@ class DashboardPage extends StatelessWidget {
                                         child: Container(
                                           decoration: BoxDecoration(
                                             border: Border.all(
-                                                color: Colors.grey[300]),
+                                                color: Colors.grey[300]!),
                                           ),
                                           child: Column(
                                             children: [

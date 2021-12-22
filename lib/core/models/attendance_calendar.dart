@@ -1,11 +1,11 @@
 class AttendanceCalendar {
-  String totalWorkedHrsDay;
-  String avgWorkingHrs;
-  String present;
-  String absent;
-  String lessThan5Hrs;
-  String greaterThan5Hrs;
-  List<Attendances> attendances;
+  String? totalWorkedHrsDay;
+  String? avgWorkingHrs;
+  String? present;
+  String? absent;
+  String? lessThan5Hrs;
+  String? greaterThan5Hrs;
+  List<Attendances>? attendances;
 
   AttendanceCalendar(
       {this.totalWorkedHrsDay,
@@ -24,9 +24,10 @@ class AttendanceCalendar {
     lessThan5Hrs = json['less_than_5_hrs'];
     greaterThan5Hrs = json['greater_than_5_hrs'];
     if (json['attendances'] != null) {
-      attendances = new List<Attendances>();
+      attendances = [];
+      // attendances = new List<Attendances>();
       json['attendances'].forEach((v) {
-        attendances.add(new Attendances.fromJson(v));
+        attendances!.add(new Attendances.fromJson(v));
       });
     }
   }
@@ -40,16 +41,16 @@ class AttendanceCalendar {
     data['less_than_5_hrs'] = this.lessThan5Hrs;
     data['greater_than_5_hrs'] = this.greaterThan5Hrs;
     if (this.attendances != null) {
-      data['attendances'] = this.attendances.map((v) => v.toJson()).toList();
+      data['attendances'] = this.attendances!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Attendances {
-  String date;
-  String status;
-  String color;
+  String? date;
+  String? status;
+  String? color;
 
   Attendances({this.date, this.status, this.color});
 

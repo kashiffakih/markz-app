@@ -1,6 +1,6 @@
 class Location {
-  String lat;
-  String lng;
+  String? lat;
+  String? lng;
 
   Location({this.lat, this.lng});
 

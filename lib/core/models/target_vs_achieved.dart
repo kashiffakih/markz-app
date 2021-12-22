@@ -1,8 +1,8 @@
 class TargetVsAchieved {
-  int target;
-  int achieved;
-  int percent;
-  List<Outlets> outlets;
+  int? target;
+  int? achieved;
+  int? percent;
+  List<Outlets>? outlets;
 
   TargetVsAchieved({this.target, this.achieved, this.percent, this.outlets});
 
@@ -11,9 +11,9 @@ class TargetVsAchieved {
     achieved = json['achieved'];
     percent = json['percent'];
     if (json['outlets'] != null) {
-      outlets = new List<Outlets>();
+      outlets = [];
       json['outlets'].forEach((v) {
-        outlets.add(new Outlets.fromJson(v));
+        outlets!.add(new Outlets.fromJson(v));
       });
     }
   }
@@ -24,15 +24,15 @@ class TargetVsAchieved {
     data['achieved'] = this.achieved;
     data['percent'] = this.percent;
     if (this.outlets != null) {
-      data['outlets'] = this.outlets.map((v) => v.toJson()).toList();
+      data['outlets'] = this.outlets!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Outlets {
-  String outlet;
-  int achieved;
+  String? outlet;
+  int? achieved;
 
   Outlets({this.outlet, this.achieved});
 

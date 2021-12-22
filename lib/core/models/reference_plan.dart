@@ -1,16 +1,16 @@
 class ReferencePlan {
-  int id;
-  int companyId;
-  String name;
-  String createdAt;
-  String updatedAt;
-  String town;
-  int totalOutlets;
-  int billedOutlets;
-  int unbilledOutlets;
-  int mtd;
-  int l3m;
-  List<Retailers> retailers;
+  int? id;
+  int? companyId;
+  String? name;
+  String? createdAt;
+  String? updatedAt;
+  String? town;
+  int? totalOutlets;
+  int? billedOutlets;
+  int? unbilledOutlets;
+  int? mtd;
+  int? l3m;
+  List<Retailers>? retailers;
 
   ReferencePlan(
       {this.id,
@@ -39,9 +39,9 @@ class ReferencePlan {
     mtd = json['mtd'];
     l3m = json['l3m'];
     if (json['retailers'] != null) {
-      retailers = new List<Retailers>();
+      retailers = [];
       json['retailers'].forEach((v) {
-        retailers.add(new Retailers.fromJson(v));
+        retailers!.add(new Retailers.fromJson(v));
       });
     }
   }
@@ -60,39 +60,39 @@ class ReferencePlan {
     data['mtd'] = this.mtd;
     data['l3m'] = this.l3m;
     if (this.retailers != null) {
-      data['retailers'] = this.retailers.map((v) => v.toJson()).toList();
+      data['retailers'] = this.retailers!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Retailers {
-  int id;
-  String name;
-  String address;
-  String createdAt;
-  String updatedAt;
-  int referencePlanId;
-  String retailerCode;
-  String proprietorName;
-  int phone;
-  String gstNo;
-  String bankName;
-  String acNo;
-  String ifscCode;
-  String branch;
-  String chequePath;
-  int retailerCategoryId;
-  int retailerClassificationId;
-  int lat;
-  int lng;
-  String imagePath;
-  int approved;
-  int mtd;
-  int l3m;
-  String isDone;
-  RetailerCategory retailerCategory;
-  RetailerCategory retailerClassification;
+  int? id;
+  String? name;
+  String? address;
+  String? createdAt;
+  String? updatedAt;
+  int? referencePlanId;
+  String? retailerCode;
+  String? proprietorName;
+  int? phone;
+  String? gstNo;
+  String? bankName;
+  String? acNo;
+  String? ifscCode;
+  String? branch;
+  String? chequePath;
+  int? retailerCategoryId;
+  int? retailerClassificationId;
+  int? lat;
+  int? lng;
+  String? imagePath;
+  int? approved;
+  int? mtd;
+  int? l3m;
+  String? isDone;
+  RetailerCategory? retailerCategory;
+  RetailerCategory? retailerClassification;
 
   Retailers(
       {this.id,
@@ -182,21 +182,21 @@ class Retailers {
     data['l3m'] = this.l3m;
     data['is_done'] = this.isDone;
     if (this.retailerCategory != null) {
-      data['retailer_category'] = this.retailerCategory.toJson();
+      data['retailer_category'] = this.retailerCategory!.toJson();
     }
     if (this.retailerClassification != null) {
-      data['retailer_classification'] = this.retailerClassification.toJson();
+      data['retailer_classification'] = this.retailerClassification!.toJson();
     }
     return data;
   }
 }
 
 class RetailerCategory {
-  int id;
-  int companyId;
-  String name;
-  String createdAt;
-  String updatedAt;
+  int? id;
+  int? companyId;
+  String? name;
+  String? createdAt;
+  String? updatedAt;
 
   RetailerCategory(
       {this.id, this.companyId, this.name, this.createdAt, this.updatedAt});

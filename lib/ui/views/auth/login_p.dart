@@ -4,6 +4,7 @@ import 'package:sales_app/core/providers/auth_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/images_sh.dart';
+import 'dart:io' show Platform;
 
 class LoginPage extends StatefulWidget {
   @override
@@ -18,8 +19,8 @@ class _LoginPageState extends State<LoginPage> {
   ConfigModel _configModel = locator<ConfigModel>();
 
   Map<String, dynamic> _loginData = {
-    'email': 'email3@gmail.com',
-    'password': '123456',
+    'email': '',
+    'password': '',
     'rememberme': 1,
   };
 
@@ -58,9 +59,22 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(
                       height: 20,
                     ),
-                    Image.asset(
-                      Images.logo,
-                      height: 200,
+                    if (Platform.isAndroid)
+                      Image.asset(
+                        Images.logo,
+                        height: 150,
+                      ),
+                    if (Platform.isIOS)
+                      Image.asset(
+                        Images.logoIOS,
+                        height: 150,
+                      ),
+                    Text(
+                      'BA CHANNEL',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 30,
+                      ),
                     ),
                     SizedBox(
                       height: 20,
@@ -71,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       initialValue: _loginData['email'],
                       validator: (value) {
-                        if (value.isEmpty) return 'Username cannot be empty';
+                        if (value!.isEmpty) return 'Username cannot be empty';
                         return null;
                       },
                       onSaved: (value) {
@@ -97,7 +111,7 @@ class _LoginPageState extends State<LoginPage> {
                       obscureText: _obscurePassword,
                       initialValue: _loginData['password'],
                       validator: (value) {
-                        if (value.isEmpty) return 'Password cannot be empty';
+                        if (value!.isEmpty) return 'Password cannot be empty';
                         return null;
                       },
                       onSaved: (value) {
@@ -171,8 +185,8 @@ class _LoginPageState extends State<LoginPage> {
                             _isLoading = true;
                           });
 
-                          if (_loginKey.currentState.validate()) {
-                            _loginKey.currentState.save();
+                          if (_loginKey.currentState!.validate()) {
+                            _loginKey.currentState!.save();
 
                             await authModel.login(loginData: _loginData);
                             if (_configModel.isLoggedIn) {
@@ -183,7 +197,7 @@ class _LoginPageState extends State<LoginPage> {
                             } else {
                               showDialog(
                                 context: context,
-                                child: AlertDialog(
+                                builder: (BuildContext context) => AlertDialog(
                                   title: Text(_configModel.loginFailedMessage),
                                   actions: <Widget>[
                                     FlatButton(

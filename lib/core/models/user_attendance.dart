@@ -1,20 +1,22 @@
 class UserAttendance {
-  int id;
-  int userId;
-  String date;
-  String loginTime;
-  String logoutTime;
-  String loginLat;
-  String logoutLat;
-  String loginLng;
-  String logoutLng;
-  String createdAt;
-  String updatedAt;
-  String battery;
-  String sessionType;
-  String remarks;
-  String loginAddress;
-  String logoutAddress;
+  int? id;
+  int? userId;
+  String? date;
+  String? loginTime;
+  String? logoutTime;
+  String? loginLat;
+  String? logoutLat;
+  String? loginLng;
+  String? logoutLng;
+  String? createdAt;
+  String? updatedAt;
+  String? battery;
+  String? sessionType;
+  String? remarks;
+  String? loginAddress;
+  String? logoutAddress;
+  String? selfiePath;
+  String? logoutSelfiePath;
 
   UserAttendance(
       {this.id,
@@ -32,7 +34,9 @@ class UserAttendance {
       this.sessionType,
       this.remarks,
       this.loginAddress,
-      this.logoutAddress});
+      this.logoutAddress,
+      this.selfiePath,
+      this.logoutSelfiePath});
 
   UserAttendance.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -51,6 +55,8 @@ class UserAttendance {
     remarks = json['remarks'];
     loginAddress = json['login_address'];
     logoutAddress = json['logout_address'];
+    selfiePath = json['selfie_path'];
+    logoutSelfiePath = json['logout_selfie_path'];
   }
 
   Map<String, dynamic> toJson() {
@@ -71,6 +77,8 @@ class UserAttendance {
     data['remarks'] = this.remarks;
     data['login_address'] = this.loginAddress;
     data['logout_address'] = this.logoutAddress;
+    data['selfie_path'] = this.selfiePath;
+    data['logout_selfie_path'] = this.logoutSelfiePath;
     return data;
   }
 }

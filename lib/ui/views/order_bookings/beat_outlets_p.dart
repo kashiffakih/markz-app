@@ -8,7 +8,7 @@ import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BeatOutletsPage extends StatelessWidget {
-  final arguments; // reference plan
+  final arguments; // reference plan, tag
 
   BeatOutletsPage({@required this.arguments});
 
@@ -30,7 +30,9 @@ class BeatOutletsPage extends StatelessWidget {
     return Scaffold(
       appBar: PreferredSize(
         child: AppBar(
-          title: Text((_referencePlan).name + ' | ' + (_referencePlan).town),
+          title: Text((_referencePlan).name! +
+              ' | ' +
+              (_referencePlan).town.toString()),
           // actions: [
           //   IconButton(
           //     icon: Icon(Icons.search),
@@ -73,38 +75,45 @@ class BeatOutletsPage extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
-            children: (_referencePlan)
-                .retailers
+            children: _referencePlan.retailers!
                 .map(
                   (_retailer) => InkWell(
                     onTap: () {
-                      if (_retailer.isDone == 'Y') {
+                      print(arguments);
+                      if (arguments['tab']['name'] == 'Visitors')
+                        Navigator.pushNamed(context, '/newVisitors',
+                            arguments: {
+                              'beat': _referencePlan,
+                              'outlet': _retailer,
+                            });
+                      if (arguments['tab']['name'] ==
+                          'Store') if (_retailer.isDone == 'Y') {
                         showDialog(
                             context: context,
-                            child: AlertDialog(
-                              title: Text(
-                                  'Order for this outlet has already been placed. Do you want to place the order again?'),
-                              actions: [
-                                FlatButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    Navigator.pushNamed(
-                                        context, '/outletDetails',
-                                        arguments: {
-                                          'beat': _referencePlan,
-                                          'outlet': _retailer,
-                                        });
-                                  },
-                                  child: Text('Yes'),
-                                ),
-                                FlatButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: Text('No'),
-                                ),
-                              ],
-                            ));
+                            builder: (BuildContext context) => AlertDialog(
+                                  title: Text(
+                                      'Offtake for this outlet has already been updated. Do you want to replace the offtake again?'),
+                                  actions: [
+                                    FlatButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        Navigator.pushNamed(
+                                            context, '/outletDetails',
+                                            arguments: {
+                                              'beat': _referencePlan,
+                                              'outlet': _retailer,
+                                            });
+                                      },
+                                      child: Text('Yes'),
+                                    ),
+                                    FlatButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text('No'),
+                                    ),
+                                  ],
+                                ));
                       } else {
                         Navigator.pushNamed(context, '/outletDetails',
                             arguments: {
@@ -120,35 +129,33 @@ class BeatOutletsPage extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                    top: 8.0,
-                                    right: 8.0,
-                                    bottom: 8.0,
+                                if (_retailer.imagePath == null)
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      top: 8.0,
+                                      right: 8.0,
+                                      bottom: 8.0,
+                                    ),
+                                    child: CircleAvatar(
+                                      radius: 32,
+                                      backgroundImage: NetworkImage(
+                                        _configModel.apiConfig['mediaURL'] +
+                                            _retailer.imagePath,
+                                      ),
+                                    ),
                                   ),
-                                  child: CircleAvatar(
-                                    radius: 32,
-                                    backgroundImage: _retailer.imagePath == null
-                                        ? AssetImage(Images.product)
-                                        : NetworkImage(
-                                            _configModel.apiConfig['mediaURL'] +
-                                                _retailer.imagePath,
-                                          ),
+                                if (_retailer.imagePath != null)
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      top: 8.0,
+                                      right: 8.0,
+                                      bottom: 8.0,
+                                    ),
+                                    child: CircleAvatar(
+                                        radius: 32,
+                                        backgroundImage:
+                                            AssetImage(Images.product)),
                                   ),
-                                ),
-                                // MaterialButton(
-                                //   onPressed: () {},
-                                //   color: Theme.of(context).primaryColor,
-                                //   textColor: Colors.white,
-                                //   child: Text(
-                                //     'CC',
-                                //     style: TextStyle(
-                                //       fontSize: 20,
-                                //     ),
-                                //   ),
-                                //   padding: EdgeInsets.all(16),
-                                //   shape: CircleBorder(),
-                                // ),
                                 Expanded(
                                   flex: 3,
                                   child: Column(
@@ -159,7 +166,7 @@ class BeatOutletsPage extends StatelessWidget {
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              _retailer.name,
+                                              _retailer.name.toString(),
                                               style: TextStyle(
                                                   color: Colors.orange,
                                                   fontWeight: FontWeight.bold),
@@ -197,7 +204,7 @@ class BeatOutletsPage extends StatelessWidget {
                                         ),
                                       ),
                                       Text(
-                                        _retailer.address,
+                                        _retailer.address.toString(),
                                         style: TextStyle(
                                           color: Colors.red,
                                         ),

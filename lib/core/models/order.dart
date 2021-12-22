@@ -1,17 +1,21 @@
+import 'sku.dart';
+import 'package:flutter/material.dart';
+
 class Order {
-  int id;
-  int companyId;
-  int distributorId;
-  int userId;
-  int retailerId;
-  int status;
-  int total;
-  String createdAt;
-  String updatedAt;
-  Ssm ssm;
-  Distributor distributor;
-  Retailer retailer;
-  List<OrderDetails> orderDetails;
+  int? id;
+  int? companyId;
+  int? distributorId;
+  int? userId;
+  int? retailerId;
+  int? status;
+  int? total;
+  String? createdAt;
+  String? updatedAt;
+  var orderType;
+  Ssm? ssm;
+  Distributor? distributor;
+  Retailer? retailer;
+  List<OrderDetails>? orderDetails;
 
   Order(
       {this.id,
@@ -23,6 +27,7 @@ class Order {
       this.total,
       this.createdAt,
       this.updatedAt,
+      this.orderType,
       this.ssm,
       this.distributor,
       this.retailer,
@@ -38,6 +43,7 @@ class Order {
     total = json['total'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
+    orderType = json['order_type'];
     ssm = json['ssm'] != null ? new Ssm.fromJson(json['ssm']) : null;
     distributor = json['distributor'] != null
         ? new Distributor.fromJson(json['distributor'])
@@ -46,9 +52,9 @@ class Order {
         ? new Retailer.fromJson(json['retailer'])
         : null;
     if (json['order_details'] != null) {
-      orderDetails = new List<OrderDetails>();
+      orderDetails = [];
       json['order_details'].forEach((v) {
-        orderDetails.add(new OrderDetails.fromJson(v));
+        orderDetails!.add(new OrderDetails.fromJson(v));
       });
     }
   }
@@ -64,27 +70,29 @@ class Order {
     data['total'] = this.total;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
+    data['order_type'] = this.orderType;
     if (this.ssm != null) {
-      data['ssm'] = this.ssm.toJson();
+      data['ssm'] = this.ssm!.toJson();
     }
     if (this.distributor != null) {
-      data['distributor'] = this.distributor.toJson();
+      data['distributor'] = this.distributor!.toJson();
     }
     if (this.retailer != null) {
-      data['retailer'] = this.retailer.toJson();
+      data['retailer'] = this.retailer!.toJson();
     }
     if (this.orderDetails != null) {
-      data['order_details'] = this.orderDetails.map((v) => v.toJson()).toList();
+      data['order_details'] =
+          this.orderDetails!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Ssm {
-  int id;
-  String name;
-  String email;
-  int distributorId;
+  int? id;
+  String? name;
+  String? email;
+  int? distributorId;
 
   Ssm({this.id, this.name, this.email, this.distributorId});
 
@@ -106,9 +114,9 @@ class Ssm {
 }
 
 class Distributor {
-  int id;
-  String name;
-  String email;
+  int? id;
+  String? name;
+  String? email;
 
   Distributor({this.id, this.name, this.email});
 
@@ -128,16 +136,16 @@ class Distributor {
 }
 
 class Retailer {
-  int id;
-  String name;
-  String address;
-  String createdAt;
-  String updatedAt;
-  int referencePlanId;
-  String retailerCode;
-  String proprietorName;
-  int phone;
-  int approved;
+  int? id;
+  String? name;
+  String? address;
+  String? createdAt;
+  String? updatedAt;
+  int? referencePlanId;
+  String? retailerCode;
+  String? proprietorName;
+  int? phone;
+  int? approved;
 
   Retailer(
       {this.id,
@@ -181,15 +189,15 @@ class Retailer {
 }
 
 class OrderDetails {
-  int id;
-  int orderId;
-  int skuId;
-  int qty;
-  int value;
-  int qtyDelivered;
-  String createdAt;
-  String updatedAt;
-  Sku sku;
+  int? id;
+  int? orderId;
+  int? skuId;
+  int? qty;
+  int? value;
+  int? qtyDelivered;
+  String? createdAt;
+  String? updatedAt;
+  Sku? sku;
 
   OrderDetails(
       {this.id,
@@ -225,49 +233,49 @@ class OrderDetails {
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
     if (this.sku != null) {
-      data['sku'] = this.sku.toJson();
+      data['sku'] = this.sku!.toJson();
     }
     return data;
   }
 }
 
-class Sku {
-  int id;
-  String name;
-  String createdAt;
-  String updatedAt;
-  int productId;
-  int companyId;
-  int offerId;
+// class Sku {
+//   int id;
+//   String name;
+//   String createdAt;
+//   String updatedAt;
+//   int productId;
+//   int companyId;
+//   int offerId;
 
-  Sku(
-      {this.id,
-      this.name,
-      this.createdAt,
-      this.updatedAt,
-      this.productId,
-      this.companyId,
-      this.offerId});
+//   Sku(
+//       {this.id,
+//       this.name,
+//       this.createdAt,
+//       this.updatedAt,
+//       this.productId,
+//       this.companyId,
+//       this.offerId});
 
-  Sku.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
-    productId = json['product_id'];
-    companyId = json['company_id'];
-    offerId = json['offer_id'];
-  }
+//   Sku.fromJson(Map<String, dynamic> json) {
+//     id = json['id'];
+//     name = json['name'];
+//     createdAt = json['created_at'];
+//     updatedAt = json['updated_at'];
+//     productId = json['product_id'];
+//     companyId = json['company_id'];
+//     offerId = json['offer_id'];
+//   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['name'] = this.name;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
-    data['product_id'] = this.productId;
-    data['company_id'] = this.companyId;
-    data['offer_id'] = this.offerId;
-    return data;
-  }
-}
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = new Map<String, dynamic>();
+//     data['id'] = this.id;
+//     data['name'] = this.name;
+//     data['created_at'] = this.createdAt;
+//     data['updated_at'] = this.updatedAt;
+//     data['product_id'] = this.productId;
+//     data['company_id'] = this.companyId;
+//     data['offer_id'] = this.offerId;
+//     return data;
+//   }
+// }

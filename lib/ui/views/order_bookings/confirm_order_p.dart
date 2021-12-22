@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/my_order_pr.dart';
 
 class ConfirmOrderPage extends StatefulWidget {
-  final arguments; // beat, outlet
+  final arguments; // beat, outlet, order_type
 
   ConfirmOrderPage({@required this.arguments});
 
@@ -12,6 +12,8 @@ class ConfirmOrderPage extends StatefulWidget {
 }
 
 class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
+  bool? _isLoading;
+
   @override
   Widget build(BuildContext context) {
     final _myOrderModel = Provider.of<MyOrderModel>(context);
@@ -93,82 +95,155 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            children: _myOrderModel.order == null
-                ? []
-                : _myOrderModel.order.orderDetails
-                    .map(
-                      (_orderDetail) => Container(
-                        padding: EdgeInsets.all(5),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _orderDetail.sku.name,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 8,
-                            ),
-                            Row(
+          child: Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Card(
+              elevation: 10,
+              child: Column(
+                children: _myOrderModel.order == null
+                    ? []
+                    : _myOrderModel.order!.orderDetails!
+                        .map(
+                          (_orderDetail) => Container(
+                            decoration: _myOrderModel.order!.orderDetails!
+                                            .indexOf(_orderDetail) %
+                                        2 !=
+                                    0
+                                ? BoxDecoration(color: Colors.grey[400])
+                                : BoxDecoration(color: Colors.white),
+                            padding: EdgeInsets.all(5),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                  child: Text(
-                                    _orderDetail.qty.toString(),
+                                if (_orderDetail.sku!.offerId == null)
+                                  Text(
+                                    _orderDetail.sku!.name.toString(),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
+                                else if (_orderDetail
+                                        .sku!.offer!.offerType!.name
+                                        .toString() ==
+                                    'FLAT')
+                                  Text(
+                                    _orderDetail.sku!.name.toString() +
+                                        ' (₹.' +
+                                        _orderDetail.sku!.offer!.offer
+                                            .toString() +
+                                        ' OFF)',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
+                                else if (_orderDetail
+                                        .sku!.offer!.offerType!.name ==
+                                    'PERCENT')
+                                  Text(
+                                    _orderDetail.sku!.name! +
+                                        ' (' +
+                                        _orderDetail.sku!.offer!.offer
+                                            .toString() +
+                                        '% OFF)',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
+                                else if (_orderDetail
+                                        .sku!.offer!.offerType!.name ==
+                                    'FREE GIFT')
+                                  Text(
+                                    _orderDetail.sku!.name! +
+                                        ' (' +
+                                        _orderDetail.sku!.offer!.itemName
+                                            .toString() +
+                                        ')',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
+                                else if (_orderDetail
+                                        .sku!.offer!.offerType!.name ==
+                                    'FREE QTY')
+                                  Text(
+                                    _orderDetail.sku!.name! +
+                                        ' (' +
+                                        _orderDetail.sku!.offer!.itemName
+                                            .toString() +
+                                        ')',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
+                                // Text(
+                                //   _orderDetail.sku.name,
+                                //   style: TextStyle(
+                                //     fontWeight: FontWeight.bold,
+                                //   ),
+                                // ),
+                                SizedBox(
+                                  height: 8,
                                 ),
-                                Expanded(
-                                  child: Text(
-                                    '*',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        _orderDetail.qty.toString(),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    '₹. ' +
-                                        (_orderDetail.sku.offerPrice != null
-                                            ? _orderDetail.sku.offerPrice
-                                                .toString()
-                                            : _orderDetail.sku.price
-                                                .toString()),
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold,
+                                    Expanded(
+                                      child: Text(
+                                        '*',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    ':',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
+                                    Expanded(
+                                      child: Text(
+                                        '₹. ' +
+                                            (_orderDetail.sku!.offerPrice !=
+                                                    null
+                                                ? _orderDetail.sku!.offerPrice
+                                                    .toString()
+                                                : _orderDetail.sku!.price
+                                                    .toString()),
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    '₹. ' + _orderDetail.value.toString(),
-                                    style: TextStyle(
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.bold,
+                                    Expanded(
+                                      child: Text(
+                                        ':',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    Expanded(
+                                      child: Text(
+                                        '₹. ' + _orderDetail.value.toString(),
+                                        style: TextStyle(
+                                          // color: Colors.green,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
+                                // Divider()
                               ],
                             ),
-                            Divider()
-                          ],
-                        ),
-                      ),
-                    )
-                    .toList(),
+                          ),
+                        )
+                        .toList(),
+              ),
+            ),
           ),
         ),
       ),
@@ -180,25 +255,31 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
         unselectedItemColor: Colors.white,
         selectedFontSize: 14,
         unselectedFontSize: 14,
-        onTap: (value) {
+        onTap: (value) async {
           if (value == 1) {
-            _myOrderModel.saveOrder();
-            showDialog(
-              context: context,
-              child: AlertDialog(
-                title: Text('Order Successfully placed'),
-                actions: [
-                  FlatButton(
-                    onPressed: () {
-                      _myOrderModel.emptyOrder();
-                      Navigator.pop(context);
-                      Navigator.pushReplacementNamed(context, '/home');
-                    },
-                    child: Text('Ok'),
+            if (_isLoading == null) {
+              setState(() async {
+                _isLoading = true;
+                await _myOrderModel.saveOrder(
+                    orderType: widget.arguments['order_type']);
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: Text('Offtake successfully updated'),
+                    actions: [
+                      FlatButton(
+                        onPressed: () {
+                          _myOrderModel.emptyOrder();
+                          Navigator.pop(context);
+                          Navigator.pushReplacementNamed(context, '/home');
+                        },
+                        child: Text('Ok'),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            );
+                );
+              });
+            }
           }
         },
         items: [
@@ -215,7 +296,7 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
                         child: Text(
                           'Count: ' +
                               (_myOrderModel.order != null
-                                  ? _myOrderModel.order.orderDetails.length
+                                  ? _myOrderModel.order!.orderDetails!.length
                                       .toString()
                                   : ''),
                           style: TextStyle(color: Colors.white),
@@ -226,7 +307,7 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
                         child: Text(
                           'Total: ₹. ' +
                               (_myOrderModel.order != null
-                                  ? _myOrderModel.order.total.toString()
+                                  ? _myOrderModel.order!.total.toString()
                                   : '') +
                               '/-',
                           style: TextStyle(color: Colors.white),

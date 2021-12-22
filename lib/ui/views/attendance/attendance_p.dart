@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/attendance_pr.dart';
+import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/device_info_pr.dart';
 import 'package:sales_app/core/providers/location_pr.dart';
+import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/images_sh.dart';
+import 'package:sales_app/ui/widgets/take_image_w.dart';
 
 class AttendancePage extends StatefulWidget {
   @override
@@ -12,6 +16,9 @@ class AttendancePage extends StatefulWidget {
 }
 
 class _AttendancePageState extends State<AttendancePage> {
+  bool? _locationServiceEnabled;
+  LocationPermission? _locationPermission;
+
   TextEditingController _remarksController = TextEditingController();
 
   Map<String, dynamic> _attendanceData = {
@@ -28,6 +35,8 @@ class _AttendancePageState extends State<AttendancePage> {
     'remarks': '',
     'login_address': '',
     'logout_address': '',
+    'selfie_path': '',
+    'logout_selfie_path': '',
   };
 
   bool _sessionInStatus = false;
@@ -36,8 +45,130 @@ class _AttendancePageState extends State<AttendancePage> {
   DateFormat timeFormat = DateFormat('hh:mm:ss');
   DateFormat dateFormat = DateFormat('yyyy-MM-dd');
 
+  @override
+  void initState() {
+    initLocationService();
+
+    super.initState();
+  }
+
+  void initLocationService() async {
+    bool _response = await Geolocator.isLocationServiceEnabled();
+    setState(() {
+      _locationServiceEnabled = _response;
+      if (_locationServiceEnabled != null && _locationServiceEnabled == false)
+        return;
+    });
+
+    _locationPermission = await Geolocator.checkPermission();
+
+    if (_locationPermission == LocationPermission.denied ||
+        _locationPermission == LocationPermission.deniedForever) return;
+
+    Provider.of<LocationModel>(context, listen: false).getCurrentLocation();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final _attendanceModel = Provider.of<AttendanceModel>(context);
+    final _locationModel = Provider.of<LocationModel>(context);
+    final _deviceInfoModel = Provider.of<DeviceInfoModel>(context);
+    final _configModel = locator<ConfigModel>();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Attendance'),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: _locationServiceEnabled == null
+              ? Container(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : _locationServiceEnabled == false
+                  ? buildLocationServicePermission()
+                  : (_locationPermission == LocationPermission.denied ||
+                          _locationPermission ==
+                              LocationPermission.deniedForever)
+                      ? buildLocationPermission()
+                      : buildAttendance(
+                          configModel: _configModel,
+                          locationModel: _locationModel,
+                          attendanceModel: _attendanceModel,
+                          deviceInfoModel: _deviceInfoModel,
+                        ),
+        ),
+      ),
+    );
+  }
+
+  Container buildLocationServicePermission() {
+    return Container(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Location service is disabled'),
+            SizedBox(height: 10),
+            RaisedButton.icon(
+              onPressed: () {
+                Geolocator.openLocationSettings();
+              },
+              icon: Icon(
+                Icons.my_location,
+                color: Colors.white,
+              ),
+              label: Text(
+                'Open Settings',
+                style: TextStyle(color: Colors.white),
+              ),
+              color: Colors.blue,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Container buildLocationPermission() {
+    return Container(
+      height: MediaQuery.of(context).size.height,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Permission Denied'),
+            SizedBox(height: 10),
+            RaisedButton.icon(
+              color: Colors.blue,
+              onPressed: () async {
+                if (_locationPermission == LocationPermission.deniedForever)
+                  Geolocator.openAppSettings();
+                if (_locationPermission == LocationPermission.denied) {
+                  _locationPermission = await Geolocator.requestPermission();
+                  setState(() {});
+                }
+                initLocationService();
+              },
+              label: Text(
+                'Allow Location Service',
+                style: TextStyle(color: Colors.white),
+              ),
+              icon: Icon(
+                Icons.my_location,
+                color: Colors.white,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   punchAttendance(
-      {@required AttendanceModel attendanceModel, @required String event}) {
+      {required AttendanceModel attendanceModel, required String event}) {
     _attendanceData['date'] = dateFormat.format(DateTime.now());
     _attendanceData['remarks'] = _remarksController.text;
     if (event == 'LOGIN')
@@ -50,242 +181,368 @@ class _AttendancePageState extends State<AttendancePage> {
       );
   }
 
-  void initalizeLocation({@required LocationModel locationModel}) {
-    if (locationModel.address == null && locationModel.currentLocation != null)
+  void initalizeLocation({required LocationModel locationModel}) {
+    if (locationModel.address == '' &&
+        locationModel.currentLocation.lat != null)
       locationModel.getLocationAddress(
         latitude: locationModel.currentLocation.lat,
         longitude: locationModel.currentLocation.lng,
       );
   }
 
-  void initalizeData({@required AttendanceModel attendanceModel}) {
+  void initalizeData({required AttendanceModel attendanceModel}) {
     if (attendanceModel.todayAttendance != null &&
+        attendanceModel.todayAttendance?.id != null &&
         _attendanceData['date'] == '') {
-      _attendanceData['id'] = attendanceModel.todayAttendance.id;
-      _attendanceData['date'] = attendanceModel.todayAttendance.date;
+      //   if (attendanceModel.todayAttendance.id != null &&
+      // _attendanceData['date'] == '') {
+      _attendanceData['id'] = attendanceModel.todayAttendance?.id;
+      _attendanceData['date'] = attendanceModel.todayAttendance?.date;
       _attendanceData['login_time'] =
-          attendanceModel.todayAttendance.loginTime ?? '';
+          attendanceModel.todayAttendance?.loginTime ?? '';
       _attendanceData['logout_time'] =
-          attendanceModel.todayAttendance.logoutTime ?? '';
-      _attendanceData['login_lat'] = attendanceModel.todayAttendance.loginLat;
-      _attendanceData['login_lng'] = attendanceModel.todayAttendance.loginLng;
-      _attendanceData['logout_lat'] = attendanceModel.todayAttendance.logoutLat;
-      _attendanceData['logout_lng'] = attendanceModel.todayAttendance.logoutLng;
-      _attendanceData['battery'] = attendanceModel.todayAttendance.battery;
+          attendanceModel.todayAttendance?.logoutTime ?? '';
+      _attendanceData['login_lat'] = attendanceModel.todayAttendance?.loginLat;
+      _attendanceData['login_lng'] = attendanceModel.todayAttendance?.loginLng;
+      _attendanceData['logout_lat'] =
+          attendanceModel.todayAttendance?.logoutLat;
+      _attendanceData['logout_lng'] =
+          attendanceModel.todayAttendance?.logoutLng;
+      _attendanceData['battery'] = attendanceModel.todayAttendance?.battery;
       _attendanceData['session_type'] =
-          attendanceModel.todayAttendance.sessionType;
-      _attendanceData['remarks'] = attendanceModel.todayAttendance.remarks;
+          attendanceModel.todayAttendance?.sessionType;
+      _attendanceData['remarks'] = attendanceModel.todayAttendance?.remarks;
       _attendanceData['login_address'] =
-          attendanceModel.todayAttendance.loginAddress;
+          attendanceModel.todayAttendance?.loginAddress;
       _attendanceData['logout_address'] =
-          attendanceModel.todayAttendance.logoutAddress;
+          attendanceModel.todayAttendance?.logoutAddress;
+      _attendanceData['selfie_path'] =
+          attendanceModel.todayAttendance?.selfiePath;
+      _attendanceData['logout_selfie_path'] =
+          attendanceModel.todayAttendance?.logoutSelfiePath;
 
-      if (attendanceModel.todayAttendance.loginTime != null) {
+      if (attendanceModel.todayAttendance?.loginTime != null) {
         _sessionInStatus = true;
       }
-      if (attendanceModel.todayAttendance.logoutTime != null) {
+      if (attendanceModel.todayAttendance?.logoutTime != null) {
         _sessionOutStatus = true;
       }
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final _attendanceModel = Provider.of<AttendanceModel>(context);
-    final _locationModel = Provider.of<LocationModel>(context);
-    final _deviceInfoModel = Provider.of<DeviceInfoModel>(context);
-
+  buildAttendance(
+      {required ConfigModel configModel,
+      required LocationModel locationModel,
+      required AttendanceModel attendanceModel,
+      required DeviceInfoModel deviceInfoModel}) {
     this.initalizeLocation(
-      locationModel: _locationModel,
+      locationModel: locationModel,
     );
 
     this.initalizeData(
-      attendanceModel: _attendanceModel,
+      attendanceModel: attendanceModel,
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Attendance'),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              InkWell(
-                onTap: () {
-                  Navigator.pushReplacementNamed(
-                      context, '/attendanceCalendar');
-                },
-                child: Container(
-                  height: 235,
-                  width: MediaQuery.of(context).size.width,
-                  padding: const EdgeInsets.all(5.0),
-                  child: Image.asset(
-                    Images.attendance,
-                  ),
-                ),
-              ),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: DropdownButtonFormField(
-                      decoration:
-                          InputDecoration(labelText: 'Select session type'),
-                      value: _attendanceData['session_type'],
-                      items: _attendanceModel.sessionTypes
-                          .map(
-                            (_type) => DropdownMenuItem(
-                              child: Text(_type),
-                              value: _type,
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _attendanceData['session_type'] = value;
-                        });
-                      }),
-                ),
-              ),
-              if (_locationModel.address != null)
-                Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Current Location: ',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(_locationModel.address),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: _locationModel.address == null
-                      ? Row(
-                          children: [
-                            Expanded(
-                              child: Text('Locating Current Location...'),
-                            ),
-                            SizedBox(
-                              child: CircularProgressIndicator(
-                                backgroundColor: Colors.white,
-                              ),
-                              height: 20,
-                              width: 20,
-                            ),
-                          ],
-                        )
-                      : Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    'Session In (Time: ${_attendanceData['login_time']})',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                Switch(
-                                    value: _sessionInStatus,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _sessionInStatus = true;
-                                        if (_attendanceData['login_time'] ==
-                                            '') {
-                                          _attendanceData['login_time'] =
-                                              timeFormat.format(DateTime.now());
-                                          _attendanceData['login_lat'] =
-                                              _locationModel
-                                                  .currentLocation.lat;
-                                          _attendanceData['login_lng'] =
-                                              _locationModel
-                                                  .currentLocation.lng;
-                                          _attendanceData['login_address'] =
-                                              _locationModel.address;
-                                          _attendanceData['battery'] =
-                                              _deviceInfoModel.batteryLevel;
-                                          this.punchAttendance(
-                                            attendanceModel: _attendanceModel,
-                                            event: 'LOGIN',
-                                          );
-                                        }
-                                      });
-                                    }),
-                              ],
-                            ),
-                            if (_attendanceData['login_time'] != '')
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      'Session Out (Time: ${_attendanceData['logout_time']})',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                  Switch(
-                                      value: _sessionOutStatus,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _sessionOutStatus = value;
-                                          if (value) {
-                                            _attendanceData['logout_time'] =
-                                                timeFormat
-                                                    .format(DateTime.now());
-                                            _attendanceData['logout_lat'] =
-                                                _locationModel
-                                                    .currentLocation.lat;
-                                            _attendanceData['logout_lng'] =
-                                                _locationModel
-                                                    .currentLocation.lng;
-                                            _attendanceData['logout_address'] =
-                                                _locationModel.address;
-                                          } else {
-                                            _attendanceData['logout_time'] = '';
-                                            _attendanceData['logout_lat'] = '';
-                                            _attendanceData['logout_lng'] = '';
-                                            _attendanceData['logout_address'] =
-                                                '';
-                                            _attendanceData['battery'] =
-                                                _deviceInfoModel.batteryLevel;
-                                          }
-                                          this.punchAttendance(
-                                            attendanceModel: _attendanceModel,
-                                            event: 'LOGOUT',
-                                          );
-                                        });
-                                      }),
-                                ],
-                              ),
-                          ],
-                        ),
-                ),
-              ),
-              Card(
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Remarks',
-                  ),
-                  controller: _remarksController,
-                  maxLines: 3,
-                ),
-              ),
-            ],
+    return Column(
+      children: [
+        InkWell(
+          onTap: () {
+            Navigator.pushReplacementNamed(context, '/attendanceCalendar');
+          },
+          child: Container(
+            height: 235,
+            width: MediaQuery.of(context).size.width,
+            padding: const EdgeInsets.all(5.0),
+            child: Image.asset(
+              Images.attendance,
+            ),
           ),
         ),
-      ),
+        Card(
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Column(
+              children: [
+                Text(
+                  dateFormat.format(DateTime.now()).toString(),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  configModel.user.email! +
+                      (configModel.user.baName != null
+                          ? ' | ' + configModel.user.baName.toString()
+                          : ''),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: DropdownButtonFormField(
+                decoration: InputDecoration(labelText: 'Select session type'),
+                value: _attendanceData['session_type'],
+                items: attendanceModel.sessionTypes
+                    .map(
+                      (_type) => DropdownMenuItem(
+                        child: Text(_type),
+                        value: _type,
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _attendanceData['session_type'] = value;
+                  });
+                }),
+          ),
+        ),
+        if (locationModel.address != '')
+          Card(
+            child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Current Location: ',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Text(locationModel.address),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: locationModel.address == ''
+                ? Row(
+                    children: [
+                      Expanded(
+                        child: Text('Locating Current Location...'),
+                      ),
+                      SizedBox(
+                        child: CircularProgressIndicator(
+                          backgroundColor: Colors.white,
+                        ),
+                        height: 20,
+                        width: 20,
+                      ),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Take Selfie',
+                            ),
+                          ),
+                          Expanded(
+                            child: TakeImageWidget(imagePath: ''),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Session In (Time: ${_attendanceData['login_time']})',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          // if (_attendanceData['selfie_path'] != '')
+                          //   if (_attendanceData['selfie_path'] == null)
+                          //     Padding(
+                          //       padding: EdgeInsets.only(
+                          //         top: 8.0,
+                          //         right: 8.0,
+                          //         bottom: 8.0,
+                          //       ),
+                          //       child: CircleAvatar(
+                          //         radius: 20,
+                          //         backgroundImage: AssetImage(Images.product),
+                          //       ),
+                          //     ),
+                          if (_attendanceData['selfie_path'] != null &&
+                              _attendanceData['selfie_path'] != '')
+                            Padding(
+                              padding: EdgeInsets.only(
+                                top: 8.0,
+                                right: 8.0,
+                                bottom: 8.0,
+                              ),
+                              child: CircleAvatar(
+                                radius: 20,
+                                backgroundImage: NetworkImage(
+                                  configModel.apiConfig['mediaURL'] +
+                                      _attendanceData['selfie_path'],
+                                ),
+                              ),
+                            ),
+                          Switch(
+                              value: _sessionInStatus,
+                              onChanged: (value) {
+                                if (configModel.file.fileName == null &&
+                                    _attendanceData['session_type'] !=
+                                        'WEEKLY OFF') {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) =>
+                                        AlertDialog(
+                                      title: Text('Please add selfie'),
+                                      actions: [
+                                        FlatButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text('OK'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                } else {
+                                  setState(() {
+                                    _sessionInStatus = true;
+                                    if (_attendanceData['login_time'] == '') {
+                                      _attendanceData['login_time'] =
+                                          timeFormat.format(DateTime.now());
+                                      _attendanceData['login_lat'] =
+                                          locationModel.currentLocation.lat;
+                                      _attendanceData['login_lng'] =
+                                          locationModel.currentLocation.lng;
+                                      _attendanceData['login_address'] =
+                                          locationModel.address;
+                                      // _attendanceData['battery'] =
+                                      //     deviceInfoModel.batteryLevel;
+                                      this.punchAttendance(
+                                        attendanceModel: attendanceModel,
+                                        event: 'LOGIN',
+                                      );
+                                    }
+                                  });
+                                }
+                              }),
+                        ],
+                      ),
+                      if (_attendanceData['login_time'] != '')
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'Session Out (Time: ${_attendanceData['logout_time']})',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            // if (_attendanceData['logout_selfie_path'] != null &&
+                            //     _attendanceData['logout_selfie_path'] != '')
+                            //   if (_attendanceData['logout_selfie_path'] == null)
+                            //     Padding(
+                            //       padding: EdgeInsets.only(
+                            //         top: 8.0,
+                            //         right: 8.0,
+                            //         bottom: 8.0,
+                            //       ),
+                            //       child: CircleAvatar(
+                            //         radius: 20,
+                            //         backgroundImage: AssetImage(Images.product),
+                            //       ),
+                            //     ),
+                            if (_attendanceData['logout_selfie_path'] != null &&
+                                _attendanceData['logout_selfie_path'] != '')
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  top: 8.0,
+                                  right: 8.0,
+                                  bottom: 8.0,
+                                ),
+                                child: CircleAvatar(
+                                  radius: 20,
+                                  backgroundImage: NetworkImage(
+                                    configModel.apiConfig['mediaURL'] +
+                                        _attendanceData['logout_selfie_path'],
+                                  ),
+                                ),
+                              ),
+                            Switch(
+                                value: _sessionOutStatus,
+                                onChanged: (value) {
+                                  if (configModel.file.fileName == null &&
+                                      _attendanceData['session_type'] !=
+                                          'WEEKLY OFF') {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) =>
+                                          AlertDialog(
+                                        title: Text('Please add selfie'),
+                                        actions: [
+                                          FlatButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text('OK'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  } else {
+                                    setState(() {
+                                      _sessionOutStatus = value;
+                                      if (value) {
+                                        _attendanceData['logout_time'] =
+                                            timeFormat.format(DateTime.now());
+                                        _attendanceData['logout_lat'] =
+                                            locationModel.currentLocation.lat;
+                                        _attendanceData['logout_lng'] =
+                                            locationModel.currentLocation.lng;
+                                        _attendanceData['logout_address'] =
+                                            locationModel.address;
+                                      } else {
+                                        _attendanceData['logout_time'] = '';
+                                        _attendanceData['logout_lat'] = '';
+                                        _attendanceData['logout_lng'] = '';
+                                        _attendanceData['logout_address'] = '';
+                                        // _attendanceData['battery'] =
+                                        //     deviceInfoModel.batteryLevel;
+                                      }
+                                      this.punchAttendance(
+                                        attendanceModel: attendanceModel,
+                                        event: 'LOGOUT',
+                                      );
+                                    });
+                                  }
+                                }),
+                          ],
+                        ),
+                    ],
+                  ),
+          ),
+        ),
+        Card(
+          child: TextFormField(
+            decoration: InputDecoration(
+              labelText: 'Remarks',
+            ),
+            controller: _remarksController,
+            maxLines: 3,
+          ),
+        ),
+      ],
     );
   }
 }

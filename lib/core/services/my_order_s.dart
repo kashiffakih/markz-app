@@ -10,11 +10,13 @@ import 'package:sales_app/locator.dart';
 class MyOrderService {
   final ConfigModel _configModel = locator<ConfigModel>();
 
-  saveOrder({@required MyOrder order}) async {
+  saveOrder({required MyOrder? order, required var orderType}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
+    order!.orderType = orderType;
+
     http.Response _response = await http.post(
-      '${_apiConfig['baseURL']}/orders',
+      Uri.parse('${_apiConfig['baseURL']}/orders'),
       body: json.encode(order),
       headers: _apiConfig['headers'],
     );
@@ -23,12 +25,14 @@ class MyOrderService {
     print(_responseData);
   }
 
-  updatePreviousOrder({@required Order order}) async {
+  updatePreviousOrder({@required Order? order}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
+    // print(order.toJson());
+
     http.Response _response = await http.post(
-      '${_apiConfig['baseURL']}/orders',
-      body: json.encode(order.toJson()),
+      Uri.parse('${_apiConfig['baseURL']}/orders'),
+      body: json.encode(order!.toJson()),
       headers: _apiConfig['headers'],
     );
 
