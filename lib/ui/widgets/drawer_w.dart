@@ -47,26 +47,27 @@ class DrawerWidget extends StatelessWidget {
                     SizedBox(
                       width: 10,
                     ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _configModel.user.name.toString(),
-                          maxLines: 2,
-                          style: TextStyle(
-                            color: Colors.white,
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _configModel.user.name.toString(),
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        Text(
-                          _configModel.user.roles!.length > 0
-                              ? _configModel.user.roles![0].name.toString()
-                              : '',
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        )
-                      ],
+                          Text(
+                            _configModel.user.roles!.length > 0
+                                ? _configModel.user.roles![0].name.toString()
+                                : '',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          )
+                        ],
+                      ),
                     )
                   ],
                 ),

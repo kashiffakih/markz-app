@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:sales_app/core/models/customer_data_entry.dart';
 import 'package:sales_app/core/providers/analytics_pr.dart';
 import 'package:sales_app/core/providers/asset_pr.dart';
 import 'package:sales_app/core/providers/attendance_pr.dart';
+import 'package:sales_app/core/providers/competitor_data_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/course_pr.dart';
+import 'package:sales_app/core/providers/customer_data_entry_pr.dart';
+import 'package:sales_app/core/providers/customer_pr.dart';
 import 'package:sales_app/core/providers/daily_photo_pr.dart';
 import 'package:sales_app/core/providers/device_info_pr.dart';
 import 'package:sales_app/core/providers/location_pr.dart';
@@ -31,6 +35,10 @@ import 'package:sales_app/ui/views/asset_tracking/assets_p.dart';
 import 'package:sales_app/ui/views/auth/login_p.dart';
 import 'package:sales_app/ui/root_p.dart';
 import 'package:sales_app/ui/views/auth/update_app_p.dart';
+import 'package:sales_app/ui/views/competitor_datas/competitor_data_create_p.dart';
+import 'package:sales_app/ui/views/competitor_datas/competitor_data_p.dart';
+import 'package:sales_app/ui/views/customer_data_entries/customer_data_entry_create_p.dart';
+import 'package:sales_app/ui/views/customer_data_entries/customer_data_entry_p.dart';
 import 'package:sales_app/ui/views/daily_photos/daily_photos_create_p.dart';
 import 'package:sales_app/ui/views/daily_photos/daily_photos_p.dart';
 import 'package:sales_app/ui/views/damage_stocks/damage_stocks_create_p.dart';
@@ -57,8 +65,10 @@ import 'package:sales_app/ui/views/order_bookings/outlet_details_p.dart';
 import 'package:sales_app/ui/views/order_details/order_detail_items_p.dart';
 import 'package:sales_app/ui/views/order_details/order_details_p.dart';
 import 'package:sales_app/ui/views/productivity/productivity_create_p.dart';
+import 'package:sales_app/ui/views/productivity/productivity_index_p.dart';
 import 'package:sales_app/ui/views/profile/profile_p.dart';
 import 'package:sales_app/ui/views/reports/daily_order_summary_p.dart';
+import 'package:sales_app/ui/views/reports/monthly_summary_p.dart';
 
 // Target vs Achieved
 import 'package:sales_app/ui/views/reports/target_vs_achieved_p.dart';
@@ -342,7 +352,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     // Order Detail Items
     case orderDetailItems:
       return MaterialPageRoute(builder: (BuildContext context) {
-        Provider.of<OrderModel>(context, listen: false).fetchOrdersOfToday();
+        // Provider.of<OrderModel>(context, listen: false).fetchOrdersOfToday();
         return OrderDetailItemsPage(
           arguments: settings.arguments,
         );
@@ -368,6 +378,19 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (BuildContext context) {
         Provider.of<AnalyticsModel>(context, listen: false).getDaySummary();
         return DaySummaryPage();
+      });
+    case monthlySummary:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        DateFormat format = DateFormat('M');
+
+        String selectedMonthId = format.format(DateTime.now());
+        String selectedYear = '2021';
+        Provider.of<OrderModel>(context, listen: false).fetchOrdersOfMonth(
+          monthId: selectedMonthId,
+          year: selectedYear,
+          dataType: 'Sales',
+        );
+        return MonthlySummaryPage();
       });
     case dailyOrderSummary:
       return MaterialPageRoute(builder: (BuildContext context) {
@@ -469,9 +492,36 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         );
       });
     // Productivity
+    case productivityIndex:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        Provider.of<CustomerModel>(context, listen: false).getCustomers();
+        return ProductivityIndexPage();
+      });
     case productivityCreate:
       return MaterialPageRoute(builder: (BuildContext context) {
         return ProductivityCreatePage();
+      });
+    // Customer Data Entry
+    case customerDataEntryIndex:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        Provider.of<CustomerDataEntryModel>(context, listen: false)
+            .getCustomerDataEntries();
+        return CustomerDataEntryPage();
+      });
+    case customerDataEntryCreate:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return CustomerDataEntryCreatePage();
+      });
+    // Competitor Data
+    case competitorDataIndex:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        Provider.of<CompetitorDataModel>(context, listen: false)
+            .getCompetitorDatas();
+        return CompetitorDataPage();
+      });
+    case competitorDataCreate:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return CompetitorDataCreatePage();
       });
     default:
       return MaterialPageRoute(builder: (BuildContext context) {

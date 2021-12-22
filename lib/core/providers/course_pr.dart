@@ -7,14 +7,14 @@ class CourseModel with ChangeNotifier {
   final CourseService _courseService = locator<CourseService>();
 
   // Courses
-  late List<Course> _courses;
+  List<Course>? _courses;
 
-  set courses(List<Course> newCourses) {
+  set courses(List<Course>? newCourses) {
     _courses = newCourses;
     notifyListeners();
   }
 
-  List<Course> get courses => _courses;
+  List<Course>? get courses => _courses;
 
   getCourses() async {
     courses = await _courseService.getCourses();

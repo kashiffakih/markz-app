@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/models/order.dart';
 import 'package:sales_app/core/providers/my_order_pr.dart';
@@ -21,6 +22,10 @@ class _OrderDetailItemsPageState extends State<OrderDetailItemsPage> {
 
     Order _order = _orderModel.orders
         .firstWhere((_order) => _order.id == widget.arguments['order'].id);
+
+    DateFormat format = DateFormat('dd-MM-yyyy');
+
+    String todayDate = format.format(DateTime.now());
 
     return Scaffold(
       appBar: PreferredSize(
@@ -103,7 +108,7 @@ class _OrderDetailItemsPageState extends State<OrderDetailItemsPage> {
             child: Card(
               elevation: 10,
               child: Column(
-                children: _order == null
+                children: _order.id == null
                     ? []
                     : _order.orderDetails!
                         .map(
@@ -196,38 +201,49 @@ class _OrderDetailItemsPageState extends State<OrderDetailItemsPage> {
                                         //     Radius.circular(5),
                                         //   ),
                                         // ),
-                                        child: TextFormField(
-                                          initialValue:
-                                              _orderDetail.qty.toString(),
-                                          keyboardType: TextInputType.number,
-                                          decoration: InputDecoration(
-                                            labelText: 'Enter Qty',
-                                            // border: InputBorder.none,
-                                          ),
-                                          onChanged: (value) {
-                                            setState(() {
-                                              if (value != '' && value != '0') {
-                                                double pricePerUnit =
-                                                    _orderDetail.value! /
-                                                        int.parse(_orderDetail
-                                                            .qty
-                                                            .toString());
-                                                _orderDetail.qty =
-                                                    int.parse(value);
-                                                _orderDetail.value =
-                                                    _orderDetail.qty! *
-                                                        pricePerUnit.toInt();
-                                                _order.total = 0;
-                                                _order.orderDetails!
-                                                    .forEach((_detail) {
-                                                  _order.total = _order.total! +
-                                                      int.parse(_detail.value
-                                                          .toString());
-                                                });
-                                              }
-                                            });
-                                          },
-                                        ),
+                                        child: format.format(DateTime.parse(
+                                                    _order.createdAt
+                                                        .toString())) !=
+                                                todayDate
+                                            ? Text(_orderDetail.qty.toString())
+                                            : TextFormField(
+                                                initialValue:
+                                                    _orderDetail.qty.toString(),
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                decoration: InputDecoration(
+                                                  labelText: 'Enter Qty',
+                                                  // border: InputBorder.none,
+                                                ),
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    if (value != '' &&
+                                                        value != '0') {
+                                                      double pricePerUnit =
+                                                          _orderDetail.value! /
+                                                              int.parse(
+                                                                  _orderDetail
+                                                                      .qty
+                                                                      .toString());
+                                                      _orderDetail.qty =
+                                                          int.parse(value);
+                                                      _orderDetail.value =
+                                                          _orderDetail.qty! *
+                                                              pricePerUnit
+                                                                  .toInt();
+                                                      _order.total = 0;
+                                                      _order.orderDetails!
+                                                          .forEach((_detail) {
+                                                        _order.total = _order
+                                                                .total! +
+                                                            int.parse(_detail
+                                                                .value
+                                                                .toString());
+                                                      });
+                                                    }
+                                                  });
+                                                },
+                                              ),
                                       ),
                                     ),
                                     Expanded(

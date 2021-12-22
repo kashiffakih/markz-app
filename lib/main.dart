@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sales_app/core/models/customer_data_entry.dart';
 import 'package:sales_app/core/providers/analytics_pr.dart';
 import 'package:sales_app/core/providers/asset_pr.dart';
 import 'package:sales_app/core/providers/attendance_pr.dart';
 import 'package:sales_app/core/providers/auth_pr.dart';
+import 'package:sales_app/core/providers/competitor_data_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/course_pr.dart';
+import 'package:sales_app/core/providers/customer_data_entry_pr.dart';
+import 'package:sales_app/core/providers/customer_pr.dart';
 import 'package:sales_app/core/providers/daily_photo_pr.dart';
 import 'package:sales_app/core/providers/device_info_pr.dart';
 import 'package:sales_app/core/providers/location_pr.dart';
@@ -89,6 +93,15 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => VisitorModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => CustomerModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => CustomerDataEntryModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => CompetitorDataModel(),
         ),
       ],
       child: MaterialApp(

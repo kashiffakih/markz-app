@@ -66,7 +66,7 @@ class DaySummaryPage extends StatelessWidget {
                                             context, '/orderDetails');
                                       },
                                       child: Text(
-                                        'View All Offtakes',
+                                        'View All Data',
                                         style: TextStyle(
                                           color: Colors.white,
                                         ),

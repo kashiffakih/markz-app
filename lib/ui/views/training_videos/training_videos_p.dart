@@ -85,11 +85,14 @@ class TrainingVideosPage extends StatelessWidget {
                     ),
                   ),
                   _courseModel.courses == null
-                      ? CircularProgressIndicator()
+                      ? Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(child: CircularProgressIndicator()),
+                        )
                       : Container(
                           padding: EdgeInsets.all(10),
                           child: Column(
-                            children: _courseModel.courses
+                            children: _courseModel.courses!
                                 .map(
                                   (_course) => InkWell(
                                     onTap: () {
@@ -106,7 +109,7 @@ class TrainingVideosPage extends StatelessWidget {
                                             Expanded(
                                               child: Center(
                                                 child: Text((_courseModel
-                                                            .courses
+                                                            .courses!
                                                             .indexOf(_course) +
                                                         1)
                                                     .toString()),

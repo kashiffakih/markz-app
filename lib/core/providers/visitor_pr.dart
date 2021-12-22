@@ -7,14 +7,14 @@ class VisitorModel with ChangeNotifier {
   final VisitorService _visitorService = locator<VisitorService>();
 
   // Get Visitors
-  late List<Visitor> _visitors;
+  List<Visitor>? _visitors;
 
-  set visitors(List<Visitor> newVisitors) {
+  set visitors(List<Visitor>? newVisitors) {
     _visitors = newVisitors;
     notifyListeners();
   }
 
-  List<Visitor> get visitors => _visitors;
+  List<Visitor>? get visitors => _visitors;
 
   getVisitors({@required retailerId}) async {
     visitors = await _visitorService.getVisitors(retailerId: retailerId);

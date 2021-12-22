@@ -24,8 +24,11 @@ class SaleTrendsPage extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           child: _analyticsModel.salesTrend == null
-              ? Center(
-                  child: CircularProgressIndicator(),
+              ? Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
                 )
               : Column(
                   children: [
@@ -43,7 +46,7 @@ class SaleTrendsPage extends StatelessWidget {
                       series: <ChartSeries>[
                         // Initialize line series
                         ColumnSeries<SalesData, String>(
-                          dataSource: _analyticsModel.salesTrend.months!
+                          dataSource: _analyticsModel.salesTrend!.months!
                               .map((_month) => SalesData(
                                     _month.month.toString(),
                                     double.parse(_month.value.toString()),
@@ -81,7 +84,7 @@ class SaleTrendsPage extends StatelessWidget {
                                 children: [
                                   Text(
                                     '₹ ' +
-                                        _analyticsModel.salesTrend.lastMonth
+                                        _analyticsModel.salesTrend!.lastMonth
                                             .toString(),
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -120,7 +123,7 @@ class SaleTrendsPage extends StatelessWidget {
                                     Text(
                                       '₹ ' +
                                           _analyticsModel
-                                              .salesTrend.currentMonth
+                                              .salesTrend!.currentMonth
                                               .toString(),
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,

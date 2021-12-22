@@ -34,6 +34,8 @@ class AnalyticsModel with ChangeNotifier {
     daySummary = await _analyticsService.daySummary(date: date);
   }
 
+  // MonthlySummary
+
   // KPI Report
   late KpiReport _kpiReport = KpiReport();
 
@@ -78,14 +80,14 @@ class AnalyticsModel with ChangeNotifier {
   }
 
   // Sales Trend
-  late SalesTrend _salesTrend;
+  SalesTrend? _salesTrend;
 
-  set salesTrend(SalesTrend newSalesTrend) {
+  set salesTrend(SalesTrend? newSalesTrend) {
     _salesTrend = newSalesTrend;
     notifyListeners();
   }
 
-  SalesTrend get salesTrend => _salesTrend;
+  SalesTrend? get salesTrend => _salesTrend;
 
   getSalesTrend() async {
     DateFormat format = DateFormat('MM');

@@ -69,7 +69,7 @@ class NewVisitorsPage extends StatelessWidget {
                       : Container(
                           padding: EdgeInsets.all(10),
                           child: Column(
-                            children: _visitorModel.visitors
+                            children: _visitorModel.visitors!
                                 .map(
                                   (_visitor) => InkWell(
                                     onTap: () {
@@ -87,7 +87,7 @@ class NewVisitorsPage extends StatelessWidget {
                                           children: [
                                             Expanded(
                                               child: Text((_visitorModel
-                                                          .visitors
+                                                          .visitors!
                                                           .indexOf(_visitor) +
                                                       1)
                                                   .toString()),

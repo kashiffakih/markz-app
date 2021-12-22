@@ -129,7 +129,21 @@ class BeatOutletsPage extends StatelessWidget {
                           children: [
                             Row(
                               children: [
+                                // Text(_retailer.imagePath.toString()),
                                 if (_retailer.imagePath == null)
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      top: 8.0,
+                                      right: 8.0,
+                                      bottom: 8.0,
+                                    ),
+                                    child: CircleAvatar(
+                                      radius: 32,
+                                      backgroundImage:
+                                          AssetImage(Images.product),
+                                    ),
+                                  ),
+                                if (_retailer.imagePath != null)
                                   Padding(
                                     padding: EdgeInsets.only(
                                       top: 8.0,
@@ -143,18 +157,6 @@ class BeatOutletsPage extends StatelessWidget {
                                             _retailer.imagePath,
                                       ),
                                     ),
-                                  ),
-                                if (_retailer.imagePath != null)
-                                  Padding(
-                                    padding: EdgeInsets.only(
-                                      top: 8.0,
-                                      right: 8.0,
-                                      bottom: 8.0,
-                                    ),
-                                    child: CircleAvatar(
-                                        radius: 32,
-                                        backgroundImage:
-                                            AssetImage(Images.product)),
                                   ),
                                 Expanded(
                                   flex: 3,

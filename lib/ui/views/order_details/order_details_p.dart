@@ -13,7 +13,7 @@ class OrderDetailsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Daily Offtake Summary | ' + todayDate),
+        title: Text('Daily Summary | ' + todayDate),
       ),
       body: SafeArea(
         child: SingleChildScrollView(

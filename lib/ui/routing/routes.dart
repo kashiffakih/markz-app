@@ -107,4 +107,16 @@ const String newVisitorId = '/newVisitorId';
 
 const String newVisitorDetails = '/newVisitorDetails';
 
+const String productivityIndex = '/productivityIndex';
 const String productivityCreate = '/productivityCreate';
+const String productivityEdit = '/productivityEdit';
+
+const String customerDataEntryIndex = '/customerDataEntryIndex';
+const String customerDataEntryCreate = '/customerDataEntryCreate';
+const String customerDataEntryEdit = '/customerDataEntryEdit';
+
+const String competitorDataIndex = '/competitorDataIndex';
+const String competitorDataCreate = '/competitorDataCreate';
+const String competitorDataEdit = '/competitorDataEdit';
+
+const String monthlySummary = '/monthlySummary';

@@ -19,49 +19,29 @@ class _HomePageState extends State<HomePage> {
 
   final List<List<Map<String, dynamic>>> _menuItems = [
     [
+      {
+        'icon': Icons.summarize,
+        'color': Colors.amber,
+        'name': 'Summary',
+        'url': '/monthlySummary',
+      },
       // {
-      //   'icon': Icons.dashboard,
-      //   'color': Colors.amber,
-      //   'name': 'Dashboard',
-      //   'url': '/dashboard',
+      //   'icon': Icons.note,
+      //   'color': Colors.teal[200],
+      //   'name': 'Daily Summary',
+      //   'url': '/daySummary',
       // },
       {
-        'icon': Icons.note,
-        'color': Colors.teal[200],
-        'name': 'Day Summary',
-        'url': '/daySummary',
-      },
-      {
-        'icon': Icons.report,
-        'color': Colors.red[200],
-        'name': 'KPI Report',
-        'url': '/kpiReport',
-      },
-      {
-        'icon': Icons.location_history,
-        'color': Colors.green[200],
-        'name': 'Photos',
-        'url': '/dailyPhotos',
-      },
-    ],
-    [
-      {
-        'icon': Icons.calendar_today,
+        'icon': Icons.chat_rounded,
         'color': Colors.blue[200],
-        'name': 'Att. Calendar',
-        'url': '/attendanceCalendar',
+        'name': 'Trend',
+        'url': '/saleTrends',
       },
       {
-        'icon': Icons.location_history,
-        'color': Colors.green[200],
-        'name': 'Store',
-        'url': '/beats',
-      },
-      {
-        'icon': Icons.access_alarms,
-        'color': Colors.cyan[200],
-        'name': 'Attendance',
-        'url': '/attendance',
+        'icon': Icons.auto_graph,
+        'color': Colors.red[200],
+        'name': 'T Vs A',
+        'url': '/kpiReport',
       },
     ],
     // [
@@ -86,15 +66,35 @@ class _HomePageState extends State<HomePage> {
     // ],
     [
       {
-        'icon': Icons.production_quantity_limits,
+        'icon': Icons.photo,
+        'color': Colors.amber[200],
+        'name': 'Photos',
+        'url': '/dailyPhotos',
+      },
+      {
+        'icon': Icons.local_grocery_store,
         'color': Colors.green[200],
+        'name': 'Store',
+        'url': '/beats',
+      },
+      {
+        'icon': Icons.production_quantity_limits,
+        'color': Colors.blue[200],
         'name': 'Stocks',
         'url': '/stockBeats',
+      },
+    ],
+    [
+      {
+        'icon': Icons.access_alarms,
+        'color': Colors.cyan[200],
+        'name': 'Attendance',
+        'url': '/attendance',
       },
       {
         'icon': Icons.photo_album,
         'color': Colors.green[200],
-        'name': 'Training Videos',
+        'name': 'Videos',
         'url': '/trainingVideos',
       },
       {
@@ -103,7 +103,27 @@ class _HomePageState extends State<HomePage> {
         'name': 'Visitors',
         'url': '/beats',
       },
-    ]
+    ],
+    [
+      {
+        'icon': Icons.poll_rounded,
+        'color': Colors.blue[200],
+        'name': 'Productivity',
+        'url': '/productivityIndex',
+      },
+      {
+        'icon': Icons.dashboard_customize_rounded,
+        'color': Colors.red[200],
+        'name': 'Customers',
+        'url': '/customerDataEntryIndex',
+      },
+      {
+        'icon': Icons.person_add_alt_outlined,
+        'color': Colors.green[200],
+        'name': 'Competitors',
+        'url': '/competitorDataIndex',
+      },
+    ],
   ];
 
   var format = DateFormat.yMMMMd();

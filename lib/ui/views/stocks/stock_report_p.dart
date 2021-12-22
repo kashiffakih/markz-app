@@ -331,7 +331,7 @@ class _StockReportPageState extends State<StockReportPage> {
                                                 child: Column(
                                                   children: [
                                                     Text(
-                                                      'Ret.',
+                                                      'Stk Ret.',
                                                       style: TextStyle(
                                                         color: Colors.red,
                                                       ),
@@ -373,7 +373,7 @@ class _StockReportPageState extends State<StockReportPage> {
                                                 child: Column(
                                                   children: [
                                                     Text(
-                                                      'Ret.',
+                                                      'Off Ret.',
                                                       style: TextStyle(
                                                         color: Colors.green,
                                                       ),

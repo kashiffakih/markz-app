@@ -1,11 +1,15 @@
 import 'package:get_it/get_it.dart';
+import 'package:sales_app/core/models/customer_data_entry.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/services/analytics_s.dart';
 import 'package:sales_app/core/services/asset_s.dart';
 import 'package:sales_app/core/services/attendance_s.dart';
 import 'package:sales_app/core/services/auth_s.dart';
+import 'package:sales_app/core/services/competitor_data_s.dart';
 import 'package:sales_app/core/services/config_s.dart';
 import 'package:sales_app/core/services/course_s.dart';
+import 'package:sales_app/core/services/customer_data_entry_s.dart';
+import 'package:sales_app/core/services/customer_s.dart';
 import 'package:sales_app/core/services/daily_photo_s.dart';
 import 'package:sales_app/core/services/device_info_s.dart';
 import 'package:sales_app/core/services/location_s.dart';
@@ -43,4 +47,7 @@ void setupLocator() {
   locator.registerLazySingleton(() => CourseService());
   locator.registerLazySingleton(() => RequistionService());
   locator.registerLazySingleton(() => VisitorService());
+  locator.registerLazySingleton(() => CustomerService());
+  locator.registerLazySingleton(() => CustomerDataEntryService());
+  locator.registerLazySingleton(() => CompetitorDataService());
 }

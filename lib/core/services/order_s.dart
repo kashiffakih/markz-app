@@ -59,4 +59,33 @@ class OrderService {
 
     return _orders;
   }
+
+  Future<List<Order>> fetchOrdersOfMonth(
+      {@required monthId, @required year, @required orderType}) async {
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    User user = _configModel.user;
+
+    print(monthId);
+    print(orderType);
+    print(year);
+
+    http.Response _response = await http.get(
+      Uri.parse(
+          '${_apiConfig['baseURL']}/offtakes?userId=${user.id}&month=$monthId&&year=$year&orderType=$orderType&raw=YES'),
+      headers: _apiConfig['headers'],
+    );
+
+    Map<String, dynamic> _responseData = json.decode(_response.body);
+
+    print(_responseData);
+
+    if (_responseData['success']) {
+      _orders = [];
+      _responseData['data'].forEach((order) {
+        _orders.add(Order.fromJson(order));
+      });
+    }
+
+    return _orders;
+  }
 }

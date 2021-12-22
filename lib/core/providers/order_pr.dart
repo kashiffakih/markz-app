@@ -43,4 +43,15 @@ class OrderModel with ChangeNotifier {
       date: date,
     );
   }
+
+  fetchOrdersOfMonth(
+      {@required monthId, @required year, @required dataType}) async {
+    ordersLoader = true;
+    notifyListeners();
+    orders = await _orderService.fetchOrdersOfMonth(
+      monthId: monthId,
+      year: year,
+      orderType: dataType,
+    );
+  }
 }
