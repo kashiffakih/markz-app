@@ -23,7 +23,7 @@ class NoticeService {
     if (_responseData['success']) {
       _notices = [];
       _responseData['data'].forEach((_notice) {
-        // _notices.add(Notice.fromJson(_notice));
+        _notices.add(Notice.fromJson(_notice));
       });
     }
 

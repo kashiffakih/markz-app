@@ -329,7 +329,7 @@ class _HomePageState extends State<HomePage> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(_notice.title.toString()),
+                                              // Text(_notice.title.toString()),
                                               Text(_notice.description
                                                   .toString()),
                                               if (_notice.link != null)
