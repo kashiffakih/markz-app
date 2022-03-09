@@ -68,6 +68,7 @@ import 'package:sales_app/ui/views/productivity/productivity_create_p.dart';
 import 'package:sales_app/ui/views/productivity/productivity_index_p.dart';
 import 'package:sales_app/ui/views/profile/profile_p.dart';
 import 'package:sales_app/ui/views/reports/daily_order_summary_p.dart';
+import 'package:sales_app/ui/views/reports/focusssed_p.dart';
 import 'package:sales_app/ui/views/reports/monthly_summary_p.dart';
 
 // Target vs Achieved
@@ -168,6 +169,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       });
     case beatOutlets:
       return MaterialPageRoute(builder: (BuildContext context) {
+        Provider.of<ReferencePlanModel>(context, listen: false)
+            .getReferencePlans();
+        Provider.of<SkuModel>(context, listen: false).getSkus();
         return BeatOutletsPage(
           arguments: settings.arguments,
         );
@@ -300,9 +304,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     // Stock Report
     case stockBeats:
       return MaterialPageRoute(builder: (BuildContext context) {
-        Provider.of<ReferencePlanModel>(context, listen: false)
-            .getReferencePlans();
-        Provider.of<SkuModel>(context, listen: false).getSkus();
+        // Provider.of<ReferencePlanModel>(context, listen: false)
+        //     .getReferencePlans();
+        // Provider.of<SkuModel>(context, listen: false).getSkus();
         return StockBeatsPage();
       });
     case stockBeatOutlets:
@@ -384,7 +388,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         DateFormat format = DateFormat('M');
 
         String selectedMonthId = format.format(DateTime.now());
-        String selectedYear = '2021';
+        String selectedYear = '2022';
         Provider.of<OrderModel>(context, listen: false).fetchOrdersOfMonth(
           monthId: selectedMonthId,
           year: selectedYear,
@@ -404,6 +408,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     // KPI Report
     case kpiReport:
       return MaterialPageRoute(builder: (BuildContext context) {
+        Provider.of<AnalyticsModel>(context, listen: false).getFocussedReport();
         Provider.of<AnalyticsModel>(context, listen: false).getKpiReport();
         return KpiReportPage();
       });
@@ -522,6 +527,12 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case competitorDataCreate:
       return MaterialPageRoute(builder: (BuildContext context) {
         return CompetitorDataCreatePage();
+      });
+    // Focussed
+    case focussedTargetVsAchieved:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        Provider.of<AnalyticsModel>(context, listen: false).getFocussedReport();
+        return FocussedReportPage();
       });
     default:
       return MaterialPageRoute(builder: (BuildContext context) {

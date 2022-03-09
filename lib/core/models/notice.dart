@@ -6,6 +6,9 @@ class Notice {
   String? description;
   String? imagepath;
   String? link;
+  String? channel;
+  String? brand;
+  String? roleName;
   String? createdAt;
   String? updatedAt;
 
@@ -17,6 +20,9 @@ class Notice {
       this.description,
       this.imagepath,
       this.link,
+      this.channel,
+      this.brand,
+      this.roleName,
       this.createdAt,
       this.updatedAt});
 
@@ -28,6 +34,9 @@ class Notice {
     description = json['description'];
     imagepath = json['imagepath'];
     link = json['link'];
+    channel = json['channel'];
+    brand = json['brand'];
+    roleName = json['role_name'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
   }
@@ -41,6 +50,9 @@ class Notice {
     data['description'] = this.description;
     data['imagepath'] = this.imagepath;
     data['link'] = this.link;
+    data['channel'] = this.channel;
+    data['brand'] = this.brand;
+    data['role_name'] = this.roleName;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
     return data;

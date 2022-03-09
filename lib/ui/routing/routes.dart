@@ -120,3 +120,5 @@ const String competitorDataCreate = '/competitorDataCreate';
 const String competitorDataEdit = '/competitorDataEdit';
 
 const String monthlySummary = '/monthlySummary';
+
+const String focussedTargetVsAchieved = '/focussedTargetVsAchieved';

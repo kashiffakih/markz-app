@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:sales_app/core/models/competitor_data.dart';
 import 'package:sales_app/core/models/customer.dart';
 import 'package:sales_app/core/providers/competitor_data_pr.dart';
+import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/customer_pr.dart';
+import 'package:sales_app/locator.dart';
 
 class CompetitorDataCreatePage extends StatefulWidget {
   @override
@@ -15,37 +17,52 @@ class _CompetitorDataCreatePageState extends State<CompetitorDataCreatePage> {
   final GlobalKey<FormState> _key = GlobalKey<FormState>();
   bool _isLoading = false;
 
-  List<String> _competitors = [
-    'Biotech',
-    'Derma fique',
-    'Nivea',
-    'Neutrogena',
-    'Olay',
-    'Plum'
-  ];
-  List<dynamic> _months = [
-    {'name': 'January', 'value': '1'},
-    {'name': 'February', 'value': '2'},
-    {'name': 'March', 'value': '3'},
-    {'name': 'April', 'value': '4'},
-    {'name': 'May', 'value': '5'},
-    {'name': 'June', 'value': '6'},
-    {'name': 'July', 'value': '7'},
-    {'name': 'August', 'value': '8'},
-    {'name': 'September', 'value': '9'},
-    {'name': 'October', 'value': '10'},
-    {'name': 'November', 'value': '11'},
-    {'name': 'December', 'value': '12'},
-  ];
-  List<dynamic> _years = [
-    {'name': '2021', 'value': '2021'},
-    {'name': '2022', 'value': '2022'},
-  ];
+  final ConfigModel _configModel = locator<ConfigModel>();
+
+  List<String> _competitors = [];
+
+  // List<dynamic> _months = [
+  //   {'name': 'January', 'value': '1'},
+  //   {'name': 'February', 'value': '2'},
+  //   {'name': 'March', 'value': '3'},
+  //   {'name': 'April', 'value': '4'},
+  //   {'name': 'May', 'value': '5'},
+  //   {'name': 'June', 'value': '6'},
+  //   {'name': 'July', 'value': '7'},
+  //   {'name': 'August', 'value': '8'},
+  //   {'name': 'September', 'value': '9'},
+  //   {'name': 'October', 'value': '10'},
+  //   {'name': 'November', 'value': '11'},
+  //   {'name': 'December', 'value': '12'},
+  // ];
+  // List<dynamic> _years = [
+  //   {'name': '2021', 'value': '2021'},
+  //   {'name': '2022', 'value': '2022'},
+  // ];
 
   @override
   Widget build(BuildContext context) {
     final _competitorDataModel = Provider.of<CompetitorDataModel>(context);
-    CompetitorData _competitor = CompetitorData();
+    CompetitorData _competitor = CompetitorData(
+      month: '1',
+      year: 2022,
+    );
+
+    String brand = 'MAMAEARTH';
+    print(_configModel.user.brand);
+    if (_configModel.user.brand.toString().toLowerCase() ==
+        brand.toLowerCase()) {
+      print(1);
+      _competitors = [
+        'Biotech',
+        'Derma fique',
+        'Nivea',
+        'Neutrogena',
+        'Olay',
+        'Plum',
+        'WOW',
+      ];
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -134,80 +151,80 @@ class _CompetitorDataCreatePageState extends State<CompetitorDataCreatePage> {
                         )
                       ],
                     ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Month',
-                          ),
-                        ),
-                        Expanded(
-                          child: DropdownButtonFormField(
-                            decoration:
-                                InputDecoration(labelText: 'Select month'),
-                            items: _months
-                                .map(
-                                  (_month) => DropdownMenuItem(
-                                    value: _month['value'],
-                                    child: Text(
-                                      _month['name'],
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                            validator: (value) {
-                              if (value == null) return 'Please select month';
-                              return null;
-                            },
-                            onChanged: (value) {
-                              setState(() async {
-                                _competitor.month = value.toString();
-                              });
-                            },
-                            onSaved: (value) {
-                              _competitor.month = value.toString();
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Year',
-                          ),
-                        ),
-                        Expanded(
-                          child: DropdownButtonFormField(
-                            decoration:
-                                InputDecoration(labelText: 'Select year'),
-                            items: _years
-                                .map(
-                                  (_year) => DropdownMenuItem(
-                                    value: _year['value'],
-                                    child: Text(
-                                      _year['name'],
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                            validator: (value) {
-                              if (value == null) return 'Please select year';
-                              return null;
-                            },
-                            onChanged: (value) async {
-                              setState(() async {
-                                _competitor.year = value.toString();
-                              });
-                            },
-                            onSaved: (value) {
-                              _competitor.year = value.toString();
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
+                    // Row(
+                    //   children: [
+                    //     Expanded(
+                    //       child: Text(
+                    //         'Month',
+                    //       ),
+                    //     ),
+                    //     Expanded(
+                    //       child: DropdownButtonFormField(
+                    //         decoration:
+                    //             InputDecoration(labelText: 'Select month'),
+                    //         items: _months
+                    //             .map(
+                    //               (_month) => DropdownMenuItem(
+                    //                 value: _month['value'],
+                    //                 child: Text(
+                    //                   _month['name'],
+                    //                 ),
+                    //               ),
+                    //             )
+                    //             .toList(),
+                    //         validator: (value) {
+                    //           if (value == null) return 'Please select month';
+                    //           return null;
+                    //         },
+                    //         onChanged: (value) {
+                    //           setState(() async {
+                    //             _competitor.month = value.toString();
+                    //           });
+                    //         },
+                    //         onSaved: (value) {
+                    //           _competitor.month = value.toString();
+                    //         },
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
+                    // Row(
+                    //   children: [
+                    //     Expanded(
+                    //       child: Text(
+                    //         'Year',
+                    //       ),
+                    //     ),
+                    //     Expanded(
+                    //       child: DropdownButtonFormField(
+                    //         decoration:
+                    //             InputDecoration(labelText: 'Select year'),
+                    //         items: _years
+                    //             .map(
+                    //               (_year) => DropdownMenuItem(
+                    //                 value: _year['value'],
+                    //                 child: Text(
+                    //                   _year['name'],
+                    //                 ),
+                    //               ),
+                    //             )
+                    //             .toList(),
+                    //         validator: (value) {
+                    //           if (value == null) return 'Please select year';
+                    //           return null;
+                    //         },
+                    //         onChanged: (value) async {
+                    //           setState(() async {
+                    //             _competitor.year = value.toString();
+                    //           });
+                    //         },
+                    //         onSaved: (value) {
+                    //           _competitor.year = value.toString();
+                    //         },
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
                     SizedBox(
                       height: 10,
                     ),

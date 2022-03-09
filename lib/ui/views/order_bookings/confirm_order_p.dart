@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/my_order_pr.dart';
 
@@ -12,7 +13,32 @@ class ConfirmOrderPage extends StatefulWidget {
 }
 
 class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
-  bool? _isLoading;
+  bool _isLoading = false;
+
+  DateTime _selectedDate = DateTime.now();
+
+  //Method for showing the date picker
+  void _pickDateDialog() {
+    showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            //which date will display when user open the picker
+            firstDate: DateTime(1950),
+            //what will be the previous supported year in picker
+            lastDate: DateTime
+                .now()) //what will be the up to supported date in picker
+        .then((pickedDate) {
+      //then usually do the future job
+      if (pickedDate == null) {
+        //if user tap cancel then this function will stop
+        return;
+      }
+      setState(() {
+        //for rebuilding the ui
+        _selectedDate = pickedDate;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +54,28 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: RaisedButton(
+                            child: Text('Add Date'),
+                            onPressed: _pickDateDialog,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          'Date: ${DateFormat.yMMMd().format(_selectedDate)}',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Divider(
+                    color: Colors.white,
+                  ),
                   Row(
                     children: [
                       Expanded(
@@ -88,10 +136,10 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
                 ],
               ),
             ),
-            preferredSize: Size.fromHeight(40),
+            preferredSize: Size.fromHeight(80),
           ),
         ),
-        preferredSize: Size.fromHeight(100),
+        preferredSize: Size.fromHeight(160),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -256,29 +304,38 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
         selectedFontSize: 14,
         unselectedFontSize: 14,
         onTap: (value) async {
-          if (value == 1) {
-            if (_isLoading == null) {
-              setState(() async {
+          if (value == 2) {
+            if (!_isLoading) {
+              setState(() {
                 _isLoading = true;
-                await _myOrderModel.saveOrder(
-                    orderType: widget.arguments['order_type']);
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) => AlertDialog(
-                    title: Text('Offtake successfully updated'),
-                    actions: [
-                      FlatButton(
-                        onPressed: () {
-                          _myOrderModel.emptyOrder();
-                          Navigator.pop(context);
-                          Navigator.pushReplacementNamed(context, '/home');
-                        },
-                        child: Text('Ok'),
-                      ),
-                    ],
-                  ),
-                );
               });
+              await _myOrderModel.saveOrder(
+                orderType: widget.arguments['order_type'],
+                date: _selectedDate,
+              );
+              print(_isLoading);
+              showDialog(
+                barrierDismissible: false,
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: Text('Offtake successfully updated'),
+                  actions: [
+                    FlatButton(
+                      onPressed: () {
+                        _myOrderModel.emptyOrder();
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                        // Navigator.pop(context);
+                        // Navigator.pushReplacementNamed(context, '/home');
+                      },
+                      child: Text('Ok'),
+                    ),
+                  ],
+                ),
+              );
             }
           }
         },
@@ -302,6 +359,21 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            icon: Icon(Icons.arrow_right),
+          ),
+          BottomNavigationBarItem(
+            title: Padding(
+              padding: EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
                       Expanded(
                         flex: 2,
                         child: Text(
@@ -320,13 +392,22 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
             ),
             icon: Icon(Icons.arrow_right),
           ),
-          BottomNavigationBarItem(
-            title: Text(
-              'SUBMIT/CONFIRM',
-              style: TextStyle(fontWeight: FontWeight.bold),
+          if (!_isLoading)
+            BottomNavigationBarItem(
+              title: Text(
+                'SUBMIT/CONFIRM',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              icon: Icon(Icons.arrow_right),
             ),
-            icon: Icon(Icons.arrow_right),
-          ),
+          if (_isLoading)
+            BottomNavigationBarItem(
+              title: Text(
+                'SAVING...',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              icon: Icon(Icons.arrow_right),
+            ),
         ],
       ),
     );

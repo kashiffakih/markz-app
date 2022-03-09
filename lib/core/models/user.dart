@@ -97,6 +97,8 @@ class User {
   int? nsmId;
   int? distributorId;
   String? baName;
+  String? brand;
+  String? channel;
   List<Roles>? roles;
   List<Companies>? companies;
   Distributor? distributor;
@@ -200,6 +202,8 @@ class User {
       this.nsmId,
       this.distributorId,
       this.baName,
+      this.brand,
+      this.channel,
       this.roles,
       this.companies,
       this.distributor});
@@ -303,6 +307,8 @@ class User {
     nsmId = json['nsm_id'];
     distributorId = json['distributor_id'];
     baName = json['ba_name'];
+    brand = json['brand'];
+    channel = json['channel'];
     if (json['roles'] != null) {
       roles = [];
       json['roles'].forEach((v) {
@@ -420,6 +426,8 @@ class User {
     data['nsm_id'] = this.nsmId;
     data['distributor_id'] = this.distributorId;
     data['ba_name'] = this.baName;
+    data['brand'] = this.brand;
+    data['channel'] = this.channel;
     if (this.roles != null) {
       data['roles'] = this.roles!.map((v) => v.toJson()).toList();
     }

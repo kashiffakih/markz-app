@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/models/reference_plan.dart';
 import 'package:sales_app/core/providers/my_order_pr.dart';
@@ -23,6 +24,11 @@ class OutletDetailsPage extends StatefulWidget {
 class _OutletDetailsPageState extends State<OutletDetailsPage> {
   bool isUploadingImage = false;
   late String _reason;
+
+  // DateFormat format = DateFormat('D');
+  // var day = format.format(DateTime.now());
+
+  // print(day);
 
   List<Map<String, dynamic>> buttons = [
     {
@@ -121,102 +127,102 @@ class _OutletDetailsPageState extends State<OutletDetailsPage> {
                           ),
                       ],
                     ),
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  flex: 3,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              _retailer.name.toString(),
-                                              style: TextStyle(
-                                                  color: Colors.orange,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                          if (_retailer.lat != null &&
-                                              _retailer.lng != null)
-                                            IconButton(
-                                              icon: Icon(
-                                                Icons.location_on,
-                                                color: Colors.pink,
-                                              ),
-                                              onPressed: () {
-                                                String url =
-                                                    'https://www.google.com/maps/?q=${_retailer.lat},${_retailer.lng}';
-                                                _launchURL(url: url);
-                                              },
-                                            ),
-                                          if (_retailer.isDone == 'Y')
-                                            Icon(
-                                              Icons.check,
-                                              color: Colors.green,
-                                            )
-                                          else
-                                            Icon(
-                                              Icons.warning,
-                                              color: Colors.red,
-                                            )
-                                        ],
-                                      ),
-                                      Text(
-                                        'RETAILER',
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                      Text(
-                                        _retailer.address.toString(),
-                                        style: TextStyle(
-                                          color: Colors.red,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Center(
-                                    child: Text(
-                                      'Avg. L3M: ₹ ' + _retailer.l3m.toString(),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Center(
-                                    child: Text(
-                                      'MTD: ₹ ' + _retailer.mtd.toString(),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    // Card(
+                    //   child: Padding(
+                    //     padding: const EdgeInsets.all(8.0),
+                    //     child: Column(
+                    //       children: [
+                    //         Row(
+                    //           children: [
+                    //             Expanded(
+                    //               flex: 3,
+                    //               child: Column(
+                    //                 crossAxisAlignment:
+                    //                     CrossAxisAlignment.start,
+                    //                 children: [
+                    //                   Row(
+                    //                     children: [
+                    //                       Expanded(
+                    //                         child: Text(
+                    //                           _retailer.name.toString(),
+                    //                           style: TextStyle(
+                    //                               color: Colors.orange,
+                    //                               fontWeight: FontWeight.bold),
+                    //                         ),
+                    //                       ),
+                    //                       if (_retailer.lat != null &&
+                    //                           _retailer.lng != null)
+                    //                         IconButton(
+                    //                           icon: Icon(
+                    //                             Icons.location_on,
+                    //                             color: Colors.pink,
+                    //                           ),
+                    //                           onPressed: () {
+                    //                             String url =
+                    //                                 'https://www.google.com/maps/?q=${_retailer.lat},${_retailer.lng}';
+                    //                             _launchURL(url: url);
+                    //                           },
+                    //                         ),
+                    //                       if (_retailer.isDone == 'Y')
+                    //                         Icon(
+                    //                           Icons.check,
+                    //                           color: Colors.green,
+                    //                         )
+                    //                       else
+                    //                         Icon(
+                    //                           Icons.warning,
+                    //                           color: Colors.red,
+                    //                         )
+                    //                     ],
+                    //                   ),
+                    //                   Text(
+                    //                     'RETAILER',
+                    //                     style: TextStyle(
+                    //                       color: Colors.grey,
+                    //                     ),
+                    //                   ),
+                    //                   Text(
+                    //                     _retailer.address.toString(),
+                    //                     style: TextStyle(
+                    //                       color: Colors.red,
+                    //                     ),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //         SizedBox(
+                    //           height: 5,
+                    //         ),
+                    //         Row(
+                    //           children: [
+                    //             Expanded(
+                    //               child: Center(
+                    //                 child: Text(
+                    //                   'Avg. L3M: ₹ ' + _retailer.l3m.toString(),
+                    //                   style: TextStyle(
+                    //                     fontWeight: FontWeight.bold,
+                    //                   ),
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //             Expanded(
+                    //               child: Center(
+                    //                 child: Text(
+                    //                   'MTD: ₹ ' + _retailer.mtd.toString(),
+                    //                   style: TextStyle(
+                    //                     fontWeight: FontWeight.bold,
+                    //                   ),
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
                     if (_retailer.imagePath == null)
                       Column(
                         children: [

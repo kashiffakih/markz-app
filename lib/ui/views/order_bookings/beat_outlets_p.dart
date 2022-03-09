@@ -24,13 +24,34 @@ class BeatOutletsPage extends StatelessWidget {
     final _referencePlanModel = Provider.of<ReferencePlanModel>(context);
     final _configModel = locator<ConfigModel>();
 
-    ReferencePlan _referencePlan = _referencePlanModel.referencePlans
-        .firstWhere((_rf) => _rf.id == arguments['beat'].id);
+    ReferencePlan? _referencePlan;
 
+    if (_referencePlanModel.referencePlansLoader == false)
+      _referencePlan = _referencePlanModel.referencePlans[0];
+
+    if (_referencePlanModel.referencePlansLoader) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Location'),
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Column(
+              children: [
+                Center(
+                  child: CircularProgressIndicator(),
+                )
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     return Scaffold(
       appBar: PreferredSize(
         child: AppBar(
-          title: Text((_referencePlan).name! +
+          title: Text((_referencePlan)!.name! +
               ' | ' +
               (_referencePlan).town.toString()),
           // actions: [
@@ -87,7 +108,7 @@ class BeatOutletsPage extends StatelessWidget {
                               'outlet': _retailer,
                             });
                       if (arguments['tab']['name'] ==
-                          'Store') if (_retailer.isDone == 'Y') {
+                          'Daily Activity') if (_retailer.isDone == 'Y') {
                         showDialog(
                             context: context,
                             builder: (BuildContext context) => AlertDialog(
@@ -199,18 +220,18 @@ class BeatOutletsPage extends StatelessWidget {
                                             )
                                         ],
                                       ),
-                                      Text(
-                                        'RETAILER',
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                      Text(
-                                        _retailer.address.toString(),
-                                        style: TextStyle(
-                                          color: Colors.red,
-                                        ),
-                                      ),
+                                      // Text(
+                                      //   'RETAILER',
+                                      //   style: TextStyle(
+                                      //     color: Colors.grey,
+                                      //   ),
+                                      // ),
+                                      // Text(
+                                      //   _retailer.address.toString(),
+                                      //   style: TextStyle(
+                                      //     color: Colors.red,
+                                      //   ),
+                                      // ),
                                     ],
                                   ),
                                 ),
@@ -219,30 +240,30 @@ class BeatOutletsPage extends StatelessWidget {
                             SizedBox(
                               height: 5,
                             ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Center(
-                                    child: Text(
-                                      'Avg. L3M: ₹ ' + _retailer.l3m.toString(),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Center(
-                                    child: Text(
-                                      'MTD: ₹ ' + _retailer.mtd.toString(),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                            // Row(
+                            //   children: [
+                            //     Expanded(
+                            //       child: Center(
+                            //         child: Text(
+                            //           'Avg. L3M: ₹ ' + _retailer.l3m.toString(),
+                            //           style: TextStyle(
+                            //             fontWeight: FontWeight.bold,
+                            //           ),
+                            //         ),
+                            //       ),
+                            //     ),
+                            //     Expanded(
+                            //       child: Center(
+                            //         child: Text(
+                            //           'MTD: ₹ ' + _retailer.mtd.toString(),
+                            //           style: TextStyle(
+                            //             fontWeight: FontWeight.bold,
+                            //           ),
+                            //         ),
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
                           ],
                         ),
                       ),

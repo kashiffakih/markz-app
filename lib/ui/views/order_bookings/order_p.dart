@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/models/order.dart';
 import 'package:sales_app/core/models/sku.dart';
@@ -19,6 +20,7 @@ class _OrderPageState extends State<OrderPage> {
   TextEditingController _controller = TextEditingController();
 
   List<Sku>? _skus = [];
+  List _skuIds = [];
   bool _isSkuFilled = false;
 
   @override
@@ -42,7 +44,9 @@ class _OrderPageState extends State<OrderPage> {
     ];
 
     setState(() {
+      print(123);
       if (_skuModel.skus != null && !_isSkuFilled) {
+        print(456);
         _isSkuFilled = true;
         _skus = _skuModel.skus;
         _skus!.forEach((_sku) {
@@ -55,7 +59,9 @@ class _OrderPageState extends State<OrderPage> {
             if (_orderDetails.length > 0)
               _sku.enteredQty = _orderDetails[0].qty;
           }
+          _skuIds.add(_sku.id);
         });
+        print(789);
       }
     });
 
@@ -107,12 +113,21 @@ class _OrderPageState extends State<OrderPage> {
                           onChanged: (value) {
                             print(value);
                             setState(() {
-                              if (value == 'All')
-                                _skus = _skuModel.skus;
-                              else
-                                _skus = _skuModel.skus!
+                              List<Sku>? _tempSkus = [];
+                              if (value == 'All') {
+                                _tempSkus = _skuModel.skus;
+                              } else {
+                                _tempSkus = _skuModel.skus!
                                     .where((sku) => sku.mainCategory == value)
                                     .toList();
+                              }
+
+                              // if (value == 'All')
+                              //   _skus = _skuModel.skus;
+                              // else
+                              //   _skus = _skuModel.skus!
+                              //       .where((sku) => sku.mainCategory == value)
+                              //       .toList();
 
                               _skus!.forEach((_sku) {
                                 if (_myOrderModel.order != null) {
@@ -126,6 +141,10 @@ class _OrderPageState extends State<OrderPage> {
                                   if (_orderDetails.length > 0)
                                     _sku.enteredQty = _orderDetails[0].qty;
                                 }
+                              });
+                              _skuIds = [];
+                              _tempSkus!.forEach((_sku) {
+                                _skuIds.add(_sku.id);
                               });
 
                               Navigator.pop(context);
@@ -137,35 +156,47 @@ class _OrderPageState extends State<OrderPage> {
                     actions: [
                       FlatButton(
                         onPressed: () {
+                          List<Sku>? _tempSkus = [];
                           print(_controller.text);
                           if (_controller.text == '') {
                             setState(() {
-                              _skus = _skuModel.skus;
+                              _tempSkus = _skuModel.skus;
                             });
                           } else {
                             setState(() {
-                              _skus = _skuModel.skus!
+                              _tempSkus = _skuModel.skus!
                                   .where((sku) => sku.name!
                                       .toLowerCase()
                                       .contains(_controller.text))
                                   .toList();
 
-                              _skus!.forEach((_sku) {
-                                if (_myOrderModel.order != null) {
-                                  var _orderDetails =
-                                      _myOrderModel.order!.orderDetails!
-                                          .where(
-                                            (_orderDetail) =>
-                                                _sku.id == _orderDetail.skuId,
-                                          )
-                                          .toList();
-                                  if (_orderDetails.length > 0)
-                                    _sku.enteredQty = _orderDetails[0].qty;
-                                }
-                              });
+                              // _skus = _skuModel.skus!
+                              //     .where((sku) => sku.name!
+                              //         .toLowerCase()
+                              //         .contains(_controller.text))
+                              //     .toList();
                             });
                           }
-                          setState(() {});
+                          setState(() {
+                            _skus!.forEach((_sku) {
+                              if (_myOrderModel.order != null) {
+                                var _orderDetails =
+                                    _myOrderModel.order!.orderDetails!
+                                        .where(
+                                          (_orderDetail) =>
+                                              _sku.id == _orderDetail.skuId,
+                                        )
+                                        .toList();
+                                if (_orderDetails.length > 0)
+                                  _sku.enteredQty = _orderDetails[0].qty;
+                              }
+                            });
+                            _skuIds = [];
+                            _tempSkus!.forEach((_sku) {
+                              _skuIds.add(_sku.id);
+                            });
+                          });
+                          print(_skuIds);
                           Navigator.pop(context);
                         },
                         child: Text('SEARCH'),
@@ -252,251 +283,267 @@ class _OrderPageState extends State<OrderPage> {
                   : Column(
                       children: _skus!
                           .map(
-                            (_sku) => Container(
-                              decoration: _skus!.indexOf(_sku) % 2 != 0
-                                  ? BoxDecoration(color: Colors.grey[400])
-                                  : BoxDecoration(color: Colors.white),
-                              padding: EdgeInsets.all(5),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (_sku.offerId == null)
-                                    Text(
-                                      _sku.name.toString(),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    )
-                                  else if (_sku.offer!.offerType!.name ==
-                                      'FLAT')
-                                    Text(
-                                      _sku.name! +
-                                          ' (₹.' +
-                                          _sku.offer!.offer.toString() +
-                                          ' OFF)',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    )
-                                  else if (_sku.offer!.offerType!.name ==
-                                      'PERCENT')
-                                    Text(
-                                      _sku.name! +
-                                          ' (' +
-                                          _sku.offer!.offer.toString() +
-                                          '% OFF)',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    )
-                                  else if (_sku.offer!.offerType!.name ==
-                                      'FREE GIFT')
-                                    Text(
-                                      _sku.name! +
-                                          ' (' +
-                                          _sku.offer!.itemName.toString() +
-                                          ')',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    )
-                                  else if (_sku.offer!.offerType!.name ==
-                                      'FREE QTY')
-                                    Text(
-                                      _sku.name! +
-                                          ' (' +
-                                          _sku.offer!.itemName.toString() +
-                                          ')',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  Text(_sku.mainCategory != null
-                                      ? '( ' + _sku.mainCategory + ' )'
-                                      : ''),
-                                  // SizedBox(
-                                  //   height: 8,
-                                  // ),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          '₹. ' + _sku.price.toString(),
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
+                            (_sku) => _skuIds.contains(_sku.id) == false
+                                ? Container()
+                                : Container(
+                                    decoration: _skus!.indexOf(_sku) % 2 != 0
+                                        ? BoxDecoration(color: Colors.grey[400])
+                                        : BoxDecoration(color: Colors.white),
+                                    padding: EdgeInsets.all(5),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        if (_sku.offerId == null)
+                                          Text(
+                                            _sku.name.toString(),
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          )
+                                        else if (_sku.offer!.offerType!.name ==
+                                            'FLAT')
+                                          Text(
+                                            _sku.name! +
+                                                ' (₹.' +
+                                                _sku.offer!.offer.toString() +
+                                                ' OFF)',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          )
+                                        else if (_sku.offer!.offerType!.name ==
+                                            'PERCENT')
+                                          Text(
+                                            _sku.name! +
+                                                ' (' +
+                                                _sku.offer!.offer.toString() +
+                                                '% OFF)',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          )
+                                        else if (_sku.offer!.offerType!.name ==
+                                            'FREE GIFT')
+                                          Text(
+                                            _sku.name! +
+                                                ' (' +
+                                                _sku.offer!.itemName
+                                                    .toString() +
+                                                ')',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          )
+                                        else if (_sku.offer!.offerType!.name ==
+                                            'FREE QTY')
+                                          Text(
+                                            _sku.name! +
+                                                ' (' +
+                                                _sku.offer!.itemName
+                                                    .toString() +
+                                                ')',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                        ),
-                                      ),
-                                      // if (_sku.offerPrice == null)
-                                      //   Expanded(
-                                      //     child: Text(
-                                      //       '₹. ' + _sku.price.toString(),
-                                      //       style: TextStyle(
-                                      //         color: Colors.red,
-                                      //         fontWeight: FontWeight.bold,
-                                      //       ),
-                                      //     ),
-                                      //   )
-                                      // else
-                                      //   Expanded(
-                                      //     child: Text(
-                                      //       '₹. ' + (_sku.offerPrice).toString(),
-                                      //       style: TextStyle(
-                                      //         color: Colors.red,
-                                      //         fontWeight: FontWeight.bold,
-                                      //       ),
-                                      //     ),
-                                      //   ),
-                                      Expanded(
-                                        child: Text(
-                                          _sku.qty.toString(),
-                                          style: TextStyle(
-                                            color: Colors.green,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: (_sku.qty! <= 0 &&
-                                                (widget.arguments[
-                                                            'order_type'] ==
-                                                        'Sales' ||
-                                                    widget.arguments[
-                                                            'order_type'] ==
-                                                        'Purchase Returned'))
-                                            ? Text('')
-                                            : Container(
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(),
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                    Radius.circular(5),
-                                                  ),
-                                                ),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 15.0,
-                                                          right: 15.0),
-                                                  child: Center(
-                                                    child: TextFormField(
-                                                      initialValue:
-                                                          _sku.enteredQty !=
-                                                                  null
-                                                              ? _sku.enteredQty
-                                                                  .toString()
-                                                              : '',
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      keyboardType:
-                                                          TextInputType.number,
-                                                      inputFormatters: <
-                                                          TextInputFormatter>[
-                                                        FilteringTextInputFormatter
-                                                            .digitsOnly
-                                                      ], // Only numbers
-                                                      decoration:
-                                                          InputDecoration(
-                                                        labelText: 'Enter Qty',
-                                                        border:
-                                                            InputBorder.none,
-                                                      ),
-                                                      onChanged: (value) {
-                                                        if (value.length >= 3) {
-                                                          showDialog(
-                                                            context: context,
-                                                            builder: (BuildContext
-                                                                    context) =>
-                                                                AlertDialog(
-                                                              title: Text(
-                                                                  'The quantity entered is more than or equal to 3 digits. Please check again before proceeding further.'),
-                                                              actions: [
-                                                                FlatButton(
-                                                                  onPressed:
-                                                                      () {
-                                                                    Navigator.pop(
-                                                                        context);
-                                                                  },
-                                                                  child: Text(
-                                                                      'OK'),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          );
-                                                        }
-                                                        if (_myOrderModel
-                                                                .order ==
-                                                            null) {
-                                                          _myOrderModel
-                                                              .updateOrder(
-                                                            retailerId: widget
-                                                                .arguments[
-                                                                    'outlet']
-                                                                .id,
-                                                          );
-                                                        }
-                                                        if (_myOrderModel.order!
-                                                                .retailerId ==
-                                                            widget
-                                                                .arguments[
-                                                                    'outlet']
-                                                                .id) {
-                                                          _myOrderModel
-                                                              .addOrUpdateOrderDetail(
-                                                            sku: _sku,
-                                                            qty: value == ''
-                                                                ? 0
-                                                                : int.parse(
-                                                                    value),
-                                                          );
-                                                        } else {
-                                                          showDialog(
-                                                            context: context,
-                                                            builder: (BuildContext
-                                                                    context) =>
-                                                                AlertDialog(
-                                                              title: Text(
-                                                                  'Order from another retailer is already there in the cart. Do you want to reset the order'),
-                                                              actions: [
-                                                                FlatButton(
-                                                                  onPressed:
-                                                                      () {
-                                                                    _myOrderModel
-                                                                        .emptyOrder();
-                                                                    Navigator.pop(
-                                                                        context);
-                                                                  },
-                                                                  child: Text(
-                                                                      'Yes'),
-                                                                ),
-                                                                FlatButton(
-                                                                  onPressed:
-                                                                      () {
-                                                                    Navigator.pop(
-                                                                        context);
-                                                                    Navigator.pushNamed(
-                                                                        context,
-                                                                        '/beats');
-                                                                  },
-                                                                  child: Text(
-                                                                      'No'),
-                                                                )
-                                                              ],
-                                                            ),
-                                                          );
-                                                        }
-                                                      },
-                                                    ),
-                                                  ),
+                                        Text(_sku.mainCategory != null
+                                            ? '( ' + _sku.mainCategory + ' )'
+                                            : ''),
+                                        // SizedBox(
+                                        //   height: 8,
+                                        // ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                '₹. ' + _sku.price.toString(),
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
                                                 ),
                                               ),
-                                      ),
-                                    ],
+                                            ),
+                                            // if (_sku.offerPrice == null)
+                                            //   Expanded(
+                                            //     child: Text(
+                                            //       '₹. ' + _sku.price.toString(),
+                                            //       style: TextStyle(
+                                            //         color: Colors.red,
+                                            //         fontWeight: FontWeight.bold,
+                                            //       ),
+                                            //     ),
+                                            //   )
+                                            // else
+                                            //   Expanded(
+                                            //     child: Text(
+                                            //       '₹. ' + (_sku.offerPrice).toString(),
+                                            //       style: TextStyle(
+                                            //         color: Colors.red,
+                                            //         fontWeight: FontWeight.bold,
+                                            //       ),
+                                            //     ),
+                                            //   ),
+                                            Expanded(
+                                              child: Text(
+                                                _sku.qty.toString(),
+                                                style: TextStyle(
+                                                  color: Colors.green,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: (_sku.qty! <= 0 &&
+                                                      (widget.arguments[
+                                                                  'order_type'] ==
+                                                              'Sales' ||
+                                                          widget.arguments[
+                                                                  'order_type'] ==
+                                                              'Purchase Returned'))
+                                                  ? Text('')
+                                                  : Container(
+                                                      decoration: BoxDecoration(
+                                                        border: Border.all(),
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                          Radius.circular(5),
+                                                        ),
+                                                      ),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                left: 15.0,
+                                                                right: 15.0),
+                                                        child: Center(
+                                                          child: TextFormField(
+                                                            initialValue: _sku
+                                                                        .enteredQty !=
+                                                                    null
+                                                                ? _sku
+                                                                    .enteredQty
+                                                                    .toString()
+                                                                : '',
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            keyboardType:
+                                                                TextInputType
+                                                                    .number,
+                                                            inputFormatters: <
+                                                                TextInputFormatter>[
+                                                              FilteringTextInputFormatter
+                                                                  .digitsOnly
+                                                            ], // Only numbers
+                                                            decoration:
+                                                                InputDecoration(
+                                                              labelText:
+                                                                  'Enter Qty',
+                                                              border:
+                                                                  InputBorder
+                                                                      .none,
+                                                            ),
+                                                            onChanged: (value) {
+                                                              if (value
+                                                                      .length >=
+                                                                  3) {
+                                                                showDialog(
+                                                                  context:
+                                                                      context,
+                                                                  builder: (BuildContext
+                                                                          context) =>
+                                                                      AlertDialog(
+                                                                    title: Text(
+                                                                        'The quantity entered is more than or equal to 3 digits. Please check again before proceeding further.'),
+                                                                    actions: [
+                                                                      FlatButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                          Navigator.pop(
+                                                                              context);
+                                                                        },
+                                                                        child: Text(
+                                                                            'OK'),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                );
+                                                              }
+                                                              if (_myOrderModel
+                                                                      .order ==
+                                                                  null) {
+                                                                _myOrderModel
+                                                                    .updateOrder(
+                                                                  retailerId: widget
+                                                                      .arguments[
+                                                                          'outlet']
+                                                                      .id,
+                                                                );
+                                                              }
+                                                              if (_myOrderModel
+                                                                      .order!
+                                                                      .retailerId ==
+                                                                  widget
+                                                                      .arguments[
+                                                                          'outlet']
+                                                                      .id) {
+                                                                _myOrderModel
+                                                                    .addOrUpdateOrderDetail(
+                                                                  sku: _sku,
+                                                                  qty: value ==
+                                                                          ''
+                                                                      ? 0
+                                                                      : int.parse(
+                                                                          value),
+                                                                );
+                                                              } else {
+                                                                showDialog(
+                                                                  context:
+                                                                      context,
+                                                                  builder: (BuildContext
+                                                                          context) =>
+                                                                      AlertDialog(
+                                                                    title: Text(
+                                                                        'Order from another retailer is already there in the cart. Do you want to reset the order'),
+                                                                    actions: [
+                                                                      FlatButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                          _myOrderModel
+                                                                              .emptyOrder();
+                                                                          Navigator.pop(
+                                                                              context);
+                                                                        },
+                                                                        child: Text(
+                                                                            'Yes'),
+                                                                      ),
+                                                                      FlatButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                          Navigator.pop(
+                                                                              context);
+                                                                          Navigator.pushNamed(
+                                                                              context,
+                                                                              '/beats');
+                                                                        },
+                                                                        child: Text(
+                                                                            'No'),
+                                                                      )
+                                                                    ],
+                                                                  ),
+                                                                );
+                                                              }
+                                                            },
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                            ),
+                                          ],
+                                        ),
+                                        // Divider()
+                                      ],
+                                    ),
                                   ),
-                                  // Divider()
-                                ],
-                              ),
-                            ),
                           )
                           .toList(),
                     ),
@@ -529,6 +576,7 @@ class _OrderPageState extends State<OrderPage> {
               ),
             );
           else if (value == 1) {
+            // _isSkuFilled = false;
             Navigator.pushNamed(context, '/confirmOrder', arguments: {
               'beat': widget.arguments['beat'],
               'outlet': widget.arguments['outlet'],

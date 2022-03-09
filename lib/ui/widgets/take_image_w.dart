@@ -69,7 +69,7 @@ class _TakeImageWidgetState extends State<TakeImageWidget> {
               onPressed: () async {
                 final XFile? imageFile = await picker.pickImage(
                   source: ImageSource.camera,
-                  imageQuality: 100,
+                  imageQuality: 50,
                 );
                 setState(() {
                   _storedFile = imageFile;

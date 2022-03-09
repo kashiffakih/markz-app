@@ -53,6 +53,16 @@ class AnalyticsModel with ChangeNotifier {
     kpiReport = await _analyticsService.kpiReport(month: month);
   }
 
+  List? focussedDatas;
+
+  getFocussedReport() async {
+    DateFormat format = DateFormat('MM');
+    String month = format.format(DateTime.now());
+
+    focussedDatas = await _analyticsService.getFocussedReport(month: month);
+    notifyListeners();
+  }
+
   // Target Vs Achieved
   late TargetVsAchieved _targetVsAchieved;
 

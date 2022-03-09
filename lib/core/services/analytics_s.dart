@@ -68,6 +68,28 @@ class AnalyticsService {
     return _kpiReport;
   }
 
+  List? _achievedDatas;
+
+  getFocussedReport({@required month}) async {
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    User user = _configModel.user;
+
+    print(user.id);
+
+    http.Response _response = await http.get(
+      Uri.parse(
+          '${_apiConfig['baseURL']}/focussedKpiReport?userId=${user.id}&month=$month'),
+      headers: _apiConfig['headers'],
+    );
+
+    Map<String, dynamic> _responseData = json.decode(_response.body);
+    if (_responseData['success']) {
+      _achievedDatas = _responseData['data'];
+    }
+
+    return _achievedDatas;
+  }
+
   // Target Vs Achieved
   late TargetVsAchieved _targetVsAchieved;
 

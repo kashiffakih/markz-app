@@ -22,7 +22,7 @@ class _HomePageState extends State<HomePage> {
       {
         'icon': Icons.summarize,
         'color': Colors.amber,
-        'name': 'Summary',
+        'name': 'Daily Summary',
         'url': '/monthlySummary',
       },
       // {
@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
       {
         'icon': Icons.chat_rounded,
         'color': Colors.blue[200],
-        'name': 'Trend',
+        'name': 'OFT Trend',
         'url': '/saleTrends',
       },
       {
@@ -74,14 +74,14 @@ class _HomePageState extends State<HomePage> {
       {
         'icon': Icons.local_grocery_store,
         'color': Colors.green[200],
-        'name': 'Store',
-        'url': '/beats',
+        'name': 'Daily Activity',
+        'url': '/beatOutlets',
       },
       {
         'icon': Icons.production_quantity_limits,
         'color': Colors.blue[200],
         'name': 'Stocks',
-        'url': '/stockBeats',
+        'url': '/stockBeatOutlets',
       },
     ],
     [
@@ -94,14 +94,14 @@ class _HomePageState extends State<HomePage> {
       {
         'icon': Icons.photo_album,
         'color': Colors.green[200],
-        'name': 'Videos',
+        'name': 'Training',
         'url': '/trainingVideos',
       },
       {
         'icon': Icons.people,
         'color': Colors.amber[200],
         'name': 'Visitors',
-        'url': '/beats',
+        'url': '/beatOutlets',
       },
     ],
     [
@@ -225,7 +225,7 @@ class _HomePageState extends State<HomePage> {
                                         child: Container(
                                           decoration: BoxDecoration(
                                             border: Border.all(
-                                                color: Colors.grey[300]!),
+                                                color: Colors.green[300]!),
                                           ),
                                           child: Column(
                                             children: [
@@ -295,80 +295,97 @@ class _HomePageState extends State<HomePage> {
                                       : BoxDecoration(color: Colors.white),
                               child: Column(
                                 children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          children: [
-                                            if (_notice.imagepath != null)
-                                              Padding(
-                                                padding: EdgeInsets.all(5),
-                                                child: CircleAvatar(
-                                                  radius: 32,
-                                                  backgroundImage: NetworkImage(
-                                                    _configModel.apiConfig[
-                                                            'mediaURL'] +
-                                                        _notice.imagepath,
-                                                  ),
-                                                ),
-                                              ),
-                                            if (_notice.name != null)
-                                              Text(
-                                                _notice.name.toString(),
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(5.0),
+                                  if (_notice.channel
+                                              .toString()
+                                              .toLowerCase() ==
+                                          _configModel.user.channel
+                                              .toString()
+                                              .toLowerCase() &&
+                                      _notice.brand.toString().toLowerCase() ==
+                                          _configModel.user.brand
+                                              .toString()
+                                              .toLowerCase() &&
+                                      _notice.roleName
+                                              .toString()
+                                              .toLowerCase() ==
+                                          _configModel.user.roles![0].name
+                                              .toString()
+                                              .toLowerCase())
+                                    Row(
+                                      children: [
+                                        Expanded(
                                           child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
                                             children: [
-                                              // Text(_notice.title.toString()),
-                                              Text(_notice.description
-                                                  .toString()),
-                                              if (_notice.link != null)
-                                                RaisedButton(
-                                                  color: Colors.blue,
-                                                  onPressed: () {
-                                                    launch(_notice.link
-                                                        .toString());
-                                                  },
-                                                  child: Text(
-                                                    'Visit Link',
-                                                    style: TextStyle(
-                                                        color: Colors.white),
+                                              if (_notice.imagepath != null)
+                                                Padding(
+                                                  padding: EdgeInsets.all(5),
+                                                  child: CircleAvatar(
+                                                    radius: 32,
+                                                    backgroundImage:
+                                                        NetworkImage(
+                                                      _configModel.apiConfig[
+                                                              'mediaURL'] +
+                                                          _notice.imagepath,
+                                                    ),
                                                   ),
-                                                )
+                                                ),
+                                              if (_notice.name != null)
+                                                Text(
+                                                  _notice.name.toString(),
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
                                             ],
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(5.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                // Text(_notice.title.toString()),
+                                                Text(_notice.description
+                                                    .toString()),
+                                                if (_notice.link != null)
+                                                  RaisedButton(
+                                                    color: Colors.blue,
+                                                    onPressed: () {
+                                                      launch(_notice.link
+                                                          .toString());
+                                                    },
+                                                    child: Text(
+                                                      'Visit Link',
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                  )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   // Divider(),
                                 ],
                               ),
                             ),
                           )
                           .toList(),
-                    Center(
-                      child: RaisedButton(
-                        color: Theme.of(context).primaryColor,
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/notifications');
-                        },
-                        child: Text(
-                          'VIEW ALL NOTIFICATIONS',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    )
+                    // Center(
+                    //   child: RaisedButton(
+                    //     color: Theme.of(context).primaryColor,
+                    //     onPressed: () {
+                    //       Navigator.pushNamed(context, '/notifications');
+                    //     },
+                    //     child: Text(
+                    //       'VIEW ALL NOTIFICATIONS',
+                    //       style: TextStyle(color: Colors.white),
+                    //     ),
+                    //   ),
+                    // )
                   ],
                 ),
               ),

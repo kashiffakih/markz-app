@@ -87,10 +87,11 @@ class MyOrderModel with ChangeNotifier {
     notifyListeners();
   }
 
-  saveOrder({required String orderType}) async {
+  saveOrder({required String orderType, date}) async {
     await _myOrderService.saveOrder(
       order: order,
       orderType: orderType,
+      date: date,
     );
   }
 

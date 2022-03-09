@@ -24,6 +24,8 @@ class SkuService {
 
     Map<String, dynamic> _responseData = json.decode(_response.body);
 
+    print(_responseData);
+
     if (_responseData['success']) {
       _skus = [];
       _responseData['data'].forEach((_referencePlan) {

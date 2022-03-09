@@ -25,6 +25,130 @@ class KpiReportPage extends StatelessWidget {
               )
             : Column(
                 children: [
+                  _analyticsModel.focussedDatas == null
+                      ? Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.all(8),
+                              child: Card(
+                                elevation: 10,
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      color: Theme.of(context).primaryColor,
+                                      padding: EdgeInsets.all(10),
+                                      child: Row(
+                                        children: [
+                                          // Expanded(
+                                          //   child: Center(
+                                          //     child: Text(
+                                          //       'Store',
+                                          //       style: TextStyle(
+                                          //         color: Colors.white,
+                                          //         fontWeight: FontWeight.bold,
+                                          //       ),
+                                          //     ),
+                                          //   ),
+                                          // ),
+                                          Expanded(
+                                            child: Center(
+                                              child: Text(
+                                                'Category',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Center(
+                                              child: Text(
+                                                'Target',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Center(
+                                              child: Text(
+                                                'Achieved',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    ..._analyticsModel.focussedDatas!
+                                        .map(
+                                          (_data) => Column(
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.all(7),
+                                                child: Row(
+                                                  children: [
+                                                    // Expanded(
+                                                    //   child: Center(
+                                                    //     child: Text(_data['store_name']),
+                                                    //   ),
+                                                    // ),
+                                                    Expanded(
+                                                      child: Center(
+                                                        child: Column(
+                                                          children: [
+                                                            if (_data[
+                                                                    'target_category'] !=
+                                                                '-')
+                                                              Text(_data[
+                                                                      'target_category']
+                                                                  .toString()),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Center(
+                                                        child: Column(
+                                                          children: [
+                                                            Text(
+                                                              _data['target']
+                                                                  .toString(),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Center(
+                                                        child: Text(
+                                                            _data['achieved']
+                                                                .toString()),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              // Divider()
+                                            ],
+                                          ),
+                                        )
+                                        .toList(),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                   // Padding(
                   //   padding: EdgeInsets.all(10),
                   //   child: Card(
@@ -35,9 +159,9 @@ class KpiReportPage extends StatelessWidget {
                   //         ElevatedButton(
                   //           onPressed: () {
                   //             Navigator.pushNamed(
-                  //                 context, '/productivityCreate');
+                  //                 context, '/focussedTargetVsAchieved');
                   //           },
-                  //           child: Text('Productivity'),
+                  //           child: Text('Focussed Targets'),
                   //         ),
                   //       ],
                   //     ),
@@ -49,63 +173,63 @@ class KpiReportPage extends StatelessWidget {
                       elevation: 10,
                       child: Column(
                         children: [
-                          Container(
-                            height: 200,
-                            child: SfRadialGauge(
-                              axes: <RadialAxis>[
-                                RadialAxis(
-                                  minimum: 0,
-                                  maximum: 150,
-                                  ranges: <GaugeRange>[
-                                    GaugeRange(
-                                      startValue: 0,
-                                      endValue: 50,
-                                      color: Colors.green,
-                                      startWidth: 10,
-                                      endWidth: 10,
-                                    ),
-                                    GaugeRange(
-                                      startValue: 50,
-                                      endValue: 100,
-                                      color: Colors.orange,
-                                      startWidth: 10,
-                                      endWidth: 10,
-                                    ),
-                                    GaugeRange(
-                                      startValue: 100,
-                                      endValue: 150,
-                                      color: Colors.red,
-                                      startWidth: 10,
-                                      endWidth: 10,
-                                    )
-                                  ],
-                                  pointers: <GaugePointer>[
-                                    NeedlePointer(
-                                        value: double.parse(_analyticsModel
-                                            .kpiReport.percent
-                                            .toString())),
-                                  ],
-                                  annotations: <GaugeAnnotation>[
-                                    GaugeAnnotation(
-                                      widget: Container(
-                                        child: Text(
-                                          _analyticsModel.kpiReport.percent
-                                                  .toString() +
-                                              ' %',
-                                          style: TextStyle(
-                                            fontSize: 25,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      angle: 90,
-                                      positionFactor: 0.5,
-                                    )
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
+                          // Container(
+                          //   height: 200,
+                          //   child: SfRadialGauge(
+                          //     axes: <RadialAxis>[
+                          //       RadialAxis(
+                          //         minimum: 0,
+                          //         maximum: 150,
+                          //         ranges: <GaugeRange>[
+                          //           GaugeRange(
+                          //             startValue: 0,
+                          //             endValue: 50,
+                          //             color: Colors.green,
+                          //             startWidth: 10,
+                          //             endWidth: 10,
+                          //           ),
+                          //           GaugeRange(
+                          //             startValue: 50,
+                          //             endValue: 100,
+                          //             color: Colors.orange,
+                          //             startWidth: 10,
+                          //             endWidth: 10,
+                          //           ),
+                          //           GaugeRange(
+                          //             startValue: 100,
+                          //             endValue: 150,
+                          //             color: Colors.red,
+                          //             startWidth: 10,
+                          //             endWidth: 10,
+                          //           )
+                          //         ],
+                          //         pointers: <GaugePointer>[
+                          //           NeedlePointer(
+                          //               value: double.parse(_analyticsModel
+                          //                   .kpiReport.percent
+                          //                   .toString())),
+                          //         ],
+                          //         annotations: <GaugeAnnotation>[
+                          //           GaugeAnnotation(
+                          //             widget: Container(
+                          //               child: Text(
+                          //                 _analyticsModel.kpiReport.percent
+                          //                         .toString() +
+                          //                     ' %',
+                          //                 style: TextStyle(
+                          //                   fontSize: 25,
+                          //                   fontWeight: FontWeight.bold,
+                          //                 ),
+                          //               ),
+                          //             ),
+                          //             angle: 90,
+                          //             positionFactor: 0.5,
+                          //           )
+                          //         ],
+                          //       )
+                          //     ],
+                          //   ),
+                          // ),
                           SizedBox(
                             height: 10,
                           ),

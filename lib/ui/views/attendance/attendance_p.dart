@@ -45,6 +45,9 @@ class _AttendancePageState extends State<AttendancePage> {
   DateFormat timeFormat = DateFormat('hh:mm:ss');
   DateFormat dateFormat = DateFormat('yyyy-MM-dd');
 
+  bool _isLoginLoading = false;
+  bool _isLogoutLoading = false;
+
   @override
   void initState() {
     initLocationService();
@@ -168,17 +171,43 @@ class _AttendancePageState extends State<AttendancePage> {
   }
 
   punchAttendance(
-      {required AttendanceModel attendanceModel, required String event}) {
+      {required AttendanceModel attendanceModel, required String event}) async {
     _attendanceData['date'] = dateFormat.format(DateTime.now());
     _attendanceData['remarks'] = _remarksController.text;
-    if (event == 'LOGIN')
-      attendanceModel.saveAttendance(
+    late BuildContext dialogContext;
+    if (event == 'LOGIN') {
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          dialogContext = context;
+          return AlertDialog(
+            title: Text('Saving attendance...'),
+          );
+        },
+      );
+      await attendanceModel.saveAttendance(
         attendanceData: _attendanceData,
       );
-    if (event == 'LOGOUT')
-      attendanceModel.updateAttendance(
+      Navigator.pop(dialogContext);
+    }
+
+    if (event == 'LOGOUT') {
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          dialogContext = context;
+          return AlertDialog(
+            title: Text('Saving attendance...'),
+          );
+        },
+      );
+      await attendanceModel.updateAttendance(
         attendanceData: _attendanceData,
       );
+      Navigator.pop(dialogContext);
+    }
   }
 
   void initalizeLocation({required LocationModel locationModel}) {
@@ -242,6 +271,8 @@ class _AttendancePageState extends State<AttendancePage> {
     this.initalizeData(
       attendanceModel: attendanceModel,
     );
+
+    print(12345);
 
     return Column(
       children: [
@@ -329,7 +360,8 @@ class _AttendancePageState extends State<AttendancePage> {
         Card(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: locationModel.address == ''
+            child: locationModel.address == '' &&
+                    attendanceModel.isTodayAttendanceReceived == false
                 ? Row(
                     children: [
                       Expanded(
@@ -346,18 +378,21 @@ class _AttendancePageState extends State<AttendancePage> {
                   )
                 : Column(
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Take Selfie',
+                      if (_attendanceData['session_type'] != 'WEEKLY OFF' &&
+                          _attendanceData['session_type'] != 'HOLIDAY' &&
+                          _attendanceData['session_type'] != 'MARKET CLOSED')
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'Take Selfie',
+                              ),
                             ),
-                          ),
-                          Expanded(
-                            child: TakeImageWidget(imagePath: ''),
-                          ),
-                        ],
-                      ),
+                            Expanded(
+                              child: TakeImageWidget(imagePath: ''),
+                            ),
+                          ],
+                        ),
                       Row(
                         children: [
                           Expanded(
@@ -395,10 +430,16 @@ class _AttendancePageState extends State<AttendancePage> {
                                 ),
                               ),
                             ),
+                          // if (configModel.file.file != null ||
+                          //     _attendanceData['session_type'] == 'WEEKLY OFF')
                           Switch(
                               value: _sessionInStatus,
                               onChanged: (value) {
-                                if (configModel.file.fileName == null &&
+                                print('File');
+                                print(configModel.file.file);
+                                print('File Name');
+                                print(configModel.file.fileName);
+                                if (configModel.file.file == null &&
                                     _attendanceData['session_type'] !=
                                         'WEEKLY OFF') {
                                   showDialog(
@@ -430,6 +471,7 @@ class _AttendancePageState extends State<AttendancePage> {
                                           locationModel.address;
                                       // _attendanceData['battery'] =
                                       //     deviceInfoModel.batteryLevel;
+
                                       this.punchAttendance(
                                         attendanceModel: attendanceModel,
                                         event: 'LOGIN',

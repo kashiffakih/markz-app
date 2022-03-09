@@ -11,41 +11,41 @@ class MonthlySummaryPage extends StatefulWidget {
 }
 
 class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
+  List<dynamic> _months = [
+    {'name': 'January', 'value': '1'},
+    {'name': 'February', 'value': '2'},
+    {'name': 'March', 'value': '3'},
+    {'name': 'April', 'value': '4'},
+    {'name': 'May', 'value': '5'},
+    {'name': 'June', 'value': '6'},
+    {'name': 'July', 'value': '7'},
+    {'name': 'August', 'value': '8'},
+    {'name': 'September', 'value': '9'},
+    {'name': 'October', 'value': '10'},
+    {'name': 'November', 'value': '11'},
+    {'name': 'December', 'value': '12'},
+  ];
+  List<dynamic> _years = [
+    {'name': '2022', 'value': '2022'},
+  ];
+  List<dynamic> _dataTypes = [
+    {'name': 'Opening', 'value': 'Opening Stock'},
+    {'name': 'Stock Received', 'value': 'Stock Received'},
+    {'name': 'Stocks Returned', 'value': 'Purchase Returned'},
+    {'name': 'Offtakes', 'value': 'Sales'},
+    {'name': 'Offtake Returned', 'value': 'Stock Returned'},
+  ];
+
+  // DateFormat format = DateFormat('M');
+
+  String selectedMonthId = '2';
+  // DateFormat yearFormat = DateFormat('Y');
+  String selectedYear = DateTime.now().year.toString();
+  String selectedDataType = 'Sales';
+
   @override
   Widget build(BuildContext context) {
     final _orderModel = Provider.of<OrderModel>(context);
-
-    List<dynamic> _months = [
-      {'name': 'January', 'value': '1'},
-      {'name': 'February', 'value': '2'},
-      {'name': 'March', 'value': '3'},
-      {'name': 'April', 'value': '4'},
-      {'name': 'May', 'value': '5'},
-      {'name': 'June', 'value': '6'},
-      {'name': 'July', 'value': '7'},
-      {'name': 'August', 'value': '8'},
-      {'name': 'September', 'value': '9'},
-      {'name': 'October', 'value': '10'},
-      {'name': 'November', 'value': '11'},
-      {'name': 'December', 'value': '12'},
-    ];
-    List<dynamic> _years = [
-      {'name': '2021', 'value': '2021'},
-      {'name': '2022', 'value': '2022'},
-    ];
-    List<dynamic> _dataTypes = [
-      {'name': 'Opening', 'value': 'Opening Stock'},
-      {'name': 'Stock Received', 'value': 'Stock Received'},
-      {'name': 'Stocks Returned', 'value': 'Purchase Returned'},
-      {'name': 'Offtakes', 'value': 'Sales'},
-      {'name': 'Offtake Returned', 'value': 'Stock Returned'},
-    ];
-
-    DateFormat format = DateFormat('M');
-
-    String selectedMonthId = format.format(DateTime.now());
-    String selectedYear = '2021';
-    String selectedDataType = 'Sales';
 
     int? totalAmount = 0;
 
@@ -150,10 +150,10 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
                                       labelText: 'Select data type'),
                                   items: _dataTypes
                                       .map(
-                                        (_month) => DropdownMenuItem(
-                                          value: _month['value'],
+                                        (_dataType) => DropdownMenuItem(
+                                          value: _dataType['value'],
                                           child: Text(
-                                            _month['name'],
+                                            _dataType['name'],
                                           ),
                                         ),
                                       )

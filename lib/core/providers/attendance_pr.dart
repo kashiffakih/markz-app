@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:sales_app/core/models/file.dart';
 import 'package:sales_app/core/models/user_attendance.dart';
@@ -24,37 +26,44 @@ class AttendanceModel with ChangeNotifier {
   }
 
   // Save Attendance
-  void saveAttendance({@required attendanceData}) async {
+  saveAttendance({@required attendanceData}) async {
     int _userAttendanceId = await _attendanceService.saveAttendance(
       attendanceData: attendanceData,
     );
-    addUserAttendanceImage(userAttendanceId: _userAttendanceId);
+    await addUserAttendanceImage(userAttendanceId: _userAttendanceId);
   }
 
   // Update Attendance
-  void updateAttendance({@required attendanceData}) async {
+  updateAttendance({@required attendanceData}) async {
     int _userAttendanceId = await _attendanceService.updateAttendance(
       attendanceData: attendanceData,
     );
-    addUserAttendanceLogoutImage(userAttendanceId: _userAttendanceId);
+    await addUserAttendanceLogoutImage(userAttendanceId: _userAttendanceId);
   }
 
   // Get attendance of a day
   UserAttendance? _todayAttendance;
+  bool isTodayAttendanceReceived = false;
 
   set todayAttendance(UserAttendance? newTodayAttendance) {
     _todayAttendance = newTodayAttendance;
+    isTodayAttendanceReceived = true;
+
     notifyListeners();
   }
 
   UserAttendance? get todayAttendance => _todayAttendance;
+
   Future<void> getAttendance({@required date}) async {
     todayAttendance = null;
+    isTodayAttendanceReceived = false;
+    print(isTodayAttendanceReceived);
     todayAttendance = await _attendanceService.getAttendance(
       date: date,
     );
     print('Today');
     print(todayAttendance);
+    print(isTodayAttendanceReceived);
   }
 
   // Add Attendance Selfie
