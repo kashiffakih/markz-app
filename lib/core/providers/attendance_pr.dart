@@ -30,7 +30,8 @@ class AttendanceModel with ChangeNotifier {
     int _userAttendanceId = await _attendanceService.saveAttendance(
       attendanceData: attendanceData,
     );
-    await addUserAttendanceImage(userAttendanceId: _userAttendanceId);
+    if (_configModel.file.fileName != null)
+      await addUserAttendanceImage(userAttendanceId: _userAttendanceId);
   }
 
   // Update Attendance
@@ -38,7 +39,8 @@ class AttendanceModel with ChangeNotifier {
     int _userAttendanceId = await _attendanceService.updateAttendance(
       attendanceData: attendanceData,
     );
-    await addUserAttendanceLogoutImage(userAttendanceId: _userAttendanceId);
+    if (_configModel.file.fileName != null)
+      await addUserAttendanceLogoutImage(userAttendanceId: _userAttendanceId);
   }
 
   // Get attendance of a day

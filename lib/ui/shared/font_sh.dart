@@ -1,3 +1,3 @@
 class Font {
-  static const String primaryFont = 'Roboto Condensed';
+  static const String primaryFont = 'Roboto';
 }

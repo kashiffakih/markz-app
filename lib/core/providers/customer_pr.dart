@@ -17,8 +17,13 @@ class CustomerModel with ChangeNotifier {
 
   List<Customer> get customers => _customers;
 
-  getCustomers() async {
-    customers = await _customerService.getCustomers();
+  getCustomers({@required monthId, @required year}) async {
+    customersLoader = false;
+    notifyListeners();
+    customers = await _customerService.getCustomers(
+      monthId: monthId,
+      year: year,
+    );
   }
 
   Future<void> customerCreate({@required Customer? customer}) async {

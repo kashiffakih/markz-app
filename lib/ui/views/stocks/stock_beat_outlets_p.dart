@@ -34,7 +34,12 @@ class StockBeatOutletsPage extends StatelessWidget {
     if (_referencePlanModel.referencePlansLoader) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Location'),
+          title: Text(
+            'Location',
+            style: TextStyle(
+              fontSize: 15,
+            ),
+          ),
         ),
         body: SafeArea(
           child: Padding(
@@ -54,114 +59,130 @@ class StockBeatOutletsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            (_referencePlan)!.name! + ' | ' + (_referencePlan).town.toString()),
+          (_referencePlan)!.name! + ' | ' + (_referencePlan).town.toString(),
+          style: TextStyle(
+            fontSize: 15,
+          ),
+        ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: (_referencePlan)
-                .retailers!
-                .map(
-                  (_retailer) => InkWell(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/stockReport', arguments: {
-                        'beat': _referencePlan,
-                        'outlet': _retailer,
-                      });
-                    },
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                if (_retailer.imagePath == null)
-                                  Padding(
-                                    padding: EdgeInsets.only(
-                                      top: 8.0,
-                                      right: 8.0,
-                                      bottom: 8.0,
-                                    ),
-                                    child: CircleAvatar(
-                                      radius: 32,
-                                      backgroundImage:
-                                          AssetImage(Images.product),
-                                    ),
-                                  ),
-                                if (_retailer.imagePath != null)
-                                  Padding(
-                                    padding: EdgeInsets.only(
-                                      top: 8.0,
-                                      right: 8.0,
-                                      bottom: 8.0,
-                                    ),
-                                    child: CircleAvatar(
-                                      radius: 32,
-                                      backgroundImage: NetworkImage(
-                                        _configModel.apiConfig['mediaURL'] +
-                                            _retailer.imagePath,
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(Images.backgroundImg),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              children: (_referencePlan)
+                  .retailers!
+                  .map(
+                    (_retailer) => InkWell(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/stockReport',
+                            arguments: {
+                              'beat': _referencePlan,
+                              'outlet': _retailer,
+                            });
+                      },
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  if (_retailer.imagePath == null)
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                        top: 8.0,
+                                        right: 8.0,
+                                        bottom: 8.0,
+                                      ),
+                                      child: CircleAvatar(
+                                        radius: 32,
+                                        backgroundImage:
+                                            AssetImage(Images.product),
                                       ),
                                     ),
-                                  ),
-                                Expanded(
-                                  flex: 3,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              _retailer.name.toString(),
-                                              style: TextStyle(
+                                  if (_retailer.imagePath != null)
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                        top: 8.0,
+                                        right: 8.0,
+                                        bottom: 8.0,
+                                      ),
+                                      child: CircleAvatar(
+                                        radius: 32,
+                                        backgroundImage: NetworkImage(
+                                          _configModel.apiConfig['mediaURL'] +
+                                              _retailer.imagePath,
+                                        ),
+                                      ),
+                                    ),
+                                  Expanded(
+                                    flex: 3,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                _retailer.name.toString(),
+                                                style: TextStyle(
                                                   color: Colors.orange,
-                                                  fontWeight: FontWeight.bold),
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15,
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                          // if (_retailer.lat != null &&
-                                          //     _retailer.lng != null)
-                                          //   IconButton(
-                                          //     icon: Icon(
-                                          //       Icons.location_on,
-                                          //       color: Colors.pink,
-                                          //     ),
-                                          //     onPressed: () {
-                                          //       String url =
-                                          //           'https://www.google.com/maps/?q=${_retailer.lat},${_retailer.lng}';
-                                          //       _launchURL(url: url);
-                                          //     },
-                                          //   ),
-                                        ],
-                                      ),
-                                      // Text(
-                                      //   'RETAILER',
-                                      //   style: TextStyle(
-                                      //     color: Colors.grey,
-                                      //   ),
-                                      // ),
-                                      // Text(
-                                      //   _retailer.address.toString(),
-                                      //   style: TextStyle(
-                                      //     color: Colors.red,
-                                      //   ),
-                                      // ),
-                                    ],
+                                            // if (_retailer.lat != null &&
+                                            //     _retailer.lng != null)
+                                            //   IconButton(
+                                            //     icon: Icon(
+                                            //       Icons.location_on,
+                                            //       color: Colors.pink,
+                                            //     ),
+                                            //     onPressed: () {
+                                            //       String url =
+                                            //           'https://www.google.com/maps/?q=${_retailer.lat},${_retailer.lng}';
+                                            //       _launchURL(url: url);
+                                            //     },
+                                            //   ),
+                                          ],
+                                        ),
+                                        // Text(
+                                        //   'RETAILER',
+                                        //   style: TextStyle(
+                                        //     color: Colors.grey,
+                                        //   ),
+                                        // ),
+                                        // Text(
+                                        //   _retailer.address.toString(),
+                                        //   style: TextStyle(
+                                        //     color: Colors.red,
+                                        //   ),
+                                        // ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                          ],
+                                ],
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                )
-                .toList(),
+                  )
+                  .toList(),
+            ),
           ),
         ),
       ),

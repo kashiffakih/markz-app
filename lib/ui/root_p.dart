@@ -114,35 +114,43 @@ class _RootPageState extends State<RootPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            if (Platform.isAndroid)
-              Image.asset(
-                Images.logo,
-                height: 150,
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(Images.backgroundImg),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              if (Platform.isAndroid)
+                Image.asset(
+                  Images.logo,
+                  height: 150,
+                ),
+              if (Platform.isIOS)
+                Image.asset(
+                  Images.logoIOS,
+                  height: 150,
+                ),
+              Text('Logging you in ...'),
+              SizedBox(
+                height: 25,
               ),
-            if (Platform.isIOS)
-              Image.asset(
-                Images.logoIOS,
-                height: 150,
+              CircularProgressIndicator(),
+              SizedBox(
+                height: 25,
               ),
-            Text('Logging you in ...'),
-            SizedBox(
-              height: 25,
-            ),
-            CircularProgressIndicator(),
-            SizedBox(
-              height: 25,
-            ),
-            RaisedButton(
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, '/login');
-              },
-              child: Text('Cancel'),
-            ),
-          ],
+              RaisedButton(
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, '/login');
+                },
+                child: Text('Cancel'),
+              ),
+            ],
+          ),
         ),
       ),
     );

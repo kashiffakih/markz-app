@@ -499,7 +499,14 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     // Productivity
     case productivityIndex:
       return MaterialPageRoute(builder: (BuildContext context) {
-        Provider.of<CustomerModel>(context, listen: false).getCustomers();
+        DateFormat format = DateFormat('M');
+
+        String selectedMonthId = format.format(DateTime.now());
+        String selectedYear = '2022';
+        Provider.of<CustomerModel>(context, listen: false).getCustomers(
+          monthId: selectedMonthId,
+          year: selectedYear,
+        );
         return ProductivityIndexPage();
       });
     case productivityCreate:

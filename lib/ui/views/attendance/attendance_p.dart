@@ -80,28 +80,42 @@ class _AttendancePageState extends State<AttendancePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Attendance'),
+        title: Text(
+          'Attendance',
+          style: TextStyle(
+            fontSize: 15,
+          ),
+        ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: _locationServiceEnabled == null
-              ? Container(
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-              : _locationServiceEnabled == false
-                  ? buildLocationServicePermission()
-                  : (_locationPermission == LocationPermission.denied ||
-                          _locationPermission ==
-                              LocationPermission.deniedForever)
-                      ? buildLocationPermission()
-                      : buildAttendance(
-                          configModel: _configModel,
-                          locationModel: _locationModel,
-                          attendanceModel: _attendanceModel,
-                          deviceInfoModel: _deviceInfoModel,
-                        ),
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(Images.backgroundImg),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: _locationServiceEnabled == null
+                ? Container(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                : _locationServiceEnabled == false
+                    ? buildLocationServicePermission()
+                    : (_locationPermission == LocationPermission.denied ||
+                            _locationPermission ==
+                                LocationPermission.deniedForever)
+                        ? buildLocationPermission()
+                        : buildAttendance(
+                            configModel: _configModel,
+                            locationModel: _locationModel,
+                            attendanceModel: _attendanceModel,
+                            deviceInfoModel: _deviceInfoModel,
+                          ),
+          ),
         ),
       ),
     );
@@ -324,7 +338,12 @@ class _AttendancePageState extends State<AttendancePage> {
                 items: attendanceModel.sessionTypes
                     .map(
                       (_type) => DropdownMenuItem(
-                        child: Text(_type),
+                        child: Text(
+                          _type,
+                          style: TextStyle(
+                            fontSize: 15,
+                          ),
+                        ),
                         value: _type,
                       ),
                     )
@@ -346,12 +365,20 @@ class _AttendancePageState extends State<AttendancePage> {
                   Expanded(
                     child: Text(
                       'Current Location: ',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                     ),
                   ),
                   Expanded(
                     flex: 2,
-                    child: Text(locationModel.address),
+                    child: Text(
+                      locationModel.address,
+                      style: TextStyle(
+                        fontSize: 15,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -365,7 +392,12 @@ class _AttendancePageState extends State<AttendancePage> {
                 ? Row(
                     children: [
                       Expanded(
-                        child: Text('Locating Current Location...'),
+                        child: Text(
+                          'Locating Current Location...',
+                          style: TextStyle(
+                            fontSize: 15,
+                          ),
+                        ),
                       ),
                       SizedBox(
                         child: CircularProgressIndicator(
@@ -380,12 +412,16 @@ class _AttendancePageState extends State<AttendancePage> {
                     children: [
                       if (_attendanceData['session_type'] != 'WEEKLY OFF' &&
                           _attendanceData['session_type'] != 'HOLIDAY' &&
-                          _attendanceData['session_type'] != 'MARKET CLOSED')
+                          _attendanceData['session_type'] != 'MARKET CLOSED' &&
+                          _attendanceData['session_type'] != 'WORK FROM HOME')
                         Row(
                           children: [
                             Expanded(
                               child: Text(
                                 'Take Selfie',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
                               ),
                             ),
                             Expanded(
@@ -398,7 +434,10 @@ class _AttendancePageState extends State<AttendancePage> {
                           Expanded(
                             child: Text(
                               'Session In (Time: ${_attendanceData['login_time']})',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
                             ),
                           ),
                           // if (_attendanceData['selfie_path'] != '')
@@ -441,18 +480,34 @@ class _AttendancePageState extends State<AttendancePage> {
                                 print(configModel.file.fileName);
                                 if (configModel.file.file == null &&
                                     _attendanceData['session_type'] !=
-                                        'WEEKLY OFF') {
+                                        'WEEKLY OFF' &&
+                                    _attendanceData['session_type'] !=
+                                        'HOLIDAY' &&
+                                    _attendanceData['session_type'] !=
+                                        'MARKET CLOSED' &&
+                                    _attendanceData['session_type'] !=
+                                        'WORK FROM HOME') {
                                   showDialog(
                                     context: context,
                                     builder: (BuildContext context) =>
                                         AlertDialog(
-                                      title: Text('Please add selfie'),
+                                      title: Text(
+                                        'Please add selfie',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                        ),
+                                      ),
                                       actions: [
                                         FlatButton(
                                           onPressed: () {
                                             Navigator.pop(context);
                                           },
-                                          child: Text('OK'),
+                                          child: Text(
+                                            'OK',
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                            ),
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -488,7 +543,10 @@ class _AttendancePageState extends State<AttendancePage> {
                             Expanded(
                               child: Text(
                                 'Session Out (Time: ${_attendanceData['logout_time']})',
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
                               ),
                             ),
                             // if (_attendanceData['logout_selfie_path'] != null &&
@@ -526,18 +584,34 @@ class _AttendancePageState extends State<AttendancePage> {
                                 onChanged: (value) {
                                   if (configModel.file.fileName == null &&
                                       _attendanceData['session_type'] !=
-                                          'WEEKLY OFF') {
+                                          'WEEKLY OFF' &&
+                                      _attendanceData['session_type'] !=
+                                          'HOLIDAY' &&
+                                      _attendanceData['session_type'] !=
+                                          'MARKET CLOSED' &&
+                                      _attendanceData['session_type'] !=
+                                          'WORK FROM HOME') {
                                     showDialog(
                                       context: context,
                                       builder: (BuildContext context) =>
                                           AlertDialog(
-                                        title: Text('Please add selfie'),
+                                        title: Text(
+                                          'Please add selfie',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                          ),
+                                        ),
                                         actions: [
                                           FlatButton(
                                             onPressed: () {
                                               Navigator.pop(context);
                                             },
-                                            child: Text('OK'),
+                                            child: Text(
+                                              'OK',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                              ),
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -575,15 +649,15 @@ class _AttendancePageState extends State<AttendancePage> {
                   ),
           ),
         ),
-        Card(
-          child: TextFormField(
-            decoration: InputDecoration(
-              labelText: 'Remarks',
-            ),
-            controller: _remarksController,
-            maxLines: 3,
-          ),
-        ),
+        // Card(
+        //   child: TextFormField(
+        //     decoration: InputDecoration(
+        //       labelText: 'Remarks',
+        //     ),
+        //     controller: _remarksController,
+        //     maxLines: 3,
+        //   ),
+        // ),
       ],
     );
   }

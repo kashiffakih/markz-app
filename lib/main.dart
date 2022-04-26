@@ -108,7 +108,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         onGenerateRoute: generateRoute,
         theme: ThemeData(
-          primarySwatch: Colors.teal,
+          primarySwatch: Colors.indigo,
           appBarTheme: AppBarTheme(
             textTheme: ThemeData.light().textTheme.copyWith(
                   headline1: TextStyle(

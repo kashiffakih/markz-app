@@ -7,4 +7,5 @@ class Images {
   static const String attendance = 'assets/img/attendance.jpg';
   static const String product = 'assets/img/product.png';
   static const String analysis = 'assets/img/analysis.jpg';
+  static const String backgroundImg = 'assets/img/background.png';
 }

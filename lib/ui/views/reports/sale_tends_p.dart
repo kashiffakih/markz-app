@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/analytics_pr.dart';
+import 'package:sales_app/ui/shared/images_sh.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class SalesData {
@@ -19,218 +20,244 @@ class SaleTrendsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Offtake Trends | ' + month),
+        title: Text(
+          'Offtake Trends | ' + month,
+          style: TextStyle(
+            fontSize: 15,
+          ),
+        ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: _analyticsModel.salesTrend == null
-              ? Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-              : Column(
-                  children: [
-                    SfCartesianChart(
-                      title: ChartTitle(text: 'Offtake Trend'),
-                      // Initialize category axis
-                      primaryXAxis: CategoryAxis(
-                        title: AxisTitle(
-                          text: 'Month',
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(Images.backgroundImg),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: _analyticsModel.salesTrend == null
+                ? Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                : Column(
+                    children: [
+                      SfCartesianChart(
+                        backgroundColor: Colors.white,
+                        title: ChartTitle(text: 'Offtake Trend'),
+                        // Initialize category axis
+                        primaryXAxis: CategoryAxis(
+                          title: AxisTitle(
+                            text: 'Month',
+                          ),
                         ),
+                        primaryYAxis: NumericAxis(
+                          isVisible: false,
+                        ),
+                        series: <ChartSeries>[
+                          // Initialize line series
+                          ColumnSeries<SalesData, String>(
+                            color: Colors.orange,
+                            dataSource: _analyticsModel.salesTrend!.months!
+                                .map((_month) => SalesData(
+                                      _month.month.toString(),
+                                      double.parse(_month.value.toString()),
+                                    ))
+                                .toList(),
+                            xValueMapper: (SalesData sales, _) => sales.year,
+                            yValueMapper: (SalesData sales, _) => sales.sales,
+                            dataLabelSettings:
+                                DataLabelSettings(isVisible: true),
+                          )
+                        ],
                       ),
-                      primaryYAxis: NumericAxis(
-                        isVisible: false,
+                      SizedBox(
+                        height: 10,
                       ),
-                      series: <ChartSeries>[
-                        // Initialize line series
-                        ColumnSeries<SalesData, String>(
-                          dataSource: _analyticsModel.salesTrend!.months!
-                              .map((_month) => SalesData(
-                                    _month.month.toString(),
-                                    double.parse(_month.value.toString()),
-                                  ))
-                              .toList(),
-                          xValueMapper: (SalesData sales, _) => sales.year,
-                          yValueMapper: (SalesData sales, _) => sales.sales,
-                          dataLabelSettings: DataLabelSettings(isVisible: true),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Row(
-                            // crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              MaterialButton(
-                                onPressed: () {},
-                                color: Colors.orange,
-                                textColor: Colors.white,
-                                child: Icon(
-                                  Icons.table_chart,
-                                  size: 20,
-                                ),
-                                padding: EdgeInsets.all(16),
-                                shape: CircleBorder(),
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '₹ ' +
-                                        _analyticsModel.salesTrend!.lastMonth
-                                            .toString(),
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                MaterialButton(
+                                  onPressed: () {},
+                                  color: Colors.orange,
+                                  textColor: Colors.white,
+                                  child: Icon(
+                                    Icons.table_chart,
+                                    size: 20,
                                   ),
-                                  Text(
-                                    'Last Month',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  )
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Row(
-                            // crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              MaterialButton(
-                                onPressed: () {},
-                                color: Colors.orange,
-                                textColor: Colors.white,
-                                child: Icon(
-                                  Icons.bar_chart,
-                                  size: 20,
+                                  padding: EdgeInsets.all(16),
+                                  shape: CircleBorder(),
                                 ),
-                                padding: EdgeInsets.all(16),
-                                shape: CircleBorder(),
-                              ),
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '₹ ' +
-                                          _analyticsModel
-                                              .salesTrend!.currentMonth
-                                              .toString(),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '₹ ' +
+                                            _analyticsModel
+                                                .salesTrend!.lastMonth
+                                                .toString(),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      'Current Month',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              )
-                            ],
+                                      Text(
+                                        'Avg. Last 3 Months',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Divider(),
-                    // Container(
-                    //   color: Theme.of(context).primaryColor,
-                    //   padding: EdgeInsets.all(10),
-                    //   child: Row(
-                    //     children: [
-                    //       Expanded(
-                    //         child: Center(
-                    //           child: Text(
-                    //             'Outlets',
-                    //             style: TextStyle(
-                    //               color: Colors.white,
-                    //               fontWeight: FontWeight.bold,
-                    //             ),
-                    //           ),
-                    //         ),
-                    //       ),
-                    //       Expanded(
-                    //         child: Center(
-                    //           child: Text(
-                    //             'Last Month',
-                    //             style: TextStyle(
-                    //               color: Colors.white,
-                    //               fontWeight: FontWeight.bold,
-                    //             ),
-                    //           ),
-                    //         ),
-                    //       ),
-                    //       Expanded(
-                    //         child: Center(
-                    //           child: Text(
-                    //             'Current Month',
-                    //             style: TextStyle(
-                    //               color: Colors.white,
-                    //               fontWeight: FontWeight.bold,
-                    //             ),
-                    //           ),
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    // ..._analyticsModel.salesTrend.outlets
-                    //     .map(
-                    //       (_outlet) => Container(
-                    //         decoration: _analyticsModel.salesTrend.outlets
-                    //                         .indexOf(_outlet) %
-                    //                     2 !=
-                    //                 0
-                    //             ? BoxDecoration(color: Colors.grey[400])
-                    //             : BoxDecoration(color: Colors.white),
-                    //         child: Column(
-                    //           children: [
-                    //             Container(
-                    //               padding: EdgeInsets.all(7),
-                    //               child: Row(
-                    //                 children: [
-                    //                   Expanded(
-                    //                     child: Center(
-                    //                       child: Text(_outlet.outlet),
-                    //                     ),
-                    //                   ),
-                    //                   Expanded(
-                    //                     child: Center(
-                    //                       child: Text(
-                    //                         '₹ ' + _outlet.lastMonth.toString(),
-                    //                       ),
-                    //                     ),
-                    //                   ),
-                    //                   Expanded(
-                    //                     child: Center(
-                    //                       child: Text(
-                    //                         '₹ ' +
-                    //                             _outlet.currentMonth.toString(),
-                    //                       ),
-                    //                     ),
-                    //                   ),
-                    //                 ],
-                    //               ),
-                    //             ),
-                    //             // Divider()
-                    //           ],
-                    //         ),
-                    //       ),
-                    //     )
-                    //     .toList()
-                  ],
-                ),
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                MaterialButton(
+                                  onPressed: () {},
+                                  color: Colors.orange,
+                                  textColor: Colors.white,
+                                  child: Icon(
+                                    Icons.bar_chart,
+                                    size: 20,
+                                  ),
+                                  padding: EdgeInsets.all(16),
+                                  shape: CircleBorder(),
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '₹ ' +
+                                            _analyticsModel
+                                                .salesTrend!.currentMonth
+                                                .toString(),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Current Month',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Divider(),
+                      // Container(
+                      //   color: Theme.of(context).primaryColor,
+                      //   padding: EdgeInsets.all(10),
+                      //   child: Row(
+                      //     children: [
+                      //       Expanded(
+                      //         child: Center(
+                      //           child: Text(
+                      //             'Outlets',
+                      //             style: TextStyle(
+                      //               color: Colors.white,
+                      //               fontWeight: FontWeight.bold,
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       Expanded(
+                      //         child: Center(
+                      //           child: Text(
+                      //             'Last Month',
+                      //             style: TextStyle(
+                      //               color: Colors.white,
+                      //               fontWeight: FontWeight.bold,
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       Expanded(
+                      //         child: Center(
+                      //           child: Text(
+                      //             'Current Month',
+                      //             style: TextStyle(
+                      //               color: Colors.white,
+                      //               fontWeight: FontWeight.bold,
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                      // ..._analyticsModel.salesTrend.outlets
+                      //     .map(
+                      //       (_outlet) => Container(
+                      //         decoration: _analyticsModel.salesTrend.outlets
+                      //                         .indexOf(_outlet) %
+                      //                     2 !=
+                      //                 0
+                      //             ? BoxDecoration(color: Colors.grey[400])
+                      //             : BoxDecoration(color: Colors.white),
+                      //         child: Column(
+                      //           children: [
+                      //             Container(
+                      //               padding: EdgeInsets.all(7),
+                      //               child: Row(
+                      //                 children: [
+                      //                   Expanded(
+                      //                     child: Center(
+                      //                       child: Text(_outlet.outlet),
+                      //                     ),
+                      //                   ),
+                      //                   Expanded(
+                      //                     child: Center(
+                      //                       child: Text(
+                      //                         '₹ ' + _outlet.lastMonth.toString(),
+                      //                       ),
+                      //                     ),
+                      //                   ),
+                      //                   Expanded(
+                      //                     child: Center(
+                      //                       child: Text(
+                      //                         '₹ ' +
+                      //                             _outlet.currentMonth.toString(),
+                      //                       ),
+                      //                     ),
+                      //                   ),
+                      //                 ],
+                      //               ),
+                      //             ),
+                      //             // Divider()
+                      //           ],
+                      //         ),
+                      //       ),
+                      //     )
+                      //     .toList()
+                    ],
+                  ),
+          ),
         ),
       ),
     );

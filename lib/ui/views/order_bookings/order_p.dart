@@ -6,6 +6,7 @@ import 'package:sales_app/core/models/order.dart';
 import 'package:sales_app/core/models/sku.dart';
 import 'package:sales_app/core/providers/my_order_pr.dart';
 import 'package:sales_app/core/providers/sku_pr.dart';
+import 'package:sales_app/ui/shared/images_sh.dart';
 
 class OrderPage extends StatefulWidget {
   final arguments; // beat, outlet, order type
@@ -40,7 +41,8 @@ class _OrderPageState extends State<OrderPage> {
       'Body',
       'Face',
       'Hair',
-      'Derma'
+      'Derma',
+      'Freebies',
     ];
 
     setState(() {
@@ -81,7 +83,12 @@ class _OrderPageState extends State<OrderPage> {
     return Scaffold(
       appBar: PreferredSize(
         child: AppBar(
-          title: Text(title),
+          title: Text(
+            title,
+            style: TextStyle(
+              fontSize: 15,
+            ),
+          ),
           actions: [
             IconButton(
               icon: Icon(Icons.search),
@@ -225,7 +232,10 @@ class _OrderPageState extends State<OrderPage> {
                         flex: 1,
                         child: Text(
                           'Product Name',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                          ),
                         ),
                       ),
                     ],
@@ -239,7 +249,10 @@ class _OrderPageState extends State<OrderPage> {
                         flex: 1,
                         child: Text(
                           'MRP',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                          ),
                         ),
                       ),
                       // Expanded(
@@ -253,14 +266,20 @@ class _OrderPageState extends State<OrderPage> {
                         flex: 1,
                         child: Text(
                           'Qty. Available',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                          ),
                         ),
                       ),
                       Expanded(
                         flex: 1,
                         child: Text(
                           'Qty',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                          ),
                         ),
                       ),
                     ],
@@ -271,11 +290,17 @@ class _OrderPageState extends State<OrderPage> {
             preferredSize: Size.fromHeight(40),
           ),
         ),
-        preferredSize: Size.fromHeight(100),
+        preferredSize: Size.fromHeight(120),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(Images.backgroundImg),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: SingleChildScrollView(
             child: Card(
               elevation: 10,
               child: _skus!.length == 0
@@ -299,6 +324,7 @@ class _OrderPageState extends State<OrderPage> {
                                             _sku.name.toString(),
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
+                                              fontSize: 15,
                                             ),
                                           )
                                         else if (_sku.offer!.offerType!.name ==
@@ -310,6 +336,7 @@ class _OrderPageState extends State<OrderPage> {
                                                 ' OFF)',
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
+                                              fontSize: 15,
                                             ),
                                           )
                                         else if (_sku.offer!.offerType!.name ==
@@ -321,6 +348,7 @@ class _OrderPageState extends State<OrderPage> {
                                                 '% OFF)',
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
+                                              fontSize: 15,
                                             ),
                                           )
                                         else if (_sku.offer!.offerType!.name ==
@@ -333,6 +361,7 @@ class _OrderPageState extends State<OrderPage> {
                                                 ')',
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
+                                              fontSize: 15,
                                             ),
                                           )
                                         else if (_sku.offer!.offerType!.name ==
@@ -345,11 +374,17 @@ class _OrderPageState extends State<OrderPage> {
                                                 ')',
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
+                                              fontSize: 15,
                                             ),
                                           ),
-                                        Text(_sku.mainCategory != null
-                                            ? '( ' + _sku.mainCategory + ' )'
-                                            : ''),
+                                        Text(
+                                          _sku.mainCategory != null
+                                              ? '( ' + _sku.mainCategory + ' )'
+                                              : '',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                          ),
+                                        ),
                                         // SizedBox(
                                         //   height: 8,
                                         // ),
@@ -360,6 +395,7 @@ class _OrderPageState extends State<OrderPage> {
                                                 '₹. ' + _sku.price.toString(),
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
+                                                  fontSize: 15,
                                                 ),
                                               ),
                                             ),
@@ -389,6 +425,7 @@ class _OrderPageState extends State<OrderPage> {
                                                 style: TextStyle(
                                                   color: Colors.green,
                                                   fontWeight: FontWeight.bold,
+                                                  fontSize: 15,
                                                 ),
                                               ),
                                             ),
@@ -550,86 +587,6 @@ class _OrderPageState extends State<OrderPage> {
             ),
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        iconSize: 0,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Color(0xFF6200EE),
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white,
-        selectedFontSize: 14,
-        unselectedFontSize: 14,
-        onTap: (value) {
-          if (_myOrderModel.order == null ||
-              _myOrderModel.order!.orderDetails!.length == 0)
-            showDialog(
-              context: context,
-              builder: (BuildContext context) => AlertDialog(
-                title: Text('Order Empty'),
-                actions: [
-                  FlatButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text('Ok')),
-                ],
-              ),
-            );
-          else if (value == 1) {
-            // _isSkuFilled = false;
-            Navigator.pushNamed(context, '/confirmOrder', arguments: {
-              'beat': widget.arguments['beat'],
-              'outlet': widget.arguments['outlet'],
-              'order_type': widget.arguments['order_type'],
-            });
-          }
-        },
-        items: [
-          BottomNavigationBarItem(
-            title: Padding(
-              padding: EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: Text(
-                          'Count: ' +
-                              (_myOrderModel.order != null
-                                  ? _myOrderModel.order!.orderDetails!.length
-                                      .toString()
-                                  : ''),
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          'Total: ₹. ' +
-                              (_myOrderModel.order != null
-                                  ? _myOrderModel.order!.total.toString()
-                                  : '') +
-                              '/-',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            icon: Icon(Icons.arrow_right),
-          ),
-          BottomNavigationBarItem(
-            title: Text(
-              'NEXT',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            icon: Icon(Icons.arrow_right),
-          ),
-        ],
       ),
     );
   }

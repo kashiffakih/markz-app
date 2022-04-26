@@ -8,6 +8,7 @@ import 'package:sales_app/core/providers/sku_availability_pr.dart';
 import 'package:sales_app/core/providers/sku_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
+import 'package:sales_app/ui/shared/images_sh.dart';
 
 class StockReportPage extends StatefulWidget {
   final arguments; // beat, outlet
@@ -30,6 +31,13 @@ class _StockReportPageState extends State<StockReportPage> {
     super.initState();
   }
 
+  int totalOpeningValue = 0;
+  int totalStockReceived = 0;
+  int totalStockReturned = 0;
+  int totalOfftake = 0;
+  int totalOfftakeReturned = 0;
+  int totalClosingValue = 0;
+
   @override
   Widget build(BuildContext context) {
     final _skuModel = Provider.of<SkuModel>(context);
@@ -49,13 +57,35 @@ class _StockReportPageState extends State<StockReportPage> {
       if (!_isSkuFilled && _skuModel.skus != null) {
         _isSkuFilled = true;
         _skus = _skuModel.skus;
+
+        _skus!.forEach((_sku) {
+          setState(() {
+            totalOpeningValue +=
+                _sku.price! * int.parse(_sku.openingStock!.toString());
+            totalStockReceived +=
+                _sku.price! * int.parse(_sku.receivedStock!.toString());
+            totalStockReturned +=
+                _sku.price! * int.parse(_sku.purchaseReturnedStock!.toString());
+            totalOfftake +=
+                _sku.price! * int.parse(_sku.salesStock!.toString());
+            totalOfftakeReturned +=
+                _sku.price! * int.parse(_sku.returnedStock!.toString());
+            totalClosingValue +=
+                _sku.price! * int.parse(_sku.closingStock!.toString());
+          });
+        });
       }
     });
 
     return Scaffold(
       appBar: PreferredSize(
         child: AppBar(
-          title: Text('SKU Availability: ' + widget.arguments['outlet'].name),
+          title: Text(
+            'SKU Availability: ' + widget.arguments['outlet'].name,
+            style: TextStyle(
+              fontSize: 15,
+            ),
+          ),
           actions: [
             IconButton(
               icon: Icon(Icons.search),
@@ -148,7 +178,7 @@ class _StockReportPageState extends State<StockReportPage> {
                             _configModel.user.email.toString(),
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                              fontSize: 15,
                             ),
                           ),
                           Text(
@@ -157,9 +187,278 @@ class _StockReportPageState extends State<StockReportPage> {
                                 : '',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                              fontSize: 15,
                             ),
-                          )
+                          ),
+                          Container(
+                            decoration: BoxDecoration(color: Colors.grey[400]),
+                            padding: EdgeInsets.all(5),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    '(Value in Lakhs)',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.all(8),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Card(
+                                          elevation: 10,
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                'Opening',
+                                                style: TextStyle(
+                                                  color: Colors.blue,
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                              Text(
+                                                "₹" +
+                                                    (totalOpeningValue / 100000)
+                                                        .toStringAsFixed(2) +
+                                                    "L",
+                                                style: TextStyle(
+                                                  color: Colors.blue,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15,
+                                                ),
+                                              )
+                                              // Text(
+                                              //   NumberFormat.compactCurrency(
+                                              //     locale: 'en_IN',
+                                              //     symbol: '',
+                                              //     decimalDigits: 1,
+                                              //   )
+                                              //       .format(totalOpeningValue)
+                                              //       .toString(),
+                                              //   style: TextStyle(
+                                              //     color: Colors.blue,
+                                              //     fontWeight: FontWeight.bold,
+                                              //     fontSize: 15,
+                                              //   ),
+                                              // ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Card(
+                                          elevation: 10,
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                'Closing',
+                                                style: TextStyle(
+                                                  color: Colors.blue,
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                              Text(
+                                                "₹" +
+                                                    (totalClosingValue / 100000)
+                                                        .toStringAsFixed(2) +
+                                                    "L",
+                                                style: TextStyle(
+                                                  color: Colors.blue,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15,
+                                                ),
+                                              )
+                                              // Text(
+                                              //   NumberFormat.compactCurrency(
+                                              //     locale: 'en_IN',
+                                              //     symbol: '',
+                                              //     decimalDigits: 1,
+                                              //   )
+                                              //       .format(totalClosingValue)
+                                              //       .toString(),
+                                              //   style: TextStyle(
+                                              //     color: Colors.blue,
+                                              //     fontWeight: FontWeight.bold,
+                                              //     fontSize: 15,
+                                              //   ),
+                                              // )
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.all(8),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Card(
+                                          elevation: 10,
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                'Rec.',
+                                                style: TextStyle(
+                                                  color: Colors.green,
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                              Text(
+                                                "₹" +
+                                                    (totalStockReceived /
+                                                            100000)
+                                                        .toStringAsFixed(2) +
+                                                    "L",
+                                                style: TextStyle(
+                                                  color: Colors.blue,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Card(
+                                          elevation: 10,
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                'Stk Ret.',
+                                                style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                              Text(
+                                                "₹" +
+                                                    (totalStockReturned /
+                                                            100000)
+                                                        .toStringAsFixed(2) +
+                                                    "L",
+                                                style: TextStyle(
+                                                  color: Colors.blue,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15,
+                                                ),
+                                              )
+                                              // Text(
+                                              //   NumberFormat.compactCurrency(
+                                              //     locale: 'en_IN',
+                                              //     symbol: '',
+                                              //     decimalDigits: 1,
+                                              //   )
+                                              //       .format(totalStockReturned)
+                                              //       .toString(),
+                                              //   style: TextStyle(
+                                              //     color: Colors.blue,
+                                              //     fontWeight: FontWeight.bold,
+                                              //     fontSize: 15,
+                                              //   ),
+                                              // )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Card(
+                                          elevation: 10,
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                'Off.',
+                                                style: TextStyle(
+                                                  color: Colors.green,
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                              Text(
+                                                "₹" +
+                                                    (totalOfftake / 100000)
+                                                        .toStringAsFixed(2) +
+                                                    "L",
+                                                style: TextStyle(
+                                                  color: Colors.blue,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15,
+                                                ),
+                                              )
+                                              // Text(
+                                              //   NumberFormat.compactCurrency(
+                                              //     locale: 'en_IN',
+                                              //     symbol: '',
+                                              //     decimalDigits: 1,
+                                              //   )
+                                              //       .format(totalOfftake)
+                                              //       .toString(),
+                                              //   style: TextStyle(
+                                              //     color: Colors.blue,
+                                              //     fontWeight: FontWeight.bold,
+                                              //     fontSize: 15,
+                                              //   ),
+                                              // )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Card(
+                                          elevation: 10,
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                'Off Ret.',
+                                                style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                              Text(
+                                                "₹" +
+                                                    (totalOfftakeReturned /
+                                                            100000)
+                                                        .toStringAsFixed(2) +
+                                                    "L",
+                                                style: TextStyle(
+                                                  color: Colors.blue,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15,
+                                                ),
+                                              )
+                                              // Text(
+                                              //   NumberFormat.compactCurrency(
+                                              //     locale: 'en_IN',
+                                              //     symbol: '',
+                                              //     decimalDigits: 1,
+                                              //   )
+                                              //       .format(
+                                              //           totalOfftakeReturned)
+                                              //       .toString(),
+                                              //   style: TextStyle(
+                                              //     color: Colors.blue,
+                                              //     fontWeight: FontWeight.bold,
+                                              //     fontSize: 15,
+                                              //   ),
+                                              // )
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -170,258 +469,346 @@ class _StockReportPageState extends State<StockReportPage> {
             preferredSize: Size.fromHeight(40),
           ),
         ),
-        preferredSize: Size.fromHeight(100),
+        preferredSize: Size.fromHeight(270),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                child: _skus!.length == 0
-                    ? Center(child: CircularProgressIndicator())
-                    : Card(
-                        elevation: 10,
-                        child: _skus == null
-                            ? CircularProgressIndicator()
-                            : Column(
-                                children: _skus!.map((_sku) {
-                                  return Container(
-                                    decoration: _skus!.indexOf(_sku) % 2 != 0
-                                        ? BoxDecoration(color: Colors.grey[400])
-                                        : BoxDecoration(color: Colors.white),
-                                    padding: EdgeInsets.all(5),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Row(
-                                            children: [
-                                              if (_sku.offerId == null)
-                                                Expanded(
-                                                  flex: 2,
-                                                  child: Text(
-                                                    _sku.name.toString(),
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(Images.backgroundImg),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  child: _skus!.length == 0
+                      ? Center(child: CircularProgressIndicator())
+                      : Card(
+                          elevation: 10,
+                          child: _skus == null
+                              ? CircularProgressIndicator()
+                              : Column(
+                                  children: _skus!.map((_sku) {
+                                    return Container(
+                                      decoration: _skus!.indexOf(_sku) % 2 != 0
+                                          ? BoxDecoration(
+                                              color: Colors.grey[400])
+                                          : BoxDecoration(color: Colors.white),
+                                      padding: EdgeInsets.all(5),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Row(
+                                              children: [
+                                                if (_sku.offerId == null)
+                                                  Expanded(
+                                                    flex: 2,
+                                                    child: Text(
+                                                      _sku.name.toString(),
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 15,
+                                                      ),
+                                                    ),
+                                                  )
+                                                else if (_sku.offer!.offerType!
+                                                        .name ==
+                                                    'FLAT')
+                                                  Expanded(
+                                                    flex: 2,
+                                                    child: Text(
+                                                      _sku.name! +
+                                                          ' (₹.' +
+                                                          _sku.offer!.offer
+                                                              .toString() +
+                                                          ' OFF)',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 15,
+                                                      ),
+                                                    ),
+                                                  )
+                                                else if (_sku.offer!.offerType!
+                                                        .name ==
+                                                    'PERCENT')
+                                                  Expanded(
+                                                    flex: 2,
+                                                    child: Text(
+                                                      _sku.name! +
+                                                          ' (' +
+                                                          _sku.offer!.offer
+                                                              .toString() +
+                                                          '% OFF)',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 15,
+                                                      ),
+                                                    ),
+                                                  )
+                                                else if (_sku.offer!.offerType!
+                                                        .name ==
+                                                    'FREE GIFT')
+                                                  Expanded(
+                                                    flex: 2,
+                                                    child: Text(
+                                                      _sku.name! +
+                                                          ' (' +
+                                                          _sku.offer!.itemName
+                                                              .toString() +
+                                                          ')',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 15,
+                                                      ),
+                                                    ),
+                                                  )
+                                                else if (_sku.offer!.offerType!
+                                                        .name ==
+                                                    'FREE QTY')
+                                                  Expanded(
+                                                    flex: 2,
+                                                    child: Text(
+                                                      _sku.name! +
+                                                          ' (' +
+                                                          _sku.offer!.itemName
+                                                              .toString() +
+                                                          ')',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 15,
+                                                      ),
                                                     ),
                                                   ),
-                                                )
-                                              else if (_sku
-                                                      .offer!.offerType!.name ==
-                                                  'FLAT')
-                                                Expanded(
-                                                  flex: 2,
-                                                  child: Text(
-                                                    _sku.name! +
-                                                        ' (₹.' +
-                                                        _sku.offer!.offer
-                                                            .toString() +
-                                                        ' OFF)',
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                )
-                                              else if (_sku
-                                                      .offer!.offerType!.name ==
-                                                  'PERCENT')
-                                                Expanded(
-                                                  flex: 2,
-                                                  child: Text(
-                                                    _sku.name! +
-                                                        ' (' +
-                                                        _sku.offer!.offer
-                                                            .toString() +
-                                                        '% OFF)',
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                )
-                                              else if (_sku
-                                                      .offer!.offerType!.name ==
-                                                  'FREE GIFT')
-                                                Expanded(
-                                                  flex: 2,
-                                                  child: Text(
-                                                    _sku.name! +
-                                                        ' (' +
-                                                        _sku.offer!.itemName
-                                                            .toString() +
-                                                        ')',
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                )
-                                              else if (_sku
-                                                      .offer!.offerType!.name ==
-                                                  'FREE QTY')
-                                                Expanded(
-                                                  flex: 2,
-                                                  child: Text(
-                                                    _sku.name! +
-                                                        ' (' +
-                                                        _sku.offer!.itemName
-                                                            .toString() +
-                                                        ')',
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                        Divider(),
-                                        Padding(
-                                          padding: EdgeInsets.all(8),
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: Column(
-                                                  children: [
-                                                    Text(
-                                                      'Op.',
-                                                      style: TextStyle(
-                                                        color: Colors.blue,
-                                                      ),
+                                          // Divider(),
+                                          Padding(
+                                            padding: EdgeInsets.all(8),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Card(
+                                                    elevation: 10,
+                                                    child: Column(
+                                                      children: [
+                                                        Text(
+                                                          'Opening',
+                                                          style: TextStyle(
+                                                            color: Colors.blue,
+                                                            fontSize: 15,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          _sku.openingStock
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                            color: Colors.blue,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 15,
+                                                          ),
+                                                        ),
+                                                        // Text(
+                                                        //   NumberFormat
+                                                        //           .compactCurrency(
+                                                        //     locale: 'en_IN',
+                                                        //     symbol: '',
+                                                        //     decimalDigits: 1,
+                                                        //   )
+                                                        //       .format(_sku
+                                                        //               .openingStock *
+                                                        //           _sku.price)
+                                                        //       .toString(),
+                                                        //   style: TextStyle(
+                                                        //     color: Colors.blue,
+                                                        //     fontWeight:
+                                                        //         FontWeight.bold,
+                                                        //     fontSize: 15,
+                                                        //   ),
+                                                        // ),
+                                                      ],
                                                     ),
-                                                    Text(
-                                                      _sku.openingStock
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                        color: Colors.blue,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    )
-                                                  ],
+                                                  ),
                                                 ),
-                                              ),
-                                              Expanded(
-                                                child: Column(
-                                                  children: [
-                                                    Text(
-                                                      'Rec.',
-                                                      style: TextStyle(
-                                                        color: Colors.green,
-                                                      ),
+                                                Expanded(
+                                                  child: Card(
+                                                    elevation: 10,
+                                                    child: Column(
+                                                      children: [
+                                                        Text(
+                                                          'Closing',
+                                                          style: TextStyle(
+                                                            color: Colors.blue,
+                                                            fontSize: 15,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          _sku.closingStock
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                            color: Colors.blue,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 15,
+                                                          ),
+                                                        ),
+                                                        // Text(
+                                                        //   NumberFormat
+                                                        //           .compactCurrency(
+                                                        //     locale: 'en_IN',
+                                                        //     symbol: '',
+                                                        //     decimalDigits: 1,
+                                                        //   )
+                                                        //       .format(_sku
+                                                        //               .closingStock *
+                                                        //           _sku.price)
+                                                        //       .toString(),
+                                                        //   style: TextStyle(
+                                                        //     color: Colors.blue,
+                                                        //     fontWeight:
+                                                        //         FontWeight.bold,
+                                                        //     fontSize: 15,
+                                                        //   ),
+                                                        // )
+                                                      ],
                                                     ),
-                                                    Text(
-                                                      _sku.receivedStock
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                        color: Colors.green,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Column(
-                                                  children: [
-                                                    Text(
-                                                      'Stk Ret.',
-                                                      style: TextStyle(
-                                                        color: Colors.red,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      _sku.purchaseReturnedStock
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Column(
-                                                  children: [
-                                                    Text(
-                                                      'Off.',
-                                                      style: TextStyle(
-                                                        color: Colors.red,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      _sku.salesStock
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Column(
-                                                  children: [
-                                                    Text(
-                                                      'Off Ret.',
-                                                      style: TextStyle(
-                                                        color: Colors.green,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      _sku.returnedStock
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                        color: Colors.green,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Column(
-                                                  children: [
-                                                    Text(
-                                                      'Cl.',
-                                                      style: TextStyle(
-                                                        color: Colors.blue,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      _sku.closingStock
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                        color: Colors.blue,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
+                                                  ),
+                                                )
+                                              ],
+                                            ),
                                           ),
-                                        )
-                                      ],
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                      ),
-              ),
-            ],
+                                          Padding(
+                                            padding: EdgeInsets.all(8),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Card(
+                                                    elevation: 10,
+                                                    child: Column(
+                                                      children: [
+                                                        Text(
+                                                          'Rec.',
+                                                          style: TextStyle(
+                                                            color: Colors.green,
+                                                            fontSize: 15,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          _sku.receivedStock
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                            color: Colors.green,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 15,
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Card(
+                                                    elevation: 10,
+                                                    child: Column(
+                                                      children: [
+                                                        Text(
+                                                          'Stk Ret.',
+                                                          style: TextStyle(
+                                                            color: Colors.red,
+                                                            fontSize: 15,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          _sku.purchaseReturnedStock
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                            color: Colors.red,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 15,
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Card(
+                                                    elevation: 10,
+                                                    child: Column(
+                                                      children: [
+                                                        Text(
+                                                          'Off.',
+                                                          style: TextStyle(
+                                                            color: Colors.green,
+                                                            fontSize: 15,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          _sku.salesStock
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                            color: Colors.green,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 15,
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Card(
+                                                    elevation: 10,
+                                                    child: Column(
+                                                      children: [
+                                                        Text(
+                                                          'Off Ret.',
+                                                          style: TextStyle(
+                                                            color: Colors.red,
+                                                            fontSize: 15,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          _sku.returnedStock
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                            color: Colors.red,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 15,
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                        ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

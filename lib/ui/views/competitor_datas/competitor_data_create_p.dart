@@ -6,6 +6,7 @@ import 'package:sales_app/core/providers/competitor_data_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/customer_pr.dart';
 import 'package:sales_app/locator.dart';
+import 'package:sales_app/ui/shared/images_sh.dart';
 
 class CompetitorDataCreatePage extends StatefulWidget {
   @override
@@ -40,16 +41,16 @@ class _CompetitorDataCreatePageState extends State<CompetitorDataCreatePage> {
   //   {'name': '2022', 'value': '2022'},
   // ];
 
+  CompetitorData _competitor = CompetitorData(
+    month: '1',
+    year: 2022,
+  );
+
   @override
   Widget build(BuildContext context) {
     final _competitorDataModel = Provider.of<CompetitorDataModel>(context);
-    CompetitorData _competitor = CompetitorData(
-      month: '1',
-      year: 2022,
-    );
 
     String brand = 'MAMAEARTH';
-    print(_configModel.user.brand);
     if (_configModel.user.brand.toString().toLowerCase() ==
         brand.toLowerCase()) {
       print(1);
@@ -62,197 +63,226 @@ class _CompetitorDataCreatePageState extends State<CompetitorDataCreatePage> {
         'Plum',
         'WOW',
       ];
+    } else {
+      _competitors = [
+        'Bioderma',
+        'Sesderma',
+        'Derma fique',
+        'Avene',
+        'Neutrogena',
+        'Olay',
+        'Sebamed'
+      ];
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Competitor Data'),
+        title: Text(
+          'Add Competitor Data',
+          style: TextStyle(fontSize: 15),
+        ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Card(
-            elevation: 10,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Form(
-                key: _key,
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Competitor',
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(Images.backgroundImg),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: Card(
+              elevation: 10,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Form(
+                  key: _key,
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Competitor',
+                              style: TextStyle(
+                                fontSize: 15,
+                              ),
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          child: DropdownButtonFormField(
-                            decoration:
-                                InputDecoration(labelText: 'Select competitor'),
-                            items: _competitors
-                                .map(
-                                  (_competitor) => DropdownMenuItem(
-                                    value: _competitor,
-                                    child: Text(
-                                      _competitor,
+                          Expanded(
+                            child: DropdownButtonFormField(
+                              decoration: InputDecoration(
+                                  labelText: 'Select competitor'),
+                              items: _competitors
+                                  .map(
+                                    (_competitor) => DropdownMenuItem(
+                                      value: _competitor,
+                                      child: Text(
+                                        _competitor,
+                                      ),
                                     ),
-                                  ),
-                                )
-                                .toList(),
-                            validator: (value) {
-                              if (value == null)
-                                return 'Please select competitor';
-                              return null;
-                            },
-                            onChanged: (value) {
-                              setState(() async {
+                                  )
+                                  .toList(),
+                              validator: (value) {
+                                if (value == null)
+                                  return 'Please select competitor';
+                                return null;
+                              },
+                              onChanged: (value) {
+                                setState(() async {
+                                  _competitor.competitor = value.toString();
+                                });
+                              },
+                              onSaved: (value) {
                                 _competitor.competitor = value.toString();
-                              });
-                            },
-                            onSaved: (value) {
-                              _competitor.competitor = value.toString();
-                            },
+                              },
+                            ),
                           ),
-                        ),
-                        // Expanded(
-                        //   child: TextFormField(
-                        //     decoration:
-                        //         InputDecoration(labelText: 'Competitor'),
-                        //     validator: (value) {
-                        //       if (value!.isEmpty) return 'Please enter value';
-                        //       return null;
-                        //     },
-                        //     onSaved: (value) {
-                        //       _competitor.competitor = value;
-                        //     },
-                        //   ),
-                        // )
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Amount',
+                          // Expanded(
+                          //   child: TextFormField(
+                          //     decoration:
+                          //         InputDecoration(labelText: 'Competitor'),
+                          //     validator: (value) {
+                          //       if (value!.isEmpty) return 'Please enter value';
+                          //       return null;
+                          //     },
+                          //     onSaved: (value) {
+                          //       _competitor.competitor = value;
+                          //     },
+                          //   ),
+                          // )
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Amount',
+                              style: TextStyle(
+                                fontSize: 15,
+                              ),
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          child: TextFormField(
-                            decoration: InputDecoration(labelText: 'Amount'),
-                            keyboardType: TextInputType.number,
-                            validator: (value) {
-                              if (value!.isEmpty) return 'Please enter value';
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _competitor.amount = value;
-                            },
-                          ),
-                        )
-                      ],
-                    ),
-                    // Row(
-                    //   children: [
-                    //     Expanded(
-                    //       child: Text(
-                    //         'Month',
-                    //       ),
-                    //     ),
-                    //     Expanded(
-                    //       child: DropdownButtonFormField(
-                    //         decoration:
-                    //             InputDecoration(labelText: 'Select month'),
-                    //         items: _months
-                    //             .map(
-                    //               (_month) => DropdownMenuItem(
-                    //                 value: _month['value'],
-                    //                 child: Text(
-                    //                   _month['name'],
-                    //                 ),
-                    //               ),
-                    //             )
-                    //             .toList(),
-                    //         validator: (value) {
-                    //           if (value == null) return 'Please select month';
-                    //           return null;
-                    //         },
-                    //         onChanged: (value) {
-                    //           setState(() async {
-                    //             _competitor.month = value.toString();
-                    //           });
-                    //         },
-                    //         onSaved: (value) {
-                    //           _competitor.month = value.toString();
-                    //         },
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
-                    // Row(
-                    //   children: [
-                    //     Expanded(
-                    //       child: Text(
-                    //         'Year',
-                    //       ),
-                    //     ),
-                    //     Expanded(
-                    //       child: DropdownButtonFormField(
-                    //         decoration:
-                    //             InputDecoration(labelText: 'Select year'),
-                    //         items: _years
-                    //             .map(
-                    //               (_year) => DropdownMenuItem(
-                    //                 value: _year['value'],
-                    //                 child: Text(
-                    //                   _year['name'],
-                    //                 ),
-                    //               ),
-                    //             )
-                    //             .toList(),
-                    //         validator: (value) {
-                    //           if (value == null) return 'Please select year';
-                    //           return null;
-                    //         },
-                    //         onChanged: (value) async {
-                    //           setState(() async {
-                    //             _competitor.year = value.toString();
-                    //           });
-                    //         },
-                    //         onSaved: (value) {
-                    //           _competitor.year = value.toString();
-                    //         },
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    _isLoading
-                        ? Text('Saving Data...')
-                        : ElevatedButton(
-                            onPressed: () async {
-                              if (_key.currentState!.validate()) {
-                                _key.currentState!.save();
-                                setState(() {
-                                  _isLoading = true;
-                                });
-                                await _competitorDataModel.competitorDataCreate(
-                                  competitorData: _competitor,
-                                );
+                          Expanded(
+                            child: TextFormField(
+                              decoration: InputDecoration(labelText: 'Amount'),
+                              keyboardType: TextInputType.number,
+                              validator: (value) {
+                                if (value!.isEmpty) return 'Please enter value';
+                                return null;
+                              },
+                              onSaved: (value) {
+                                _competitor.amount = value;
+                              },
+                            ),
+                          )
+                        ],
+                      ),
+                      // Row(
+                      //   children: [
+                      //     Expanded(
+                      //       child: Text(
+                      //         'Month',
+                      //       ),
+                      //     ),
+                      //     Expanded(
+                      //       child: DropdownButtonFormField(
+                      //         decoration:
+                      //             InputDecoration(labelText: 'Select month'),
+                      //         items: _months
+                      //             .map(
+                      //               (_month) => DropdownMenuItem(
+                      //                 value: _month['value'],
+                      //                 child: Text(
+                      //                   _month['name'],
+                      //                 ),
+                      //               ),
+                      //             )
+                      //             .toList(),
+                      //         validator: (value) {
+                      //           if (value == null) return 'Please select month';
+                      //           return null;
+                      //         },
+                      //         onChanged: (value) {
+                      //           setState(() async {
+                      //             _competitor.month = value.toString();
+                      //           });
+                      //         },
+                      //         onSaved: (value) {
+                      //           _competitor.month = value.toString();
+                      //         },
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+                      // Row(
+                      //   children: [
+                      //     Expanded(
+                      //       child: Text(
+                      //         'Year',
+                      //       ),
+                      //     ),
+                      //     Expanded(
+                      //       child: DropdownButtonFormField(
+                      //         decoration:
+                      //             InputDecoration(labelText: 'Select year'),
+                      //         items: _years
+                      //             .map(
+                      //               (_year) => DropdownMenuItem(
+                      //                 value: _year['value'],
+                      //                 child: Text(
+                      //                   _year['name'],
+                      //                 ),
+                      //               ),
+                      //             )
+                      //             .toList(),
+                      //         validator: (value) {
+                      //           if (value == null) return 'Please select year';
+                      //           return null;
+                      //         },
+                      //         onChanged: (value) async {
+                      //           setState(() async {
+                      //             _competitor.year = value.toString();
+                      //           });
+                      //         },
+                      //         onSaved: (value) {
+                      //           _competitor.year = value.toString();
+                      //         },
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      _isLoading
+                          ? Text('Saving Data...')
+                          : ElevatedButton(
+                              onPressed: () async {
+                                if (_key.currentState!.validate()) {
+                                  _key.currentState!.save();
+                                  setState(() {
+                                    _isLoading = true;
+                                  });
+                                  await _competitorDataModel
+                                      .competitorDataCreate(
+                                    competitorData: _competitor,
+                                  );
 
-                                _competitorDataModel.getCompetitorDatas();
+                                  _competitorDataModel.getCompetitorDatas();
 
-                                Navigator.pop(context);
+                                  Navigator.pop(context);
 
-                                setState(() {
-                                  _isLoading = false;
-                                });
-                              }
-                            },
-                            child: Text('Add Competitor Data'),
-                          ),
-                  ],
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+                                }
+                              },
+                              child: Text('Add Competitor Data'),
+                            ),
+                    ],
+                  ),
                 ),
               ),
             ),

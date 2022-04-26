@@ -13,13 +13,14 @@ class CustomerService {
 
   List<Customer>? _customers;
 
-  getCustomers() async {
+  getCustomers({@required monthId, @required year}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
     int? userId = _configModel.user.id;
 
     http.Response _response = await http.get(
-      Uri.parse('${_apiConfig['baseURL']}/customers?userid=$userId&app=YES'),
+      Uri.parse(
+          '${_apiConfig['baseURL']}/customers?userid=$userId&app=YES&month=$monthId&year=$year'),
       headers: _apiConfig['headers'],
     );
 
@@ -55,6 +56,5 @@ class CustomerService {
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
-    
   }
 }

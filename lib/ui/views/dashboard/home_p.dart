@@ -20,72 +20,6 @@ class _HomePageState extends State<HomePage> {
   final List<List<Map<String, dynamic>>> _menuItems = [
     [
       {
-        'icon': Icons.summarize,
-        'color': Colors.amber,
-        'name': 'Daily Summary',
-        'url': '/monthlySummary',
-      },
-      // {
-      //   'icon': Icons.note,
-      //   'color': Colors.teal[200],
-      //   'name': 'Daily Summary',
-      //   'url': '/daySummary',
-      // },
-      {
-        'icon': Icons.chat_rounded,
-        'color': Colors.blue[200],
-        'name': 'OFT Trend',
-        'url': '/saleTrends',
-      },
-      {
-        'icon': Icons.auto_graph,
-        'color': Colors.red[200],
-        'name': 'T Vs A',
-        'url': '/kpiReport',
-      },
-    ],
-    // [
-    //   {
-    //     'icon': Icons.shopping_basket,
-    //     'color': Colors.blue[200],
-    //     'name': 'SKU Tracking',
-    //     'url': '/skuBeats',
-    //   },
-    //   {
-    //     'icon': Icons.ac_unit,
-    //     'color': Colors.blue[200],
-    //     'name': 'Asset Tracking',
-    //     'url': '/assetBeats',
-    //   },
-    //   {
-    //     'icon': Icons.location_history,
-    //     'color': Colors.green[200],
-    //     'name': 'Photos',
-    //     'url': '/dailyPhotos',
-    //   },
-    // ],
-    [
-      {
-        'icon': Icons.photo,
-        'color': Colors.amber[200],
-        'name': 'Photos',
-        'url': '/dailyPhotos',
-      },
-      {
-        'icon': Icons.local_grocery_store,
-        'color': Colors.green[200],
-        'name': 'Daily Activity',
-        'url': '/beatOutlets',
-      },
-      {
-        'icon': Icons.production_quantity_limits,
-        'color': Colors.blue[200],
-        'name': 'Stocks',
-        'url': '/stockBeatOutlets',
-      },
-    ],
-    [
-      {
         'icon': Icons.access_alarms,
         'color': Colors.cyan[200],
         'name': 'Attendance',
@@ -104,26 +38,6 @@ class _HomePageState extends State<HomePage> {
         'url': '/beatOutlets',
       },
     ],
-    [
-      {
-        'icon': Icons.poll_rounded,
-        'color': Colors.blue[200],
-        'name': 'Productivity',
-        'url': '/productivityIndex',
-      },
-      {
-        'icon': Icons.dashboard_customize_rounded,
-        'color': Colors.red[200],
-        'name': 'Customers',
-        'url': '/customerDataEntryIndex',
-      },
-      {
-        'icon': Icons.person_add_alt_outlined,
-        'color': Colors.green[200],
-        'name': 'Competitors',
-        'url': '/competitorDataIndex',
-      },
-    ],
   ];
 
   var format = DateFormat.yMMMMd();
@@ -136,7 +50,12 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       drawer: DrawerWidget(),
       appBar: AppBar(
-        title: Text('BA Channel'),
+        title: Text(
+          'BD APP',
+          style: TextStyle(
+            fontSize: 15,
+          ),
+        ),
         actions: [
           IconButton(
             color: Colors.white,
@@ -161,235 +80,131 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: Image.asset(Images.background),
-              ),
-              Card(
-                child: Column(
-                  children: [
-                    Text(
-                      'Hi, ${_configModel.user.name}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Divider(),
-                  ],
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(Images.backgroundImg),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: Image.asset(Images.background),
                 ),
-              ),
-              Card(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          Expanded(
+                Card(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(
                             child: Text(
-                              "Menu",
+                              'Hi, ${_configModel.user.name}',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
+                                fontSize: 15,
                               ),
                             ),
                           ),
-                          Text(
-                            format.format(DateTime.now()),
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                    Divider(),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: _menuItems
-                          .map(
-                            (_menuItem) => Row(
-                              children: _menuItem
-                                  .map(
-                                    (_item) => Expanded(
-                                      child: InkWell(
-                                        onTap: () {
-                                          Navigator.pushNamed(
-                                              context, _item['url'],
-                                              arguments: {
-                                                'tab': _item,
-                                              });
-                                        },
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: Colors.green[300]!),
-                                          ),
-                                          child: Column(
-                                            children: [
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                              Icon(
-                                                _item['icon'],
-                                                color: _item['color'],
-                                                size: 30,
-                                              ),
-                                              SizedBox(
-                                                height: 5,
-                                              ),
-                                              Text(
-                                                _item['name'],
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
-                            ),
-                          )
-                          .toList(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    )
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              Card(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              "Notifications",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
+                Card(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                "Menu",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                            Text(
+                              format.format(DateTime.now()),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    Divider(),
-                    if (_noticeModel.notices.length > 0)
-                      ..._noticeModel.notices
-                          .map(
-                            (_notice) => Container(
-                              decoration:
-                                  _noticeModel.notices.indexOf(_notice) % 2 != 0
-                                      ? BoxDecoration(color: Colors.grey[400])
-                                      : BoxDecoration(color: Colors.white),
-                              child: Column(
-                                children: [
-                                  if (_notice.channel
-                                              .toString()
-                                              .toLowerCase() ==
-                                          _configModel.user.channel
-                                              .toString()
-                                              .toLowerCase() &&
-                                      _notice.brand.toString().toLowerCase() ==
-                                          _configModel.user.brand
-                                              .toString()
-                                              .toLowerCase() &&
-                                      _notice.roleName
-                                              .toString()
-                                              .toLowerCase() ==
-                                          _configModel.user.roles![0].name
-                                              .toString()
-                                              .toLowerCase())
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: Column(
-                                            children: [
-                                              if (_notice.imagepath != null)
-                                                Padding(
-                                                  padding: EdgeInsets.all(5),
-                                                  child: CircleAvatar(
-                                                    radius: 32,
-                                                    backgroundImage:
-                                                        NetworkImage(
-                                                      _configModel.apiConfig[
-                                                              'mediaURL'] +
-                                                          _notice.imagepath,
-                                                    ),
-                                                  ),
-                                                ),
-                                              if (_notice.name != null)
-                                                Text(
-                                                  _notice.name.toString(),
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(5.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: _menuItems
+                            .map(
+                              (_menuItem) => Row(
+                                children: _menuItem
+                                    .map(
+                                      (_item) => Expanded(
+                                        child: InkWell(
+                                          onTap: () {
+                                            Navigator.pushNamed(
+                                                context, _item['url'],
+                                                arguments: {
+                                                  'tab': _item,
+                                                });
+                                          },
+                                          child: Container(
+                                            // decoration: BoxDecoration(
+                                            //   border: Border.all(
+                                            //     color: Colors.green[300]!,
+                                            //   ),
+                                            // ),
                                             child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
                                               children: [
-                                                // Text(_notice.title.toString()),
-                                                Text(_notice.description
-                                                    .toString()),
-                                                if (_notice.link != null)
-                                                  RaisedButton(
-                                                    color: Colors.blue,
-                                                    onPressed: () {
-                                                      launch(_notice.link
-                                                          .toString());
-                                                    },
-                                                    child: Text(
-                                                      'Visit Link',
-                                                      style: TextStyle(
-                                                          color: Colors.white),
-                                                    ),
-                                                  )
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                Icon(
+                                                  _item['icon'],
+                                                  color: _item['color'],
+                                                  size: 25,
+                                                ),
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Text(
+                                                  _item['name'],
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 15),
+                                                ),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
                                               ],
                                             ),
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  // Divider(),
-                                ],
+                                      ),
+                                    )
+                                    .toList(),
                               ),
-                            ),
-                          )
-                          .toList(),
-                    // Center(
-                    //   child: RaisedButton(
-                    //     color: Theme.of(context).primaryColor,
-                    //     onPressed: () {
-                    //       Navigator.pushNamed(context, '/notifications');
-                    //     },
-                    //     child: Text(
-                    //       'VIEW ALL NOTIFICATIONS',
-                    //       style: TextStyle(color: Colors.white),
-                    //     ),
-                    //   ),
-                    // )
-                  ],
+                            )
+                            .toList(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      )
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

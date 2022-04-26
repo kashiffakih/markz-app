@@ -128,50 +128,6 @@ class DailyOrderSummaryPage extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        iconSize: 0,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Color(0xFF6200EE),
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white,
-        selectedFontSize: 14,
-        unselectedFontSize: 14,
-        onTap: (value) {
-          // Respond to item press.
-          print(value);
-        },
-        items: [
-          BottomNavigationBarItem(
-            title: Padding(
-              padding: EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: Text(
-                          'Order Total',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            icon: Icon(Icons.arrow_right),
-          ),
-          BottomNavigationBarItem(
-            title: Text(
-              '₹. 9',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            icon: Icon(Icons.arrow_right),
-          ),
-        ],
-      ),
     );
   }
 }

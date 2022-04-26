@@ -44,12 +44,12 @@ class _OutletDetailsPageState extends State<OutletDetailsPage> {
     {
       'title': 'Stock Returned',
       'key': 'Purchase Returned',
-      'color': Colors.red[400],
+      'color': Colors.green[400],
     },
     {
       'title': 'Offtake',
       'key': 'Sales',
-      'color': Colors.red[400],
+      'color': Colors.green[400],
     },
     {
       'title': 'Offtake Returned',
@@ -81,567 +81,586 @@ class _OutletDetailsPageState extends State<OutletDetailsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_retailer.name! + ' Details'),
+        title: Text(
+          _retailer.name! + ' Details',
+          style: TextStyle(
+            fontSize: 15,
+          ),
+        ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              InkWell(
-                onTap: () {},
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        if (_retailer.imagePath == null)
-                          Expanded(
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                top: 8.0,
-                                right: 8.0,
-                                bottom: 8.0,
-                              ),
-                              child: CircleAvatar(
-                                radius: 100,
-                                backgroundImage: AssetImage(Images.product),
-                              ),
-                            ),
-                          ),
-                        if (_retailer.imagePath != null)
-                          Expanded(
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                top: 8.0,
-                                right: 8.0,
-                                bottom: 8.0,
-                              ),
-                              child: CircleAvatar(
-                                radius: 100,
-                                backgroundImage: NetworkImage(
-                                  _configModel.apiConfig['mediaURL'] +
-                                      _retailer.imagePath,
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    // Card(
-                    //   child: Padding(
-                    //     padding: const EdgeInsets.all(8.0),
-                    //     child: Column(
-                    //       children: [
-                    //         Row(
-                    //           children: [
-                    //             Expanded(
-                    //               flex: 3,
-                    //               child: Column(
-                    //                 crossAxisAlignment:
-                    //                     CrossAxisAlignment.start,
-                    //                 children: [
-                    //                   Row(
-                    //                     children: [
-                    //                       Expanded(
-                    //                         child: Text(
-                    //                           _retailer.name.toString(),
-                    //                           style: TextStyle(
-                    //                               color: Colors.orange,
-                    //                               fontWeight: FontWeight.bold),
-                    //                         ),
-                    //                       ),
-                    //                       if (_retailer.lat != null &&
-                    //                           _retailer.lng != null)
-                    //                         IconButton(
-                    //                           icon: Icon(
-                    //                             Icons.location_on,
-                    //                             color: Colors.pink,
-                    //                           ),
-                    //                           onPressed: () {
-                    //                             String url =
-                    //                                 'https://www.google.com/maps/?q=${_retailer.lat},${_retailer.lng}';
-                    //                             _launchURL(url: url);
-                    //                           },
-                    //                         ),
-                    //                       if (_retailer.isDone == 'Y')
-                    //                         Icon(
-                    //                           Icons.check,
-                    //                           color: Colors.green,
-                    //                         )
-                    //                       else
-                    //                         Icon(
-                    //                           Icons.warning,
-                    //                           color: Colors.red,
-                    //                         )
-                    //                     ],
-                    //                   ),
-                    //                   Text(
-                    //                     'RETAILER',
-                    //                     style: TextStyle(
-                    //                       color: Colors.grey,
-                    //                     ),
-                    //                   ),
-                    //                   Text(
-                    //                     _retailer.address.toString(),
-                    //                     style: TextStyle(
-                    //                       color: Colors.red,
-                    //                     ),
-                    //                   ),
-                    //                 ],
-                    //               ),
-                    //             ),
-                    //           ],
-                    //         ),
-                    //         SizedBox(
-                    //           height: 5,
-                    //         ),
-                    //         Row(
-                    //           children: [
-                    //             Expanded(
-                    //               child: Center(
-                    //                 child: Text(
-                    //                   'Avg. L3M: ₹ ' + _retailer.l3m.toString(),
-                    //                   style: TextStyle(
-                    //                     fontWeight: FontWeight.bold,
-                    //                   ),
-                    //                 ),
-                    //               ),
-                    //             ),
-                    //             Expanded(
-                    //               child: Center(
-                    //                 child: Text(
-                    //                   'MTD: ₹ ' + _retailer.mtd.toString(),
-                    //                   style: TextStyle(
-                    //                     fontWeight: FontWeight.bold,
-                    //                   ),
-                    //                 ),
-                    //               ),
-                    //             ),
-                    //           ],
-                    //         ),
-                    //       ],
-                    //     ),
-                    //   ),
-                    // ),
-                    if (_retailer.imagePath == null)
-                      Column(
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(Images.backgroundImg),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                InkWell(
+                  onTap: () {},
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
                         children: [
-                          Divider(),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: TakeImageWidget(imagePath: ''),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: isUploadingImage
-                                      ? Center(
-                                          child: CircularProgressIndicator())
-                                      : RaisedButton(
-                                          color: Theme.of(context).primaryColor,
-                                          onPressed: () async {
-                                            if (_configModel.file == null) {
-                                              showDialog(
-                                                context: context,
-                                                builder:
-                                                    (BuildContext context) =>
-                                                        AlertDialog(
-                                                  title:
-                                                      Text('Please add image'),
-                                                  actions: [
-                                                    FlatButton(
-                                                      onPressed: () {
-                                                        Navigator.pop(context);
-                                                      },
-                                                      child: Text('OK'),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            } else {
-                                              setState(() {
-                                                isUploadingImage = true;
-                                              });
-                                              await _referencePlanModel
-                                                  .addRetailerImage(
-                                                      retailer: _retailer);
-                                              setState(() {
-                                                isUploadingImage = false;
-                                              });
-                                            }
-                                          },
-                                          child: Text(
-                                            'Upload Image',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontFamily: Font.primaryFont,
-                                            ),
-                                          ),
-                                        ),
+                          if (_retailer.imagePath == null)
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  top: 8.0,
+                                  right: 8.0,
+                                  bottom: 8.0,
                                 ),
-                              ],
+                                child: CircleAvatar(
+                                  radius: 100,
+                                  backgroundImage: AssetImage(Images.product),
+                                ),
+                              ),
                             ),
-                          ),
+                          if (_retailer.imagePath != null)
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  top: 8.0,
+                                  right: 8.0,
+                                  bottom: 8.0,
+                                ),
+                                child: CircleAvatar(
+                                  radius: 100,
+                                  backgroundImage: NetworkImage(
+                                    _configModel.apiConfig['mediaURL'] +
+                                        _retailer.imagePath,
+                                  ),
+                                ),
+                              ),
+                            ),
                         ],
                       ),
-                    Divider(),
-                    ...buttons
-                        .map(
-                          (_b) => Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: RaisedButton(
-                                    color: _b['color'],
-                                    onPressed: () {
-                                      if (_retailer.imagePath == null) {
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) =>
-                                              AlertDialog(
-                                            title: Text(
-                                                'Please upload the image first!!!'),
-                                            actions: [
-                                              FlatButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text('Ok'),
+                      // Card(
+                      //   child: Padding(
+                      //     padding: const EdgeInsets.all(8.0),
+                      //     child: Column(
+                      //       children: [
+                      //         Row(
+                      //           children: [
+                      //             Expanded(
+                      //               flex: 3,
+                      //               child: Column(
+                      //                 crossAxisAlignment:
+                      //                     CrossAxisAlignment.start,
+                      //                 children: [
+                      //                   Row(
+                      //                     children: [
+                      //                       Expanded(
+                      //                         child: Text(
+                      //                           _retailer.name.toString(),
+                      //                           style: TextStyle(
+                      //                               color: Colors.orange,
+                      //                               fontWeight: FontWeight.bold),
+                      //                         ),
+                      //                       ),
+                      //                       if (_retailer.lat != null &&
+                      //                           _retailer.lng != null)
+                      //                         IconButton(
+                      //                           icon: Icon(
+                      //                             Icons.location_on,
+                      //                             color: Colors.pink,
+                      //                           ),
+                      //                           onPressed: () {
+                      //                             String url =
+                      //                                 'https://www.google.com/maps/?q=${_retailer.lat},${_retailer.lng}';
+                      //                             _launchURL(url: url);
+                      //                           },
+                      //                         ),
+                      //                       if (_retailer.isDone == 'Y')
+                      //                         Icon(
+                      //                           Icons.check,
+                      //                           color: Colors.green,
+                      //                         )
+                      //                       else
+                      //                         Icon(
+                      //                           Icons.warning,
+                      //                           color: Colors.red,
+                      //                         )
+                      //                     ],
+                      //                   ),
+                      //                   Text(
+                      //                     'RETAILER',
+                      //                     style: TextStyle(
+                      //                       color: Colors.grey,
+                      //                     ),
+                      //                   ),
+                      //                   Text(
+                      //                     _retailer.address.toString(),
+                      //                     style: TextStyle(
+                      //                       color: Colors.red,
+                      //                     ),
+                      //                   ),
+                      //                 ],
+                      //               ),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //         SizedBox(
+                      //           height: 5,
+                      //         ),
+                      //         Row(
+                      //           children: [
+                      //             Expanded(
+                      //               child: Center(
+                      //                 child: Text(
+                      //                   'Avg. L3M: ₹ ' + _retailer.l3m.toString(),
+                      //                   style: TextStyle(
+                      //                     fontWeight: FontWeight.bold,
+                      //                   ),
+                      //                 ),
+                      //               ),
+                      //             ),
+                      //             Expanded(
+                      //               child: Center(
+                      //                 child: Text(
+                      //                   'MTD: ₹ ' + _retailer.mtd.toString(),
+                      //                   style: TextStyle(
+                      //                     fontWeight: FontWeight.bold,
+                      //                   ),
+                      //                 ),
+                      //               ),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   ),
+                      // ),
+                      if (_retailer.imagePath == null)
+                        Column(
+                          children: [
+                            Divider(),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TakeImageWidget(imagePath: ''),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: isUploadingImage
+                                        ? Center(
+                                            child: CircularProgressIndicator())
+                                        : RaisedButton(
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                            onPressed: () async {
+                                              if (_configModel.file == null) {
+                                                showDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) =>
+                                                          AlertDialog(
+                                                    title: Text(
+                                                        'Please add image'),
+                                                    actions: [
+                                                      FlatButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child: Text('OK'),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              } else {
+                                                setState(() {
+                                                  isUploadingImage = true;
+                                                });
+                                                await _referencePlanModel
+                                                    .addRetailerImage(
+                                                        retailer: _retailer);
+                                                setState(() {
+                                                  isUploadingImage = false;
+                                                });
+                                              }
+                                            },
+                                            child: Text(
+                                              'Upload Image',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontFamily: Font.primaryFont,
                                               ),
-                                            ],
+                                            ),
                                           ),
-                                        );
-                                      } else {
-                                        if (_myOrderModel.order == null) {
-                                          Navigator.pushNamed(context, '/order',
-                                              arguments: {
-                                                'beat': _referencePlan,
-                                                'outlet': _retailer,
-                                                'order_type': _b['key'],
-                                              });
-                                        } else if (_myOrderModel
-                                                .order!.retailerId ==
-                                            _retailer.id) {
-                                          Navigator.pushNamed(context, '/order',
-                                              arguments: {
-                                                'beat': _referencePlan,
-                                                'outlet': _retailer,
-                                                'order_type': _b['key'],
-                                              });
-                                        } else {
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      Divider(),
+                      ...buttons
+                          .map(
+                            (_b) => Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: RaisedButton(
+                                      color: _b['color'],
+                                      onPressed: () {
+                                        if (_retailer.imagePath == null) {
                                           showDialog(
                                             context: context,
                                             builder: (BuildContext context) =>
                                                 AlertDialog(
                                               title: Text(
-                                                  'Order from another retailer is already there in the cart. Do you want to reset the order'),
+                                                  'Please upload the image first!!!'),
                                               actions: [
                                                 FlatButton(
                                                   onPressed: () {
-                                                    _myOrderModel.emptyOrder();
                                                     Navigator.pop(context);
-                                                    Navigator.pushNamed(
-                                                        context, '/order',
-                                                        arguments: {
-                                                          'beat':
-                                                              _referencePlan,
-                                                          'outlet': _retailer,
-                                                        });
                                                   },
-                                                  child: Text('Yes'),
+                                                  child: Text('Ok'),
                                                 ),
-                                                FlatButton(
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
-                                                    Navigator.pushNamed(
-                                                        context, '/beats');
-                                                  },
-                                                  child: Text('No'),
-                                                )
                                               ],
                                             ),
                                           );
+                                        } else {
+                                          if (_myOrderModel.order == null) {
+                                            Navigator.pushNamed(
+                                                context, '/order',
+                                                arguments: {
+                                                  'beat': _referencePlan,
+                                                  'outlet': _retailer,
+                                                  'order_type': _b['key'],
+                                                });
+                                          } else if (_myOrderModel
+                                                  .order!.retailerId ==
+                                              _retailer.id) {
+                                            Navigator.pushNamed(
+                                                context, '/order',
+                                                arguments: {
+                                                  'beat': _referencePlan,
+                                                  'outlet': _retailer,
+                                                  'order_type': _b['key'],
+                                                });
+                                          } else {
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) =>
+                                                  AlertDialog(
+                                                title: Text(
+                                                    'Order from another retailer is already there in the cart. Do you want to reset the order'),
+                                                actions: [
+                                                  FlatButton(
+                                                    onPressed: () {
+                                                      _myOrderModel
+                                                          .emptyOrder();
+                                                      Navigator.pop(context);
+                                                      Navigator.pushNamed(
+                                                          context, '/order',
+                                                          arguments: {
+                                                            'beat':
+                                                                _referencePlan,
+                                                            'outlet': _retailer,
+                                                          });
+                                                    },
+                                                    child: Text('Yes'),
+                                                  ),
+                                                  FlatButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                      Navigator.pushNamed(
+                                                          context, '/beats');
+                                                    },
+                                                    child: Text('No'),
+                                                  )
+                                                ],
+                                              ),
+                                            );
+                                          }
                                         }
-                                      }
-                                    },
-                                    child: Text(
-                                      _b['title'],
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontFamily: Font.primaryFont,
+                                      },
+                                      child: Text(
+                                        _b['title'],
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: Font.primaryFont,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        )
-                        .toList(),
-                    // Padding(
-                    //   padding: const EdgeInsets.all(8.0),
-                    //   child: Row(
-                    //     children: [
-                    //       Expanded(
-                    //         child: RaisedButton(
-                    //           color: Theme.of(context).primaryColor,
-                    //           onPressed: () {
-                    //             if (_retailer.imagePath == null) {
-                    //               showDialog(
-                    //                 context: context,
-                    //                 builder: (BuildContext context) =>
-                    //                     AlertDialog(
-                    //                   title: Text(
-                    //                       'Please upload the image first!!!'),
-                    //                   actions: [
-                    //                     FlatButton(
-                    //                       onPressed: () {
-                    //                         Navigator.pop(context);
-                    //                       },
-                    //                       child: Text('Ok'),
-                    //                     ),
-                    //                   ],
-                    //                 ),
-                    //               );
-                    //             } else {
-                    //               if (_myOrderModel.order == null) {
-                    //                 Navigator.pushNamed(context, '/order',
-                    //                     arguments: {
-                    //                       'beat': _referencePlan,
-                    //                       'outlet': _retailer,
-                    //                       'order_type': 'Sales',
-                    //                     });
-                    //               } else if (_myOrderModel.order.retailerId ==
-                    //                   _retailer.id) {
-                    //                 Navigator.pushNamed(context, '/order',
-                    //                     arguments: {
-                    //                       'beat': _referencePlan,
-                    //                       'outlet': _retailer,
-                    //                       'order_type': 'Sales',
-                    //                     });
-                    //               } else {
-                    //                 showDialog(
-                    //                   context: context,
-                    //                   builder: (BuildContext context) =>
-                    //                       AlertDialog(
-                    //                     title: Text(
-                    //                         'Order from another retailer is already there in the cart. Do you want to reset the order'),
-                    //                     actions: [
-                    //                       FlatButton(
-                    //                         onPressed: () {
-                    //                           _myOrderModel.emptyOrder();
-                    //                           Navigator.pop(context);
-                    //                           Navigator.pushNamed(
-                    //                               context, '/order',
-                    //                               arguments: {
-                    //                                 'beat': _referencePlan,
-                    //                                 'outlet': _retailer,
-                    //                               });
-                    //                         },
-                    //                         child: Text('Yes'),
-                    //                       ),
-                    //                       FlatButton(
-                    //                         onPressed: () {
-                    //                           Navigator.pop(context);
-                    //                           Navigator.pushNamed(
-                    //                               context, '/beats');
-                    //                         },
-                    //                         child: Text('No'),
-                    //                       )
-                    //                     ],
-                    //                   ),
-                    //                 );
-                    //               }
-                    //             }
-                    //           },
-                    //           child: Text(
-                    //             'Add Offtake',
-                    //             style: TextStyle(
-                    //               color: Colors.white,
-                    //               fontFamily: Font.primaryFont,
-                    //             ),
-                    //           ),
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    // Padding(
-                    //   padding: const EdgeInsets.all(8.0),
-                    //   child: Row(
-                    //     children: [
-                    //       Expanded(
-                    //         child: RaisedButton(
-                    //           color: Colors.cyan,
-                    //           onPressed: () {
-                    //             if (_retailer.imagePath == null) {
-                    //               showDialog(
-                    //                 context: context,
-                    //                 builder: (BuildContext context) =>
-                    //                     AlertDialog(
-                    //                   title: Text(
-                    //                       'Please upload the image first!!!'),
-                    //                   actions: [
-                    //                     FlatButton(
-                    //                       onPressed: () {
-                    //                         Navigator.pop(context);
-                    //                       },
-                    //                       child: Text('Ok'),
-                    //                     ),
-                    //                   ],
-                    //                 ),
-                    //               );
-                    //             } else {
-                    //               if (_myOrderModel.order == null) {
-                    //                 Navigator.pushNamed(context, '/order',
-                    //                     arguments: {
-                    //                       'beat': _referencePlan,
-                    //                       'outlet': _retailer,
-                    //                       'order_type': 'Stock Received',
-                    //                     });
-                    //               } else if (_myOrderModel.order.retailerId ==
-                    //                   _retailer.id) {
-                    //                 Navigator.pushNamed(context, '/order',
-                    //                     arguments: {
-                    //                       'beat': _referencePlan,
-                    //                       'outlet': _retailer,
-                    //                       'order_type': 'Stock Received',
-                    //                     });
-                    //               } else {
-                    //                 showDialog(
-                    //                   context: context,
-                    //                   builder: (BuildContext context) =>
-                    //                       AlertDialog(
-                    //                     title: Text(
-                    //                         'Order from another retailer is already there in the cart. Do you want to reset the order'),
-                    //                     actions: [
-                    //                       FlatButton(
-                    //                         onPressed: () {
-                    //                           _myOrderModel.emptyOrder();
-                    //                           Navigator.pop(context);
-                    //                           Navigator.pushNamed(
-                    //                               context, '/order',
-                    //                               arguments: {
-                    //                                 'beat': _referencePlan,
-                    //                                 'outlet': _retailer,
-                    //                               });
-                    //                         },
-                    //                         child: Text('Yes'),
-                    //                       ),
-                    //                       FlatButton(
-                    //                         onPressed: () {
-                    //                           Navigator.pop(context);
-                    //                           Navigator.pushNamed(
-                    //                               context, '/beats');
-                    //                         },
-                    //                         child: Text('No'),
-                    //                       )
-                    //                     ],
-                    //                   ),
-                    //                 );
-                    //               }
-                    //             }
-                    //           },
-                    //           child: Text(
-                    //             'Stocks Received',
-                    //             style: TextStyle(
-                    //               color: Colors.white,
-                    //               fontFamily: Font.primaryFont,
-                    //             ),
-                    //           ),
-                    //         ),
-                    //       ),
-                    //       Expanded(
-                    //         child: RaisedButton(
-                    //           color: Colors.orange,
-                    //           onPressed: () {
-                    //             if (_retailer.imagePath == null) {
-                    //               showDialog(
-                    //                 context: context,
-                    //                 builder: (BuildContext context) =>
-                    //                     AlertDialog(
-                    //                   title: Text(
-                    //                       'Please upload the image first!!!'),
-                    //                   actions: [
-                    //                     FlatButton(
-                    //                       onPressed: () {
-                    //                         Navigator.pop(context);
-                    //                       },
-                    //                       child: Text('Ok'),
-                    //                     ),
-                    //                   ],
-                    //                 ),
-                    //               );
-                    //             } else {
-                    //               if (_myOrderModel.order == null) {
-                    //                 Navigator.pushNamed(context, '/order',
-                    //                     arguments: {
-                    //                       'beat': _referencePlan,
-                    //                       'outlet': _retailer,
-                    //                       'order_type': 'Stock Returned',
-                    //                     });
-                    //               } else if (_myOrderModel.order.retailerId ==
-                    //                   _retailer.id) {
-                    //                 Navigator.pushNamed(context, '/order',
-                    //                     arguments: {
-                    //                       'beat': _referencePlan,
-                    //                       'outlet': _retailer,
-                    //                       'order_type': 'Stock Returned',
-                    //                     });
-                    //               } else {
-                    //                 showDialog(
-                    //                   context: context,
-                    //                   builder: (BuildContext context) =>
-                    //                       AlertDialog(
-                    //                     title: Text(
-                    //                         'Order from another retailer is already there in the cart. Do you want to reset the order'),
-                    //                     actions: [
-                    //                       FlatButton(
-                    //                         onPressed: () {
-                    //                           _myOrderModel.emptyOrder();
-                    //                           Navigator.pop(context);
-                    //                           Navigator.pushNamed(
-                    //                               context, '/order',
-                    //                               arguments: {
-                    //                                 'beat': _referencePlan,
-                    //                                 'outlet': _retailer,
-                    //                               });
-                    //                         },
-                    //                         child: Text('Yes'),
-                    //                       ),
-                    //                       FlatButton(
-                    //                         onPressed: () {
-                    //                           Navigator.pop(context);
-                    //                           Navigator.pushNamed(
-                    //                               context, '/beats');
-                    //                         },
-                    //                         child: Text('No'),
-                    //                       )
-                    //                     ],
-                    //                   ),
-                    //                 );
-                    //               }
-                    //             }
-                    //           },
-                    //           child: Text(
-                    //             'Returned Stocks',
-                    //             style: TextStyle(
-                    //               color: Colors.white,
-                    //               fontFamily: Font.primaryFont,
-                    //             ),
-                    //           ),
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // )
-                  ],
-                ),
-              )
-            ],
+                          )
+                          .toList(),
+                      // Padding(
+                      //   padding: const EdgeInsets.all(8.0),
+                      //   child: Row(
+                      //     children: [
+                      //       Expanded(
+                      //         child: RaisedButton(
+                      //           color: Theme.of(context).primaryColor,
+                      //           onPressed: () {
+                      //             if (_retailer.imagePath == null) {
+                      //               showDialog(
+                      //                 context: context,
+                      //                 builder: (BuildContext context) =>
+                      //                     AlertDialog(
+                      //                   title: Text(
+                      //                       'Please upload the image first!!!'),
+                      //                   actions: [
+                      //                     FlatButton(
+                      //                       onPressed: () {
+                      //                         Navigator.pop(context);
+                      //                       },
+                      //                       child: Text('Ok'),
+                      //                     ),
+                      //                   ],
+                      //                 ),
+                      //               );
+                      //             } else {
+                      //               if (_myOrderModel.order == null) {
+                      //                 Navigator.pushNamed(context, '/order',
+                      //                     arguments: {
+                      //                       'beat': _referencePlan,
+                      //                       'outlet': _retailer,
+                      //                       'order_type': 'Sales',
+                      //                     });
+                      //               } else if (_myOrderModel.order.retailerId ==
+                      //                   _retailer.id) {
+                      //                 Navigator.pushNamed(context, '/order',
+                      //                     arguments: {
+                      //                       'beat': _referencePlan,
+                      //                       'outlet': _retailer,
+                      //                       'order_type': 'Sales',
+                      //                     });
+                      //               } else {
+                      //                 showDialog(
+                      //                   context: context,
+                      //                   builder: (BuildContext context) =>
+                      //                       AlertDialog(
+                      //                     title: Text(
+                      //                         'Order from another retailer is already there in the cart. Do you want to reset the order'),
+                      //                     actions: [
+                      //                       FlatButton(
+                      //                         onPressed: () {
+                      //                           _myOrderModel.emptyOrder();
+                      //                           Navigator.pop(context);
+                      //                           Navigator.pushNamed(
+                      //                               context, '/order',
+                      //                               arguments: {
+                      //                                 'beat': _referencePlan,
+                      //                                 'outlet': _retailer,
+                      //                               });
+                      //                         },
+                      //                         child: Text('Yes'),
+                      //                       ),
+                      //                       FlatButton(
+                      //                         onPressed: () {
+                      //                           Navigator.pop(context);
+                      //                           Navigator.pushNamed(
+                      //                               context, '/beats');
+                      //                         },
+                      //                         child: Text('No'),
+                      //                       )
+                      //                     ],
+                      //                   ),
+                      //                 );
+                      //               }
+                      //             }
+                      //           },
+                      //           child: Text(
+                      //             'Add Offtake',
+                      //             style: TextStyle(
+                      //               color: Colors.white,
+                      //               fontFamily: Font.primaryFont,
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                      // Padding(
+                      //   padding: const EdgeInsets.all(8.0),
+                      //   child: Row(
+                      //     children: [
+                      //       Expanded(
+                      //         child: RaisedButton(
+                      //           color: Colors.cyan,
+                      //           onPressed: () {
+                      //             if (_retailer.imagePath == null) {
+                      //               showDialog(
+                      //                 context: context,
+                      //                 builder: (BuildContext context) =>
+                      //                     AlertDialog(
+                      //                   title: Text(
+                      //                       'Please upload the image first!!!'),
+                      //                   actions: [
+                      //                     FlatButton(
+                      //                       onPressed: () {
+                      //                         Navigator.pop(context);
+                      //                       },
+                      //                       child: Text('Ok'),
+                      //                     ),
+                      //                   ],
+                      //                 ),
+                      //               );
+                      //             } else {
+                      //               if (_myOrderModel.order == null) {
+                      //                 Navigator.pushNamed(context, '/order',
+                      //                     arguments: {
+                      //                       'beat': _referencePlan,
+                      //                       'outlet': _retailer,
+                      //                       'order_type': 'Stock Received',
+                      //                     });
+                      //               } else if (_myOrderModel.order.retailerId ==
+                      //                   _retailer.id) {
+                      //                 Navigator.pushNamed(context, '/order',
+                      //                     arguments: {
+                      //                       'beat': _referencePlan,
+                      //                       'outlet': _retailer,
+                      //                       'order_type': 'Stock Received',
+                      //                     });
+                      //               } else {
+                      //                 showDialog(
+                      //                   context: context,
+                      //                   builder: (BuildContext context) =>
+                      //                       AlertDialog(
+                      //                     title: Text(
+                      //                         'Order from another retailer is already there in the cart. Do you want to reset the order'),
+                      //                     actions: [
+                      //                       FlatButton(
+                      //                         onPressed: () {
+                      //                           _myOrderModel.emptyOrder();
+                      //                           Navigator.pop(context);
+                      //                           Navigator.pushNamed(
+                      //                               context, '/order',
+                      //                               arguments: {
+                      //                                 'beat': _referencePlan,
+                      //                                 'outlet': _retailer,
+                      //                               });
+                      //                         },
+                      //                         child: Text('Yes'),
+                      //                       ),
+                      //                       FlatButton(
+                      //                         onPressed: () {
+                      //                           Navigator.pop(context);
+                      //                           Navigator.pushNamed(
+                      //                               context, '/beats');
+                      //                         },
+                      //                         child: Text('No'),
+                      //                       )
+                      //                     ],
+                      //                   ),
+                      //                 );
+                      //               }
+                      //             }
+                      //           },
+                      //           child: Text(
+                      //             'Stocks Received',
+                      //             style: TextStyle(
+                      //               color: Colors.white,
+                      //               fontFamily: Font.primaryFont,
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       Expanded(
+                      //         child: RaisedButton(
+                      //           color: Colors.orange,
+                      //           onPressed: () {
+                      //             if (_retailer.imagePath == null) {
+                      //               showDialog(
+                      //                 context: context,
+                      //                 builder: (BuildContext context) =>
+                      //                     AlertDialog(
+                      //                   title: Text(
+                      //                       'Please upload the image first!!!'),
+                      //                   actions: [
+                      //                     FlatButton(
+                      //                       onPressed: () {
+                      //                         Navigator.pop(context);
+                      //                       },
+                      //                       child: Text('Ok'),
+                      //                     ),
+                      //                   ],
+                      //                 ),
+                      //               );
+                      //             } else {
+                      //               if (_myOrderModel.order == null) {
+                      //                 Navigator.pushNamed(context, '/order',
+                      //                     arguments: {
+                      //                       'beat': _referencePlan,
+                      //                       'outlet': _retailer,
+                      //                       'order_type': 'Stock Returned',
+                      //                     });
+                      //               } else if (_myOrderModel.order.retailerId ==
+                      //                   _retailer.id) {
+                      //                 Navigator.pushNamed(context, '/order',
+                      //                     arguments: {
+                      //                       'beat': _referencePlan,
+                      //                       'outlet': _retailer,
+                      //                       'order_type': 'Stock Returned',
+                      //                     });
+                      //               } else {
+                      //                 showDialog(
+                      //                   context: context,
+                      //                   builder: (BuildContext context) =>
+                      //                       AlertDialog(
+                      //                     title: Text(
+                      //                         'Order from another retailer is already there in the cart. Do you want to reset the order'),
+                      //                     actions: [
+                      //                       FlatButton(
+                      //                         onPressed: () {
+                      //                           _myOrderModel.emptyOrder();
+                      //                           Navigator.pop(context);
+                      //                           Navigator.pushNamed(
+                      //                               context, '/order',
+                      //                               arguments: {
+                      //                                 'beat': _referencePlan,
+                      //                                 'outlet': _retailer,
+                      //                               });
+                      //                         },
+                      //                         child: Text('Yes'),
+                      //                       ),
+                      //                       FlatButton(
+                      //                         onPressed: () {
+                      //                           Navigator.pop(context);
+                      //                           Navigator.pushNamed(
+                      //                               context, '/beats');
+                      //                         },
+                      //                         child: Text('No'),
+                      //                       )
+                      //                     ],
+                      //                   ),
+                      //                 );
+                      //               }
+                      //             }
+                      //           },
+                      //           child: Text(
+                      //             'Returned Stocks',
+                      //             style: TextStyle(
+                      //               color: Colors.white,
+                      //               fontFamily: Font.primaryFont,
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // )
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
