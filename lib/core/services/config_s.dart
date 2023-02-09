@@ -19,7 +19,8 @@ class ConfigService {
       },
       'responseType': 'json',
       'baseURL': url! + '/api',
-      'mediaURL': url! + '/storage/',
+      // 'mediaURL': url! + '/storage/',
+      'mediaURL': 'https://az-medias.s3.ap-south-1.amazonaws.com/',
     };
   }
 

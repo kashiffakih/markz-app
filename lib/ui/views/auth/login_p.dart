@@ -18,17 +18,17 @@ class _LoginPageState extends State<LoginPage> {
 
   ConfigModel _configModel = locator<ConfigModel>();
 
-  // Map<String, dynamic> _loginData = {
-  //   'email': '',
-  //   'password': '',
-  //   'rememberme': 1,
-  // };
-
   Map<String, dynamic> _loginData = {
-    'email': 'w/mum/0002',
-    'password': '123456',
+    'email': '',
+    'password': '',
     'rememberme': 1,
   };
+
+  // Map<String, dynamic> _loginData = {
+  //   'email': 'BD001',
+  //   'password': '123456',
+  //   'rememberme': 1,
+  // };
 
   // Map<String, dynamic> _loginData = {};
 
@@ -66,6 +66,7 @@ class _LoginPageState extends State<LoginPage> {
               padding: EdgeInsets.all(4),
               child: Container(
                 child: Card(
+                  color: Color.fromRGBO(255, 255, 255, 0.6),
                   elevation: 7,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -76,18 +77,18 @@ class _LoginPageState extends State<LoginPage> {
                           SizedBox(
                             height: 20,
                           ),
-                          // if (Platform.isAndroid)
-                          //   Image.asset(
-                          //     Images.logo,
-                          //     height: 150,
-                          //   ),
-                          // if (Platform.isIOS)
-                          //   Image.asset(
-                          //     Images.logoIOS,
-                          //     height: 150,
-                          //   ),
+                          if (Platform.isAndroid)
+                            Image.asset(
+                              Images.logo,
+                              height: 150,
+                            ),
+                          if (Platform.isIOS)
+                            Image.asset(
+                              Images.logoIOS,
+                              height: 150,
+                            ),
                           Text(
-                            'BD APP',
+                            'BD APPLICATION',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 20,

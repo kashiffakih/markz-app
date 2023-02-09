@@ -2,12 +2,7 @@ import 'dart:convert';
 
 import 'package:intl/intl.dart';
 import 'package:sales_app/core/models/attendance_calendar.dart';
-import 'package:sales_app/core/models/billed_outlet.dart';
-import 'package:sales_app/core/models/day_summary.dart';
-import 'package:sales_app/core/models/invoice_detail.dart';
 import 'package:sales_app/core/models/kpi_report.dart';
-import 'package:sales_app/core/models/sales_trend.dart';
-import 'package:sales_app/core/models/target_vs_achieved.dart';
 import 'package:sales_app/core/models/user.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/locator.dart';
@@ -21,30 +16,6 @@ class AnalyticsService {
     DateTime date = DateTime.now();
     int dayOfYear = int.parse(DateFormat("D").format(date));
     return ((dayOfYear - date.weekday + 10) / 7).floor();
-  }
-
-  // Day Summary
-  late DaySummary _daySummary;
-
-  daySummary({@required date}) async {
-    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    User user = _configModel.user;
-
-    int weekNo = weekNumber();
-    int day = DateTime.now().weekday;
-
-    http.Response _response = await http.get(
-      Uri.parse(
-          '${_apiConfig['baseURL']}/daySummary?userId=${user.id}&date=$date&weekNo=$weekNo&day=$day'),
-      headers: _apiConfig['headers'],
-    );
-
-    Map<String, dynamic> _responseData = json.decode(_response.body);
-    if (_responseData['success']) {
-      _daySummary = DaySummary.fromJson(_responseData['data']);
-    }
-
-    return _daySummary;
   }
 
   // KPI Report
@@ -88,96 +59,6 @@ class AnalyticsService {
     }
 
     return _achievedDatas;
-  }
-
-  // Target Vs Achieved
-  late TargetVsAchieved _targetVsAchieved;
-
-  targetVsAchieved({@required month, @required beatIds}) async {
-    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    User user = _configModel.user;
-
-    String beatIdsString = beatIds.join(', ');
-
-    http.Response _response = await http.get(
-      Uri.parse(
-          '${_apiConfig['baseURL']}/targetVsAchieved?userId=${user.id}&month=$month&beatIds=$beatIdsString'),
-      headers: _apiConfig['headers'],
-    );
-
-    Map<String, dynamic> _responseData = json.decode(_response.body);
-    if (_responseData['success']) {
-      _targetVsAchieved = TargetVsAchieved.fromJson(_responseData['data']);
-    }
-
-    return _targetVsAchieved;
-  }
-
-  // Sales Trend
-  late SalesTrend _salesTrend;
-
-  salesTrend({@required month, @required beatIds}) async {
-    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    User user = _configModel.user;
-
-    String beatIdsString = beatIds.join(', ');
-
-    http.Response _response = await http.get(
-      Uri.parse(
-          '${_apiConfig['baseURL']}/salesTrend?userId=${user.id}&month=$month&beatIds=$beatIdsString'),
-      headers: _apiConfig['headers'],
-    );
-
-    Map<String, dynamic> _responseData = json.decode(_response.body);
-    if (_responseData['success']) {
-      _salesTrend = SalesTrend.fromJson(_responseData['data']);
-    }
-
-    return _salesTrend;
-  }
-
-  // Billed Outlets
-  late BilledOutlet _billedOutlet;
-
-  billedOutlet({@required month, @required beatIds}) async {
-    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    User user = _configModel.user;
-
-    String beatIdsString = beatIds.join(', ');
-
-    http.Response _response = await http.get(
-      Uri.parse(
-          '${_apiConfig['baseURL']}/billedOutlet?userId=${user.id}&month=$month&beatIds=$beatIdsString'),
-      headers: _apiConfig['headers'],
-    );
-
-    Map<String, dynamic> _responseData = json.decode(_response.body);
-    if (_responseData['success']) {
-      _billedOutlet = BilledOutlet.fromJson(_responseData['data']);
-    }
-
-    return _billedOutlet;
-  }
-
-  // Invoice Details
-  late InvoiceDetail _invoiceDetail;
-
-  invoiceDetail({@required month}) async {
-    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    User user = _configModel.user;
-
-    http.Response _response = await http.get(
-      Uri.parse(
-          '${_apiConfig['baseURL']}/invoiceDetail?userId=${user.id}&month=$month'),
-      headers: _apiConfig['headers'],
-    );
-
-    Map<String, dynamic> _responseData = json.decode(_response.body);
-    if (_responseData['success']) {
-      _invoiceDetail = InvoiceDetail.fromJson(_responseData['data']);
-    }
-
-    return _invoiceDetail;
   }
 
   // Attendance Calendar

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/analytics_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
@@ -28,19 +30,40 @@ class _HomePageState extends State<HomePage> {
       {
         'icon': Icons.photo_album,
         'color': Colors.green[200],
-        'name': 'Training',
-        'url': '/trainingVideos',
+        'name': 'Prospects',
+        'url': '/profiles',
       },
       {
-        'icon': Icons.people,
-        'color': Colors.amber[200],
-        'name': 'Visitors',
-        'url': '/beatOutlets',
+        'icon': Icons.auto_graph,
+        'color': Colors.red[200],
+        'name': 'KPI',
+        'url': '/kpiReport',
       },
     ],
   ];
 
   var format = DateFormat.yMMMMd();
+
+  void initLocationService() async {
+    Location location = new Location();
+    bool ison = await location.serviceEnabled();
+    print(ison);
+    if (!ison) {
+      //if defvice is off
+      bool isturnedon = await location.requestService();
+      if (isturnedon) {
+        print("GPS device is turned ON");
+      } else {
+        print("GPS Device is still OFF");
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initLocationService();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +74,7 @@ class _HomePageState extends State<HomePage> {
       drawer: DrawerWidget(),
       appBar: AppBar(
         title: Text(
-          'BD APP',
+          'Business Development App',
           style: TextStyle(
             fontSize: 15,
           ),

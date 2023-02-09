@@ -304,6 +304,7 @@ class _AttendancePageState extends State<AttendancePage> {
           ),
         ),
         Card(
+          color: Color.fromRGBO(255, 255, 255, 0.6),
           child: Padding(
             padding: EdgeInsets.all(10),
             child: Column(
@@ -330,6 +331,7 @@ class _AttendancePageState extends State<AttendancePage> {
           ),
         ),
         Card(
+          color: Color.fromRGBO(255, 255, 255, 0.6),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: DropdownButtonFormField(
@@ -357,6 +359,7 @@ class _AttendancePageState extends State<AttendancePage> {
         ),
         if (locationModel.address != '')
           Card(
+            color: Color.fromRGBO(255, 255, 255, 0.6),
             child: Padding(
               padding: EdgeInsets.all(8.0),
               child: Row(
@@ -385,6 +388,7 @@ class _AttendancePageState extends State<AttendancePage> {
             ),
           ),
         Card(
+          color: Color.fromRGBO(255, 255, 255, 0.6),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: locationModel.address == '' &&
