@@ -101,13 +101,13 @@ class DrawerWidget extends StatelessWidget {
                   builder: (BuildContext context) => AlertDialog(
                     title: Text('Are you sure you want to logout?'),
                     actions: <Widget>[
-                      FlatButton(
+                      TextButton(
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
                         child: Text('NO'),
                       ),
-                      FlatButton(
+                      TextButton(
                         onPressed: () async {
                           Navigator.of(context).pop();
                           await _configModel.removeLoginData();

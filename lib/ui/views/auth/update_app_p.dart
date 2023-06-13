@@ -55,8 +55,8 @@ class UpdateAppPage extends StatelessWidget {
                         ),
                       ),
                       Expanded(
-                        child: RaisedButton(
-                          color: Colors.blue,
+                        child: ElevatedButton(
+                          // color: Colors.blue,
                           onPressed: () {
                             launch(
                                 'https://play.google.com/store/apps/details?id=org.pms.mamaearth');
@@ -80,8 +80,8 @@ class UpdateAppPage extends StatelessWidget {
                         ),
                       ),
                       Expanded(
-                        child: RaisedButton(
-                          color: Colors.green,
+                        child: ElevatedButton(
+                          // color: Colors.green,
                           onPressed: () {
                             launch(
                                 'https://apps.apple.com/us/app/ba-channel/id1586774436');

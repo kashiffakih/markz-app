@@ -1,272 +1,309 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:sales_app/core/providers/auth_pr.dart';
-import 'package:sales_app/core/providers/config_pr.dart';
-import 'package:sales_app/locator.dart';
-import 'package:sales_app/ui/shared/images_sh.dart';
-import 'dart:io' show Platform;
+import 'package:sales_app/ui/shared/font_sh.dart';
 
-class LoginPage extends StatefulWidget {
-  @override
-  _LoginPageState createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  bool _obscurePassword = true;
-
-  final GlobalKey<FormState> _loginKey = GlobalKey<FormState>();
-
-  ConfigModel _configModel = locator<ConfigModel>();
-
-  Map<String, dynamic> _loginData = {
-    'email': '',
-    'password': '',
-    'rememberme': 1,
-  };
-
-  // Map<String, dynamic> _loginData = {
-  //   'email': 'BD001',
-  //   'password': '123456',
-  //   'rememberme': 1,
-  // };
-
-  // Map<String, dynamic> _loginData = {};
-
-  bool _isLoading = false;
-
-  @override
-  void initState() {
-    fetchLoginData();
-
-    super.initState();
-  }
-
-  fetchLoginData() async {
-    await _configModel.fetchLoginData();
-  }
+class LoginPage extends StatelessWidget {
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // _loginData = _configModel.loginData;
+    double baseWidth = 360;
+    double fem = MediaQuery.of(context).size.width / baseWidth;
+    double ffem = fem * 0.97;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Login'),
-      ),
-      body: SafeArea(
+      body: SingleChildScrollView(
         child: Container(
-          height: MediaQuery.of(context).size.height,
+          padding: EdgeInsets.fromLTRB(6, 16, 6, 80),
+          // height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(Images.backgroundImg),
-              fit: BoxFit.cover,
-            ),
+            color: Color(0xffffffff),
           ),
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(4),
-              child: Container(
-                child: Card(
-                  color: Color.fromRGBO(255, 255, 255, 0.6),
-                  elevation: 7,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Form(
-                      key: _loginKey,
-                      child: Column(
-                        children: <Widget>[
-                          SizedBox(
-                            height: 20,
+          child: Column(
+            children: [
+              Container(
+                margin: EdgeInsets.all(20),
+                width: double.infinity,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          child: Image.asset(
+                            'assets/images/vector-GJ4.png',
+                            height: 15,
                           ),
-                          if (Platform.isAndroid)
-                            Image.asset(
-                              Images.logo,
-                              height: 150,
-                            ),
-                          if (Platform.isIOS)
-                            Image.asset(
-                              Images.logoIOS,
-                              height: 150,
-                            ),
-                          Text(
-                            'BD APPLICATION',
-                            style: TextStyle(
+                        ),
+                        Expanded(
+                          child: Text(
+                            'Login',
+                            textAlign: TextAlign.center,
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              fontSize: 20,
+                              color: Color(0xff1e232c),
                             ),
                           ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          TextFormField(
-                            decoration: InputDecoration(
-                              labelText: 'Username',
-                            ),
-                            initialValue: _loginData['email'],
-                            validator: (value) {
-                              if (value!.isEmpty)
-                                return 'Username cannot be empty';
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _loginData['email'] = value;
-                            },
-                          ),
-                          TextFormField(
-                            decoration: InputDecoration(
-                              labelText: 'Password',
-                              suffixIcon: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
-                                child: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_off
-                                      : Icons.visibility,
-                                ),
-                              ),
-                            ),
-                            obscureText: _obscurePassword,
-                            initialValue: _loginData['password'],
-                            validator: (value) {
-                              if (value!.isEmpty)
-                                return 'Password cannot be empty';
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _loginData['password'] = value;
-                            },
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          Container(
-                            child: Align(
-                              alignment: Alignment.bottomRight,
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 12),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    InkWell(
-                                      splashColor: Colors.transparent,
-                                      highlightColor: Colors.transparent,
-                                      onTap: () {
-                                        setState(() {
-                                          _loginData['rememberme'] =
-                                              _loginData['rememberme'] == 1
-                                                  ? 0
-                                                  : 1;
-                                        });
-                                      },
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            width: 20,
-                                            height: 20,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.blue,
-                                            ),
-                                            child: _loginData['rememberme'] == 1
-                                                ? Icon(
-                                                    Icons.check,
-                                                    size: 15.0,
-                                                    color: Colors.white,
-                                                  )
-                                                : Icon(
-                                                    Icons
-                                                        .check_box_outline_blank,
-                                                    size: 15.0,
-                                                    color: Colors.blue,
-                                                  ),
-                                          ),
-                                          SizedBox(
-                                            width: 5,
-                                          ),
-                                          Text('Remember Me')
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          Consumer<AuthModel>(
-                            builder: (context, authModel, child) =>
-                                MaterialButton(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      new BorderRadius.circular(16.0)),
-                              minWidth: MediaQuery.of(context).size.width * .8,
-                              color: Theme.of(context).primaryColor,
-                              onPressed: () async {
-                                setState(() {
-                                  _isLoading = true;
-                                });
-
-                                if (_loginKey.currentState!.validate()) {
-                                  _loginKey.currentState!.save();
-
-                                  await authModel.login(loginData: _loginData);
-                                  if (_configModel.isLoggedIn) {
-                                    Navigator.pushReplacementNamed(
-                                      context,
-                                      '/',
-                                    );
-                                  } else {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) =>
-                                          AlertDialog(
-                                        title: Text(
-                                            _configModel.loginFailedMessage),
-                                        actions: <Widget>[
-                                          FlatButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: Text('Ok'),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }
-                                }
-
-                                setState(() {
-                                  _isLoading = false;
-                                });
-                              },
-                              child: _isLoading
-                                  ? SizedBox(
-                                      child: CircularProgressIndicator(
-                                        backgroundColor: Colors.white,
-                                      ),
-                                      height: 20,
-                                      width: 20,
-                                    )
-                                  : Text(
-                                      'Login',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                      ),
-                                    ),
-                            ),
-                          )
-                        ],
-                      ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              Container(
+                child: Text(
+                  'Hello! Welcome Back',
+                  textAlign: TextAlign.center,
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 29,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xff1e232c),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              Container(
+                margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
+                padding: EdgeInsets.fromLTRB(16.82, 15.87, 16.82, 18.13),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Color(0xffe8ecf4)),
+                  color: Color(0xfff7f8f9),
+                  borderRadius: BorderRadius.circular(7.6632652283),
+                ),
+                child: Text(
+                  'Enter your email',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xff8390a1),
+                  ),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
+                padding: EdgeInsets.fromLTRB(16.82, 15.87, 16.82, 18.13),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Color(0xffe8ecf4)),
+                  color: Color(0xfff7f8f9),
+                  borderRadius: BorderRadius.circular(7.6632652283),
+                ),
+                child: Text(
+                  'Enter your password',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xff8390a1),
+                  ),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.fromLTRB(207, 0, 0, 39),
+                child: Text(
+                  'Forgot Password?',
+                  textAlign: TextAlign.right,
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 13 * ffem,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xffc7b456),
+                  ),
+                ),
+              ),
+              Container(
+                margin:
+                    EdgeInsets.fromLTRB(20 * fem, 0 * fem, 20 * fem, 86 * fem),
+                width: double.infinity,
+                height: 52 * fem,
+                decoration: BoxDecoration(
+                  color: Color(0xff0f0f0f),
+                  borderRadius: BorderRadius.circular(7.6632652283 * fem),
+                ),
+                child: Center(
+                  child: Text(
+                    'Log in',
+                    textAlign: TextAlign.center,
+                    style: MyGoogleFontStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 15 * ffem,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xffffffff),
                     ),
                   ),
                 ),
               ),
-            ),
+              Container(
+                margin: EdgeInsets.all(20),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.fromLTRB(
+                            0 * fem, 1.91 * fem, 12.44 * fem, 0 * fem),
+                        width: 105.57 * fem,
+                        height: 0.94 * fem,
+                        decoration: BoxDecoration(
+                          color: Color(0xffe8ecf4),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.fromLTRB(
+                            0 * fem, 0 * fem, 12.36 * fem, 0 * fem),
+                        child: Text(
+                          'Or Login with',
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 12.792224884 * ffem,
+                            fontWeight: FontWeight.w600,
+                            height: 1.2 * ffem / fem,
+                            color: Color(0xff6a707c),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.fromLTRB(
+                            0 * fem, 1.91 * fem, 0 * fem, 0 * fem),
+                        width: 104.63 * fem,
+                        height: 0.94 * fem,
+                        decoration: BoxDecoration(
+                          color: Color(0xffe8ecf4),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.all(5),
+                        padding: EdgeInsets.fromLTRB(
+                            41.47 * fem, 15.08 * fem, 46.19 * fem, 15.08 * fem),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Color(0xffe8ecf4)),
+                          color: Color(0xffffffff),
+                          borderRadius:
+                              BorderRadius.circular(7.5407857895 * fem),
+                        ),
+                        child: Center(
+                          child: SizedBox(
+                            width: 11.31 * fem,
+                            height: 22.62 * fem,
+                            child: Image.asset(
+                              'assets/images/facebookic-Srt.png',
+                              width: 11.31 * fem,
+                              height: 22.62 * fem,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.all(5),
+                        padding: EdgeInsets.fromLTRB(
+                            35.99 * fem, 15.25 * fem, 40.7 * fem, 15.25 * fem),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Color(0xffe8ecf4)),
+                          color: Color(0xffffffff),
+                          borderRadius:
+                              BorderRadius.circular(7.5407857895 * fem),
+                        ),
+                        child: Center(
+                          child: SizedBox(
+                            width: 22.28 * fem,
+                            height: 22.28 * fem,
+                            child: Image.asset(
+                              'assets/images/googleic-3Lc.png',
+                              width: 22.28 * fem,
+                              height: 22.28 * fem,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(
+                            34.88 * fem, 14.14 * fem, 39.59 * fem, 14.14 * fem),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Color(0xffe8ecf4)),
+                          color: Color(0xffffffff),
+                          borderRadius:
+                              BorderRadius.circular(7.5407857895 * fem),
+                        ),
+                        child: Center(
+                          child: SizedBox(
+                            width: 24.51 * fem,
+                            height: 24.51 * fem,
+                            child: Image.asset(
+                              'assets/images/cib-apple-KaY.png',
+                              width: 24.51 * fem,
+                              height: 24.51 * fem,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 13 * ffem,
+                    fontWeight: FontWeight.w600,
+                    height: 1.399999912 * ffem / fem,
+                    letterSpacing: 0.13 * fem,
+                    color: Color(0xff1e232c),
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Don’t have an account? ',
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 13 * ffem,
+                        fontWeight: FontWeight.w500,
+                        height: 1.399999912 * ffem / fem,
+                        letterSpacing: 0.13 * fem,
+                        color: Color(0xff1e232c),
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'Register Now',
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 13 * ffem,
+                        fontWeight: FontWeight.w700,
+                        height: 1.399999912 * ffem / fem,
+                        letterSpacing: 0.13 * fem,
+                        color: Color(0xffc9b758),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),

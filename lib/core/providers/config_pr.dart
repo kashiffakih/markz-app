@@ -1,25 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:sales_app/core/models/file.dart';
 import 'package:sales_app/core/models/user.dart';
 import 'package:sales_app/core/services/config_s.dart';
 import 'package:sales_app/locator.dart';
 
 class ConfigModel with ChangeNotifier {
   final ConfigService _configService = locator<ConfigService>();
-
-  // File
-  late File _file = File();
-  set file(File newFile) {
-    _file = newFile;
-    notifyListeners();
-  }
-
-  File get file => _file;
-
-  updateFile({required File newFile}) {
-    file = newFile;
-    notifyListeners();
-  }
 
   // Api Config
   late Map<String, dynamic> _apiConfig;
