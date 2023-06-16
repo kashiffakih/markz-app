@@ -5,3 +5,5 @@ const String splashPage = '/splashPage';
 const String splash2Page = '/splash2Page';
 const String loginPage = '/loginPage';
 const String registerPage = '/registerPage';
+const String forgotPasswordPage = '/forgotPasswordPage';
+const String changePasswordPage = '/changePasswordPage';

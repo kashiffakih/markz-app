@@ -18,29 +18,37 @@ class Splash2Page extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(
-                  width: 200,
-                  height: 300,
-                  child: Image.asset(
-                    'assets/images/pinewrapslogo-1.png',
+                Padding(
+                  padding: const EdgeInsets.only(left: 30.0),
+                  child: SizedBox(
+                    width: 200,
+                    height: 300,
+                    child: Image.asset(
+                      'assets/images/pinewrapslogo-1.png',
+                    ),
                   ),
                 ),
-                Container(
-                  width: double.infinity,
-                  height: 55,
-                  decoration: BoxDecoration(
-                    color: Color(0xff0f0f0f),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Log in',
-                      textAlign: TextAlign.center,
-                      style: MyGoogleFontStyle(
-                        fontFamily: 'Urbanist',
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xffffffff),
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/loginPage');
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    height: 55,
+                    decoration: BoxDecoration(
+                      color: Color(0xff0f0f0f),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Log in',
+                        textAlign: TextAlign.center,
+                        style: MyGoogleFontStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xffffffff),
+                        ),
                       ),
                     ),
                   ),
@@ -48,23 +56,28 @@ class Splash2Page extends StatelessWidget {
                 SizedBox(
                   height: 10,
                 ),
-                Container(
-                  width: double.infinity,
-                  height: 55,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Color(0xff000000)),
-                    color: Color(0xffffffff),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Sign up',
-                      textAlign: TextAlign.center,
-                      style: MyGoogleFontStyle(
-                        fontFamily: 'Urbanist',
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xff1e1e1e),
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/registerPage');
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    height: 55,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Color(0xff000000)),
+                      color: Color(0xffffffff),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Sign up',
+                        textAlign: TextAlign.center,
+                        style: MyGoogleFontStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xff1e1e1e),
+                        ),
                       ),
                     ),
                   ),

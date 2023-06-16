@@ -7,7 +7,6 @@ import 'package:sales_app/core/providers/auth_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
-import 'package:sales_app/ui/shared/images_sh.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class RootPage extends StatefulWidget {
@@ -17,21 +16,21 @@ class RootPage extends StatefulWidget {
 
 class _RootPageState extends State<RootPage> {
   authenticateUser(_, AuthModel authModel, ConfigModel configModel) async {
-    // configModel.getApiConfig(domain: 'http://192.168.0.181:8080');
-    configModel.getApiConfig(domain: 'http://api.bd.aaibuzz.com');
+    configModel.getApiConfig(domain: 'http://192.168.29.9:8080');
+    // configModel.getApiConfig(domain: 'http://api.bd.aaibuzz.com');
     await configModel.fetchLoginData();
 
     String currentAppVersion = await getPackageDetails();
 
     if (configModel.loginData.length == 0) {
-      Future.delayed(
-        Duration.zero,
-        () => Navigator.pushReplacementNamed(context, '/allPages'),
-      );
       // Future.delayed(
       //   Duration.zero,
-      //   () => Navigator.pushReplacementNamed(context, '/login'),
+      //   () => Navigator.pushReplacementNamed(context, '/allPages'),
       // );
+      Future.delayed(
+        Duration.zero,
+        () => Navigator.pushReplacementNamed(context, '/splash2Page'),
+      );
     } else {
       await authModel.login(loginData: configModel.loginData);
       print('APP: ' + currentAppVersion);
@@ -43,13 +42,13 @@ class _RootPageState extends State<RootPage> {
         } else {
           Future.delayed(
             Duration.zero,
-            () => Navigator.pushReplacementNamed(context, '/home'),
+            () => Navigator.pushReplacementNamed(context, '/registerPage'),
           );
         }
       } else {
         Future.delayed(
           Duration.zero,
-          () => Navigator.pushReplacementNamed(context, '/login'),
+          () => Navigator.pushReplacementNamed(context, '/loginPage'),
         );
       }
     }
@@ -97,7 +96,7 @@ class _RootPageState extends State<RootPage> {
                   ),
                 ),
                 Text(
-                  'Loading',
+                  'Loadin...',
                   style: MyGoogleFontStyle(
                     fontFamily: 'Urbanist',
                     color: Color(0xff000000),
@@ -115,18 +114,12 @@ class _RootPageState extends State<RootPage> {
                   ),
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: SizedBox(
-                      width: 115,
-                      height: 10,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: Color(0xff232323),
-                        ),
-                      ),
+                    child: LinearProgressIndicator(
+                      color: Color(0xff232323),
+                      backgroundColor: Colors.white,
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),

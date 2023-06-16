@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sales_app/ui/routing/routes.dart';
+import 'package:sales_app/ui/views/auth/change-password.dart';
+import 'package:sales_app/ui/views/auth/forgot-password.dart';
 import 'package:sales_app/ui/views/auth/login_p.dart';
 
 // Auth
@@ -39,6 +41,14 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case registerPage:
       return MaterialPageRoute(builder: (BuildContext context) {
         return RegisterPage();
+      });
+    case forgotPasswordPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return ForgotPasswordPage();
+      });
+    case changePasswordPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return ChangePasswordPage();
       });
 
     default:

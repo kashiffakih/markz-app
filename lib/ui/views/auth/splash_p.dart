@@ -20,15 +20,18 @@ class _SplashPageState extends State<SplashPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(
-                  width: 200,
-                  height: 300,
-                  child: Image.asset(
-                    'assets/images/pinewrapslogo-1.png',
+                Padding(
+                  padding: const EdgeInsets.only(left: 30.0),
+                  child: SizedBox(
+                    width: 200,
+                    height: 300,
+                    child: Image.asset(
+                      'assets/images/pinewrapslogo-1.png',
+                    ),
                   ),
                 ),
                 Text(
-                  'Loading',
+                  'Loading...',
                   style: MyGoogleFontStyle(
                     fontFamily: 'Urbanist',
                     color: Color(0xff000000),
@@ -46,15 +49,9 @@ class _SplashPageState extends State<SplashPage> {
                   ),
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: SizedBox(
-                      width: 115,
-                      height: 10,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: Color(0xff232323),
-                        ),
-                      ),
+                    child: LinearProgressIndicator(
+                      color: Color(0xff232323),
+                      backgroundColor: Colors.white,
                     ),
                   ),
                 )
