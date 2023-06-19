@@ -83,4 +83,21 @@ class AuthService {
     print(_responseData);
     return _responseData['success'];
   }
+
+  Future<bool> changePassword({@required Map<String, dynamic>? data}) async {
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    var email = data!["email"];
+    var password = data["password"];
+    print(data.toString());
+    http.Response _response = await http.get(
+      Uri.parse(
+          '${_apiConfig['baseURL']}/change_password/users?email=$email&password=$password'),
+      // body: json.encode(data),
+      headers: _apiConfig['headers'],
+    );
+
+    Map<String, dynamic> _responseData = json.decode(_response.body);
+    print(_responseData);
+    return _responseData['success'];
+  }
 }

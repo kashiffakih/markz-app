@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/auth_pr.dart';
-import 'package:sales_app/core/providers/config_pr.dart';
-import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/auth/change-password.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({Key? key}) : super(key: key);
@@ -16,8 +15,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   bool _enterCode = false;
 
   final GlobalKey<FormState> _loginKey = GlobalKey<FormState>();
-
-  ConfigModel _configModel = locator<ConfigModel>();
 
   Map<String, dynamic> _loginData = {'email': '', 'code': ''};
   bool _isLoading = false;
@@ -308,8 +305,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               bool response =
                                   await authModel.verifyCode(data: _loginData);
                               if (response == true) {
-                                Navigator.pushReplacementNamed(
-                                    context, '/changePasswordPage');
+                                // print(_loginData);
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => ChangePasswordPage(
+                                        arguments: _loginData)));
                               } else {
                                 showDialog(
                                   context: context,
@@ -362,7 +361,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   margin: EdgeInsets.fromLTRB(
                       13.76 * fem, 270 * fem, 0 * fem, 0 * fem),
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(context, '/loginPage');
+                    },
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
                     ),

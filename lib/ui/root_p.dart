@@ -42,7 +42,7 @@ class _RootPageState extends State<RootPage> {
         } else {
           Future.delayed(
             Duration.zero,
-            () => Navigator.pushReplacementNamed(context, '/registerPage'),
+            () => Navigator.pushReplacementNamed(context, '/homePage'),
           );
         }
       } else {

@@ -31,4 +31,10 @@ class AuthModel with ChangeNotifier {
       data: data,
     );
   }
+
+  Future<bool> changePassword({required Map<String, dynamic> data}) async {
+    return await _authService.changePassword(
+      data: data,
+    );
+  }
 }

@@ -7,3 +7,7 @@ const String loginPage = '/loginPage';
 const String registerPage = '/registerPage';
 const String forgotPasswordPage = '/forgotPasswordPage';
 const String changePasswordPage = '/changePasswordPage';
+const String successPasswordPage = '/successPassword';
+
+// Home Page
+const String homePage = '/homePage';
