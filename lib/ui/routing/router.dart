@@ -6,11 +6,13 @@ import 'package:sales_app/ui/views/auth/login_p.dart';
 
 // Auth
 import 'package:sales_app/ui/root_p.dart';
+import 'package:sales_app/ui/views/auth/password_changed_p.dart';
 import 'package:sales_app/ui/views/auth/register_p.dart';
 import 'package:sales_app/ui/views/auth/splash_p.dart';
 import 'package:sales_app/ui/views/auth/splash_2_p.dart';
 import 'package:sales_app/ui/views/auth/update_app_p.dart';
 import 'package:sales_app/ui/views/all_pages_p.dart';
+import 'package:sales_app/ui/views/home/home_p.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
@@ -49,6 +51,14 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case changePasswordPage:
       return MaterialPageRoute(builder: (BuildContext context) {
         return ChangePasswordPage();
+      });
+    case successPasswordPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return PasswordChangesPage();
+      });
+    case homePage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return HomePage();
       });
 
     default:
