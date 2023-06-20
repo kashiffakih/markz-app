@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sales_app/core/providers/product_pr.dart';
 import 'package:sales_app/ui/routing/routes.dart';
 import 'package:sales_app/ui/views/auth/change-password.dart';
 import 'package:sales_app/ui/views/auth/forgot-password.dart';
@@ -13,6 +15,7 @@ import 'package:sales_app/ui/views/auth/splash_2_p.dart';
 import 'package:sales_app/ui/views/auth/update_app_p.dart';
 import 'package:sales_app/ui/views/all_pages_p.dart';
 import 'package:sales_app/ui/views/home/home_p.dart';
+import 'package:sales_app/ui/views/products/products_p.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
@@ -50,7 +53,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       });
     case changePasswordPage:
       return MaterialPageRoute(builder: (BuildContext context) {
-        return ChangePasswordPage();
+        return ChangePasswordPage(
+          arguments: null,
+        );
       });
     case successPasswordPage:
       return MaterialPageRoute(builder: (BuildContext context) {
@@ -58,7 +63,13 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       });
     case homePage:
       return MaterialPageRoute(builder: (BuildContext context) {
+        Provider.of<ProductModel>(context, listen: false).getProduct();
         return HomePage();
+      });
+    case productPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        // Provider.of<ProductModel>(context, listen: false).getProduct();
+        return ProductsPage();
       });
 
     default:
