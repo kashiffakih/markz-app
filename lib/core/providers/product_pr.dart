@@ -25,10 +25,11 @@ class ProductModel with ChangeNotifier {
     products = await _productService.getProducts();
   }
 
-  List<dynamic>? categories;
+  List<dynamic>? categories = [];
   getCategories() async {
     categories = await _productService.getCategories();
-    // print(categories);
+    notifyListeners();
+    print(categories);
   }
 
 // List of products

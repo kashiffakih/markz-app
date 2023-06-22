@@ -510,33 +510,33 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           ),
-                                          Positioned(
-                                            // itemsdci (318:1967)
-                                            left: 2.7470703125 * fem,
-                                            top: 24.3071899414 * fem,
-                                            child: Align(
-                                              child: SizedBox(
-                                                width: 38 * fem,
-                                                height: 14 * fem,
-                                                child: Text(
-                                                  _productModel
-                                                          .categories![index]
-                                                              ['products']
-                                                          .length
-                                                          .toString() +
-                                                      ' Items',
-                                                  style: MyGoogleFontStyle(
-                                                    fontFamily: 'Poppins',
-                                                    fontSize:
-                                                        9.1566257477 * ffem,
-                                                    fontWeight: FontWeight.w600,
-                                                    height: 1.5 * ffem / fem,
-                                                    color: Color(0xffffffff),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
+                                          // Positioned(
+                                          //   // itemsdci (318:1967)
+                                          //   left: 2.7470703125 * fem,
+                                          //   top: 24.3071899414 * fem,
+                                          //   child: Align(
+                                          //     child: SizedBox(
+                                          //       width: 38 * fem,
+                                          //       height: 14 * fem,
+                                          //       child: Text(
+                                          //         _productModel
+                                          //                 .categories![index]
+                                          //                     ['products']
+                                          //                 .length
+                                          //                 .toString() +
+                                          //             ' Items',
+                                          //         style: MyGoogleFontStyle(
+                                          //           fontFamily: 'Poppins',
+                                          //           fontSize:
+                                          //               9.1566257477 * ffem,
+                                          //           fontWeight: FontWeight.w600,
+                                          //           height: 1.5 * ffem / fem,
+                                          //           color: Color(0xffffffff),
+                                          //         ),
+                                          //       ),
+                                          //     ),
+                                          //   ),
+                                          // ),
                                         ],
                                       ),
                                     ),
@@ -575,33 +575,33 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           ),
-                                          Positioned(
-                                            // itemsuEn (318:1973)
-                                            left: 2.7470703125 * fem,
-                                            top: 24.3071899414 * fem,
-                                            child: Align(
-                                              child: SizedBox(
-                                                width: 38 * fem,
-                                                height: 14 * fem,
-                                                child: Text(
-                                                  _productModel
-                                                          .categories![index]
-                                                              ['products']
-                                                          .length
-                                                          .toString() +
-                                                      ' Items',
-                                                  style: MyGoogleFontStyle(
-                                                    fontFamily: 'Poppins',
-                                                    fontSize:
-                                                        9.1566257477 * ffem,
-                                                    fontWeight: FontWeight.w600,
-                                                    height: 1.5 * ffem / fem,
-                                                    color: Color(0xffffffff),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
+                                          // Positioned(
+                                          //   // itemsuEn (318:1973)
+                                          //   left: 2.7470703125 * fem,
+                                          //   top: 24.3071899414 * fem,
+                                          //   child: Align(
+                                          //     child: SizedBox(
+                                          //       width: 38 * fem,
+                                          //       height: 14 * fem,
+                                          //       child: Text(
+                                          //         _productModel
+                                          //                 .categories![index]
+                                          //                     ['products']
+                                          //                 .length
+                                          //                 .toString() +
+                                          //             ' Items',
+                                          //         style: MyGoogleFontStyle(
+                                          //           fontFamily: 'Poppins',
+                                          //           fontSize:
+                                          //               9.1566257477 * ffem,
+                                          //           fontWeight: FontWeight.w600,
+                                          //           height: 1.5 * ffem / fem,
+                                          //           color: Color(0xffffffff),
+                                          //         ),
+                                          //       ),
+                                          //     ),
+                                          //   ),
+                                          // ),
                                         ],
                                       ),
                                     ),
