@@ -118,7 +118,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                           ),
                                         ),
                                         Text(
-                                          // avaliableinstockuAv (318:2110)
                                           'Avaliable in stock',
                                           style: MyGoogleFontStyle(
                                             fontWeight: FontWeight.w600,
@@ -371,6 +370,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                   children: [
                                     Expanded(
                                       child: ListView.builder(
+                                        itemCount: 12,
                                         scrollDirection: Axis.horizontal,
                                         itemBuilder:
                                             (BuildContext context, index) =>
