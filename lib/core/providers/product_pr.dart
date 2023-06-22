@@ -29,7 +29,6 @@ class ProductModel with ChangeNotifier {
   getCategories() async {
     categories = await _productService.getCategories();
     notifyListeners();
-    print(categories);
   }
 
 // List of products

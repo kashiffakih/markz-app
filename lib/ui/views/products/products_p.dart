@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/product_pr.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/products/product_id_p.dart';
 
 class ProductsPage extends StatefulWidget {
   final arguments;
@@ -218,13 +219,19 @@ class _ProductsPageState extends State<ProductsPage> {
                           scrollDirection: Axis.vertical,
                           crossAxisCount: 2,
                           crossAxisSpacing: 10,
-                          mainAxisSpacing: 170,
+                          mainAxisSpacing: 135,
                           children: List.generate(
                               _productModel.categoryWiseproducts!.length,
                               (index) {
                             return InkWell(
                               onTap: () {
-                                Navigator.pushNamed(context, '/productIdPage');
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => ProductIdPage(
+                                            arguments: {
+                                              'product': _productModel
+                                                  .categoryWiseproducts![index]
+                                                  .toJson()
+                                            })));
                               },
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,

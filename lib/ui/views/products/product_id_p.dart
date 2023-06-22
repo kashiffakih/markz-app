@@ -1,15 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:provider/provider.dart';
+import 'package:sales_app/core/models/product.dart';
+import 'package:sales_app/core/providers/product_pr.dart';
+// import 'package:flutter/rendering.dart';
+// import 'package:sales_app/core/models/product.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 
 class ProductIdPage extends StatefulWidget {
-  const ProductIdPage({Key? key}) : super(key: key);
+  final arguments;
+  const ProductIdPage({Key? key, this.arguments}) : super(key: key);
 
   @override
   State<ProductIdPage> createState() => _ProductIdPageState();
 }
 
 class _ProductIdPageState extends State<ProductIdPage> {
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<ProductModel>(context, listen: false)
+        .getCategoryWiseProduct(widget.arguments!['product']['category_id']);
+  }
+
   List<Map<String, dynamic>> flavors = [
     {
       'id': 1,
@@ -19,6 +31,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
 
   @override
   Widget build(BuildContext context) {
+    final ProductModel _productModel = Provider.of<ProductModel>(context);
+    // print(_productModel.categoryWiseproducts!
+    //     .where((element) => element.id != widget.arguments!['product']['id']));
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -79,8 +94,10 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                     // Name
                                     Expanded(
                                       child: Text(
-                                        '3 Shade Chocolate Cake',
+                                        widget.arguments!['product']['name']
+                                            .toString(),
                                         style: MyGoogleFontStyle(
+                                          fontSize: 17,
                                           fontFamily: 'Urbanist',
                                           fontWeight: FontWeight.w700,
                                           color: Color(0xff000000),
@@ -370,11 +387,229 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                   children: [
                                     Expanded(
                                       child: ListView.builder(
-                                        itemCount: 12,
+                                        itemCount: _productModel
+                                            .categoryWiseproducts!.length,
                                         scrollDirection: Axis.horizontal,
                                         itemBuilder:
                                             (BuildContext context, index) =>
-                                                Text('Hi'),
+                                                InkWell(
+                                          onTap: () {
+                                            Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ProductIdPage(
+                                                            arguments: {
+                                                              'product':
+                                                                  _productModel
+                                                                      .categoryWiseproducts![
+                                                                          index]
+                                                                      .toJson()
+                                                            })));
+                                          },
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Container(
+                                                // margin: EdgeInsets.fromLTRB(
+                                                //     0, 0, 0, 0),
+                                                width: 170,
+                                                height: 320,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Container(
+                                                      width: double.infinity,
+                                                      height: 210.33,
+                                                      child: Stack(
+                                                        children: [
+                                                          Positioned(
+                                                            // frame9SvA (318:2815)
+                                                            left: 0,
+                                                            top: 0,
+                                                            child: Container(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .fromLTRB(
+                                                                          106,
+                                                                          13,
+                                                                          14,
+                                                                          13),
+                                                              width: 155,
+                                                              height: 193,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            15),
+                                                                color: Color(
+                                                                    0x0c000000),
+                                                                image:
+                                                                    DecorationImage(
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                  image:
+                                                                      AssetImage(
+                                                                    'assets/images/shades-chocolate-cake-3-1-2-1-bg.png',
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              child: Align(
+                                                                // vector3f4 (318:2818)
+                                                                alignment:
+                                                                    Alignment
+                                                                        .topRight,
+                                                                child: SizedBox(
+                                                                  width: 25,
+                                                                  height: 22.4,
+                                                                  child:
+                                                                      TextButton(
+                                                                    onPressed:
+                                                                        () {},
+                                                                    style: TextButton
+                                                                        .styleFrom(
+                                                                      padding:
+                                                                          EdgeInsets
+                                                                              .zero,
+                                                                    ),
+                                                                    child: Image
+                                                                        .asset(
+                                                                      'assets/images/vector-yse.png',
+                                                                      width: 25,
+                                                                      height:
+                                                                          22.4,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Positioned(
+                                                            // frame494xX8 (318:2821)
+                                                            left: 31,
+                                                            top: 165,
+                                                            child: TextButton(
+                                                              onPressed: () {},
+                                                              style: TextButton
+                                                                  .styleFrom(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .zero,
+                                                              ),
+                                                              child: Container(
+                                                                width: 82,
+                                                                height: 27.33,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  border: Border.all(
+                                                                      color: Color(
+                                                                          0xffeaeaea)),
+                                                                  color: Color(
+                                                                      0xffffffff),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              7.0163693428),
+                                                                  boxShadow: [
+                                                                    BoxShadow(
+                                                                      color: Color(
+                                                                          0x3f000000),
+                                                                      offset: Offset(
+                                                                          0,
+                                                                          2.1298701763),
+                                                                      blurRadius:
+                                                                          2.1298701763,
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                child: Center(
+                                                                  child: Text(
+                                                                    'ADD',
+                                                                    style:
+                                                                        MyGoogleFontStyle(
+                                                                      fontFamily:
+                                                                          'DM Sans',
+                                                                      fontSize:
+                                                                          12,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w700,
+                                                                      height: 1,
+                                                                      color: Color(
+                                                                          0xffc7b456),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    // SizedBox(
+                                                    //   height: 10,
+                                                    // ),
+                                                    Container(
+                                                      // margin:
+                                                      //     EdgeInsets.fromLTRB(
+                                                      //         0, 10, 0, 0),
+                                                      child: Text(
+                                                        _productModel
+                                                            .categoryWiseproducts![
+                                                                index]
+                                                            .name
+                                                            .toString(),
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontSize: 15,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                          height: 1.2,
+                                                          letterSpacing: -0.3,
+                                                          color:
+                                                              Color(0xff000000),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      child: Text(
+                                                        _productModel
+                                                            .categoryWiseproducts![
+                                                                index]
+                                                            .productPrices![0]
+                                                            .price
+                                                            .toString(),
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily: 'Poppins',
+                                                          fontSize:
+                                                              10.9543466568,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          height: 1.5,
+                                                          letterSpacing:
+                                                              -0.2190869331,
+                                                          color:
+                                                              Color(0x99000000),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
                                     )
                                   ],
@@ -420,7 +655,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                   height: 200,
                                   child: TabBarView(
                                     children: [
-                                      Text('Description'),
+                                      Text(widget.arguments!['product']
+                                              ['description']
+                                          .toString()),
                                       Text('Reviews'),
                                     ],
                                   ),
@@ -473,7 +710,10 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                             ),
                                           ),
                                           TextSpan(
-                                            text: '\$198.00',
+                                            text: widget.arguments!['product']
+                                                    ['product_prices'][0]
+                                                    ['price']
+                                                .toString(),
                                             style: MyGoogleFontStyle(
                                               fontFamily: 'Poppins',
                                               fontWeight: FontWeight.w700,
