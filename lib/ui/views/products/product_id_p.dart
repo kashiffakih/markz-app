@@ -450,6 +450,79 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                 thickness: 2,
                                 color: Colors.black,
                               ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: RichText(
+                                      text: TextSpan(
+                                        style: MyGoogleFontStyle(
+                                          fontFamily: 'Poppins',
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xff000000),
+                                        ),
+                                        children: [
+                                          TextSpan(
+                                            text: 'Total Price\n',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontWeight: FontWeight.w400,
+                                              color: Color(0xffaaaaaa),
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: '\$198.00',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Poppins',
+                                              fontWeight: FontWeight.w700,
+                                              color: Color(0xff000000),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {},
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                    ),
+                                    child: Container(
+                                      padding:
+                                          EdgeInsets.fromLTRB(40, 20, 40, 20),
+                                      decoration: BoxDecoration(
+                                        color: Color(0xff1e1e1e),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.only(right: 10),
+                                            child: Image.asset(
+                                              'assets/images/shopping-bag-03.png',
+                                              width: 20,
+                                              height: 18,
+                                            ),
+                                          ),
+                                          Text(
+                                            // addtocartB9Y (318:2187)
+                                            'Add to Cart',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontWeight: FontWeight.w700,
+                                              color: Color(0xffffffff),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
                             ],
                           ),
                         ),
