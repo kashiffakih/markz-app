@@ -420,7 +420,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   children: [
                                                     Container(
                                                       width: double.infinity,
-                                                      height: 180,
+                                                      height: 160,
                                                       child: Stack(
                                                         children: [
                                                           Positioned(
@@ -435,8 +435,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                           13,
                                                                           14,
                                                                           13),
-                                                              width: 155,
-                                                              height: 153,
+                                                              width: 145,
+                                                              height: 133,
                                                               decoration:
                                                                   BoxDecoration(
                                                                 borderRadius:
@@ -487,8 +487,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                           ),
                                                           Positioned(
                                                             // frame494xX8 (318:2821)
-                                                            left: 40,
-                                                            top: 130,
+                                                            left: 31,
+                                                            top: 110,
                                                             child: TextButton(
                                                               onPressed: () {},
                                                               style: TextButton
@@ -547,13 +547,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                         ],
                                                       ),
                                                     ),
-                                                    // SizedBox(
-                                                    //   height: 10,
-                                                    // ),
                                                     Container(
-                                                      // margin:
-                                                      //     EdgeInsets.fromLTRB(
-                                                      //         0, 10, 0, 0),
                                                       child: Text(
                                                         _productModel
                                                             .categoryWiseproducts![
