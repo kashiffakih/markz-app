@@ -4,7 +4,9 @@ import 'package:sales_app/core/providers/product_pr.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 
 class ProductsPage extends StatefulWidget {
-  const ProductsPage({Key? key}) : super(key: key);
+  final arguments;
+
+  const ProductsPage({Key? key, this.arguments}) : super(key: key);
 
   @override
   State<ProductsPage> createState() => _ProductsPageState();
@@ -13,8 +15,9 @@ class ProductsPage extends StatefulWidget {
 class _ProductsPageState extends State<ProductsPage> {
   @override
   void initState() {
-    Provider.of<ProductModel>(context, listen: false).getProduct();
     super.initState();
+    Provider.of<ProductModel>(context, listen: false)
+        .getCategoryWiseProduct(widget.arguments['categoryId']);
   }
 
   @override
@@ -22,6 +25,7 @@ class _ProductsPageState extends State<ProductsPage> {
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
+    final ProductModel _productModel = Provider.of<ProductModel>(context);
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -208,16 +212,16 @@ class _ProductsPageState extends State<ProductsPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
-                        // autogroupyyg4G1U (Gb6Na1CxmF6AUu1q3pyyg4)
-                        margin: EdgeInsets.fromLTRB(
-                            0 * fem, 0 * fem, 0 * fem, 27 * fem),
                         width: double.infinity,
                         height: 782 * fem,
                         child: GridView.count(
+                          scrollDirection: Axis.vertical,
                           crossAxisCount: 2,
-                          crossAxisSpacing: 2.0,
-                          mainAxisSpacing: 8.0,
-                          children: List.generate(1, (index) {
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 170,
+                          children: List.generate(
+                              _productModel.categoryWiseproducts!.length,
+                              (index) {
                             return InkWell(
                               onTap: () {
                                 Navigator.pushNamed(context, '/productIdPage');
@@ -361,7 +365,10 @@ class _ProductsPageState extends State<ProductsPage> {
                                             maxWidth: 123 * fem,
                                           ),
                                           child: Text(
-                                            '3 SHADE CHOCOLATE\nCAKE 3′',
+                                            _productModel
+                                                .categoryWiseproducts![index]
+                                                .name
+                                                .toString(),
                                             textAlign: TextAlign.center,
                                             style: MyGoogleFontStyle(
                                               fontFamily: 'Urbanist',
@@ -378,7 +385,11 @@ class _ProductsPageState extends State<ProductsPage> {
                                           margin: EdgeInsets.fromLTRB(0 * fem,
                                               0 * fem, 1 * fem, 0 * fem),
                                           child: Text(
-                                            'د.إ65.00',
+                                            _productModel
+                                                .categoryWiseproducts![index]
+                                                .productPrices![0]
+                                                .price
+                                                .toString(),
                                             style: MyGoogleFontStyle(
                                               fontFamily: 'Poppins',
                                               fontSize: 10.9543466568 * ffem,

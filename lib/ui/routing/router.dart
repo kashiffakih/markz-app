@@ -65,11 +65,14 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case homePage:
       return MaterialPageRoute(builder: (BuildContext context) {
         Provider.of<ProductModel>(context, listen: false).getProduct();
+        Provider.of<ProductModel>(context, listen: false).getCategories();
         return HomePage();
       });
     case productPage:
       return MaterialPageRoute(builder: (BuildContext context) {
-        return ProductsPage();
+        return ProductsPage(
+          arguments: null,
+        );
       });
     case productIdPage:
       return MaterialPageRoute(builder: (BuildContext context) {

@@ -8,6 +8,7 @@ class ProductModel with ChangeNotifier {
 
   // Product loader
   bool productsLoader = true;
+  bool categoryWiseproductsLoader = true;
 
   // List of products
   List<Product>? _products;
@@ -22,5 +23,27 @@ class ProductModel with ChangeNotifier {
 
   getProduct() async {
     products = await _productService.getProducts();
+  }
+
+  List<dynamic>? categories;
+  getCategories() async {
+    categories = await _productService.getCategories();
+    // print(categories);
+  }
+
+// List of products
+  List<Product>? _categoryWiseproducts;
+
+  set categoryWiseproducts(List<Product>? newProduct) {
+    _categoryWiseproducts = newProduct;
+    categoryWiseproductsLoader = false;
+    notifyListeners();
+  }
+
+  List<Product>? get categoryWiseproducts => _categoryWiseproducts;
+
+  getCategoryWiseProduct(categoryId) async {
+    categoryWiseproducts =
+        await _productService.getCategoryWiseProducts(categoryId);
   }
 }
