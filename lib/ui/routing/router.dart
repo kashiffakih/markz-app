@@ -14,6 +14,8 @@ import 'package:sales_app/ui/views/auth/splash_p.dart';
 import 'package:sales_app/ui/views/auth/splash_2_p.dart';
 import 'package:sales_app/ui/views/auth/update_app_p.dart';
 import 'package:sales_app/ui/views/all_pages_p.dart';
+import 'package:sales_app/ui/views/checkout/cart_p.dart';
+import 'package:sales_app/ui/views/checkout/checkout_p.dart';
 import 'package:sales_app/ui/views/home/home_p.dart';
 import 'package:sales_app/ui/views/products/product_id_p.dart';
 import 'package:sales_app/ui/views/products/products_p.dart';
@@ -79,6 +81,14 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         return ProductIdPage(
           arguments: {},
         );
+      });
+    case cartPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return CartPage();
+      });
+    case checkoutPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return CheckoutPage();
       });
     default:
       return MaterialPageRoute(builder: (BuildContext context) {
