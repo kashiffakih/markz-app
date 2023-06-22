@@ -15,6 +15,7 @@ import 'package:sales_app/ui/views/auth/splash_2_p.dart';
 import 'package:sales_app/ui/views/auth/update_app_p.dart';
 import 'package:sales_app/ui/views/all_pages_p.dart';
 import 'package:sales_app/ui/views/home/home_p.dart';
+import 'package:sales_app/ui/views/products/product_id_p.dart';
 import 'package:sales_app/ui/views/products/products_p.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
@@ -68,10 +69,12 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       });
     case productPage:
       return MaterialPageRoute(builder: (BuildContext context) {
-        // Provider.of<ProductModel>(context, listen: false).getProduct();
         return ProductsPage();
       });
-
+    case productIdPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return ProductIdPage();
+      });
     default:
       return MaterialPageRoute(builder: (BuildContext context) {
         return RootPage();

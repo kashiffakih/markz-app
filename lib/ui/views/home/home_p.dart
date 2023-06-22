@@ -37,13 +37,11 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
-                      // autogroupeveykGE (Gb5gBLB7LhU8d64Pr5eVEY)
                       width: double.infinity,
                       height: 247 * fem,
                       child: Stack(
                         children: [
                           Positioned(
-                            // unsplashhcpwe1prcgfg (318:1932)
                             left: 0 * fem,
                             top: 67 * fem,
                             child: Align(
@@ -52,14 +50,12 @@ class _HomePageState extends State<HomePage> {
                                 height: 180 * fem,
                                 child: Image.asset(
                                   'assets/images/unsplash__HCpwe1-Prc.png',
-                                  // 'assets/images/unsplash-hcpwe1-prc.png',
                                   fit: BoxFit.cover,
                                 ),
                               ),
                             ),
                           ),
                           Positioned(
-                            // group9021nyc (318:1933)
                             left: 106.1574707031 * fem,
                             top: 138.9032592773 * fem,
                             child: Container(
@@ -69,7 +65,6 @@ class _HomePageState extends State<HomePage> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Center(
-                                    // theresagiftforeveryoneiMU (318:1934)
                                     child: Container(
                                       margin: EdgeInsets.fromLTRB(0 * fem,
                                           0 * fem, 0 * fem, 12.21 * fem),
@@ -90,7 +85,6 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                   Center(
-                                    // shopnowyoC (318:1935)
                                     child: Container(
                                       margin: EdgeInsets.fromLTRB(0 * fem,
                                           0 * fem, 0.54 * fem, 0 * fem),
@@ -115,7 +109,6 @@ class _HomePageState extends State<HomePage> {
                             height: 210,
                           ),
                           Positioned(
-                            // group8977gSi (318:1974)
                             left: 0 * fem,
                             top: 0 * fem,
                             child: Container(
@@ -127,7 +120,6 @@ class _HomePageState extends State<HomePage> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Container(
-                                    // group89748pW (318:1976)
                                     margin: EdgeInsets.fromLTRB(
                                         0 * fem, 0 * fem, 0 * fem, 8.21 * fem),
                                     height: double.infinity,
@@ -136,7 +128,6 @@ class _HomePageState extends State<HomePage> {
                                           CrossAxisAlignment.end,
                                       children: [
                                         Container(
-                                          // pinewrapslogo1GQv (318:1978)
                                           margin: EdgeInsets.fromLTRB(5 * fem,
                                               2 * fem, 0 * fem, 4.7 * fem),
                                           width: 34.22 * fem,
@@ -147,13 +138,11 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ),
                                         Container(
-                                          // autogroup99k6Y7Y (Gb5gQpndK38ijyCFQE99K6)
                                           width: 200 * fem,
                                           height: 39.83 * fem,
                                           child: Stack(
                                             children: [
                                               Positioned(
-                                                // welcometoewG (318:1977)
                                                 left: 0 * fem,
                                                 top: 0 * fem,
                                                 child: Align(
@@ -180,7 +169,6 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                               ),
                                               Positioned(
-                                                // pinewrapsXEN (318:1979)
                                                 left: 0 * fem,
                                                 top: 11.8349609375 * fem,
                                                 child: Align(

@@ -220,7 +220,7 @@ class _ProductsPageState extends State<ProductsPage> {
                           children: List.generate(1, (index) {
                             return InkWell(
                               onTap: () {
-                                // print(_productModel.products![index].id);
+                                Navigator.pushNamed(context, '/productIdPage');
                               },
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,

@@ -9,7 +9,6 @@ const String forgotPasswordPage = '/forgotPasswordPage';
 const String changePasswordPage = '/changePasswordPage';
 const String successPasswordPage = '/successPassword';
 
-// Home Page
 const String homePage = '/homePage';
-// Product Page
 const String productPage = '/productPage';
+const String productIdPage = '/productIdPage';
