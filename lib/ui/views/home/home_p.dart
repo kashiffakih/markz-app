@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/product_pr.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/products/product_id_p.dart';
 import 'package:sales_app/ui/views/products/products_p.dart';
 
 class HomePage extends StatefulWidget {
@@ -275,7 +276,14 @@ class _HomePageState extends State<HomePage> {
                         itemBuilder: (context, index) {
                           return InkWell(
                             onTap: () {
-                              print(_productModel.products![index].id);
+                              // print(_productModel.products![index].id);
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => ProductIdPage(
+                                          arguments: {
+                                            'product': _productModel
+                                                .products![index]
+                                                .toJson()
+                                          })));
                             },
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,

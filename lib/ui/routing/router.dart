@@ -78,7 +78,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       });
     case productIdPage:
       return MaterialPageRoute(builder: (BuildContext context) {
-        return ProductIdPage();
+        return ProductIdPage(
+          arguments: {},
+        );
       });
     case cartPage:
       return MaterialPageRoute(builder: (BuildContext context) {
