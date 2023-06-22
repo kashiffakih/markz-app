@@ -12,6 +12,7 @@ class CartPage extends StatelessWidget {
           child: Container(
             child: Column(
               children: [
+                // Title
                 Container(
                   margin: EdgeInsets.all(20),
                   width: double.infinity,
@@ -48,6 +49,7 @@ class CartPage extends StatelessWidget {
                     ],
                   ),
                 ),
+                // Body
                 Container(
                   height: MediaQuery.of(context).size.height,
                   child: Stack(
@@ -228,7 +230,10 @@ class CartPage extends StatelessWidget {
                               Container(
                                 margin: EdgeInsets.fromLTRB(0.89, 0, 0, 0),
                                 child: TextButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                        context, '/checkoutPage');
+                                  },
                                   style: TextButton.styleFrom(
                                     padding: EdgeInsets.zero,
                                   ),
