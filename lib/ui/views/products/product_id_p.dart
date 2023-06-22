@@ -29,7 +29,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
             child: Column(
               children: [
                 Container(
-                  height: 3000,
+                  height: 1430,
                   child: Stack(
                     children: [
                       // Featured Image
