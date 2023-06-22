@@ -306,7 +306,7 @@ class CheckoutPage extends StatelessWidget {
                                 child: TextButton(
                                   onPressed: () {
                                     Navigator.pushNamed(
-                                        context, '/checkoutPage');
+                                        context, '/successPage');
                                   },
                                   style: TextButton.styleFrom(
                                     padding: EdgeInsets.zero,
