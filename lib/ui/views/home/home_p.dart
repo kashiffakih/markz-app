@@ -17,7 +17,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final ProductModel _productModel = Provider.of<ProductModel>(context);
     final ConfigModel _configModel = Provider.of<ConfigModel>(context);
-    // print(_productModel.categories.toString());
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
@@ -510,33 +509,33 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           ),
-                                          // Positioned(
-                                          //   // itemsdci (318:1967)
-                                          //   left: 2.7470703125 * fem,
-                                          //   top: 24.3071899414 * fem,
-                                          //   child: Align(
-                                          //     child: SizedBox(
-                                          //       width: 38 * fem,
-                                          //       height: 14 * fem,
-                                          //       child: Text(
-                                          //         _productModel
-                                          //                 .categories![index]
-                                          //                     ['products']
-                                          //                 .length
-                                          //                 .toString() +
-                                          //             ' Items',
-                                          //         style: MyGoogleFontStyle(
-                                          //           fontFamily: 'Poppins',
-                                          //           fontSize:
-                                          //               9.1566257477 * ffem,
-                                          //           fontWeight: FontWeight.w600,
-                                          //           height: 1.5 * ffem / fem,
-                                          //           color: Color(0xffffffff),
-                                          //         ),
-                                          //       ),
-                                          //     ),
-                                          //   ),
-                                          // ),
+                                          Positioned(
+                                            // itemsdci (318:1967)
+                                            left: 2.7470703125 * fem,
+                                            top: 24.3071899414 * fem,
+                                            child: Align(
+                                              child: SizedBox(
+                                                width: 38 * fem,
+                                                height: 14 * fem,
+                                                child: Text(
+                                                  _productModel
+                                                          .categories![index]
+                                                              ['products']
+                                                          .length
+                                                          .toString() +
+                                                      ' Items',
+                                                  style: MyGoogleFontStyle(
+                                                    fontFamily: 'Poppins',
+                                                    fontSize:
+                                                        9.1566257477 * ffem,
+                                                    fontWeight: FontWeight.w600,
+                                                    height: 1.5 * ffem / fem,
+                                                    color: Color(0xffffffff),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -575,33 +574,33 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           ),
-                                          // Positioned(
-                                          //   // itemsuEn (318:1973)
-                                          //   left: 2.7470703125 * fem,
-                                          //   top: 24.3071899414 * fem,
-                                          //   child: Align(
-                                          //     child: SizedBox(
-                                          //       width: 38 * fem,
-                                          //       height: 14 * fem,
-                                          //       child: Text(
-                                          //         _productModel
-                                          //                 .categories![index]
-                                          //                     ['products']
-                                          //                 .length
-                                          //                 .toString() +
-                                          //             ' Items',
-                                          //         style: MyGoogleFontStyle(
-                                          //           fontFamily: 'Poppins',
-                                          //           fontSize:
-                                          //               9.1566257477 * ffem,
-                                          //           fontWeight: FontWeight.w600,
-                                          //           height: 1.5 * ffem / fem,
-                                          //           color: Color(0xffffffff),
-                                          //         ),
-                                          //       ),
-                                          //     ),
-                                          //   ),
-                                          // ),
+                                          Positioned(
+                                            // itemsuEn (318:1973)
+                                            left: 2.7470703125 * fem,
+                                            top: 24.3071899414 * fem,
+                                            child: Align(
+                                              child: SizedBox(
+                                                width: 38 * fem,
+                                                height: 14 * fem,
+                                                child: Text(
+                                                  _productModel
+                                                          .categories![index]
+                                                              ['products']
+                                                          .length
+                                                          .toString() +
+                                                      ' Items',
+                                                  style: MyGoogleFontStyle(
+                                                    fontFamily: 'Poppins',
+                                                    fontSize:
+                                                        9.1566257477 * ffem,
+                                                    fontWeight: FontWeight.w600,
+                                                    height: 1.5 * ffem / fem,
+                                                    color: Color(0xffffffff),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
