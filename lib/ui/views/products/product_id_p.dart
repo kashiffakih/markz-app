@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 
 class ProductIdPage extends StatefulWidget {
@@ -485,7 +484,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                     ),
                                   ),
                                   TextButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.pushNamed(context, '/cartPage');
+                                    },
                                     style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero,
                                     ),

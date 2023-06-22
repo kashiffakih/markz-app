@@ -12,3 +12,5 @@ const String successPasswordPage = '/successPassword';
 const String homePage = '/homePage';
 const String productPage = '/productPage';
 const String productIdPage = '/productIdPage';
+const String cartPage = '/cartPage';
+const String checkoutPage = '/checkoutPage';
