@@ -4,7 +4,7 @@ class Order {
   int? orderCost;
   int? totalCashback;
   int? couponAmount;
-  int? taxAmount;
+  double? taxAmount;
   int? packagingAmount;
   String? deliveryAmount;
   int? tipAmount;
@@ -16,6 +16,7 @@ class Order {
   int? companyId;
   String? updatedAt;
   String? createdAt;
+  String? taxPercent;
   int? id;
   List<OrderDetails>? orderDetails;
 
@@ -37,6 +38,7 @@ class Order {
       this.companyId,
       this.updatedAt,
       this.createdAt,
+      this.taxPercent,
       this.id,
       this.orderDetails});
 
@@ -58,6 +60,7 @@ class Order {
     companyId = json['company_id'];
     updatedAt = json['updated_at'];
     createdAt = json['created_at'];
+    taxPercent = json['tax_percent'];
     id = json['id'];
     if (json['order_details'] != null) {
       orderDetails = <OrderDetails>[];
@@ -86,6 +89,7 @@ class Order {
     data['company_id'] = this.companyId;
     data['updated_at'] = this.updatedAt;
     data['created_at'] = this.createdAt;
+    data['tax_percent'] = this.taxPercent;
     data['id'] = this.id;
     if (this.orderDetails != null) {
       data['order_details'] =

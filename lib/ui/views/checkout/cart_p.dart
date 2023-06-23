@@ -1,11 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+// import 'package:sales_app/core/models/add_to_cart.dart';
+import 'package:sales_app/core/providers/add_to_cart_pr.dart';
+// import 'package:provider/provider.dart';
+// import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/checkout/checkout_p.dart';
 
-class CartPage extends StatelessWidget {
-  const CartPage({Key? key}) : super(key: key);
+class CartPage extends StatefulWidget {
+  const CartPage({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<CartPage> createState() => _CartPageState();
+}
+
+class _CartPageState extends State<CartPage> {
+  // bool type = true;
+  @override
+  void initState() {
+    Provider.of<AddToCartModel>(context, listen: false).getAddToCart('', '');
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -62,7 +83,7 @@ class CartPage extends StatelessWidget {
                             width: MediaQuery.of(context).size.width - 50,
                             height: MediaQuery.of(context).size.height - 250,
                             child: ListView.builder(
-                              itemCount: 10,
+                              itemCount: _addToCartModel.addToCarts!.length,
                               itemBuilder: (BuildContext context, index) =>
                                   Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,7 +104,9 @@ class CartPage extends StatelessWidget {
                                         child: Column(
                                           children: [
                                             Text(
-                                              'Chocolate Cake',
+                                              _addToCartModel.addToCarts![index]
+                                                  .product!.name
+                                                  .toString(),
                                               style: MyGoogleFontStyle(
                                                 fontFamily: 'Urbanist',
                                                 fontWeight: FontWeight.w500,
@@ -91,7 +114,13 @@ class CartPage extends StatelessWidget {
                                               ),
                                             ),
                                             Text(
-                                              '₹ 65.00',
+                                              '₹ ' +
+                                                  _addToCartModel
+                                                      .addToCarts![index]
+                                                      .product!
+                                                      .productPrices![0]
+                                                      .price
+                                                      .toString(),
                                               style: MyGoogleFontStyle(
                                                 fontFamily: 'Poppins',
                                                 fontWeight: FontWeight.w600,
@@ -101,7 +130,17 @@ class CartPage extends StatelessWidget {
                                             Row(
                                               children: [
                                                 TextButton(
-                                                  onPressed: () {},
+                                                  onPressed: () async {
+                                                    bool minus = false;
+                                                    await _addToCartModel
+                                                        .getAddToCart(
+                                                            _addToCartModel
+                                                                .addToCarts![
+                                                                    index]
+                                                                .product!
+                                                                .id,
+                                                            minus);
+                                                  },
                                                   style: TextButton.styleFrom(
                                                     padding: EdgeInsets.zero,
                                                   ),
@@ -117,7 +156,9 @@ class CartPage extends StatelessWidget {
                                                   ),
                                                 ),
                                                 Text(
-                                                  '1',
+                                                  _addToCartModel
+                                                      .addToCarts![index].qty
+                                                      .toString(),
                                                   style: MyGoogleFontStyle(
                                                     fontFamily: 'Poppins',
                                                     fontWeight: FontWeight.w500,
@@ -125,7 +166,17 @@ class CartPage extends StatelessWidget {
                                                   ),
                                                 ),
                                                 TextButton(
-                                                  onPressed: () {},
+                                                  onPressed: () async {
+                                                    bool type = true;
+                                                    await _addToCartModel
+                                                        .getAddToCart(
+                                                            _addToCartModel
+                                                                .addToCarts![
+                                                                    index]
+                                                                .product!
+                                                                .id,
+                                                            type);
+                                                  },
                                                   style: TextButton.styleFrom(
                                                     padding: EdgeInsets.zero,
                                                   ),
@@ -213,7 +264,8 @@ class CartPage extends StatelessWidget {
                                   ),
                                   Expanded(
                                     child: Text(
-                                      '₹ 95.00',
+                                      '₹ ' +
+                                          _addToCartModel.cartTotal.toString(),
                                       textAlign: TextAlign.right,
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Inter',
@@ -231,8 +283,21 @@ class CartPage extends StatelessWidget {
                                 margin: EdgeInsets.fromLTRB(0.89, 0, 0, 0),
                                 child: TextButton(
                                   onPressed: () {
-                                    Navigator.pushNamed(
-                                        context, '/checkoutPage');
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                CheckoutPage(arguments: {
+                                                  'cartTotal': _addToCartModel
+                                                      .cartTotal
+                                                      .toString(),
+                                                  'cartItems':
+                                                      _addToCartModel.addToCarts
+                                                })));
+                                    // Navigator.pushNamed(
+                                    //     context, '/checkoutPage', arguments: {
+                                    //   'cartTotal':
+                                    //       _addToCartModel.cartTotal.toString()
+                                    // });
                                   },
                                   style: TextButton.styleFrom(
                                     padding: EdgeInsets.zero,
