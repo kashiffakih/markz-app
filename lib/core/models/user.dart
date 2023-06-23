@@ -1,3 +1,5 @@
+import 'package:sales_app/core/models/product.dart';
+
 class User {
   int? id;
   String? name;
@@ -100,7 +102,7 @@ class User {
   String? brand;
   String? channel;
   List<Roles>? roles;
-  List<Companies>? companies;
+  List<Company>? companies;
   Distributor? distributor;
 
   User(
@@ -318,7 +320,7 @@ class User {
     if (json['companies'] != null) {
       companies = [];
       json['companies'].forEach((v) {
-        companies!.add(new Companies.fromJson(v));
+        companies!.add(new Company.fromJson(v));
       });
     }
     distributor = json['distributor'] != null
@@ -462,211 +464,6 @@ class Roles {
     data['name'] = this.name;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
-    return data;
-  }
-}
-
-class Companies {
-  int? id;
-  String? name;
-  String? email;
-  int? phone;
-  String? address;
-  String? logoPath;
-  String? contactPerson;
-  String? createdAt;
-  String? updatedAt;
-  String? timeZone;
-  String? pdsWordPath;
-  String? pdsPdfPath;
-  String? form2WordPath;
-  String? form2PdfPath;
-  String? form11WordPath;
-  String? form11PdfPath;
-  String? pfWordPath;
-  String? pfPdfPath;
-  String? esicBenefitWordPath;
-  String? esicBenefitPdfPath;
-  String? insuranceClaimWordPath;
-  String? insuranceClaimPdfPath;
-  String? salarySlipWordPath;
-  String? salarySlipPdfPath;
-  String? pmsPoliciesWordPath;
-  String? pmsPoliciesPdfPath;
-  String? actOfMisconductWordPath;
-  String? actOfMisconductPdfPath;
-  String? uanActivationWordPath;
-  String? uanActivationPdfPath;
-  String? onlineClaimWordPath;
-  String? onlineClaimPdfPath;
-  String? kycUpdateWordPath;
-  String? kycUpdatePdfPath;
-  String? graduityFormWordPath;
-  String? graduityFormPdfPath;
-  String? welcomeNote;
-  String? welcomeEmailSubject;
-  String? welcomeEmailBody;
-  String? df1EmailSubject;
-  String? df1EmailBody;
-  String? df2EmailSubject;
-  String? df2EmailBody;
-  int? attendance;
-  int? leave;
-  int? expenses;
-  int? orders;
-  int? recruiters;
-
-  Companies(
-      {this.id,
-      this.name,
-      this.email,
-      this.phone,
-      this.address,
-      this.logoPath,
-      this.contactPerson,
-      this.createdAt,
-      this.updatedAt,
-      this.timeZone,
-      this.pdsWordPath,
-      this.pdsPdfPath,
-      this.form2WordPath,
-      this.form2PdfPath,
-      this.form11WordPath,
-      this.form11PdfPath,
-      this.pfWordPath,
-      this.pfPdfPath,
-      this.esicBenefitWordPath,
-      this.esicBenefitPdfPath,
-      this.insuranceClaimWordPath,
-      this.insuranceClaimPdfPath,
-      this.salarySlipWordPath,
-      this.salarySlipPdfPath,
-      this.pmsPoliciesWordPath,
-      this.pmsPoliciesPdfPath,
-      this.actOfMisconductWordPath,
-      this.actOfMisconductPdfPath,
-      this.uanActivationWordPath,
-      this.uanActivationPdfPath,
-      this.onlineClaimWordPath,
-      this.onlineClaimPdfPath,
-      this.kycUpdateWordPath,
-      this.kycUpdatePdfPath,
-      this.graduityFormWordPath,
-      this.graduityFormPdfPath,
-      this.welcomeNote,
-      this.welcomeEmailSubject,
-      this.welcomeEmailBody,
-      this.df1EmailSubject,
-      this.df1EmailBody,
-      this.df2EmailSubject,
-      this.df2EmailBody,
-      this.attendance,
-      this.leave,
-      this.expenses,
-      this.orders,
-      this.recruiters});
-
-  Companies.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    email = json['email'];
-    phone = json['phone'];
-    address = json['address'];
-    logoPath = json['logo_path'];
-    contactPerson = json['contact_person'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
-    timeZone = json['time_zone'];
-    pdsWordPath = json['pds_word_path'];
-    pdsPdfPath = json['pds_pdf_path'];
-    form2WordPath = json['form_2_word_path'];
-    form2PdfPath = json['form_2_pdf_path'];
-    form11WordPath = json['form_11_word_path'];
-    form11PdfPath = json['form_11_pdf_path'];
-    pfWordPath = json['pf_word_path'];
-    pfPdfPath = json['pf_pdf_path'];
-    esicBenefitWordPath = json['esic_benefit_word_path'];
-    esicBenefitPdfPath = json['esic_benefit_pdf_path'];
-    insuranceClaimWordPath = json['insurance_claim_word_path'];
-    insuranceClaimPdfPath = json['insurance_claim_pdf_path'];
-    salarySlipWordPath = json['salary_slip_word_path'];
-    salarySlipPdfPath = json['salary_slip_pdf_path'];
-    pmsPoliciesWordPath = json['pms_policies_word_path'];
-    pmsPoliciesPdfPath = json['pms_policies_pdf_path'];
-    actOfMisconductWordPath = json['act_of_misconduct_word_path'];
-    actOfMisconductPdfPath = json['act_of_misconduct_pdf_path'];
-    uanActivationWordPath = json['uan_activation_word_path'];
-    uanActivationPdfPath = json['uan_activation_pdf_path'];
-    onlineClaimWordPath = json['online_claim_word_path'];
-    onlineClaimPdfPath = json['online_claim_pdf_path'];
-    kycUpdateWordPath = json['kyc_update_word_path'];
-    kycUpdatePdfPath = json['kyc_update_pdf_path'];
-    graduityFormWordPath = json['graduity_form_word_path'];
-    graduityFormPdfPath = json['graduity_form_pdf_path'];
-    welcomeNote = json['welcome_note'];
-    welcomeEmailSubject = json['welcome_email_subject'];
-    welcomeEmailBody = json['welcome_email_body'];
-    df1EmailSubject = json['df_1_email_subject'];
-    df1EmailBody = json['df_1_email_body'];
-    df2EmailSubject = json['df_2_email_subject'];
-    df2EmailBody = json['df_2_email_body'];
-    attendance = json['attendance'];
-    leave = json['leave'];
-    expenses = json['expenses'];
-    orders = json['orders'];
-    recruiters = json['recruiters'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['name'] = this.name;
-    data['email'] = this.email;
-    data['phone'] = this.phone;
-    data['address'] = this.address;
-    data['logo_path'] = this.logoPath;
-    data['contact_person'] = this.contactPerson;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
-    data['time_zone'] = this.timeZone;
-    data['pds_word_path'] = this.pdsWordPath;
-    data['pds_pdf_path'] = this.pdsPdfPath;
-    data['form_2_word_path'] = this.form2WordPath;
-    data['form_2_pdf_path'] = this.form2PdfPath;
-    data['form_11_word_path'] = this.form11WordPath;
-    data['form_11_pdf_path'] = this.form11PdfPath;
-    data['pf_word_path'] = this.pfWordPath;
-    data['pf_pdf_path'] = this.pfPdfPath;
-    data['esic_benefit_word_path'] = this.esicBenefitWordPath;
-    data['esic_benefit_pdf_path'] = this.esicBenefitPdfPath;
-    data['insurance_claim_word_path'] = this.insuranceClaimWordPath;
-    data['insurance_claim_pdf_path'] = this.insuranceClaimPdfPath;
-    data['salary_slip_word_path'] = this.salarySlipWordPath;
-    data['salary_slip_pdf_path'] = this.salarySlipPdfPath;
-    data['pms_policies_word_path'] = this.pmsPoliciesWordPath;
-    data['pms_policies_pdf_path'] = this.pmsPoliciesPdfPath;
-    data['act_of_misconduct_word_path'] = this.actOfMisconductWordPath;
-    data['act_of_misconduct_pdf_path'] = this.actOfMisconductPdfPath;
-    data['uan_activation_word_path'] = this.uanActivationWordPath;
-    data['uan_activation_pdf_path'] = this.uanActivationPdfPath;
-    data['online_claim_word_path'] = this.onlineClaimWordPath;
-    data['online_claim_pdf_path'] = this.onlineClaimPdfPath;
-    data['kyc_update_word_path'] = this.kycUpdateWordPath;
-    data['kyc_update_pdf_path'] = this.kycUpdatePdfPath;
-    data['graduity_form_word_path'] = this.graduityFormWordPath;
-    data['graduity_form_pdf_path'] = this.graduityFormPdfPath;
-    data['welcome_note'] = this.welcomeNote;
-    data['welcome_email_subject'] = this.welcomeEmailSubject;
-    data['welcome_email_body'] = this.welcomeEmailBody;
-    data['df_1_email_subject'] = this.df1EmailSubject;
-    data['df_1_email_body'] = this.df1EmailBody;
-    data['df_2_email_subject'] = this.df2EmailSubject;
-    data['df_2_email_body'] = this.df2EmailBody;
-    data['attendance'] = this.attendance;
-    data['leave'] = this.leave;
-    data['expenses'] = this.expenses;
-    data['orders'] = this.orders;
-    data['recruiters'] = this.recruiters;
     return data;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/product_pr.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/products/product_id_p.dart';
@@ -27,6 +28,7 @@ class _ProductsPageState extends State<ProductsPage> {
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
     final ProductModel _productModel = Provider.of<ProductModel>(context);
+    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -309,7 +311,18 @@ class _ProductsPageState extends State<ProductsPage> {
                                                 left: 31 * fem,
                                                 top: 165 * fem,
                                                 child: TextButton(
-                                                  onPressed: () {},
+                                                  onPressed: () async {
+                                                    bool type = true;
+                                                    await _addToCartModel
+                                                        .getAddToCart(
+                                                            _productModel
+                                                                .categoryWiseproducts![
+                                                                    index]
+                                                                .id,
+                                                            type);
+                                                    Navigator.pushNamed(
+                                                        context, '/cartPage');
+                                                  },
                                                   style: TextButton.styleFrom(
                                                     padding: EdgeInsets.zero,
                                                   ),

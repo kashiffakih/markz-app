@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sales_app/core/providers/order_pr.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 
-class CheckoutPage extends StatelessWidget {
-  const CheckoutPage({Key? key}) : super(key: key);
+class CheckoutPage extends StatefulWidget {
+  final arguments;
+  const CheckoutPage({Key? key, this.arguments}) : super(key: key);
 
   @override
+  State<CheckoutPage> createState() => _CheckoutPageState();
+}
+
+class _CheckoutPageState extends State<CheckoutPage> {
+  @override
   Widget build(BuildContext context) {
+    final OrderModel _orderModel = Provider.of<OrderModel>(context);
+
+    // print(widget.arguments['cartItems'][0].toJson());
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -284,7 +295,9 @@ class CheckoutPage extends StatelessWidget {
                                           ),
                                         ),
                                         Text(
-                                          '₹ 95.00',
+                                          '₹ ' +
+                                              widget.arguments['cartTotal']
+                                                  .toString(),
                                           textAlign: TextAlign.right,
                                           style: MyGoogleFontStyle(
                                             fontFamily: 'Inter',
@@ -304,9 +317,16 @@ class CheckoutPage extends StatelessWidget {
                               Container(
                                 margin: EdgeInsets.fromLTRB(0.89, 0, 0, 0),
                                 child: TextButton(
-                                  onPressed: () {
-                                    Navigator.pushNamed(
-                                        context, '/successPage');
+                                  onPressed: () async {
+                                    bool response =
+                                        await _orderModel.placedOrder(
+                                            widget.arguments['cartItems'],
+                                            widget.arguments['cartTotal']
+                                                .toString());
+                                    if (response == true) {
+                                      Navigator.pushNamed(
+                                          context, '/successPage');
+                                    }
                                   },
                                   style: TextButton.styleFrom(
                                     padding: EdgeInsets.zero,
