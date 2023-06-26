@@ -446,24 +446,13 @@ class _HomePageState extends State<HomePage> {
                                       child: ClipRRect(
                                         borderRadius:
                                             BorderRadius.circular(10 * fem),
-                                        child: _productModel.categories![index]
-                                                    ['name'] ==
-                                                'Cake'
-                                            ? Image.asset(
-                                                'assets/images/image-24.png',
-                                                fit: BoxFit.cover,
-                                              )
-                                            : _productModel.categories![index]
-                                                        ['name'] ==
-                                                    'Flower'
-                                                ? Image.asset(
-                                                    'assets/images/image-23.png',
-                                                    fit: BoxFit.cover,
-                                                  )
-                                                : Image.asset(
-                                                    'assets/images/image-20-bg.png',
-                                                    fit: BoxFit.cover,
-                                                  ),
+                                        child: Image.network(
+                                          _configModel.apiConfig['mediaURL'] +
+                                              _productModel.categories![index]
+                                                      ['imagepath']
+                                                  .toString(),
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
                                     ),
                                   ),

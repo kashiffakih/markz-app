@@ -182,7 +182,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Card',
+                                      'Cash On Delivery',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontWeight: FontWeight.w700,
