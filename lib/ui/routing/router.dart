@@ -20,6 +20,16 @@ import 'package:sales_app/ui/views/checkout/success_p.dart';
 import 'package:sales_app/ui/views/home/home_p.dart';
 import 'package:sales_app/ui/views/products/product_id_p.dart';
 import 'package:sales_app/ui/views/products/products_p.dart';
+import 'package:sales_app/ui/views/profile/address_p.dart';
+import 'package:sales_app/ui/views/profile/contact_p.dart';
+import 'package:sales_app/ui/views/profile/notifications_p.dart';
+import 'package:sales_app/ui/views/profile/orders_p.dart';
+import 'package:sales_app/ui/views/profile/profile_p.dart';
+import 'package:sales_app/ui/views/profile/reviews_p.dart';
+import 'package:sales_app/ui/views/profile/rewards_p.dart';
+import 'package:sales_app/ui/views/profile/settings_p.dart';
+import 'package:sales_app/ui/views/profile/shipping_create_p.dart';
+import 'package:sales_app/ui/views/profile/wishlist_p.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
@@ -94,6 +104,46 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case successPage:
       return MaterialPageRoute(builder: (BuildContext context) {
         return SuccessPage();
+      });
+    case profilePage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return ProfilePage();
+      });
+    case notificationPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return NotificationsPage();
+      });
+    case ordersPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return OrdersPage();
+      });
+    case addressPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return AddressPage();
+      });
+    case wishlistPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return WishlistPage();
+      });
+    case reviewsPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return ReviewsPage();
+      });
+    case shippingCreatePage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return ShippingCreatePage();
+      });
+    case settingsPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return SettingsPage();
+      });
+    case rewardsPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return RewardsPage();
+      });
+    case contactPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return ContactPage();
       });
     default:
       return MaterialPageRoute(builder: (BuildContext context) {

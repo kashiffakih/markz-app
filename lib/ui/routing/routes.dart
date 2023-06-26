@@ -15,3 +15,14 @@ const String productIdPage = '/productIdPage';
 const String cartPage = '/cartPage';
 const String checkoutPage = '/checkoutPage';
 const String successPage = '/successPage';
+
+const String profilePage = '/profilePage';
+const String notificationPage = '/notificationPage';
+const String ordersPage = '/ordersPage';
+const String addressPage = '/addressPage';
+const String wishlistPage = '/wishlistPage';
+const String reviewsPage = '/reviewsPage';
+const String shippingCreatePage = '/shippingCreatePage';
+const String settingsPage = '/settingsPage';
+const String rewardsPage = '/rewardsPage';
+const String contactPage = '/contactPage';

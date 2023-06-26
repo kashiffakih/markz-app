@@ -220,7 +220,10 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ),
                                         InkWell(
-                                          onTap: () {},
+                                          onTap: () {
+                                            Navigator.pushNamed(
+                                                context, '/notificationPage');
+                                          },
                                           child: Padding(
                                             padding: const EdgeInsets.all(10.0),
                                             child: Image.asset(
@@ -231,7 +234,10 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ),
                                         InkWell(
-                                          onTap: () {},
+                                          onTap: () {
+                                            Navigator.pushNamed(
+                                                context, '/profilePage');
+                                          },
                                           child: Padding(
                                             padding: const EdgeInsets.all(10.0),
                                             child: Image.asset(
