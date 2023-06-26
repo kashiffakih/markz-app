@@ -21,7 +21,10 @@ class OrderService {
         'order_detail_cost': item.product!.productPrices![0].price,
         'product_id': item.productId,
         'quantity': item.qty,
-        'product_pack': "1 Kg"
+        'product_pack': "1 Kg",
+        'kind_of_flower': item.kindOfFlower,
+        'flavour': item.flavour,
+        'write_on_cake': item.writeOnCake,
       });
     });
 

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 // import 'package:sales_app/core/models/add_to_cart.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
+import 'package:sales_app/core/providers/config_pr.dart';
+import 'package:sales_app/locator.dart';
 // import 'package:provider/provider.dart';
 // import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
@@ -20,13 +22,15 @@ class _CartPageState extends State<CartPage> {
   // bool type = true;
   @override
   void initState() {
-    Provider.of<AddToCartModel>(context, listen: false).getAddToCart('', '');
+    Provider.of<AddToCartModel>(context, listen: false)
+        .getAddToCart('', '', '');
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
+    final ConfigModel _configModel = locator<ConfigModel>();
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -94,8 +98,12 @@ class _CartPageState extends State<CartPage> {
                                       Container(
                                         margin:
                                             EdgeInsets.fromLTRB(0, 0, 18, 0),
-                                        child: Image.asset(
-                                          'assets/images/mask-group-HvE.png',
+                                        child: Image.network(
+                                          _configModel.apiConfig['mediaURL'] +
+                                              _addToCartModel.addToCarts![index]
+                                                  .product!.imagepath1
+                                                  .toString(),
+                                          // 'assets/images/mask-group-HvE.png',
                                           width: 100,
                                           height: 100,
                                         ),
@@ -139,7 +147,8 @@ class _CartPageState extends State<CartPage> {
                                                                     index]
                                                                 .product!
                                                                 .id,
-                                                            minus);
+                                                            minus,
+                                                            '');
                                                   },
                                                   style: TextButton.styleFrom(
                                                     padding: EdgeInsets.zero,
@@ -175,7 +184,8 @@ class _CartPageState extends State<CartPage> {
                                                                     index]
                                                                 .product!
                                                                 .id,
-                                                            type);
+                                                            type,
+                                                            '');
                                                   },
                                                   style: TextButton.styleFrom(
                                                     padding: EdgeInsets.zero,

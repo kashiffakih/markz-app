@@ -7,13 +7,16 @@ import 'dart:convert';
 class AddToCartService {
   final ConfigModel _configModel = locator<ConfigModel>();
   List<AddToCart> _addToCarts = [];
-  Future<Map<String, dynamic>> getAddToCart(productId, [type]) async {
+  Future<Map<String, dynamic>> getAddToCart(productId, type, [cartData]) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
     var userId = _configModel.user.id;
+    var kindOfFlower = cartData['kindOfFlower'].toString();
+    var flavour = cartData['flavour'].toString();
+    var writeOnCake = cartData['writeOnCake'].toString();
 
     http.Response _response = await http.get(
       Uri.parse(
-          '${_apiConfig['baseURL']}/add_to_cart?userId=$userId&productId=$productId&type=$type'),
+          '${_apiConfig['baseURL']}/add_to_cart?userId=$userId&productId=$productId&type=$type&kind_of_flower=$kindOfFlower&flavour=$flavour&write_on_cake=$writeOnCake'),
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
@@ -26,5 +29,6 @@ class AddToCartService {
     String _cartTotal = _responseData['cart_total'].toString();
 
     return {'addToCarts': _addToCarts, 'cart_total': _cartTotal};
+    // return cartData;
   }
 }
