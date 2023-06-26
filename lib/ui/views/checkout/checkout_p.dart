@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/order_pr.dart';
+import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 
 class CheckoutPage extends StatefulWidget {
@@ -15,6 +17,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   Widget build(BuildContext context) {
     final OrderModel _orderModel = Provider.of<OrderModel>(context);
+    final ConfigModel _configModel = locator<ConfigModel>();
 
     // print(widget.arguments['cartItems'][0].toJson());
     return Scaffold(
@@ -297,6 +300,179 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                         Text(
                                           '₹ ' +
                                               widget.arguments['cartTotal']
+                                                  .toString(),
+                                          textAlign: TextAlign.right,
+                                          style: MyGoogleFontStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xff303030),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            'Delivery',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xff909090),
+                                            ),
+                                          ),
+                                        ),
+                                        Text(
+                                          '₹ ' +
+                                              _configModel.user.companies![0]
+                                                  .deliveryCharges
+                                                  .toString(),
+                                          textAlign: TextAlign.right,
+                                          style: MyGoogleFontStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xff303030),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            'Tax %',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xff909090),
+                                            ),
+                                          ),
+                                        ),
+                                        Text(
+                                          '₹ ' +
+                                              _configModel
+                                                  .user.companies![0].taxPercent
+                                                  .toString(),
+                                          textAlign: TextAlign.right,
+                                          style: MyGoogleFontStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xff303030),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            'Tax Amount',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xff909090),
+                                            ),
+                                          ),
+                                        ),
+                                        Text(
+                                          '₹ ' +
+                                              (int.parse(widget.arguments[
+                                                              'cartTotal']
+                                                          .toString()) /
+                                                      100 *
+                                                      int.parse(_configModel
+                                                          .user
+                                                          .companies![0]
+                                                          .taxPercent
+                                                          .toString()))
+                                                  .toString(),
+                                          textAlign: TextAlign.right,
+                                          style: MyGoogleFontStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xff303030),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            'Packaging',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xff909090),
+                                            ),
+                                          ),
+                                        ),
+                                        Text(
+                                          '₹ ' +
+                                              (int.parse(_configModel
+                                                      .user
+                                                      .companies![0]
+                                                      .packagingCharges
+                                                      .toString()))
+                                                  .toString(),
+                                          textAlign: TextAlign.right,
+                                          style: MyGoogleFontStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xff303030),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            'Total',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xff909090),
+                                            ),
+                                          ),
+                                        ),
+                                        Text(
+                                          '₹ ' +
+                                              (int.parse(widget.arguments['cartTotal'].toString()) +
+                                                      int.parse(_configModel
+                                                          .user
+                                                          .companies![0]
+                                                          .deliveryCharges
+                                                          .toString()) +
+                                                      (int.parse(widget.arguments[
+                                                                  'cartTotal']
+                                                              .toString()) /
+                                                          100 *
+                                                          int.parse(_configModel
+                                                              .user
+                                                              .companies![0]
+                                                              .taxPercent
+                                                              .toString())) +
+                                                      (int.parse(_configModel
+                                                          .user
+                                                          .companies![0]
+                                                          .packagingCharges
+                                                          .toString())))
                                                   .toString(),
                                           textAlign: TextAlign.right,
                                           style: MyGoogleFontStyle(

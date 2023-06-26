@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
+import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/product_pr.dart';
+import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/products/product_id_p.dart';
 
@@ -27,6 +29,7 @@ class _ProductsPageState extends State<ProductsPage> {
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
+    final ConfigModel _configModel = locator<ConfigModel>();
     final ProductModel _productModel = Provider.of<ProductModel>(context);
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     return Scaffold(
@@ -277,9 +280,16 @@ class _ProductsPageState extends State<ProductsPage> {
                                                     color: Color(0x0c000000),
                                                     image: DecorationImage(
                                                       fit: BoxFit.cover,
-                                                      image: AssetImage(
-                                                        'assets/images/shades-chocolate-cake-3-1-2-1-bg.png',
+                                                      image: NetworkImage(
+                                                        _configModel.apiConfig[
+                                                                'mediaURL'] +
+                                                            _productModel
+                                                                .categoryWiseproducts![
+                                                                    index]
+                                                                .imagepath1
+                                                                .toString(),
                                                       ),
+                                                      // 'assets/images/shades-chocolate-cake-3-1-2-1-bg.png',
                                                     ),
                                                   ),
                                                   child: Align(
