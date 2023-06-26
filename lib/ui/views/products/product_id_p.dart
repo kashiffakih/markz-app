@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sales_app/core/models/product.dart';
+import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/product_pr.dart';
-// import 'package:flutter/rendering.dart';
-// import 'package:sales_app/core/models/product.dart';
-
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/checkout/cart_p.dart';
 
 class ProductIdPage extends StatefulWidget {
   final arguments;
@@ -33,8 +31,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
   @override
   Widget build(BuildContext context) {
     final ProductModel _productModel = Provider.of<ProductModel>(context);
-    // print(_productModel.categoryWiseproducts!
-    //     .where((element) => element.id != widget.arguments!['product']['id']));
+    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -426,7 +423,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   children: [
                                                     Container(
                                                       width: double.infinity,
-                                                      height: 210.33,
+                                                      height: 160,
                                                       child: Stack(
                                                         children: [
                                                           Positioned(
@@ -441,8 +438,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                           13,
                                                                           14,
                                                                           13),
-                                                              width: 155,
-                                                              height: 193,
+                                                              width: 145,
+                                                              height: 133,
                                                               decoration:
                                                                   BoxDecoration(
                                                                 borderRadius:
@@ -494,9 +491,22 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                           Positioned(
                                                             // frame494xX8 (318:2821)
                                                             left: 31,
-                                                            top: 165,
+                                                            top: 110,
                                                             child: TextButton(
-                                                              onPressed: () {},
+                                                              onPressed:
+                                                                  () async {
+                                                                bool type =
+                                                                    true;
+                                                                await _addToCartModel
+                                                                    .getAddToCart(
+                                                                        _productModel
+                                                                            .categoryWiseproducts![index]
+                                                                            .id,
+                                                                        type);
+                                                                Navigator.pushNamed(
+                                                                    context,
+                                                                    '/cartPage');
+                                                              },
                                                               style: TextButton
                                                                   .styleFrom(
                                                                 padding:
@@ -553,13 +563,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                         ],
                                                       ),
                                                     ),
-                                                    // SizedBox(
-                                                    //   height: 10,
-                                                    // ),
                                                     Container(
-                                                      // margin:
-                                                      //     EdgeInsets.fromLTRB(
-                                                      //         0, 10, 0, 0),
                                                       child: Text(
                                                         _productModel
                                                             .categoryWiseproducts![
@@ -726,7 +730,11 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                     ),
                                   ),
                                   TextButton(
-                                    onPressed: () {
+                                    onPressed: () async {
+                                      bool type = true;
+                                      await _addToCartModel.getAddToCart(
+                                          widget.arguments!['product']['id'],
+                                          type);
                                       Navigator.pushNamed(context, '/cartPage');
                                     },
                                     style: TextButton.styleFrom(
