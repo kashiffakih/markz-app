@@ -162,7 +162,7 @@ class Category {
   String? name;
   String? createdAt;
   String? updatedAt;
-  Null? imagepath;
+  String? imagepath;
 
   Category(
       {this.id, this.name, this.createdAt, this.updatedAt, this.imagepath});
@@ -190,7 +190,7 @@ class SubCategory {
   int? id;
   int? categoryId;
   String? name;
-  Null? imagepath;
+  String? imagepath;
   String? createdAt;
   String? updatedAt;
 
@@ -380,7 +380,7 @@ class Tags {
   String? name;
   String? createdAt;
   String? updatedAt;
-  Null? imagepath;
+  String? imagepath;
 
   Tags({
     this.id,
