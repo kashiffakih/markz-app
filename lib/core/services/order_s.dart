@@ -35,15 +35,15 @@ class OrderService {
       orderCost: int.parse(cartTotal),
       packagingAmount: _configModel.user.companies![0].packagingCharges,
       taxAmount: double.parse(cartTotal) /
-          double.parse(_configModel.user.companies![0].taxPercent.toString()) *
-          100,
+          100 *
+          double.parse(_configModel.user.companies![0].taxPercent.toString()),
       taxPercent: _configModel.user.companies![0].taxPercent.toString(),
       tipAmount: 0,
       totalAmount: ((double.parse(cartTotal)) +
               (double.parse(cartTotal) /
+                  100 *
                   double.parse(
-                      _configModel.user.companies![0].taxPercent.toString()) *
-                  100))
+                      _configModel.user.companies![0].taxPercent.toString())))
           .toString(),
       totalCashback: 0,
       walletAmountUsed: 0,
