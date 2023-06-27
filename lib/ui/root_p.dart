@@ -16,8 +16,8 @@ class RootPage extends StatefulWidget {
 
 class _RootPageState extends State<RootPage> {
   authenticateUser(_, AuthModel authModel, ConfigModel configModel) async {
-    configModel.getApiConfig(domain: 'http://192.168.29.9:8080');
-    // configModel.getApiConfig(domain: 'http://api.bd.aaibuzz.com');
+    // configModel.getApiConfig(domain: 'http://192.168.29.149:8080');
+    configModel.getApiConfig(domain: 'http://api.pw.aaibuzz.com');
     await configModel.fetchLoginData();
 
     String currentAppVersion = await getPackageDetails();
