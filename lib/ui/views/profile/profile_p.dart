@@ -50,8 +50,221 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
                 // Body
-                Row(
-                  children: [],
+                Container(
+                  margin: EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      // Photo and Name
+                      Row(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(40),
+                              image: DecorationImage(
+                                fit: BoxFit.cover,
+                                image: AssetImage(
+                                  'assets/images/avatar-bg.png',
+                                ),
+                              ),
+                            ),
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Kristin Watson',
+                                style: MyGoogleFontStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xff303030),
+                                ),
+                              ),
+                              Text(
+                                // bruno203gmailcom6y4 (318:2508)
+                                'bruno203@gmail.com',
+                                style: MyGoogleFontStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xff808080),
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                      // My Orders
+                      Container(
+                        margin: EdgeInsets.only(top: 10, bottom: 10),
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Color(0xffc7b456)),
+                          color: Color(0xffffffff),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(5),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0x338a959e),
+                              offset: Offset(0, 7.6690645218),
+                              blurRadius: 19.1726608276,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'My Orders',
+                                    style: MyGoogleFontStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xff232323),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    // alreadyhave10orders9Ca (I318:2511;0:1158)
+                                    'Already have 10 orders',
+                                    style: MyGoogleFontStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xff909090),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Image.asset(
+                              'assets/images/frame-15-6zi.png',
+                              width: 7.18,
+                              height: 12.92,
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Rewards
+                      Container(
+                        margin: EdgeInsets.only(bottom: 10),
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Color(0xffc7b456)),
+                          color: Color(0xffffffff),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(5),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0x338a959e),
+                              offset: Offset(0, 7.6690645218),
+                              blurRadius: 19.1726608276,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Rewards',
+                                    style: MyGoogleFontStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xff232323),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    // alreadyhave10orders9Ca (I318:2511;0:1158)
+                                    'Already have 10 orders',
+                                    style: MyGoogleFontStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xff909090),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Image.asset(
+                              'assets/images/frame-15-6zi.png',
+                              width: 7.18,
+                              height: 12.92,
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Wishlist
+                      Container(
+                        margin: EdgeInsets.only(bottom: 10),
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Color(0xffc7b456)),
+                          color: Color(0xffffffff),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(5),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0x338a959e),
+                              offset: Offset(0, 7.6690645218),
+                              blurRadius: 19.1726608276,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Wishlist',
+                                    style: MyGoogleFontStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xff232323),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    // alreadyhave10orders9Ca (I318:2511;0:1158)
+                                    'Already have 10 orders',
+                                    style: MyGoogleFontStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xff909090),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Image.asset(
+                              'assets/images/frame-15-6zi.png',
+                              width: 7.18,
+                              height: 12.92,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 )
               ],
             ),
