@@ -157,59 +157,64 @@ class ProfilePage extends StatelessWidget {
                         ),
                       ),
                       // Rewards
-                      Container(
-                        margin: EdgeInsets.only(bottom: 10),
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xffc7b456)),
-                          color: Color(0xffffffff),
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(5),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0x338a959e),
-                              offset: Offset(0, 7.6690645218),
-                              blurRadius: 19.1726608276,
+                      InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/rewardsPage');
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 10),
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Color(0xffc7b456)),
+                            color: Color(0xffffffff),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(5),
                             ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Rewards',
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xff232323),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    // alreadyhave10orders9Ca (I318:2511;0:1158)
-                                    'Already have 10 orders',
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xff909090),
-                                    ),
-                                  ),
-                                ],
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0x338a959e),
+                                offset: Offset(0, 7.6690645218),
+                                blurRadius: 19.1726608276,
                               ),
-                            ),
-                            Image.asset(
-                              'assets/images/frame-15-6zi.png',
-                              width: 7.18,
-                              height: 12.92,
-                            ),
-                          ],
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Rewards',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xff232323),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      // alreadyhave10orders9Ca (I318:2511;0:1158)
+                                      'Already have 10 orders',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xff909090),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Image.asset(
+                                'assets/images/frame-15-6zi.png',
+                                width: 7.18,
+                                height: 12.92,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       // Wishlist
@@ -452,115 +457,125 @@ class ProfilePage extends StatelessWidget {
                         ),
                       ),
                       // Contact Us
-                      Container(
-                        margin: EdgeInsets.only(bottom: 10),
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xffc7b456)),
-                          color: Color(0xffffffff),
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(5),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0x338a959e),
-                              offset: Offset(0, 7.6690645218),
-                              blurRadius: 19.1726608276,
+                      InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/contactPage');
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 10),
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Color(0xffc7b456)),
+                            color: Color(0xffffffff),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(5),
                             ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Contact Us',
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xff232323),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    // alreadyhave10orders9Ca (I318:2511;0:1158)
-                                    'Already have 10 orders',
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xff909090),
-                                    ),
-                                  ),
-                                ],
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0x338a959e),
+                                offset: Offset(0, 7.6690645218),
+                                blurRadius: 19.1726608276,
                               ),
-                            ),
-                            Image.asset(
-                              'assets/images/frame-15-6zi.png',
-                              width: 7.18,
-                              height: 12.92,
-                            ),
-                          ],
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Contact Us',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xff232323),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      // alreadyhave10orders9Ca (I318:2511;0:1158)
+                                      'Already have 10 orders',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xff909090),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Image.asset(
+                                'assets/images/frame-15-6zi.png',
+                                width: 7.18,
+                                height: 12.92,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       // Setting
-                      Container(
-                        margin: EdgeInsets.only(bottom: 10),
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xffc7b456)),
-                          color: Color(0xffffffff),
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(5),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0x338a959e),
-                              offset: Offset(0, 7.6690645218),
-                              blurRadius: 19.1726608276,
+                      InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/settingsPage');
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 10),
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Color(0xffc7b456)),
+                            color: Color(0xffffffff),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(5),
                             ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Setting',
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xff232323),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    // alreadyhave10orders9Ca (I318:2511;0:1158)
-                                    'Already have 10 orders',
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xff909090),
-                                    ),
-                                  ),
-                                ],
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0x338a959e),
+                                offset: Offset(0, 7.6690645218),
+                                blurRadius: 19.1726608276,
                               ),
-                            ),
-                            Image.asset(
-                              'assets/images/frame-15-6zi.png',
-                              width: 7.18,
-                              height: 12.92,
-                            ),
-                          ],
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Setting',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xff232323),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      // alreadyhave10orders9Ca (I318:2511;0:1158)
+                                      'Already have 10 orders',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xff909090),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Image.asset(
+                                'assets/images/frame-15-6zi.png',
+                                width: 7.18,
+                                height: 12.92,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],

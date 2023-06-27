@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sales_app/ui/shared/font_sh.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -6,8 +7,258 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Settings Page'),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Container(
+            child: Column(
+              children: [
+                // Title
+                Container(
+                  margin: EdgeInsets.all(20),
+                  width: double.infinity,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Row(
+                          children: [
+                            Container(
+                              child: Image.asset(
+                                'assets/images/vector-GJ4.png',
+                                height: 15,
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                'Setting',
+                                textAlign: TextAlign.center,
+                                style: MyGoogleFontStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xff1e232c),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Body
+                Container(
+                  height: 600,
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        left: 25,
+                        top: 0,
+                        child: Container(
+                          width: MediaQuery.of(context).size.width - 50,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Personal information
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'Personal information',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xff909090),
+                                      ),
+                                    ),
+                                  ),
+                                  Image.asset(
+                                    'assets/images/edit-2-mP4.png',
+                                    width: 15.34,
+                                    height: 19.15,
+                                  )
+                                ],
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width - 50,
+                                margin: EdgeInsets.only(top: 10, bottom: 10),
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Color(0xffc7b456)),
+                                  color: Color(0xffffffff),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(5),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0x338a959e),
+                                      offset: Offset(0, 7.6690645218),
+                                      blurRadius: 19.1726608276,
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Name',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xff232323),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 3,
+                                    ),
+                                    Text(
+                                      'Bruno Pham',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xff909090),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Password
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'Payment',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xff909090),
+                                      ),
+                                    ),
+                                  ),
+                                  Image.asset(
+                                    'assets/images/edit-2-mP4.png',
+                                    width: 15.34,
+                                    height: 19.15,
+                                  )
+                                ],
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width - 50,
+                                margin: EdgeInsets.only(top: 10, bottom: 10),
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Color(0xffc7b456)),
+                                  color: Color(0xffffffff),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(5),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0x338a959e),
+                                      offset: Offset(0, 7.6690645218),
+                                      blurRadius: 19.1726608276,
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Password',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xff232323),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 3,
+                                    ),
+                                    Text(
+                                      'Bruno Pham',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xff909090),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Notifications
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'Notifications',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xff909090),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width - 50,
+                                margin: EdgeInsets.only(top: 10, bottom: 10),
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Color(0xffc7b456)),
+                                  color: Color(0xffffffff),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(5),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0x338a959e),
+                                      offset: Offset(0, 7.6690645218),
+                                      blurRadius: 19.1726608276,
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'New arrivals',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xff232323),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                        child: Text(
+                                          'Icon',
+                                          textAlign: TextAlign.end,
+                                          style: MyGoogleFontStyle(
+                                            fontFamily: 'Urbanist',
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xff232323),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
