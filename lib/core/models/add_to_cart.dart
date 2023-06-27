@@ -8,6 +8,9 @@ class AddToCart {
   int? qty;
   String? createdAt;
   String? updatedAt;
+  String? kindOfFlower;
+  String? flavour;
+  String? writeOnCake;
   User? user;
   Product? product;
 
@@ -18,6 +21,9 @@ class AddToCart {
       this.qty,
       this.createdAt,
       this.updatedAt,
+      this.kindOfFlower,
+      this.flavour,
+      this.writeOnCake,
       this.user,
       this.product});
 
@@ -28,6 +34,9 @@ class AddToCart {
     qty = json['qty'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
+    kindOfFlower = json['kind_of_flower'];
+    flavour = json['flavour'];
+    writeOnCake = json['write_on_cake'];
     user = json['user'] != null ? new User.fromJson(json['user']) : null;
     product =
         json['product'] != null ? new Product.fromJson(json['product']) : null;
@@ -41,6 +50,9 @@ class AddToCart {
     data['qty'] = this.qty;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
+    data['kind_of_flower'] = this.kindOfFlower;
+    data['flavour'] = this.flavour;
+    data['write_on_cake'] = this.writeOnCake;
     if (this.user != null) {
       data['user'] = this.user!.toJson();
     }

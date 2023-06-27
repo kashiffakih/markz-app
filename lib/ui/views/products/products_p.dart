@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
+import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/product_pr.dart';
+import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/products/product_id_p.dart';
 
@@ -20,6 +22,7 @@ class _ProductsPageState extends State<ProductsPage> {
     super.initState();
     Provider.of<ProductModel>(context, listen: false)
         .getCategoryWiseProduct(widget.arguments['categoryId']);
+    Provider.of<ProductModel>(context, listen: false).getCategories();
   }
 
   @override
@@ -27,6 +30,7 @@ class _ProductsPageState extends State<ProductsPage> {
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
+    final ConfigModel _configModel = locator<ConfigModel>();
     final ProductModel _productModel = Provider.of<ProductModel>(context);
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     return Scaffold(
@@ -214,222 +218,268 @@ class _ProductsPageState extends State<ProductsPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Container(
-                        width: double.infinity,
-                        height: 782 * fem,
-                        child: GridView.count(
-                          scrollDirection: Axis.vertical,
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 135,
-                          children: List.generate(
-                              _productModel.categoryWiseproducts!.length,
-                              (index) {
-                            return InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => ProductIdPage(
-                                            arguments: {
-                                              'product': _productModel
-                                                  .categoryWiseproducts![index]
-                                                  .toJson()
-                                            })));
-                              },
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    // group8949Yce (318:1997)
-                                    width: 145 * fem,
-                                    height: double.infinity,
-                                    decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.circular(15 * fem),
-                                    ),
-                                    child: Column(
+                      _productModel.categoryWiseproducts != null
+                          ? Container(
+                              width: double.infinity,
+                              height: 782 * fem,
+                              child: GridView.count(
+                                scrollDirection: Axis.vertical,
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 135,
+                                children: List.generate(
+                                    _productModel.categoryWiseproducts!.length,
+                                    (index) {
+                                  return InkWell(
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ProductIdPage(arguments: {
+                                                    'product': _productModel
+                                                        .categoryWiseproducts![
+                                                            index]
+                                                        .toJson()
+                                                  })));
+                                    },
+                                    child: Row(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: [
                                         Container(
-                                          // autogroupcl2kX2W (Gb6PJEVbdu1GJDGk6hCL2k)
-                                          margin: EdgeInsets.fromLTRB(0 * fem,
-                                              0 * fem, 0 * fem, 11.67 * fem),
-                                          width: double.infinity,
-                                          height: 210.33 * fem,
-                                          child: Stack(
+                                          // group8949Yce (318:1997)
+                                          width: 145 * fem,
+                                          height: double.infinity,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(15 * fem),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
                                             children: [
-                                              Positioned(
-                                                // frame9SvA (318:2815)
-                                                left: 0 * fem,
-                                                top: 0 * fem,
-                                                child: Container(
-                                                  padding: EdgeInsets.fromLTRB(
-                                                      106 * fem,
-                                                      13 * fem,
-                                                      14 * fem,
-                                                      13 * fem),
-                                                  width: 145 * fem,
-                                                  height: 193 * fem,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            15 * fem),
-                                                    color: Color(0x0c000000),
-                                                    image: DecorationImage(
-                                                      fit: BoxFit.cover,
-                                                      image: AssetImage(
-                                                        'assets/images/shades-chocolate-cake-3-1-2-1-bg.png',
+                                              Container(
+                                                // autogroupcl2kX2W (Gb6PJEVbdu1GJDGk6hCL2k)
+                                                margin: EdgeInsets.fromLTRB(
+                                                    0 * fem,
+                                                    0 * fem,
+                                                    0 * fem,
+                                                    11.67 * fem),
+                                                width: double.infinity,
+                                                height: 210.33 * fem,
+                                                child: Stack(
+                                                  children: [
+                                                    Positioned(
+                                                      // frame9SvA (318:2815)
+                                                      left: 0 * fem,
+                                                      top: 0 * fem,
+                                                      child: Container(
+                                                        padding:
+                                                            EdgeInsets.fromLTRB(
+                                                                106 * fem,
+                                                                13 * fem,
+                                                                14 * fem,
+                                                                13 * fem),
+                                                        width: 145 * fem,
+                                                        height: 193 * fem,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      15 * fem),
+                                                          color:
+                                                              Color(0x0c000000),
+                                                          image:
+                                                              DecorationImage(
+                                                            fit: BoxFit.cover,
+                                                            image: NetworkImage(
+                                                              _configModel.apiConfig[
+                                                                      'mediaURL'] +
+                                                                  _productModel
+                                                                      .categoryWiseproducts![
+                                                                          index]
+                                                                      .imagepath1
+                                                                      .toString(),
+                                                            ),
+                                                            // 'assets/images/shades-chocolate-cake-3-1-2-1-bg.png',
+                                                          ),
+                                                        ),
+                                                        child: Align(
+                                                          // vector3f4 (318:2818)
+                                                          alignment: Alignment
+                                                              .topRight,
+                                                          child: SizedBox(
+                                                            width: 25 * fem,
+                                                            height: 22.4 * fem,
+                                                            child: TextButton(
+                                                              onPressed: () {},
+                                                              style: TextButton
+                                                                  .styleFrom(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .zero,
+                                                              ),
+                                                              child:
+                                                                  Image.asset(
+                                                                'assets/images/vector-yse.png',
+                                                                width: 25 * fem,
+                                                                height:
+                                                                    22.4 * fem,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                  child: Align(
-                                                    // vector3f4 (318:2818)
-                                                    alignment:
-                                                        Alignment.topRight,
-                                                    child: SizedBox(
-                                                      width: 25 * fem,
-                                                      height: 22.4 * fem,
+                                                    Positioned(
+                                                      // frame494xX8 (318:2821)
+                                                      left: 31 * fem,
+                                                      top: 165 * fem,
                                                       child: TextButton(
-                                                        onPressed: () {},
+                                                        onPressed: () async {
+                                                          bool type = true;
+                                                          await _addToCartModel
+                                                              .getAddToCart(
+                                                                  _productModel
+                                                                      .categoryWiseproducts![
+                                                                          index]
+                                                                      .id,
+                                                                  type,
+                                                                  '');
+                                                          Navigator.pushNamed(
+                                                              context,
+                                                              '/cartPage');
+                                                        },
                                                         style: TextButton
                                                             .styleFrom(
                                                           padding:
                                                               EdgeInsets.zero,
                                                         ),
-                                                        child: Image.asset(
-                                                          'assets/images/vector-yse.png',
-                                                          width: 25 * fem,
-                                                          height: 22.4 * fem,
+                                                        child: Container(
+                                                          width: 82 * fem,
+                                                          height: 27.33 * fem,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            border: Border.all(
+                                                                color: Color(
+                                                                    0xffeaeaea)),
+                                                            color: Color(
+                                                                0xffffffff),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        7.0163693428 *
+                                                                            fem),
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: Color(
+                                                                    0x3f000000),
+                                                                offset: Offset(
+                                                                    0 * fem,
+                                                                    2.1298701763 *
+                                                                        fem),
+                                                                blurRadius:
+                                                                    2.1298701763 *
+                                                                        fem,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          child: Center(
+                                                            child: Text(
+                                                              'ADD',
+                                                              style:
+                                                                  MyGoogleFontStyle(
+                                                                fontFamily:
+                                                                    'DM Sans',
+                                                                fontSize:
+                                                                    12 * ffem,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
+                                                                height: 1 *
+                                                                    ffem /
+                                                                    fem,
+                                                                color: Color(
+                                                                    0xffc7b456),
+                                                              ),
+                                                            ),
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
+                                                  ],
+                                                ),
+                                              ),
+                                              // SizedBox(
+                                              //   height: 10,
+                                              // ),
+                                              Container(
+                                                // shadechocolatecake3mjU (318:2819)
+                                                margin: EdgeInsets.fromLTRB(
+                                                    10 * fem,
+                                                    0 * fem,
+                                                    0 * fem,
+                                                    4 * fem),
+                                                constraints: BoxConstraints(
+                                                  maxWidth: 123 * fem,
+                                                ),
+                                                child: Text(
+                                                  _productModel
+                                                      .categoryWiseproducts![
+                                                          index]
+                                                      .name
+                                                      .toString(),
+                                                  textAlign: TextAlign.center,
+                                                  style: MyGoogleFontStyle(
+                                                    fontFamily: 'Urbanist',
+                                                    fontSize: 15 * ffem,
+                                                    fontWeight: FontWeight.w700,
+                                                    height: 1.2 * ffem / fem,
+                                                    letterSpacing: -0.3 * fem,
+                                                    color: Color(0xff000000),
                                                   ),
                                                 ),
                                               ),
-                                              Positioned(
-                                                // frame494xX8 (318:2821)
-                                                left: 31 * fem,
-                                                top: 165 * fem,
-                                                child: TextButton(
-                                                  onPressed: () async {
-                                                    bool type = true;
-                                                    await _addToCartModel
-                                                        .getAddToCart(
-                                                            _productModel
-                                                                .categoryWiseproducts![
-                                                                    index]
-                                                                .id,
-                                                            type);
-                                                    Navigator.pushNamed(
-                                                        context, '/cartPage');
-                                                  },
-                                                  style: TextButton.styleFrom(
-                                                    padding: EdgeInsets.zero,
-                                                  ),
-                                                  child: Container(
-                                                    width: 82 * fem,
-                                                    height: 27.33 * fem,
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                          color: Color(
-                                                              0xffeaeaea)),
-                                                      color: Color(0xffffffff),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              7.0163693428 *
-                                                                  fem),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color:
-                                                              Color(0x3f000000),
-                                                          offset: Offset(
-                                                              0 * fem,
-                                                              2.1298701763 *
-                                                                  fem),
-                                                          blurRadius:
-                                                              2.1298701763 *
-                                                                  fem,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    child: Center(
-                                                      child: Text(
-                                                        'ADD',
-                                                        style:
-                                                            MyGoogleFontStyle(
-                                                          fontFamily: 'DM Sans',
-                                                          fontSize: 12 * ffem,
-                                                          fontWeight:
-                                                              FontWeight.w700,
-                                                          height:
-                                                              1 * ffem / fem,
-                                                          color:
-                                                              Color(0xffc7b456),
-                                                        ),
-                                                      ),
-                                                    ),
+                                              Container(
+                                                // TMQ (318:2820)
+                                                margin: EdgeInsets.fromLTRB(
+                                                    0 * fem,
+                                                    0 * fem,
+                                                    1 * fem,
+                                                    0 * fem),
+                                                child: Text(
+                                                  _productModel
+                                                      .categoryWiseproducts![
+                                                          index]
+                                                      .productPrices![0]
+                                                      .price
+                                                      .toString(),
+                                                  style: MyGoogleFontStyle(
+                                                    fontFamily: 'Poppins',
+                                                    fontSize:
+                                                        10.9543466568 * ffem,
+                                                    fontWeight: FontWeight.w500,
+                                                    height: 1.5 * ffem / fem,
+                                                    letterSpacing:
+                                                        -0.2190869331 * fem,
+                                                    color: Color(0x99000000),
                                                   ),
                                                 ),
                                               ),
                                             ],
                                           ),
                                         ),
-                                        // SizedBox(
-                                        //   height: 10,
-                                        // ),
-                                        Container(
-                                          // shadechocolatecake3mjU (318:2819)
-                                          margin: EdgeInsets.fromLTRB(10 * fem,
-                                              0 * fem, 0 * fem, 4 * fem),
-                                          constraints: BoxConstraints(
-                                            maxWidth: 123 * fem,
-                                          ),
-                                          child: Text(
-                                            _productModel
-                                                .categoryWiseproducts![index]
-                                                .name
-                                                .toString(),
-                                            textAlign: TextAlign.center,
-                                            style: MyGoogleFontStyle(
-                                              fontFamily: 'Urbanist',
-                                              fontSize: 15 * ffem,
-                                              fontWeight: FontWeight.w700,
-                                              height: 1.2 * ffem / fem,
-                                              letterSpacing: -0.3 * fem,
-                                              color: Color(0xff000000),
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          // TMQ (318:2820)
-                                          margin: EdgeInsets.fromLTRB(0 * fem,
-                                              0 * fem, 1 * fem, 0 * fem),
-                                          child: Text(
-                                            _productModel
-                                                .categoryWiseproducts![index]
-                                                .productPrices![0]
-                                                .price
-                                                .toString(),
-                                            style: MyGoogleFontStyle(
-                                              fontFamily: 'Poppins',
-                                              fontSize: 10.9543466568 * ffem,
-                                              fontWeight: FontWeight.w500,
-                                              height: 1.5 * ffem / fem,
-                                              letterSpacing:
-                                                  -0.2190869331 * fem,
-                                              color: Color(0x99000000),
-                                            ),
-                                          ),
-                                        ),
                                       ],
                                     ),
-                                  ),
-                                ],
+                                  );
+                                }),
                               ),
-                            );
-                          }),
-                        ),
-                      ),
+                            )
+                          : SizedBox(
+                              height: 550,
+                              child:
+                                  Center(child: CircularProgressIndicator())),
                     ],
                   ),
                 ),

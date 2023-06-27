@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/product_pr.dart';
+import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/products/product_id_p.dart';
 import 'package:sales_app/ui/views/products/products_p.dart';
@@ -16,8 +17,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
+    final ConfigModel _configModel = locator<ConfigModel>();
     final ProductModel _productModel = Provider.of<ProductModel>(context);
-    final ConfigModel _configModel = Provider.of<ConfigModel>(context);
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
@@ -309,8 +310,12 @@ class _HomePageState extends State<HomePage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: [
+                                        // Text(
+                                        //     _configModel.apiConfig['mediaURL'] +
+                                        //         _productModel
+                                        //             .products![index].imagepath1
+                                        //             .toString()),
                                         Container(
-                                          // frame9Si2 (318:1998)
                                           margin: EdgeInsets.fromLTRB(0 * fem,
                                               0 * fem, 0 * fem, 5 * fem),
                                           padding: EdgeInsets.fromLTRB(
@@ -324,11 +329,17 @@ class _HomePageState extends State<HomePage> {
                                             borderRadius:
                                                 BorderRadius.circular(15 * fem),
                                             image: DecorationImage(
-                                              fit: BoxFit.cover,
-                                              image: AssetImage(
-                                                'assets/images/shades-chocolate-cake-3-1-2-1-bg.png',
-                                              ),
-                                            ),
+                                                fit: BoxFit.cover,
+                                                image: NetworkImage(_configModel
+                                                        .apiConfig['mediaURL'] +
+                                                    _productModel
+                                                        .products![index]
+                                                        .imagepath2
+                                                        .toString())
+                                                // image: AssetImage(
+                                                //   'assets/images/shades-chocolate-cake-3-1-2-1-bg.png',
+                                                // ),
+                                                ),
                                           ),
                                           child: Align(
                                             // vectorRZx (318:2001)
@@ -441,24 +452,13 @@ class _HomePageState extends State<HomePage> {
                                       child: ClipRRect(
                                         borderRadius:
                                             BorderRadius.circular(10 * fem),
-                                        child: _productModel.categories![index]
-                                                    ['name'] ==
-                                                'Cake'
-                                            ? Image.asset(
-                                                'assets/images/image-24.png',
-                                                fit: BoxFit.cover,
-                                              )
-                                            : _productModel.categories![index]
-                                                        ['name'] ==
-                                                    'Flower'
-                                                ? Image.asset(
-                                                    'assets/images/image-23.png',
-                                                    fit: BoxFit.cover,
-                                                  )
-                                                : Image.asset(
-                                                    'assets/images/image-20-bg.png',
-                                                    fit: BoxFit.cover,
-                                                  ),
+                                        child: Image.network(
+                                          _configModel.apiConfig['mediaURL'] +
+                                              _productModel.categories![index]
+                                                      ['imagepath']
+                                                  .toString(),
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
                                     ),
                                   ),
