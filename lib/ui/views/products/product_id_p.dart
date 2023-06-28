@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/product_pr.dart';
+import 'package:sales_app/core/providers/wish_list_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 
@@ -20,6 +21,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
     super.initState();
     Provider.of<ProductModel>(context, listen: false)
         .getCategoryWiseProduct(widget.arguments!['product']['category_id']);
+    var productId = '';
+    Provider.of<WishListModel>(context, listen: false).getWishLists(productId);
   }
 
   List<Map<String, dynamic>> flavors = [
@@ -54,6 +57,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
     final ConfigModel _configModel = locator<ConfigModel>();
     final ProductModel _productModel = Provider.of<ProductModel>(context);
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
+    final WishListModel _wishListModel = Provider.of<WishListModel>(context);
     final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     return Scaffold(
       body: SafeArea(
@@ -683,25 +687,57 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                               ),
                                                                             ),
                                                                             child:
-                                                                                Align(
-                                                                              // vector3f4 (318:2818)
-                                                                              alignment: Alignment.topRight,
-                                                                              child: SizedBox(
-                                                                                width: 25,
-                                                                                height: 22.4,
-                                                                                child: TextButton(
-                                                                                  onPressed: () {},
-                                                                                  style: TextButton.styleFrom(
-                                                                                    padding: EdgeInsets.zero,
-                                                                                  ),
-                                                                                  child: Image.asset(
-                                                                                    'assets/images/vector-yse.png',
-                                                                                    width: 25,
-                                                                                    height: 22.4,
-                                                                                  ),
-                                                                                ),
-                                                                              ),
+                                                                                InkWell(
+                                                                              onTap: () async {
+                                                                                await _wishListModel.getWishLists(_productModel.categoryWiseproducts![index].id);
+                                                                              },
+                                                                              child: _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.categoryWiseproducts![index].id && wishList.userId == _configModel.user.id).toList().length == 0
+                                                                                  ? Align(
+                                                                                      // vectorRZx (318:2001)
+                                                                                      alignment: Alignment.topRight,
+                                                                                      child: SizedBox(
+                                                                                        width: 25,
+                                                                                        height: 22.4,
+                                                                                        child: Image.asset(
+                                                                                          'assets/images/vector-yse.png',
+                                                                                          width: 25,
+                                                                                          height: 22.4,
+                                                                                        ),
+                                                                                      ),
+                                                                                    )
+                                                                                  : Align(
+                                                                                      // vectorRZx (318:2001)
+                                                                                      alignment: Alignment.topRight,
+                                                                                      child: SizedBox(
+                                                                                        width: 25,
+                                                                                        height: 22.4,
+                                                                                        child: Image.asset(
+                                                                                          'assets/images/vector-wXc.png',
+                                                                                          width: 25,
+                                                                                          height: 22.4,
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
                                                                             ),
+                                                                            //     Align(
+                                                                            //   // vector3f4 (318:2818)
+                                                                            //   alignment: Alignment.topRight,
+                                                                            //   child: SizedBox(
+                                                                            //     width: 25,
+                                                                            //     height: 22.4,
+                                                                            //     child: TextButton(
+                                                                            //       onPressed: () {},
+                                                                            //       style: TextButton.styleFrom(
+                                                                            //         padding: EdgeInsets.zero,
+                                                                            //       ),
+                                                                            //       child: Image.asset(
+                                                                            //         'assets/images/vector-yse.png',
+                                                                            //         width: 25,
+                                                                            //         height: 22.4,
+                                                                            //       ),
+                                                                            //     ),
+                                                                            //   ),
+                                                                            // ),
                                                                           ),
                                                                         ),
                                                                         Positioned(
@@ -783,29 +819,38 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                  Container(
-                                                                    child: Text(
-                                                                      _productModel
-                                                                          .categoryWiseproducts![
-                                                                              index]
-                                                                          .productPrices![
-                                                                              0]
-                                                                          .price
-                                                                          .toString(),
-                                                                      style:
-                                                                          MyGoogleFontStyle(
-                                                                        fontFamily:
-                                                                            'Poppins',
-                                                                        fontSize:
-                                                                            10.9543466568,
-                                                                        fontWeight:
-                                                                            FontWeight.w500,
-                                                                        height:
-                                                                            1.5,
-                                                                        letterSpacing:
-                                                                            -0.2190869331,
-                                                                        color: Color(
-                                                                            0x99000000),
+                                                                  InkWell(
+                                                                    onTap: () {
+                                                                      Navigator.of(context).push(MaterialPageRoute(
+                                                                          builder: (context) =>
+                                                                              ProductIdPage(arguments: {
+                                                                                'product': _productModel.categoryWiseproducts![index].toJson()
+                                                                              })));
+                                                                    },
+                                                                    child:
+                                                                        Container(
+                                                                      child:
+                                                                          Text(
+                                                                        _productModel
+                                                                            .categoryWiseproducts![index]
+                                                                            .productPrices![0]
+                                                                            .price
+                                                                            .toString(),
+                                                                        style:
+                                                                            MyGoogleFontStyle(
+                                                                          fontFamily:
+                                                                              'Poppins',
+                                                                          fontSize:
+                                                                              10.9543466568,
+                                                                          fontWeight:
+                                                                              FontWeight.w500,
+                                                                          height:
+                                                                              1.5,
+                                                                          letterSpacing:
+                                                                              -0.2190869331,
+                                                                          color:
+                                                                              Color(0x99000000),
+                                                                        ),
                                                                       ),
                                                                     ),
                                                                   ),
