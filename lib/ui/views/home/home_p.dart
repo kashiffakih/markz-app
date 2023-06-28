@@ -28,7 +28,6 @@ class _HomePageState extends State<HomePage> {
     final ConfigModel _configModel = locator<ConfigModel>();
     final ProductModel _productModel = Provider.of<ProductModel>(context);
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
-    // print(_wishListModel.wishLists![0].toJson());
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;

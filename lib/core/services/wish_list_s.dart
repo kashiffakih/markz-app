@@ -26,4 +26,19 @@ class WishListService {
     }
     return _wishLists;
   }
+
+  Future<bool> addAllToCart() async {
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    var userId = _configModel.user.id;
+
+    bool type = true;
+    http.Response _response = await http.get(
+      Uri.parse(
+          '${_apiConfig['baseURL']}/wishlist_to_all_add_to_cart?userId=$userId&type=$type'),
+      headers: _apiConfig['headers'],
+    );
+    Map<String, dynamic> _responseData = json.decode(_response.body);
+
+    return _responseData['success'];
+  }
 }
