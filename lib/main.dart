@@ -5,6 +5,7 @@ import 'package:sales_app/core/providers/auth_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/order_pr.dart';
 import 'package:sales_app/core/providers/product_pr.dart';
+import 'package:sales_app/core/providers/wish_list_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/routing/router.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
@@ -33,6 +34,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => OrderModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => WishListModel(),
         ),
       ],
       child: MaterialApp(
