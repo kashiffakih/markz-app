@@ -21,4 +21,8 @@ class WishListModel with ChangeNotifier {
   getWishLists(productId) async {
     wishLists = await _wishListService.getWishLists(productId);
   }
+
+  Future<bool> addAllToCart() async {
+    return await _wishListService.addAllToCart();
+  }
 }
