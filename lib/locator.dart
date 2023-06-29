@@ -5,6 +5,7 @@ import 'package:sales_app/core/services/auth_s.dart';
 import 'package:sales_app/core/services/config_s.dart';
 import 'package:sales_app/core/services/order_s.dart';
 import 'package:sales_app/core/services/product_s.dart';
+import 'package:sales_app/core/services/review_s.dart';
 import 'package:sales_app/core/services/wish_list_s.dart';
 
 GetIt locator = GetIt.instance;
@@ -17,4 +18,5 @@ void setupLocator() {
   locator.registerLazySingleton(() => AddToCartService());
   locator.registerLazySingleton(() => OrderService());
   locator.registerLazySingleton(() => WishListService());
+  locator.registerLazySingleton(() => ReviewService());
 }

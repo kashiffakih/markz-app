@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/order_pr.dart';
+import 'package:sales_app/core/providers/review_pr.dart';
 import 'package:sales_app/core/providers/wish_list_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
@@ -16,11 +17,28 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   @override
+  void initState() {
+    super.initState();
+    var productId = '';
+    Map<String, dynamic> _CartData = {
+      'kindOfFlower': '',
+      'flavour': '',
+      'writeOnCake': '',
+    };
+    Provider.of<ReviewModel>(context, listen: false).getMyReviews(productId);
+    Provider.of<WishListModel>(context, listen: false).getWishLists(productId);
+    Provider.of<OrderModel>(context, listen: false).getOrder();
+    Provider.of<AddToCartModel>(context, listen: false)
+        .getAddToCart(productId, '', _CartData);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final ConfigModel _configModel = locator<ConfigModel>();
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     final OrderModel _orderModel = Provider.of<OrderModel>(context);
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
+    final ReviewModel _reviewModel = Provider.of<ReviewModel>(context);
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -347,12 +365,17 @@ class _ProfilePageState extends State<ProfilePage> {
                                       height: 5,
                                     ),
                                     Text(
-                                      _addToCartModel.addToCarts!.length == 0
+                                      _addToCartModel.addToCartLoader
                                           ? 'My Cart is empty'
-                                          : 'Already have ' +
-                                              _addToCartModel.addToCarts!.length
-                                                  .toString() +
-                                              ' orders',
+                                          : _addToCartModel
+                                                      .addToCarts!.length ==
+                                                  0
+                                              ? 'My Cart is empty'
+                                              : 'Already have ' +
+                                                  _addToCartModel
+                                                      .addToCarts!.length
+                                                      .toString() +
+                                                  ' orders',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontSize: 11,
@@ -412,8 +435,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                       height: 5,
                                     ),
                                     Text(
-                                      // alreadyhave10orders9Ca (I318:2511;0:1158)
-                                      'Already have 10 orders',
+                                      _reviewModel.reviewLoader
+                                          ? 'My review is empty.'
+                                          : _reviewModel.reviews!.length == 0
+                                              ? 'My review is empty.'
+                                              : 'Already have ' +
+                                                  _reviewModel.reviews!.length
+                                                      .toString() +
+                                                  ' reviews',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontSize: 11,
