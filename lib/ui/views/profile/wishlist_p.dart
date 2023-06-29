@@ -82,155 +82,182 @@ class _WishlistPageState extends State<WishlistPage> {
                           child: Container(
                             width: MediaQuery.of(context).size.width - 50,
                             height: MediaQuery.of(context).size.height - 200,
-                            child: ListView.builder(
-                              itemCount: _wishListModel.wishLists!.length,
-                              itemBuilder: (BuildContext context, index) =>
-                                  Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      SizedBox(
-                                        height: 100,
-                                        width: 80,
-                                        child: Expanded(
-                                          flex: 3,
-                                          child: Image.network(
-                                            _configModel.apiConfig['mediaURL'] +
-                                                _wishListModel.wishLists![index]
-                                                    .product!.imagepath1
-                                                    .toString(),
-                                            // 'assets/images/mask-group-HvE.png',
-                                            width: 80,
-                                            height: 100,
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        child: Expanded(
-                                          flex: 5,
-                                          child: Column(
-                                            children: [
-                                              Text(
-                                                _wishListModel.wishLists![index]
-                                                    .product!.name
-                                                    .toString(),
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Urbanist',
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xff909090),
+                            child: _wishListModel.wishLists!.length == 0
+                                ? SizedBox(
+                                    height: 60,
+                                    child: Center(
+                                        child: Text('Wishlist is empty')),
+                                  )
+                                : ListView.builder(
+                                    itemCount: _wishListModel.wishLists!.length,
+                                    itemBuilder:
+                                        (BuildContext context, index) => Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            SizedBox(
+                                              height: 100,
+                                              width: 80,
+                                              child: Expanded(
+                                                flex: 3,
+                                                child: Image.network(
+                                                  _configModel.apiConfig[
+                                                          'mediaURL'] +
+                                                      _wishListModel
+                                                          .wishLists![index]
+                                                          .product!
+                                                          .imagepath1
+                                                          .toString(),
+                                                  // 'assets/images/mask-group-HvE.png',
+                                                  width: 80,
+                                                  height: 100,
                                                 ),
                                               ),
-                                              Text(
-                                                '₹ ' +
-                                                    _wishListModel
-                                                        .wishLists![index]
-                                                        .product!
-                                                        .productPrices![0]
-                                                        .price
-                                                        .toString(),
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Poppins',
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Color(0xff1e1e1e),
-                                                ),
-                                              ),
-                                              InkWell(
-                                                onTap: () async {
-                                                  bool type = true;
-                                                  Map<String, dynamic>
-                                                      _CartData = {
-                                                    'kindOfFlower': '',
-                                                    'flavour': '',
-                                                    'writeOnCake': '',
-                                                  };
-                                                  await _addToCartModel
-                                                      .getAddToCart(
+                                            ),
+                                            Container(
+                                              child: Expanded(
+                                                flex: 5,
+                                                child: Column(
+                                                  children: [
+                                                    Text(
+                                                      _wishListModel
+                                                          .wishLists![index]
+                                                          .product!
+                                                          .name
+                                                          .toString(),
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Urbanist',
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color:
+                                                            Color(0xff909090),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '₹ ' +
                                                           _wishListModel
                                                               .wishLists![index]
                                                               .product!
-                                                              .id,
-                                                          type,
-                                                          _CartData);
-                                                  setState(() {
-                                                    _wishListModel
-                                                        .getWishLists('');
-                                                  });
-                                                },
-                                                child: Container(
-                                                  padding: EdgeInsets.fromLTRB(
-                                                      13, 4, 14, 6),
-                                                  width: 100,
-                                                  height: 30,
-                                                  decoration: BoxDecoration(
-                                                    color: Color(0xff000000),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
-                                                  ),
-                                                  child: Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Container(
-                                                        margin:
+                                                              .productPrices![0]
+                                                              .price
+                                                              .toString(),
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color:
+                                                            Color(0xff1e1e1e),
+                                                      ),
+                                                    ),
+                                                    InkWell(
+                                                      onTap: () async {
+                                                        bool type = true;
+                                                        Map<String, dynamic>
+                                                            _CartData = {
+                                                          'kindOfFlower': '',
+                                                          'flavour': '',
+                                                          'writeOnCake': '',
+                                                        };
+                                                        await _addToCartModel
+                                                            .getAddToCart(
+                                                                _wishListModel
+                                                                    .wishLists![
+                                                                        index]
+                                                                    .product!
+                                                                    .id,
+                                                                type,
+                                                                _CartData);
+                                                        setState(() {
+                                                          _wishListModel
+                                                              .getWishLists('');
+                                                        });
+                                                      },
+                                                      child: Container(
+                                                        padding:
                                                             EdgeInsets.fromLTRB(
-                                                                0, 0, 5, 0),
-                                                        child: Text(
-                                                          'Add to Cart',
-                                                          style:
-                                                              MyGoogleFontStyle(
-                                                            fontFamily:
-                                                                'Poppins',
-                                                            fontSize: 9,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            color: Color(
-                                                                0xffffffff),
-                                                          ),
+                                                                13, 4, 14, 6),
+                                                        width: 100,
+                                                        height: 30,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color:
+                                                              Color(0xff000000),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5),
+                                                        ),
+                                                        child: Row(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Container(
+                                                              margin: EdgeInsets
+                                                                  .fromLTRB(0,
+                                                                      0, 5, 0),
+                                                              child: Text(
+                                                                'Add to Cart',
+                                                                style:
+                                                                    MyGoogleFontStyle(
+                                                                  fontFamily:
+                                                                      'Poppins',
+                                                                  fontSize: 9,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  color: Color(
+                                                                      0xffffffff),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Image.asset(
+                                                              'assets/images/shopping-bag-03-YoY.png',
+                                                              width: 9.5,
+                                                              height: 9.2,
+                                                            ),
+                                                          ],
                                                         ),
                                                       ),
-                                                      Image.asset(
-                                                        'assets/images/shopping-bag-03-YoY.png',
-                                                        width: 9.5,
-                                                        height: 9.2,
-                                                      ),
-                                                    ],
-                                                  ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
-                                            ],
+                                            ),
+                                            Expanded(
+                                              child: IconButton(
+                                                onPressed: () async {
+                                                  await _wishListModel
+                                                      .getWishLists(
+                                                          _wishListModel
+                                                              .wishLists![index]
+                                                              .product!
+                                                              .id);
+                                                },
+                                                icon: Icon(Icons.close_rounded),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width -
+                                              50,
+                                          child: Divider(
+                                            thickness: 2,
+                                            color: Colors.black,
                                           ),
                                         ),
-                                      ),
-                                      Expanded(
-                                        child: IconButton(
-                                          onPressed: () async {
-                                            await _wishListModel.getWishLists(
-                                                _wishListModel.wishLists![index]
-                                                    .product!.id);
-                                          },
-                                          icon: Icon(Icons.close_rounded),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width - 50,
-                                    child: Divider(
-                                      thickness: 2,
-                                      color: Colors.black,
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
                           ),
                         ),
                       ),
@@ -244,38 +271,42 @@ class _WishlistPageState extends State<WishlistPage> {
                               SizedBox(
                                 height: 10,
                               ),
-                              Container(
-                                margin: EdgeInsets.fromLTRB(0.89, 0, 0, 0),
-                                child: TextButton(
-                                  onPressed: () async {
-                                    await _wishListModel.addAllToCart();
-                                    setState(() {
-                                      _wishListModel.getWishLists('');
-                                    });
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                  ),
-                                  child: Container(
-                                    width: 321,
-                                    height: 53,
-                                    decoration: BoxDecoration(
-                                      color: Color(0xff1e1e1e),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        'Add all to my cart',
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xffffffff),
+                              _wishListModel.wishLists!.length != 0
+                                  ? Container(
+                                      margin:
+                                          EdgeInsets.fromLTRB(0.89, 0, 0, 0),
+                                      child: TextButton(
+                                        onPressed: () async {
+                                          await _wishListModel.addAllToCart();
+                                          setState(() {
+                                            _wishListModel.getWishLists('');
+                                          });
+                                        },
+                                        style: TextButton.styleFrom(
+                                          padding: EdgeInsets.zero,
+                                        ),
+                                        child: Container(
+                                          width: 321,
+                                          height: 53,
+                                          decoration: BoxDecoration(
+                                            color: Color(0xff1e1e1e),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              'Add all to my cart',
+                                              style: MyGoogleFontStyle(
+                                                fontFamily: 'Urbanist',
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xffffffff),
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                                    )
+                                  : Text(''),
                             ],
                           ),
                         ),
