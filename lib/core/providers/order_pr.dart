@@ -22,11 +22,18 @@ class OrderModel with ChangeNotifier {
 
   Future<bool> placedOrder(List<AddToCart> cartItems, String cartTotal) async {
     return await _orderService.placedOrder(cartItems, cartTotal);
-    // notifyListeners();
-    // Map<String, dynamic> _response =
-    //     await _addToCartService.getAddToCart(productId, type);
-    // addToCarts = _response['addToCarts'];
-    // cartTotal = _response['cart_total'];
-    // return order;
+  }
+
+  List<Order> _orders = [];
+
+  set orders(List<Order> newOrder) {
+    _orders = newOrder;
+    orderLoader = false;
+    notifyListeners();
+  }
+
+  List<Order> get orders => _orders;
+  getOrder() async {
+    orders = await _orderService.getOrders();
   }
 }
