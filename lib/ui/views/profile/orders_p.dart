@@ -116,1020 +116,1021 @@ class _OrdersPageState extends State<OrdersPage> {
                           height: MediaQuery.of(context).size.height - 124,
                           child: TabBarView(
                             children: [
-                              // Text('Order Placed'),
-                              SingleChildScrollView(
-                                child: Column(
-                                  children: [
-                                    ..._orderModel.orders
-                                        .where((_orderStatus) =>
-                                            _orderStatus.orderStatuses!.isEmpty)
-                                        .map(
-                                          (_order) => Column(children: [
-                                            Container(
-                                              height: 130,
-                                              margin: EdgeInsets.all(10),
-                                              padding: EdgeInsets.all(10),
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    color: Color(0xffc7b456)),
-                                                color: Color(0xffffffff),
-                                                borderRadius: BorderRadius.all(
-                                                  Radius.circular(5),
-                                                ),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Color(0x338a959e),
-                                                    offset:
-                                                        Offset(0, 7.6690645218),
-                                                    blurRadius: 19.1726608276,
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: Text(
-                                                          'Order No: ' +
-                                                              _order.id
-                                                                  .toString(),
-                                                          style:
-                                                              MyGoogleFontStyle(
-                                                            fontFamily:
-                                                                'Urbanist',
-                                                            fontWeight:
-                                                                FontWeight.w700,
-                                                            color: Color(
-                                                                0xff232323),
-                                                          ),
-                                                        ),
+                              _orderModel.orderLoader
+                                  ? SizedBox(
+                                      height: 60,
+                                      child: Center(
+                                          child: Text("No Order Placed Yet")),
+                                    )
+                                  // Text('Order Placed'),
+                                  : SingleChildScrollView(
+                                      child: Column(
+                                        children: [
+                                          ..._orderModel.orders
+                                              .where((_orderStatus) =>
+                                                  _orderStatus
+                                                      .orderStatuses!.isEmpty)
+                                              .map(
+                                                (_order) => Column(children: [
+                                                  Container(
+                                                    height: 130,
+                                                    margin: EdgeInsets.all(10),
+                                                    padding: EdgeInsets.all(10),
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: Color(
+                                                              0xffc7b456)),
+                                                      color: Color(0xffffffff),
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                        Radius.circular(5),
                                                       ),
-                                                      Expanded(
-                                                        child: Text(
-                                                          _format!.format(DateTime
-                                                              .parse(_order
-                                                                  .createdAt
-                                                                  .toString())),
-                                                          textAlign:
-                                                              TextAlign.right,
-                                                          style:
-                                                              MyGoogleFontStyle(
-                                                            fontFamily:
-                                                                'Poppins',
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                            color: Color(
-                                                                0xff909090),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Divider(
-                                                    thickness: 1,
-                                                    color: Colors.grey,
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: RichText(
-                                                          text: TextSpan(
-                                                            style:
-                                                                MyGoogleFontStyle(
-                                                              fontFamily:
-                                                                  'Poppins',
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w700,
-                                                              color: Color(
-                                                                  0xff000000),
-                                                            ),
-                                                            children: [
-                                                              TextSpan(
-                                                                text:
-                                                                    'Quantity: ',
-                                                                style:
-                                                                    MyGoogleFontStyle(
-                                                                  fontFamily:
-                                                                      'Urbanist',
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
-                                                                  color: Color(
-                                                                      0xffaaaaaa),
-                                                                ),
-                                                              ),
-                                                              TextSpan(
-                                                                text: _order
-                                                                    .orderDetails!
-                                                                    .length
-                                                                    .toString(),
-                                                                style:
-                                                                    MyGoogleFontStyle(
-                                                                  fontFamily:
-                                                                      'Poppins',
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w700,
-                                                                  color: Color(
-                                                                      0xff000000),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Expanded(
-                                                        child: RichText(
-                                                          textAlign:
-                                                              TextAlign.right,
-                                                          text: TextSpan(
-                                                            style:
-                                                                MyGoogleFontStyle(
-                                                              fontFamily:
-                                                                  'Poppins',
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w700,
-                                                              color: Color(
-                                                                  0xff000000),
-                                                            ),
-                                                            children: [
-                                                              TextSpan(
-                                                                text:
-                                                                    'Total Amount: ',
-                                                                style:
-                                                                    MyGoogleFontStyle(
-                                                                  fontFamily:
-                                                                      'Urbanist',
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
-                                                                  color: Color(
-                                                                      0xffaaaaaa),
-                                                                ),
-                                                              ),
-                                                              TextSpan(
-                                                                text: _order
-                                                                    .totalAmount
-                                                                    .toString(),
-                                                                style:
-                                                                    MyGoogleFontStyle(
-                                                                  fontFamily:
-                                                                      'Poppins',
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w700,
-                                                                  color: Color(
-                                                                      0xff000000),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  SizedBox(
-                                                    height: 15,
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Container(
-                                                        width: 74.5,
-                                                        height: 30,
-                                                        decoration:
-                                                            BoxDecoration(
+                                                      boxShadow: [
+                                                        BoxShadow(
                                                           color:
-                                                              Color(0xff232323),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(8),
+                                                              Color(0x338a959e),
+                                                          offset: Offset(
+                                                              0, 7.6690645218),
+                                                          blurRadius:
+                                                              19.1726608276,
                                                         ),
-                                                        child: Center(
-                                                          child: Text(
-                                                            'Detail',
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                            style:
-                                                                MyGoogleFontStyle(
-                                                              fontFamily:
-                                                                  'Poppins',
-                                                              fontSize: 12,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400,
-                                                              color: Color(
-                                                                  0xffffffff),
+                                                      ],
+                                                    ),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Row(
+                                                          children: [
+                                                            Expanded(
+                                                              child: Text(
+                                                                'Order No: ' +
+                                                                    _order.id
+                                                                        .toString(),
+                                                                style:
+                                                                    MyGoogleFontStyle(
+                                                                  fontFamily:
+                                                                      'Urbanist',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w700,
+                                                                  color: Color(
+                                                                      0xff232323),
+                                                                ),
+                                                              ),
                                                             ),
-                                                          ),
+                                                            Expanded(
+                                                              child: Text(
+                                                                _format!.format(
+                                                                    DateTime.parse(_order
+                                                                        .createdAt
+                                                                        .toString())),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .right,
+                                                                style:
+                                                                    MyGoogleFontStyle(
+                                                                  fontFamily:
+                                                                      'Poppins',
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                  color: Color(
+                                                                      0xff909090),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
-                                                      ),
-                                                      Expanded(
-                                                        child: Text(
-                                                          'Order Placed',
-                                                          textAlign:
-                                                              TextAlign.right,
-                                                          style:
-                                                              MyGoogleFontStyle(
-                                                            fontFamily:
-                                                                'Poppins',
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                            color: Colors.black,
+                                                        Divider(
+                                                          thickness: 1,
+                                                          color: Colors.grey,
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Expanded(
+                                                              child: RichText(
+                                                                text: TextSpan(
+                                                                  style:
+                                                                      MyGoogleFontStyle(
+                                                                    fontFamily:
+                                                                        'Poppins',
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w700,
+                                                                    color: Color(
+                                                                        0xff000000),
+                                                                  ),
+                                                                  children: [
+                                                                    TextSpan(
+                                                                      text:
+                                                                          'Quantity: ',
+                                                                      style:
+                                                                          MyGoogleFontStyle(
+                                                                        fontFamily:
+                                                                            'Urbanist',
+                                                                        fontWeight:
+                                                                            FontWeight.w400,
+                                                                        color: Color(
+                                                                            0xffaaaaaa),
+                                                                      ),
+                                                                    ),
+                                                                    TextSpan(
+                                                                      text: _order
+                                                                          .orderDetails!
+                                                                          .length
+                                                                          .toString(),
+                                                                      style:
+                                                                          MyGoogleFontStyle(
+                                                                        fontFamily:
+                                                                            'Poppins',
+                                                                        fontWeight:
+                                                                            FontWeight.w700,
+                                                                        color: Color(
+                                                                            0xff000000),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Expanded(
+                                                              child: RichText(
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .right,
+                                                                text: TextSpan(
+                                                                  style:
+                                                                      MyGoogleFontStyle(
+                                                                    fontFamily:
+                                                                        'Poppins',
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w700,
+                                                                    color: Color(
+                                                                        0xff000000),
+                                                                  ),
+                                                                  children: [
+                                                                    TextSpan(
+                                                                      text:
+                                                                          'Total Amount: ',
+                                                                      style:
+                                                                          MyGoogleFontStyle(
+                                                                        fontFamily:
+                                                                            'Urbanist',
+                                                                        fontWeight:
+                                                                            FontWeight.w400,
+                                                                        color: Color(
+                                                                            0xffaaaaaa),
+                                                                      ),
+                                                                    ),
+                                                                    TextSpan(
+                                                                      text: _order
+                                                                          .totalAmount
+                                                                          .toString(),
+                                                                      style:
+                                                                          MyGoogleFontStyle(
+                                                                        fontFamily:
+                                                                            'Poppins',
+                                                                        fontWeight:
+                                                                            FontWeight.w700,
+                                                                        color: Color(
+                                                                            0xff000000),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        SizedBox(
+                                                          height: 15,
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Container(
+                                                              width: 74.5,
+                                                              height: 30,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Color(
+                                                                    0xff232323),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            8),
+                                                              ),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  'Detail',
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                  style:
+                                                                      MyGoogleFontStyle(
+                                                                    fontFamily:
+                                                                        'Poppins',
+                                                                    fontSize:
+                                                                        12,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400,
+                                                                    color: Color(
+                                                                        0xffffffff),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Expanded(
+                                                              child: Text(
+                                                                'Order Placed',
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .right,
+                                                                style:
+                                                                    MyGoogleFontStyle(
+                                                                  fontFamily:
+                                                                      'Poppins',
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                  color: Colors
+                                                                      .black,
+                                                                ),
+                                                              ),
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ]),
+                                              )
+                                              .toList(),
+                                        ],
+                                      ),
+                                    ),
+                              _orderModel.orderLoader
+                                  ? SizedBox(
+                                      height: 60,
+                                      child: Center(
+                                          child: Text("No Order Placed Yet")),
+                                    )
+                                  // Text('Order Placed'),
+                                  : SingleChildScrollView(
+                                      child: Column(
+                                        children: [
+                                          ..._orderModel.orders
+                                              .map(
+                                                (_order) => Column(
+                                                  children:
+                                                      _order.orderStatuses!
+                                                          .where(
+                                                              (_orderStatus) =>
+                                                                  _orderStatus
+                                                                      .status!
+                                                                      .name ==
+                                                                  'Delivered')
+                                                          .map(
+                                                            (_orderStatus) =>
+                                                                Container(
+                                                              height: 130,
+                                                              margin: EdgeInsets
+                                                                  .all(10),
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(10),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                border: Border.all(
+                                                                    color: Color(
+                                                                        0xffc7b456)),
+                                                                color: Color(
+                                                                    0xffffffff),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .all(
+                                                                  Radius
+                                                                      .circular(
+                                                                          5),
+                                                                ),
+                                                                boxShadow: [
+                                                                  BoxShadow(
+                                                                    color: Color(
+                                                                        0x338a959e),
+                                                                    offset: Offset(
+                                                                        0,
+                                                                        7.6690645218),
+                                                                    blurRadius:
+                                                                        19.1726608276,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Row(
+                                                                    children: [
+                                                                      Expanded(
+                                                                        child:
+                                                                            Text(
+                                                                          'Order No: ' +
+                                                                              _order.id.toString(),
+                                                                          style:
+                                                                              MyGoogleFontStyle(
+                                                                            fontFamily:
+                                                                                'Urbanist',
+                                                                            fontWeight:
+                                                                                FontWeight.w700,
+                                                                            color:
+                                                                                Color(0xff232323),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      Expanded(
+                                                                        child:
+                                                                            Text(
+                                                                          _format!.format(DateTime.parse(_order
+                                                                              .createdAt
+                                                                              .toString())),
+                                                                          textAlign:
+                                                                              TextAlign.right,
+                                                                          style:
+                                                                              MyGoogleFontStyle(
+                                                                            fontFamily:
+                                                                                'Poppins',
+                                                                            fontSize:
+                                                                                14,
+                                                                            fontWeight:
+                                                                                FontWeight.w400,
+                                                                            color:
+                                                                                Color(0xff909090),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  Divider(
+                                                                    thickness:
+                                                                        1,
+                                                                    color: Colors
+                                                                        .grey,
+                                                                  ),
+                                                                  Row(
+                                                                    children: [
+                                                                      Expanded(
+                                                                        child:
+                                                                            RichText(
+                                                                          text:
+                                                                              TextSpan(
+                                                                            style:
+                                                                                MyGoogleFontStyle(
+                                                                              fontFamily: 'Poppins',
+                                                                              fontWeight: FontWeight.w700,
+                                                                              color: Color(0xff000000),
+                                                                            ),
+                                                                            children: [
+                                                                              TextSpan(
+                                                                                text: 'Quantity: ',
+                                                                                style: MyGoogleFontStyle(
+                                                                                  fontFamily: 'Urbanist',
+                                                                                  fontWeight: FontWeight.w400,
+                                                                                  color: Color(0xffaaaaaa),
+                                                                                ),
+                                                                              ),
+                                                                              TextSpan(
+                                                                                text: _order.orderDetails!.length.toString(),
+                                                                                style: MyGoogleFontStyle(
+                                                                                  fontFamily: 'Poppins',
+                                                                                  fontWeight: FontWeight.w700,
+                                                                                  color: Color(0xff000000),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      Expanded(
+                                                                        child:
+                                                                            RichText(
+                                                                          textAlign:
+                                                                              TextAlign.right,
+                                                                          text:
+                                                                              TextSpan(
+                                                                            style:
+                                                                                MyGoogleFontStyle(
+                                                                              fontFamily: 'Poppins',
+                                                                              fontWeight: FontWeight.w700,
+                                                                              color: Color(0xff000000),
+                                                                            ),
+                                                                            children: [
+                                                                              TextSpan(
+                                                                                text: 'Total Amount: ',
+                                                                                style: MyGoogleFontStyle(
+                                                                                  fontFamily: 'Urbanist',
+                                                                                  fontWeight: FontWeight.w400,
+                                                                                  color: Color(0xffaaaaaa),
+                                                                                ),
+                                                                              ),
+                                                                              TextSpan(
+                                                                                text: _order.totalAmount.toString(),
+                                                                                style: MyGoogleFontStyle(
+                                                                                  fontFamily: 'Poppins',
+                                                                                  fontWeight: FontWeight.w700,
+                                                                                  color: Color(0xff000000),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 15,
+                                                                  ),
+                                                                  Row(
+                                                                    children: [
+                                                                      Container(
+                                                                        width:
+                                                                            74.5,
+                                                                        height:
+                                                                            30,
+                                                                        decoration:
+                                                                            BoxDecoration(
+                                                                          color:
+                                                                              Color(0xff232323),
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(8),
+                                                                        ),
+                                                                        child:
+                                                                            Center(
+                                                                          child:
+                                                                              Text(
+                                                                            'Detail',
+                                                                            textAlign:
+                                                                                TextAlign.center,
+                                                                            style:
+                                                                                MyGoogleFontStyle(
+                                                                              fontFamily: 'Poppins',
+                                                                              fontSize: 12,
+                                                                              fontWeight: FontWeight.w400,
+                                                                              color: Color(0xffffffff),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      Expanded(
+                                                                        child:
+                                                                            Text(
+                                                                          _orderStatus
+                                                                              .status!
+                                                                              .name
+                                                                              .toString(),
+                                                                          textAlign:
+                                                                              TextAlign.right,
+                                                                          style:
+                                                                              MyGoogleFontStyle(
+                                                                            fontFamily:
+                                                                                'Poppins',
+                                                                            fontSize:
+                                                                                14,
+                                                                            fontWeight:
+                                                                                FontWeight.w400,
+                                                                            color:
+                                                                                Colors.green,
+                                                                          ),
+                                                                        ),
+                                                                      )
+                                                                    ],
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          )
+                                                          .toList(),
+                                                ),
+                                              )
+                                              .toList(),
+                                        ],
+                                      ),
+                                    ),
+                              _orderModel.orderLoader
+                                  ? SizedBox(
+                                      height: 60,
+                                      child: Center(
+                                          child: Text("No Order Placed Yet")),
+                                    )
+                                  // Text('Order Placed'),
+                                  : SingleChildScrollView(
+                                      child: Column(
+                                        children: [
+                                          ..._orderModel.orders
+                                              .map(
+                                                (_order) => Column(
+                                                  children: _order
+                                                      .orderStatuses!
+                                                      .where((_orderStatus) =>
+                                                          _orderStatus
+                                                              .status!.name ==
+                                                          'Order Processing')
+                                                      .map(
+                                                        (_orderStatus) =>
+                                                            Container(
+                                                          height: 130,
+                                                          margin:
+                                                              EdgeInsets.all(
+                                                                  10),
+                                                          padding:
+                                                              EdgeInsets.all(
+                                                                  10),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            border: Border.all(
+                                                                color: Color(
+                                                                    0xffc7b456)),
+                                                            color: Color(
+                                                                0xffffffff),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .all(
+                                                              Radius.circular(
+                                                                  5),
+                                                            ),
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: Color(
+                                                                    0x338a959e),
+                                                                offset: Offset(
+                                                                    0,
+                                                                    7.6690645218),
+                                                                blurRadius:
+                                                                    19.1726608276,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Row(
+                                                                children: [
+                                                                  Expanded(
+                                                                    child: Text(
+                                                                      'Order No: ' +
+                                                                          _order
+                                                                              .id
+                                                                              .toString(),
+                                                                      style:
+                                                                          MyGoogleFontStyle(
+                                                                        fontFamily:
+                                                                            'Urbanist',
+                                                                        fontWeight:
+                                                                            FontWeight.w700,
+                                                                        color: Color(
+                                                                            0xff232323),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Expanded(
+                                                                    child: Text(
+                                                                      _format!.format(DateTime.parse(_order
+                                                                          .createdAt
+                                                                          .toString())),
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .right,
+                                                                      style:
+                                                                          MyGoogleFontStyle(
+                                                                        fontFamily:
+                                                                            'Poppins',
+                                                                        fontSize:
+                                                                            14,
+                                                                        fontWeight:
+                                                                            FontWeight.w400,
+                                                                        color: Color(
+                                                                            0xff909090),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Divider(
+                                                                thickness: 1,
+                                                                color:
+                                                                    Colors.grey,
+                                                              ),
+                                                              Row(
+                                                                children: [
+                                                                  Expanded(
+                                                                    child:
+                                                                        RichText(
+                                                                      text:
+                                                                          TextSpan(
+                                                                        style:
+                                                                            MyGoogleFontStyle(
+                                                                          fontFamily:
+                                                                              'Poppins',
+                                                                          fontWeight:
+                                                                              FontWeight.w700,
+                                                                          color:
+                                                                              Color(0xff000000),
+                                                                        ),
+                                                                        children: [
+                                                                          TextSpan(
+                                                                            text:
+                                                                                'Quantity: ',
+                                                                            style:
+                                                                                MyGoogleFontStyle(
+                                                                              fontFamily: 'Urbanist',
+                                                                              fontWeight: FontWeight.w400,
+                                                                              color: Color(0xffaaaaaa),
+                                                                            ),
+                                                                          ),
+                                                                          TextSpan(
+                                                                            text:
+                                                                                _order.orderDetails!.length.toString(),
+                                                                            style:
+                                                                                MyGoogleFontStyle(
+                                                                              fontFamily: 'Poppins',
+                                                                              fontWeight: FontWeight.w700,
+                                                                              color: Color(0xff000000),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Expanded(
+                                                                    child:
+                                                                        RichText(
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .right,
+                                                                      text:
+                                                                          TextSpan(
+                                                                        style:
+                                                                            MyGoogleFontStyle(
+                                                                          fontFamily:
+                                                                              'Poppins',
+                                                                          fontWeight:
+                                                                              FontWeight.w700,
+                                                                          color:
+                                                                              Color(0xff000000),
+                                                                        ),
+                                                                        children: [
+                                                                          TextSpan(
+                                                                            text:
+                                                                                'Total Amount: ',
+                                                                            style:
+                                                                                MyGoogleFontStyle(
+                                                                              fontFamily: 'Urbanist',
+                                                                              fontWeight: FontWeight.w400,
+                                                                              color: Color(0xffaaaaaa),
+                                                                            ),
+                                                                          ),
+                                                                          TextSpan(
+                                                                            text:
+                                                                                _order.totalAmount.toString(),
+                                                                            style:
+                                                                                MyGoogleFontStyle(
+                                                                              fontFamily: 'Poppins',
+                                                                              fontWeight: FontWeight.w700,
+                                                                              color: Color(0xff000000),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              SizedBox(
+                                                                height: 15,
+                                                              ),
+                                                              Row(
+                                                                children: [
+                                                                  Container(
+                                                                    width: 74.5,
+                                                                    height: 30,
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      color: Color(
+                                                                          0xff232323),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8),
+                                                                    ),
+                                                                    child:
+                                                                        Center(
+                                                                      child:
+                                                                          Text(
+                                                                        'Detail',
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                        style:
+                                                                            MyGoogleFontStyle(
+                                                                          fontFamily:
+                                                                              'Poppins',
+                                                                          fontSize:
+                                                                              12,
+                                                                          fontWeight:
+                                                                              FontWeight.w400,
+                                                                          color:
+                                                                              Color(0xffffffff),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Expanded(
+                                                                    child: Text(
+                                                                      _orderStatus
+                                                                          .status!
+                                                                          .name
+                                                                          .toString(),
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .right,
+                                                                      style:
+                                                                          MyGoogleFontStyle(
+                                                                        fontFamily:
+                                                                            'Poppins',
+                                                                        fontSize:
+                                                                            14,
+                                                                        fontWeight:
+                                                                            FontWeight.w400,
+                                                                        color: Colors
+                                                                            .orange,
+                                                                      ),
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            ],
                                                           ),
                                                         ),
                                                       )
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ]),
-                                        )
-                                        .toList(),
-                                  ],
-                                ),
-                              ),
-                              SingleChildScrollView(
-                                child: Column(
-                                  children: [
-                                    ..._orderModel.orders
-                                        .map(
-                                          (_order) => Column(
-                                            children: _order.orderStatuses!
-                                                .where((_orderStatus) =>
-                                                    _orderStatus.status!.name ==
-                                                    'Delivered')
-                                                .map(
-                                                  (_orderStatus) => Container(
-                                                    height: 130,
-                                                    margin: EdgeInsets.all(10),
-                                                    padding: EdgeInsets.all(10),
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                          color: Color(
-                                                              0xffc7b456)),
-                                                      color: Color(0xffffffff),
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(5),
-                                                      ),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color:
-                                                              Color(0x338a959e),
-                                                          offset: Offset(
-                                                              0, 7.6690645218),
-                                                          blurRadius:
-                                                              19.1726608276,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Row(
-                                                          children: [
-                                                            Expanded(
-                                                              child: Text(
-                                                                'Order No: ' +
-                                                                    _order.id
-                                                                        .toString(),
-                                                                style:
-                                                                    MyGoogleFontStyle(
-                                                                  fontFamily:
-                                                                      'Urbanist',
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w700,
-                                                                  color: Color(
-                                                                      0xff232323),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Expanded(
-                                                              child: Text(
-                                                                _format!.format(
-                                                                    DateTime.parse(_order
-                                                                        .createdAt
-                                                                        .toString())),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .right,
-                                                                style:
-                                                                    MyGoogleFontStyle(
-                                                                  fontFamily:
-                                                                      'Poppins',
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
-                                                                  color: Color(
-                                                                      0xff909090),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        Divider(
-                                                          thickness: 1,
-                                                          color: Colors.grey,
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Expanded(
-                                                              child: RichText(
-                                                                text: TextSpan(
-                                                                  style:
-                                                                      MyGoogleFontStyle(
-                                                                    fontFamily:
-                                                                        'Poppins',
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w700,
-                                                                    color: Color(
-                                                                        0xff000000),
-                                                                  ),
-                                                                  children: [
-                                                                    TextSpan(
-                                                                      text:
-                                                                          'Quantity: ',
-                                                                      style:
-                                                                          MyGoogleFontStyle(
-                                                                        fontFamily:
-                                                                            'Urbanist',
-                                                                        fontWeight:
-                                                                            FontWeight.w400,
-                                                                        color: Color(
-                                                                            0xffaaaaaa),
-                                                                      ),
-                                                                    ),
-                                                                    TextSpan(
-                                                                      text: _order
-                                                                          .orderDetails!
-                                                                          .length
-                                                                          .toString(),
-                                                                      style:
-                                                                          MyGoogleFontStyle(
-                                                                        fontFamily:
-                                                                            'Poppins',
-                                                                        fontWeight:
-                                                                            FontWeight.w700,
-                                                                        color: Color(
-                                                                            0xff000000),
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Expanded(
-                                                              child: RichText(
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .right,
-                                                                text: TextSpan(
-                                                                  style:
-                                                                      MyGoogleFontStyle(
-                                                                    fontFamily:
-                                                                        'Poppins',
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w700,
-                                                                    color: Color(
-                                                                        0xff000000),
-                                                                  ),
-                                                                  children: [
-                                                                    TextSpan(
-                                                                      text:
-                                                                          'Total Amount: ',
-                                                                      style:
-                                                                          MyGoogleFontStyle(
-                                                                        fontFamily:
-                                                                            'Urbanist',
-                                                                        fontWeight:
-                                                                            FontWeight.w400,
-                                                                        color: Color(
-                                                                            0xffaaaaaa),
-                                                                      ),
-                                                                    ),
-                                                                    TextSpan(
-                                                                      text: _order
-                                                                          .totalAmount
-                                                                          .toString(),
-                                                                      style:
-                                                                          MyGoogleFontStyle(
-                                                                        fontFamily:
-                                                                            'Poppins',
-                                                                        fontWeight:
-                                                                            FontWeight.w700,
-                                                                        color: Color(
-                                                                            0xff000000),
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        SizedBox(
-                                                          height: 15,
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Container(
-                                                              width: 74.5,
-                                                              height: 30,
+                                                      .toList(),
+                                                ),
+                                              )
+                                              .toList(),
+                                        ],
+                                      ),
+                                    ),
+                              _orderModel.orderLoader
+                                  ? SizedBox(
+                                      height: 60,
+                                      child: Center(
+                                          child: Text("No Order Placed Yet")),
+                                    )
+                                  // Text('Order Placed'),
+                                  : SingleChildScrollView(
+                                      child: Column(
+                                        children: [
+                                          ..._orderModel.orders
+                                              .map(
+                                                (_order) => Column(
+                                                  children:
+                                                      _order.orderStatuses!
+                                                          .where(
+                                                              (_orderStatus) =>
+                                                                  _orderStatus
+                                                                      .status!
+                                                                      .name ==
+                                                                  'Cancelled')
+                                                          .map(
+                                                            (_orderStatus) =>
+                                                                Container(
+                                                              height: 130,
+                                                              margin: EdgeInsets
+                                                                  .all(10),
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(10),
                                                               decoration:
                                                                   BoxDecoration(
+                                                                border: Border.all(
+                                                                    color: Color(
+                                                                        0xffc7b456)),
                                                                 color: Color(
-                                                                    0xff232323),
+                                                                    0xffffffff),
                                                                 borderRadius:
                                                                     BorderRadius
-                                                                        .circular(
-                                                                            8),
-                                                              ),
-                                                              child: Center(
-                                                                child: Text(
-                                                                  'Detail',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style:
-                                                                      MyGoogleFontStyle(
-                                                                    fontFamily:
-                                                                        'Poppins',
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400,
+                                                                        .all(
+                                                                  Radius
+                                                                      .circular(
+                                                                          5),
+                                                                ),
+                                                                boxShadow: [
+                                                                  BoxShadow(
                                                                     color: Color(
-                                                                        0xffffffff),
+                                                                        0x338a959e),
+                                                                    offset: Offset(
+                                                                        0,
+                                                                        7.6690645218),
+                                                                    blurRadius:
+                                                                        19.1726608276,
                                                                   ),
-                                                                ),
+                                                                ],
                                                               ),
-                                                            ),
-                                                            Expanded(
-                                                              child: Text(
-                                                                _orderStatus
-                                                                    .status!
-                                                                    .name
-                                                                    .toString(),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .right,
-                                                                style:
-                                                                    MyGoogleFontStyle(
-                                                                  fontFamily:
-                                                                      'Poppins',
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
-                                                                  color: Colors
-                                                                      .green,
-                                                                ),
-                                                              ),
-                                                            )
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                )
-                                                .toList(),
-                                          ),
-                                        )
-                                        .toList(),
-                                  ],
-                                ),
-                              ),
-                              SingleChildScrollView(
-                                child: Column(
-                                  children: [
-                                    ..._orderModel.orders
-                                        .map(
-                                          (_order) => Column(
-                                            children: _order.orderStatuses!
-                                                .where((_orderStatus) =>
-                                                    _orderStatus.status!.name ==
-                                                    'Order Processing')
-                                                .map(
-                                                  (_orderStatus) => Container(
-                                                    height: 130,
-                                                    margin: EdgeInsets.all(10),
-                                                    padding: EdgeInsets.all(10),
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                          color: Color(
-                                                              0xffc7b456)),
-                                                      color: Color(0xffffffff),
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(5),
-                                                      ),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color:
-                                                              Color(0x338a959e),
-                                                          offset: Offset(
-                                                              0, 7.6690645218),
-                                                          blurRadius:
-                                                              19.1726608276,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Row(
-                                                          children: [
-                                                            Expanded(
-                                                              child: Text(
-                                                                'Order No: ' +
-                                                                    _order.id
-                                                                        .toString(),
-                                                                style:
-                                                                    MyGoogleFontStyle(
-                                                                  fontFamily:
-                                                                      'Urbanist',
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w700,
-                                                                  color: Color(
-                                                                      0xff232323),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Expanded(
-                                                              child: Text(
-                                                                _format!.format(
-                                                                    DateTime.parse(_order
-                                                                        .createdAt
-                                                                        .toString())),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .right,
-                                                                style:
-                                                                    MyGoogleFontStyle(
-                                                                  fontFamily:
-                                                                      'Poppins',
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
-                                                                  color: Color(
-                                                                      0xff909090),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        Divider(
-                                                          thickness: 1,
-                                                          color: Colors.grey,
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Expanded(
-                                                              child: RichText(
-                                                                text: TextSpan(
-                                                                  style:
-                                                                      MyGoogleFontStyle(
-                                                                    fontFamily:
-                                                                        'Poppins',
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w700,
-                                                                    color: Color(
-                                                                        0xff000000),
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Row(
+                                                                    children: [
+                                                                      Expanded(
+                                                                        child:
+                                                                            Text(
+                                                                          'Order No: ' +
+                                                                              _order.id.toString(),
+                                                                          style:
+                                                                              MyGoogleFontStyle(
+                                                                            fontFamily:
+                                                                                'Urbanist',
+                                                                            fontWeight:
+                                                                                FontWeight.w700,
+                                                                            color:
+                                                                                Color(0xff232323),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      Expanded(
+                                                                        child:
+                                                                            Text(
+                                                                          _format!.format(DateTime.parse(_order
+                                                                              .createdAt
+                                                                              .toString())),
+                                                                          textAlign:
+                                                                              TextAlign.right,
+                                                                          style:
+                                                                              MyGoogleFontStyle(
+                                                                            fontFamily:
+                                                                                'Poppins',
+                                                                            fontSize:
+                                                                                14,
+                                                                            fontWeight:
+                                                                                FontWeight.w400,
+                                                                            color:
+                                                                                Color(0xff909090),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
                                                                   ),
-                                                                  children: [
-                                                                    TextSpan(
-                                                                      text:
-                                                                          'Quantity: ',
-                                                                      style:
-                                                                          MyGoogleFontStyle(
-                                                                        fontFamily:
-                                                                            'Urbanist',
-                                                                        fontWeight:
-                                                                            FontWeight.w400,
-                                                                        color: Color(
-                                                                            0xffaaaaaa),
-                                                                      ),
-                                                                    ),
-                                                                    TextSpan(
-                                                                      text: _order
-                                                                          .orderDetails!
-                                                                          .length
-                                                                          .toString(),
-                                                                      style:
-                                                                          MyGoogleFontStyle(
-                                                                        fontFamily:
-                                                                            'Poppins',
-                                                                        fontWeight:
-                                                                            FontWeight.w700,
-                                                                        color: Color(
-                                                                            0xff000000),
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Expanded(
-                                                              child: RichText(
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .right,
-                                                                text: TextSpan(
-                                                                  style:
-                                                                      MyGoogleFontStyle(
-                                                                    fontFamily:
-                                                                        'Poppins',
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w700,
-                                                                    color: Color(
-                                                                        0xff000000),
+                                                                  Divider(
+                                                                    thickness:
+                                                                        1,
+                                                                    color: Colors
+                                                                        .grey,
                                                                   ),
-                                                                  children: [
-                                                                    TextSpan(
-                                                                      text:
-                                                                          'Total Amount: ',
-                                                                      style:
-                                                                          MyGoogleFontStyle(
-                                                                        fontFamily:
-                                                                            'Urbanist',
-                                                                        fontWeight:
-                                                                            FontWeight.w400,
-                                                                        color: Color(
-                                                                            0xffaaaaaa),
+                                                                  Row(
+                                                                    children: [
+                                                                      Expanded(
+                                                                        child:
+                                                                            RichText(
+                                                                          text:
+                                                                              TextSpan(
+                                                                            style:
+                                                                                MyGoogleFontStyle(
+                                                                              fontFamily: 'Poppins',
+                                                                              fontWeight: FontWeight.w700,
+                                                                              color: Color(0xff000000),
+                                                                            ),
+                                                                            children: [
+                                                                              TextSpan(
+                                                                                text: 'Quantity: ',
+                                                                                style: MyGoogleFontStyle(
+                                                                                  fontFamily: 'Urbanist',
+                                                                                  fontWeight: FontWeight.w400,
+                                                                                  color: Color(0xffaaaaaa),
+                                                                                ),
+                                                                              ),
+                                                                              TextSpan(
+                                                                                text: _order.orderDetails!.length.toString(),
+                                                                                style: MyGoogleFontStyle(
+                                                                                  fontFamily: 'Poppins',
+                                                                                  fontWeight: FontWeight.w700,
+                                                                                  color: Color(0xff000000),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
                                                                       ),
-                                                                    ),
-                                                                    TextSpan(
-                                                                      text: _order
-                                                                          .totalAmount
-                                                                          .toString(),
-                                                                      style:
-                                                                          MyGoogleFontStyle(
-                                                                        fontFamily:
-                                                                            'Poppins',
-                                                                        fontWeight:
-                                                                            FontWeight.w700,
-                                                                        color: Color(
-                                                                            0xff000000),
+                                                                      Expanded(
+                                                                        child:
+                                                                            RichText(
+                                                                          textAlign:
+                                                                              TextAlign.right,
+                                                                          text:
+                                                                              TextSpan(
+                                                                            style:
+                                                                                MyGoogleFontStyle(
+                                                                              fontFamily: 'Poppins',
+                                                                              fontWeight: FontWeight.w700,
+                                                                              color: Color(0xff000000),
+                                                                            ),
+                                                                            children: [
+                                                                              TextSpan(
+                                                                                text: 'Total Amount: ',
+                                                                                style: MyGoogleFontStyle(
+                                                                                  fontFamily: 'Urbanist',
+                                                                                  fontWeight: FontWeight.w400,
+                                                                                  color: Color(0xffaaaaaa),
+                                                                                ),
+                                                                              ),
+                                                                              TextSpan(
+                                                                                text: _order.totalAmount.toString(),
+                                                                                style: MyGoogleFontStyle(
+                                                                                  fontFamily: 'Poppins',
+                                                                                  fontWeight: FontWeight.w700,
+                                                                                  color: Color(0xff000000),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
                                                                       ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        SizedBox(
-                                                          height: 15,
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Container(
-                                                              width: 74.5,
-                                                              height: 30,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Color(
-                                                                    0xff232323),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            8),
-                                                              ),
-                                                              child: Center(
-                                                                child: Text(
-                                                                  'Detail',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style:
-                                                                      MyGoogleFontStyle(
-                                                                    fontFamily:
-                                                                        'Poppins',
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400,
-                                                                    color: Color(
-                                                                        0xffffffff),
+                                                                    ],
                                                                   ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Expanded(
-                                                              child: Text(
-                                                                _orderStatus
-                                                                    .status!
-                                                                    .name
-                                                                    .toString(),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .right,
-                                                                style:
-                                                                    MyGoogleFontStyle(
-                                                                  fontFamily:
-                                                                      'Poppins',
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
-                                                                  color: Colors
-                                                                      .orange,
-                                                                ),
-                                                              ),
-                                                            )
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                )
-                                                .toList(),
-                                          ),
-                                        )
-                                        .toList(),
-                                  ],
-                                ),
-                              ),
-                              SingleChildScrollView(
-                                child: Column(
-                                  children: [
-                                    ..._orderModel.orders
-                                        .map(
-                                          (_order) => Column(
-                                            children: _order.orderStatuses!
-                                                .where((_orderStatus) =>
-                                                    _orderStatus.status!.name ==
-                                                    'Cancelled')
-                                                .map(
-                                                  (_orderStatus) => Container(
-                                                    height: 130,
-                                                    margin: EdgeInsets.all(10),
-                                                    padding: EdgeInsets.all(10),
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                          color: Color(
-                                                              0xffc7b456)),
-                                                      color: Color(0xffffffff),
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(5),
-                                                      ),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color:
-                                                              Color(0x338a959e),
-                                                          offset: Offset(
-                                                              0, 7.6690645218),
-                                                          blurRadius:
-                                                              19.1726608276,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Row(
-                                                          children: [
-                                                            Expanded(
-                                                              child: Text(
-                                                                'Order No: ' +
-                                                                    _order.id
-                                                                        .toString(),
-                                                                style:
-                                                                    MyGoogleFontStyle(
-                                                                  fontFamily:
-                                                                      'Urbanist',
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w700,
-                                                                  color: Color(
-                                                                      0xff232323),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Expanded(
-                                                              child: Text(
-                                                                _format!.format(
-                                                                    DateTime.parse(_order
-                                                                        .createdAt
-                                                                        .toString())),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .right,
-                                                                style:
-                                                                    MyGoogleFontStyle(
-                                                                  fontFamily:
-                                                                      'Poppins',
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
-                                                                  color: Color(
-                                                                      0xff909090),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        Divider(
-                                                          thickness: 1,
-                                                          color: Colors.grey,
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Expanded(
-                                                              child: RichText(
-                                                                text: TextSpan(
-                                                                  style:
-                                                                      MyGoogleFontStyle(
-                                                                    fontFamily:
-                                                                        'Poppins',
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w700,
-                                                                    color: Color(
-                                                                        0xff000000),
+                                                                  SizedBox(
+                                                                    height: 15,
                                                                   ),
-                                                                  children: [
-                                                                    TextSpan(
-                                                                      text:
-                                                                          'Quantity: ',
-                                                                      style:
-                                                                          MyGoogleFontStyle(
-                                                                        fontFamily:
-                                                                            'Urbanist',
-                                                                        fontWeight:
-                                                                            FontWeight.w400,
-                                                                        color: Color(
-                                                                            0xffaaaaaa),
+                                                                  Row(
+                                                                    children: [
+                                                                      Container(
+                                                                        width:
+                                                                            74.5,
+                                                                        height:
+                                                                            30,
+                                                                        decoration:
+                                                                            BoxDecoration(
+                                                                          color:
+                                                                              Color(0xff232323),
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(8),
+                                                                        ),
+                                                                        child:
+                                                                            Center(
+                                                                          child:
+                                                                              Text(
+                                                                            'Detail',
+                                                                            textAlign:
+                                                                                TextAlign.center,
+                                                                            style:
+                                                                                MyGoogleFontStyle(
+                                                                              fontFamily: 'Poppins',
+                                                                              fontSize: 12,
+                                                                              fontWeight: FontWeight.w400,
+                                                                              color: Color(0xffffffff),
+                                                                            ),
+                                                                          ),
+                                                                        ),
                                                                       ),
-                                                                    ),
-                                                                    TextSpan(
-                                                                      text: _order
-                                                                          .orderDetails!
-                                                                          .length
-                                                                          .toString(),
-                                                                      style:
-                                                                          MyGoogleFontStyle(
-                                                                        fontFamily:
-                                                                            'Poppins',
-                                                                        fontWeight:
-                                                                            FontWeight.w700,
-                                                                        color: Color(
-                                                                            0xff000000),
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Expanded(
-                                                              child: RichText(
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .right,
-                                                                text: TextSpan(
-                                                                  style:
-                                                                      MyGoogleFontStyle(
-                                                                    fontFamily:
-                                                                        'Poppins',
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w700,
-                                                                    color: Color(
-                                                                        0xff000000),
+                                                                      Expanded(
+                                                                        child:
+                                                                            Text(
+                                                                          _orderStatus
+                                                                              .status!
+                                                                              .name
+                                                                              .toString(),
+                                                                          textAlign:
+                                                                              TextAlign.right,
+                                                                          style:
+                                                                              MyGoogleFontStyle(
+                                                                            fontFamily:
+                                                                                'Poppins',
+                                                                            fontSize:
+                                                                                14,
+                                                                            fontWeight:
+                                                                                FontWeight.w400,
+                                                                            color:
+                                                                                Colors.red,
+                                                                          ),
+                                                                        ),
+                                                                      )
+                                                                    ],
                                                                   ),
-                                                                  children: [
-                                                                    TextSpan(
-                                                                      text:
-                                                                          'Total Amount: ',
-                                                                      style:
-                                                                          MyGoogleFontStyle(
-                                                                        fontFamily:
-                                                                            'Urbanist',
-                                                                        fontWeight:
-                                                                            FontWeight.w400,
-                                                                        color: Color(
-                                                                            0xffaaaaaa),
-                                                                      ),
-                                                                    ),
-                                                                    TextSpan(
-                                                                      text: _order
-                                                                          .totalAmount
-                                                                          .toString(),
-                                                                      style:
-                                                                          MyGoogleFontStyle(
-                                                                        fontFamily:
-                                                                            'Poppins',
-                                                                        fontWeight:
-                                                                            FontWeight.w700,
-                                                                        color: Color(
-                                                                            0xff000000),
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
+                                                                ],
                                                               ),
                                                             ),
-                                                          ],
-                                                        ),
-                                                        SizedBox(
-                                                          height: 15,
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Container(
-                                                              width: 74.5,
-                                                              height: 30,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Color(
-                                                                    0xff232323),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            8),
-                                                              ),
-                                                              child: Center(
-                                                                child: Text(
-                                                                  'Detail',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style:
-                                                                      MyGoogleFontStyle(
-                                                                    fontFamily:
-                                                                        'Poppins',
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400,
-                                                                    color: Color(
-                                                                        0xffffffff),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Expanded(
-                                                              child: Text(
-                                                                _orderStatus
-                                                                    .status!
-                                                                    .name
-                                                                    .toString(),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .right,
-                                                                style:
-                                                                    MyGoogleFontStyle(
-                                                                  fontFamily:
-                                                                      'Poppins',
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
-                                                                  color: Colors
-                                                                      .red,
-                                                                ),
-                                                              ),
-                                                            )
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                )
-                                                .toList(),
-                                          ),
-                                        )
-                                        .toList(),
-                                  ],
-                                ),
-                              ),
+                                                          )
+                                                          .toList(),
+                                                ),
+                                              )
+                                              .toList(),
+                                        ],
+                                      ),
+                                    ),
                             ],
                           ),
                         )
