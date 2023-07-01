@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
@@ -16,8 +17,10 @@ class ProductIdPage extends StatefulWidget {
 }
 
 class _ProductIdPageState extends State<ProductIdPage> {
+  DateFormat? _format;
   @override
   void initState() {
+    _format = DateFormat('yyyy-MM-dd');
     super.initState();
     Provider.of<ProductModel>(context, listen: false)
         .getCategoryWiseProduct(widget.arguments!['product']['category_id']);
@@ -920,13 +923,174 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   .size
                                                   .width -
                                               50,
-                                          height: 200,
+                                          height: 170,
                                           child: TabBarView(
                                             children: [
                                               Text(widget.arguments!['product']
                                                       ['description']
                                                   .toString()),
-                                              Text('Reviews'),
+                                              Container(
+                                                // height: 270,
+                                                margin: EdgeInsets.all(20),
+                                                child:
+                                                    widget.arguments!['product']
+                                                                ['reviews'] ==
+                                                            null
+                                                        ? Center(
+                                                            child: Text(
+                                                                'No reviews'))
+                                                        : ListView.builder(
+                                                            itemCount: widget
+                                                                .arguments![
+                                                                    'product']
+                                                                    ['reviews']!
+                                                                .length,
+                                                            itemBuilder: (BuildContext
+                                                                        context,
+                                                                    index) =>
+                                                                SingleChildScrollView(
+                                                              child: Column(
+                                                                children: [
+                                                                  Container(
+                                                                    margin: EdgeInsets.only(
+                                                                        bottom:
+                                                                            10),
+                                                                    padding:
+                                                                        EdgeInsets.all(
+                                                                            10),
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      border: Border.all(
+                                                                          color:
+                                                                              Color(0xffc7b456)),
+                                                                      color: Color(
+                                                                          0xffffffff),
+                                                                      borderRadius:
+                                                                          BorderRadius
+                                                                              .all(
+                                                                        Radius.circular(
+                                                                            5),
+                                                                      ),
+                                                                      boxShadow: [
+                                                                        BoxShadow(
+                                                                          color:
+                                                                              Color(0x338a959e),
+                                                                          offset: Offset(
+                                                                              0,
+                                                                              7.6690645218),
+                                                                          blurRadius:
+                                                                              19.1726608276,
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    child:
+                                                                        Column(
+                                                                      children: [
+                                                                        // Photo and Title
+                                                                        Row(
+                                                                          children: [
+                                                                            Expanded(
+                                                                              child: Column(
+                                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                children: [
+                                                                                  Row(
+                                                                                    children: [
+                                                                                      Container(
+                                                                                        // mediaF3t (I318:2555;0:1388)
+                                                                                        margin: EdgeInsets.fromLTRB(0, 0, 15, 0),
+                                                                                        width: 66.71,
+                                                                                        height: 66.71,
+                                                                                        child: Image.network(
+                                                                                          _configModel.apiConfig['mediaURL'] + widget.arguments!['product']['imagepath1'].toString(),
+                                                                                          // 'assets/images/media.png',
+                                                                                          width: 66.71,
+                                                                                          height: 66.71,
+                                                                                        ),
+                                                                                      ),
+                                                                                      Column(
+                                                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                        children: [
+                                                                                          Text(
+                                                                                            widget.arguments!['product']['name'].toString(),
+                                                                                            style: MyGoogleFontStyle(
+                                                                                              fontFamily: 'Poppins',
+                                                                                              fontSize: 16,
+                                                                                              fontWeight: FontWeight.w400,
+                                                                                              color: Color(0xff232323),
+                                                                                            ),
+                                                                                          ),
+                                                                                          Text(
+                                                                                            // BLr (I318:2555;0:1392)
+                                                                                            '₹ ' + widget.arguments!['product']['product_prices']![0]['price'].toString(),
+                                                                                            style: MyGoogleFontStyle(
+                                                                                              fontFamily: 'Poppins',
+                                                                                              fontSize: 16,
+                                                                                              fontWeight: FontWeight.w600,
+                                                                                              color: Color(0xff232323),
+                                                                                            ),
+                                                                                          ),
+                                                                                        ],
+                                                                                      ),
+                                                                                    ],
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                        SizedBox(
+                                                                          height:
+                                                                              10,
+                                                                        ),
+                                                                        // Stars
+                                                                        Row(
+                                                                          children: [
+                                                                            Expanded(
+                                                                              child: Text(_configModel.user.firstName.toString()),
+                                                                            ),
+                                                                            Expanded(
+                                                                              child: Text(
+                                                                                _format!.format(DateTime.parse(widget.arguments!['product']['reviews']![index]['created_at'].toString())),
+                                                                                textAlign: TextAlign.right,
+                                                                                style: MyGoogleFontStyle(
+                                                                                  fontFamily: 'Poppins',
+                                                                                  fontSize: 12,
+                                                                                  fontWeight: FontWeight.w400,
+                                                                                  color: Color(0xff909090),
+                                                                                ),
+                                                                              ),
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                        SizedBox(
+                                                                          height:
+                                                                              10,
+                                                                        ),
+                                                                        // Description
+                                                                        Text(
+                                                                          widget
+                                                                              .arguments!['product']['reviews']![index]['description']
+                                                                              .toString(),
+                                                                          style:
+                                                                              MyGoogleFontStyle(
+                                                                            fontFamily:
+                                                                                'Poppins',
+                                                                            fontSize:
+                                                                                12,
+                                                                            fontWeight:
+                                                                                FontWeight.w400,
+                                                                            color:
+                                                                                Color(0xff909090),
+                                                                          ),
+                                                                        )
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                              ),
                                             ],
                                           ),
                                         )
