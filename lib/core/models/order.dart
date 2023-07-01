@@ -15,7 +15,7 @@ class Order {
   int? isDeliveryBoyAccepted;
   Null? txnid;
   num? txnamount;
-  Null? paymentmode;
+  String? paymentmode;
   Null? currency;
   Null? txndate;
   Null? status;
