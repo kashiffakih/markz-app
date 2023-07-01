@@ -27,6 +27,12 @@ class _CartPageState extends State<CartPage> {
     super.initState();
   }
 
+  Map<String, dynamic> _CartData = {
+    'kindOfFlower': '',
+    'flavour': '',
+    'writeOnCake': '',
+  };
+
   @override
   Widget build(BuildContext context) {
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
@@ -171,7 +177,7 @@ class _CartPageState extends State<CartPage> {
                                                                         .product!
                                                                         .id,
                                                                     minus,
-                                                                    '');
+                                                                    _CartData);
                                                           },
                                                           style: TextButton
                                                               .styleFrom(
@@ -213,6 +219,7 @@ class _CartPageState extends State<CartPage> {
                                                         TextButton(
                                                           onPressed: () async {
                                                             bool type = true;
+
                                                             await _addToCartModel
                                                                 .getAddToCart(
                                                                     _addToCartModel
@@ -221,7 +228,7 @@ class _CartPageState extends State<CartPage> {
                                                                         .product!
                                                                         .id,
                                                                     type,
-                                                                    '');
+                                                                    _CartData);
                                                           },
                                                           style: TextButton
                                                               .styleFrom(
