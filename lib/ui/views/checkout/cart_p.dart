@@ -92,7 +92,7 @@ class _CartPageState extends State<CartPage> {
                           child: Container(
                             width: MediaQuery.of(context).size.width - 50,
                             height: MediaQuery.of(context).size.height - 250,
-                            child: _addToCartModel.addToCartLoader
+                            child: _addToCartModel.addToCarts!.isEmpty
                                 ? SizedBox(
                                     height: 60,
                                     child: Center(child: Text('Cart is empty')),

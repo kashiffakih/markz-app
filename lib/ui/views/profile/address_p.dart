@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sales_app/core/providers/config_pr.dart';
+import 'package:sales_app/core/providers/user_address_pr.dart';
+import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/profile/shipping_id_p.dart';
 
 class AddressPage extends StatefulWidget {
   const AddressPage({Key? key}) : super(key: key);
@@ -12,7 +17,16 @@ class _AddressPageState extends State<AddressPage> {
   bool _isShipping = false;
 
   @override
+  void initState() {
+    super.initState();
+    Provider.of<UserAddressModel>(context, listen: false).getUserAddresses();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final UserAddressModel _userAddressModel =
+        Provider.of<UserAddressModel>(context);
+    final ConfigModel _configModel = locator<ConfigModel>();
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -58,141 +72,123 @@ class _AddressPageState extends State<AddressPage> {
                 ),
                 // Body
                 Container(
+                  height: 600,
                   padding: EdgeInsets.all(15),
-                  child: Column(
-                    children: [
-                      // Shipping Address 1
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: _isShipping,
-                            onChanged: (value) {
-                              _isShipping = true;
-                            },
-                          ),
-                          Expanded(
-                            child: Text(
-                              'Use as the shipping address',
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff232323),
+                  child: _userAddressModel.userAddressesLoader
+                      ? SizedBox(
+                          height: 60,
+                          child: Center(child: Text('No address found.')),
+                        )
+                      : ListView.builder(
+                          itemCount: _userAddressModel.userAddresses!.length,
+                          itemBuilder: (BuildContext context, index) => Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: _isShipping,
+                                    onChanged: (value) {
+                                      _isShipping = true;
+                                    },
+                                  ),
+                                  Expanded(
+                                    flex: 4,
+                                    child: Text(
+                                      'Use as the shipping address',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xff232323),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                      child: InkWell(
+                                          onTap: () {
+                                            Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ShippingUpdatePage(
+                                                            arguments: {
+                                                              'userAddress':
+                                                                  _userAddressModel
+                                                                          .userAddresses![
+                                                                      index]
+                                                            })));
+                                          },
+                                          child: Icon(Icons.edit))),
+                                ],
                               ),
-                            ),
+                              Container(
+                                margin: EdgeInsets.only(bottom: 10),
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Color(0xffc7b456)),
+                                  color: Color(0xffffffff),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(5),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0x338a959e),
+                                      offset: Offset(0, 7.6690645218),
+                                      blurRadius: 19.1726608276,
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _configModel.user.firstName.toString(),
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xff232323),
+                                      ),
+                                    ),
+                                    Divider(
+                                      thickness: 1,
+                                      color: Colors.grey,
+                                    ),
+                                    Text(
+                                      _userAddressModel
+                                              .userAddresses![index].add1
+                                              .toString() +
+                                          ', ' +
+                                          _userAddressModel
+                                              .userAddresses![index].add2
+                                              .toString() +
+                                          ', ' +
+                                          _userAddressModel
+                                              .userAddresses![index].add3
+                                              .toString() +
+                                          ', ' +
+                                          _userAddressModel
+                                              .userAddresses![index].city
+                                              .toString() +
+                                          ', ' +
+                                          _userAddressModel
+                                              .userAddresses![index].state
+                                              .toString() +
+                                          '. ' +
+                                          _userAddressModel
+                                              .userAddresses![index].pincode
+                                              .toString() +
+                                          '.',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xff909090),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(bottom: 10),
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xffc7b456)),
-                          color: Color(0xffffffff),
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(5),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0x338a959e),
-                              offset: Offset(0, 7.6690645218),
-                              blurRadius: 19.1726608276,
-                            ),
-                          ],
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Bruno Fernandes',
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Urbanist',
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xff232323),
-                              ),
-                            ),
-                            Divider(
-                              thickness: 1,
-                              color: Colors.grey,
-                            ),
-                            Text(
-                              '25 rue Robert Latouche, Nice, 06200, Côte D’azur, France',
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Urbanist',
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff909090),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Shipping Address 2
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: _isShipping,
-                            onChanged: (value) {
-                              _isShipping = true;
-                            },
-                          ),
-                          Expanded(
-                            child: Text(
-                              'Use as the shipping address',
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff232323),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(bottom: 10),
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xffc7b456)),
-                          color: Color(0xffffffff),
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(5),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0x338a959e),
-                              offset: Offset(0, 7.6690645218),
-                              blurRadius: 19.1726608276,
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Bruno Fernandes',
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Urbanist',
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xff232323),
-                              ),
-                            ),
-                            Divider(
-                              thickness: 1,
-                              color: Colors.grey,
-                            ),
-                            Text(
-                              '25 rue Robert Latouche, Nice, 06200, Côte D’azur, France',
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Urbanist',
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff909090),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
               ],
             ),

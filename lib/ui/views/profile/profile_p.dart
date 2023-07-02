@@ -4,6 +4,7 @@ import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/order_pr.dart';
 import 'package:sales_app/core/providers/review_pr.dart';
+import 'package:sales_app/core/providers/user_address_pr.dart';
 import 'package:sales_app/core/providers/wish_list_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
@@ -30,6 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
     Provider.of<OrderModel>(context, listen: false).getOrder();
     Provider.of<AddToCartModel>(context, listen: false)
         .getAddToCart(productId, '', _CartData);
+    Provider.of<UserAddressModel>(context, listen: false).getUserAddresses();
   }
 
   @override
@@ -39,6 +41,8 @@ class _ProfilePageState extends State<ProfilePage> {
     final OrderModel _orderModel = Provider.of<OrderModel>(context);
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
     final ReviewModel _reviewModel = Provider.of<ReviewModel>(context);
+    final UserAddressModel _userAddressModel =
+        Provider.of<UserAddressModel>(context);
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -502,8 +506,17 @@ class _ProfilePageState extends State<ProfilePage> {
                                       height: 5,
                                     ),
                                     Text(
-                                      // alreadyhave10orders9Ca (I318:2511;0:1158)
-                                      'Already have 10 orders',
+                                      _userAddressModel.userAddressesLoader
+                                          ? 'Shipping address is empty.'
+                                          : _userAddressModel
+                                                      .userAddresses!.length ==
+                                                  0
+                                              ? 'Shipping address is empty.'
+                                              : 'Already have ' +
+                                                  _userAddressModel
+                                                      .userAddresses!.length
+                                                      .toString() +
+                                                  ' address',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontSize: 11,

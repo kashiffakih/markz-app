@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:sales_app/core/providers/config_pr.dart';
+import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  final ConfigModel _configModel = locator<ConfigModel>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,7 +123,7 @@ class SettingsPage extends StatelessWidget {
                                       height: 3,
                                     ),
                                     Text(
-                                      'Bruno Pham',
+                                      _configModel.user.firstName.toString(),
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontWeight: FontWeight.w400,
@@ -126,24 +134,67 @@ class SettingsPage extends StatelessWidget {
                                 ),
                               ),
                               // Password
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      'Payment',
+                              // Row(
+                              //   children: [
+                              //     Expanded(
+                              //       child: Text(
+                              //         'Email',
+                              //         style: MyGoogleFontStyle(
+                              //           fontFamily: 'Urbanist',
+                              //           fontWeight: FontWeight.w700,
+                              //           color: Color(0xff909090),
+                              //         ),
+                              //       ),
+                              //     ),
+                              //     Image.asset(
+                              //       'assets/images/edit-2-mP4.png',
+                              //       width: 15.34,
+                              //       height: 19.15,
+                              //     )
+                              //   ],
+                              // ),
+                              Container(
+                                width: MediaQuery.of(context).size.width - 50,
+                                margin: EdgeInsets.only(top: 10, bottom: 10),
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Color(0xffc7b456)),
+                                  color: Color(0xffffffff),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(5),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0x338a959e),
+                                      offset: Offset(0, 7.6690645218),
+                                      blurRadius: 19.1726608276,
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Email',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontWeight: FontWeight.w700,
+                                        color: Color(0xff232323),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 3,
+                                    ),
+                                    Text(
+                                      _configModel.user.email.toString(),
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w400,
                                         color: Color(0xff909090),
                                       ),
                                     ),
-                                  ),
-                                  Image.asset(
-                                    'assets/images/edit-2-mP4.png',
-                                    width: 15.34,
-                                    height: 19.15,
-                                  )
-                                ],
+                                  ],
+                                ),
                               ),
                               Container(
                                 width: MediaQuery.of(context).size.width - 50,
@@ -167,7 +218,7 @@ class SettingsPage extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Password',
+                                      'Phone',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontWeight: FontWeight.w700,
@@ -178,7 +229,7 @@ class SettingsPage extends StatelessWidget {
                                       height: 3,
                                     ),
                                     Text(
-                                      'Bruno Pham',
+                                      _configModel.user.phone.toString(),
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontWeight: FontWeight.w400,

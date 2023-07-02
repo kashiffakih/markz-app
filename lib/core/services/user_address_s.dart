@@ -1,0 +1,57 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:sales_app/core/models/user_address.dart';
+import 'package:sales_app/core/providers/config_pr.dart';
+import 'package:sales_app/locator.dart';
+import 'package:http/http.dart' as http;
+
+class UserAddressService {
+  final ConfigModel _configModel = locator<ConfigModel>();
+
+  List<UserAddress> _userAddresses = [];
+
+  getUserAddresses() async {
+    Map<String, dynamic> apiConfig = _configModel.apiConfig;
+    var userId = _configModel.user.id;
+    http.Response _response = await http.get(
+      Uri.parse(apiConfig['baseURL'] + '/user_addresses?userId=$userId'),
+      headers: apiConfig['headers'],
+    );
+    Map<String, dynamic> _responseData = json.decode(_response.body);
+    if (_responseData['success']) {
+      _userAddresses = [];
+      _responseData['data'].forEach((data) {
+        _userAddresses.add(UserAddress.fromJson(data));
+      });
+    }
+
+    return _userAddresses;
+  }
+
+  Future<bool> saveUserAddress({@required UserAddress? userAddress}) async {
+    Map<String, dynamic> apiConfig = _configModel.apiConfig;
+    userAddress!.userId = _configModel.user.id;
+
+    http.Response _response = await http.post(
+        Uri.parse(apiConfig['baseURL'] + '/user_addresses'),
+        body: json.encode(userAddress.toJson()),
+        headers: apiConfig['headers']);
+
+    Map<String, dynamic> _responseData = json.decode(_response.body);
+    return _responseData['success'];
+  }
+
+  Future<bool> updateUserAddress({@required UserAddress? userAddress}) async {
+    Map<String, dynamic> apiConfig = _configModel.apiConfig;
+    // print(userAddress!.add1.toString());
+    http.Response _response = await http.patch(
+        Uri.parse(apiConfig['baseURL'] + '/user_addresses/${userAddress!.id}'),
+        body: json.encode(userAddress.toJson()),
+        headers: apiConfig['headers']);
+
+    Map<String, dynamic> _responseData = json.decode(_response.body);
+    // print(_responseData);
+    return _responseData['success'];
+  }
+}

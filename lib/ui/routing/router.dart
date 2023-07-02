@@ -29,6 +29,7 @@ import 'package:sales_app/ui/views/profile/reviews_p.dart';
 import 'package:sales_app/ui/views/profile/rewards_p.dart';
 import 'package:sales_app/ui/views/profile/settings_p.dart';
 import 'package:sales_app/ui/views/profile/shipping_create_p.dart';
+import 'package:sales_app/ui/views/profile/shipping_id_p.dart';
 import 'package:sales_app/ui/views/profile/wishlist_p.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
@@ -121,6 +122,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (BuildContext context) {
         return AddressPage();
       });
+
     case wishlistPage:
       return MaterialPageRoute(builder: (BuildContext context) {
         return WishlistPage();
@@ -132,6 +134,12 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case shippingCreatePage:
       return MaterialPageRoute(builder: (BuildContext context) {
         return ShippingCreatePage();
+      });
+    case shippingUpdatePage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return ShippingUpdatePage(
+          arguments: null,
+        );
       });
     case settingsPage:
       return MaterialPageRoute(builder: (BuildContext context) {

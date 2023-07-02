@@ -20,7 +20,6 @@ class AddToCartModel with ChangeNotifier {
 
   List<AddToCart>? get addToCarts => _addToCarts;
 
-  // List of carts
   String? _cartTotal;
 
   set cartTotal(String? newCartTotal) {
