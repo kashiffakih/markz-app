@@ -44,14 +44,12 @@ class UserAddressService {
 
   Future<bool> updateUserAddress({@required UserAddress? userAddress}) async {
     Map<String, dynamic> apiConfig = _configModel.apiConfig;
-    // print(userAddress!.add1.toString());
     http.Response _response = await http.patch(
         Uri.parse(apiConfig['baseURL'] + '/user_addresses/${userAddress!.id}'),
         body: json.encode(userAddress.toJson()),
         headers: apiConfig['headers']);
 
     Map<String, dynamic> _responseData = json.decode(_response.body);
-    // print(_responseData);
     return _responseData['success'];
   }
 }

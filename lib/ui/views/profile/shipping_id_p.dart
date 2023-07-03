@@ -110,7 +110,6 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                               return null;
                             },
                             onSaved: (value) {
-                              // print(value);
                               _userAddress.add1 = value;
                             },
                           ),
@@ -313,7 +312,6 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                               if (_formKey.currentState!.validate()) {
                                 _formKey.currentState!.save();
 
-                                print(_userAddress.toJson());
                                 setState(() {
                                   _loading = true;
                                 });

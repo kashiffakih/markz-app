@@ -31,7 +31,6 @@ class AddToCartModel with ChangeNotifier {
   String? get cartTotal => _cartTotal;
 
   getAddToCart(productId, type, cartData) async {
-    // print(cartData.toString());
     Map<String, dynamic> _response =
         await _addToCartService.getAddToCart(productId, type, cartData);
     addToCarts = _response['addToCarts'];

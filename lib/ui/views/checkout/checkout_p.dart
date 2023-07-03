@@ -19,7 +19,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
     final OrderModel _orderModel = Provider.of<OrderModel>(context);
     final ConfigModel _configModel = locator<ConfigModel>();
 
-    // print(widget.arguments['cartItems'][0].toJson());
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
