@@ -74,7 +74,7 @@ class _AddressPageState extends State<AddressPage> {
                 Container(
                   height: 600,
                   padding: EdgeInsets.all(15),
-                  child: _userAddressModel.userAddressesLoader
+                  child: _userAddressModel.userAddresses!.isEmpty
                       ? SizedBox(
                           height: 60,
                           child: Center(child: Text('No address found.')),

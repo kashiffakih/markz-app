@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:sales_app/core/models/product.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/locator.dart';

@@ -116,7 +116,7 @@ class _OrdersPageState extends State<OrdersPage> {
                           height: MediaQuery.of(context).size.height - 124,
                           child: TabBarView(
                             children: [
-                              _orderModel.orderLoader
+                              _orderModel.orders.isEmpty
                                   ? SizedBox(
                                       height: 60,
                                       child: Center(
@@ -374,7 +374,7 @@ class _OrdersPageState extends State<OrdersPage> {
                                         ],
                                       ),
                                     ),
-                              _orderModel.orderLoader
+                              _orderModel.orders.isEmpty
                                   ? SizedBox(
                                       height: 60,
                                       child: Center(
@@ -621,7 +621,7 @@ class _OrdersPageState extends State<OrdersPage> {
                                         ],
                                       ),
                                     ),
-                              _orderModel.orderLoader
+                              _orderModel.orders.isEmpty
                                   ? SizedBox(
                                       height: 60,
                                       child: Center(
@@ -884,7 +884,7 @@ class _OrdersPageState extends State<OrdersPage> {
                                         ],
                                       ),
                                     ),
-                              _orderModel.orderLoader
+                              _orderModel.orders.isEmpty
                                   ? SizedBox(
                                       height: 60,
                                       child: Center(

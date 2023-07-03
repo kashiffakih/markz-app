@@ -1166,7 +1166,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                           TextButton(
                                             onPressed: () async {
                                               bool type = true;
-                                              // print(_CartData.toString());
                                               await _addToCartModel
                                                   .getAddToCart(
                                                       widget.arguments![

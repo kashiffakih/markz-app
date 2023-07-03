@@ -75,7 +75,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
                 Container(
                   height: 650,
                   margin: EdgeInsets.all(20),
-                  child: _reviewModel.reviewLoader
+                  child: _reviewModel.reviews!.isEmpty
                       ? Center(child: Text('No reviews'))
                       : ListView.builder(
                           itemCount: _reviewModel.reviews!.length,
