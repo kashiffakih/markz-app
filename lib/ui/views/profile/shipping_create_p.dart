@@ -303,7 +303,6 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                         ),
                         // Save address
                         Container(
-                          // primaryXwC (318:2628)
                           margin: EdgeInsets.fromLTRB(5, 0, 6.34, 0),
                           child: TextButton(
                             onPressed: () async {
