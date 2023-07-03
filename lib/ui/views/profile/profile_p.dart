@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
+import 'package:sales_app/core/providers/auth_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/order_pr.dart';
 import 'package:sales_app/core/providers/review_pr.dart';
@@ -88,7 +89,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 // Body
                 Container(
-                  margin: EdgeInsets.all(20),
+                  margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
                   child: Column(
                     children: [
                       // Photo and Name
@@ -120,7 +121,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                               ),
                               Text(
-                                // bruno203gmailcom6y4 (318:2508)
                                 _configModel.user.email.toString(),
                                 style: MyGoogleFontStyle(
                                   fontFamily: 'Urbanist',
@@ -129,7 +129,74 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                               ),
                             ],
-                          )
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Container(
+                                  // margin: EdgeInsets.fromLTRB(5, 0, 6.34, 0),
+                                  child: TextButton(
+                                    onPressed: () async {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) =>
+                                            AlertDialog(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20)),
+                                          title: Text(
+                                              'Are you sure you want to logout?'),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: Text('NO'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () async {
+                                                Navigator.of(context).pop();
+                                                await _configModel
+                                                    .removeLoginData();
+                                                Navigator.pushReplacementNamed(
+                                                    context, '/login');
+                                              },
+                                              child: Text('YES'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                    ),
+                                    child: Container(
+                                      width: 80,
+                                      height: 35,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xff1e1e1e),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'Logout',
+                                          textAlign: TextAlign.center,
+                                          style: MyGoogleFontStyle(
+                                            fontFamily: 'Urbanist',
+                                            fontSize: 15.1428556442,
+                                            fontWeight: FontWeight.w700,
+                                            height: 1.4999999685,
+                                            color: Color(0xffffffff),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                       // My Orders

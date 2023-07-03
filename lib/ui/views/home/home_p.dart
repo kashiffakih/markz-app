@@ -968,37 +968,6 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-            Container(
-              child: ListTile(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) => AlertDialog(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
-                      title: Text('Are you sure you want to logout?'),
-                      actions: <Widget>[
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text('NO'),
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            Navigator.of(context).pop();
-                            await _configModel.removeLoginData();
-                            Navigator.pushReplacementNamed(context, '/login');
-                          },
-                          child: Text('YES'),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-                title: Text('Logout'),
-              ),
-            ),
           ],
         ),
       ),
