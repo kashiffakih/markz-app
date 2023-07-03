@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
-import 'package:sales_app/core/providers/auth_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/order_pr.dart';
 import 'package:sales_app/core/providers/review_pr.dart';
@@ -102,11 +101,14 @@ class _ProfilePageState extends State<ProfilePage> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(40),
                               image: DecorationImage(
-                                fit: BoxFit.cover,
-                                image: AssetImage(
-                                  'assets/images/avatar-bg.png',
-                                ),
-                              ),
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(
+                                      _configModel.apiConfig['mediaURL'] +
+                                          _configModel.user.imagepath)
+                                  // image: AssetImage(
+                                  //   'assets/images/avatar-bg.png',
+                                  // ),
+                                  ),
                             ),
                           ),
                           Column(

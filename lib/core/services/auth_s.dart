@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sales_app/core/models/user.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:http/http.dart' as http;
@@ -28,7 +29,6 @@ class AuthService {
   Future<bool> registerUser(
       {@required Map<String, dynamic>? registerData}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-
     http.Response _response = await http.post(
       Uri.parse('${_apiConfig['baseURL']}/register-user'),
       body: json.encode(registerData),
@@ -50,7 +50,26 @@ class AuthService {
       Map<String, dynamic> _responseUserRoleData =
           json.decode(_responseUserRole.body);
     }
-    return _responseData['success'];
+    if (registerData!['imagepath'] != 'null') {
+      var _id = _responseData['data']['id'];
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('${_apiConfig['baseURL']}/upload_user_photo'),
+      )
+        ..fields['userid'] = _id
+        // ..fields['attachment'] = registerData['imagepath']
+        ..files.add(
+          await http.MultipartFile.fromPath(
+            'attachment',
+            registerData['imagepath'],
+          ),
+        )
+        ..headers.addAll(_apiConfig['headers']);
+      http.StreamedResponse _responseImage = await request.send();
+      http.Response response = await http.Response.fromStream(_responseImage);
+      print(response.body);
+    }
+    return true;
   }
 
   Future<bool> sendCodeForResetPassword(
@@ -95,6 +114,7 @@ class AuthService {
     );
 
     Map<String, dynamic> _responseData = json.decode(_response.body);
+
     return _responseData['success'];
   }
 }

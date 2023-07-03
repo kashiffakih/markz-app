@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/models/user.dart';
 import 'package:sales_app/core/providers/auth_pr.dart';
@@ -14,6 +17,8 @@ class SettingUpdatePage extends StatefulWidget {
 }
 
 class _SettingUpdatePageState extends State<SettingUpdatePage> {
+  File? galleryFile;
+  final picker = ImagePicker();
   User _user = User();
 
   final _formKey = GlobalKey<FormState>();
@@ -154,6 +159,37 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                         SizedBox(
                           height: 20,
                         ),
+                        Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(
+                                        Colors.green)),
+                                child: const Text(
+                                    'Select Image from Gallery and Camera'),
+                                onPressed: () {
+                                  _showPicker(context: context);
+                                },
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              SizedBox(
+                                height: 200.0,
+                                width: 300.0,
+                                child: galleryFile == null
+                                    ? const Center(
+                                        child: Text('Sorry nothing selected!!'))
+                                    : Center(child: Image.file(galleryFile!)),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
                         // Save address
                         Container(
                           // primaryXwC (318:2628)
@@ -166,6 +202,10 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                                 setState(() {
                                   _loading = true;
                                 });
+                                // print(galleryFile.toString().split('/').last);
+                                _user.imagepath =
+                                    galleryFile.toString().split('/').last;
+                                print(galleryFile.toString().split('/').last);
                                 bool response = await _userModel.register(
                                     registerData: _user.toJson());
                                 if (response == true) {
@@ -196,7 +236,7 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                                         width: 20,
                                       )
                                     : Text(
-                                        'Update address',
+                                        'Update Personal information',
                                         textAlign: TextAlign.center,
                                         style: MyGoogleFontStyle(
                                           fontFamily: 'Urbanist',
@@ -219,6 +259,55 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showPicker({
+    required BuildContext context,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Photo Library'),
+                onTap: () {
+                  getImage(ImageSource.gallery);
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_camera),
+                title: const Text('Camera'),
+                onTap: () {
+                  getImage(ImageSource.camera);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future getImage(
+    ImageSource img,
+  ) async {
+    final pickedFile = await picker.pickImage(source: img);
+    XFile? xfilePick = pickedFile;
+    setState(
+      () {
+        if (xfilePick != null) {
+          galleryFile = File(pickedFile!.path);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(// is this context <<<
+              const SnackBar(content: Text('Nothing is selected')));
+        }
+      },
     );
   }
 }
