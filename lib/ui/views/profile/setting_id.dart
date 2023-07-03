@@ -169,7 +169,7 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                                 bool response = await _userModel.register(
                                     registerData: _user.toJson());
                                 if (response == true) {
-                                  Navigator.pushNamed(context, '/SettingsPage');
+                                  Navigator.pushNamed(context, '/settingsPage');
                                 }
                                 setState(() {
                                   _loading = false;
