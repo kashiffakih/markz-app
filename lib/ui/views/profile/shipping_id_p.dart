@@ -56,7 +56,7 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                             ),
                             Expanded(
                               child: Text(
-                                'Add Shipping Address',
+                                'Update Shipping Address',
                                 textAlign: TextAlign.center,
                                 style: MyGoogleFontStyle(
                                   fontFamily: 'Urbanist',

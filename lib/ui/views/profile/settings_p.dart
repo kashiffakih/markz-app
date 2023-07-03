@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/profile/setting_id.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -83,10 +84,20 @@ class _SettingsPageState extends State<SettingsPage> {
                                       ),
                                     ),
                                   ),
-                                  Image.asset(
-                                    'assets/images/edit-2-mP4.png',
-                                    width: 15.34,
-                                    height: 19.15,
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  SettingUpdatePage(arguments: {
+                                                    'user': _configModel.user
+                                                  })));
+                                    },
+                                    child: Image.asset(
+                                      'assets/images/edit-2-mP4.png',
+                                      width: 15.34,
+                                      height: 19.15,
+                                    ),
                                   )
                                 ],
                               ),
@@ -133,26 +144,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ],
                                 ),
                               ),
-                              // Password
-                              // Row(
-                              //   children: [
-                              //     Expanded(
-                              //       child: Text(
-                              //         'Email',
-                              //         style: MyGoogleFontStyle(
-                              //           fontFamily: 'Urbanist',
-                              //           fontWeight: FontWeight.w700,
-                              //           color: Color(0xff909090),
-                              //         ),
-                              //       ),
-                              //     ),
-                              //     Image.asset(
-                              //       'assets/images/edit-2-mP4.png',
-                              //       width: 15.34,
-                              //       height: 19.15,
-                              //     )
-                              //   ],
-                              // ),
                               Container(
                                 width: MediaQuery.of(context).size.width - 50,
                                 margin: EdgeInsets.only(top: 10, bottom: 10),

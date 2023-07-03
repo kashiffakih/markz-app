@@ -27,6 +27,7 @@ import 'package:sales_app/ui/views/profile/orders_p.dart';
 import 'package:sales_app/ui/views/profile/profile_p.dart';
 import 'package:sales_app/ui/views/profile/reviews_p.dart';
 import 'package:sales_app/ui/views/profile/rewards_p.dart';
+import 'package:sales_app/ui/views/profile/setting_id.dart';
 import 'package:sales_app/ui/views/profile/settings_p.dart';
 import 'package:sales_app/ui/views/profile/shipping_create_p.dart';
 import 'package:sales_app/ui/views/profile/shipping_id_p.dart';
@@ -144,6 +145,12 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case settingsPage:
       return MaterialPageRoute(builder: (BuildContext context) {
         return SettingsPage();
+      });
+    case settingUpdatePage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return SettingUpdatePage(
+          arguments: null,
+        );
       });
     case rewardsPage:
       return MaterialPageRoute(builder: (BuildContext context) {

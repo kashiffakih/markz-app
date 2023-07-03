@@ -25,5 +25,6 @@ const String reviewsPage = '/reviewsPage';
 const String shippingCreatePage = '/shippingCreatePage';
 const String shippingUpdatePage = '/shippingUpdatePage';
 const String settingsPage = '/settingsPage';
+const String settingUpdatePage = '/settingUpdatePage';
 const String rewardsPage = '/rewardsPage';
 const String contactPage = '/contactPage';
