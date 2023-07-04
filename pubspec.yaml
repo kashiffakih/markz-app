@@ -38,6 +38,7 @@ dependencies:
   package_info_plus: ^3.0.3
   google_fonts: ^4.0.3
   image_picker: ^0.8.4+4
+  file_picker: ^5.2.11
 
 dev_dependencies:
   flutter_test:
