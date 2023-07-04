@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sales_app/core/models/product.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/product_pr.dart';
@@ -18,13 +19,23 @@ class ProductsPage extends StatefulWidget {
 }
 
 class _ProductsPageState extends State<ProductsPage> {
+  Map<String, dynamic> _CartData = {
+    'kindOfFlower': '',
+    'flavour': '',
+    'writeOnCake': '',
+  };
+  List<Product>? filteredProducts = [];
+  bool _isInitialLoad = false;
+
   @override
   void initState() {
     super.initState();
+    var productId = '';
+    Provider.of<AddToCartModel>(context, listen: false)
+        .getAddToCart(productId, '', _CartData);
     Provider.of<ProductModel>(context, listen: false)
         .getCategoryWiseProduct(widget.arguments['categoryId']);
     Provider.of<ProductModel>(context, listen: false).getCategories();
-    var productId = '';
     Provider.of<WishListModel>(context, listen: false).getWishLists(productId);
   }
 
@@ -37,6 +48,12 @@ class _ProductsPageState extends State<ProductsPage> {
     final ProductModel _productModel = Provider.of<ProductModel>(context);
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
+    setState(() {
+      if (!_isInitialLoad && _productModel.categoryWiseproducts!.length > 0) {
+        filteredProducts = _productModel.categoryWiseproducts;
+        _isInitialLoad = true;
+      }
+    });
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -87,7 +104,6 @@ class _ProductsPageState extends State<ProductsPage> {
                 ),
               ),
               Container(
-                // autogroupssgpQZc (Gb6N9ga9uFSqELzZUwsSGp)
                 margin:
                     EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 14 * fem),
                 width: 371 * fem,
@@ -96,8 +112,15 @@ class _ProductsPageState extends State<ProductsPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     TextButton(
-                      // frame5v2A (318:2792)
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          filteredProducts = _productModel.categoryWiseproducts!
+                              .where((element) =>
+                                  element.categoryId ==
+                                  widget.arguments['categoryId'])
+                              .toList();
+                        });
+                      },
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,
                       ),
@@ -126,102 +149,73 @@ class _ProductsPageState extends State<ProductsPage> {
                     SizedBox(
                       width: 2 * fem,
                     ),
-                    TextButton(
-                      // frame6AhC (318:2794)
-                      onPressed: () {},
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                      ),
-                      child: Container(
-                        width: 79 * fem,
-                        height: double.infinity,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xffc7b456)),
-                          borderRadius: BorderRadius.circular(10 * fem),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Cakes',
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontSize: 18 * ffem,
-                              fontWeight: FontWeight.w600,
-                              height: 1.2 * ffem / fem,
-                              letterSpacing: -0.36 * fem,
-                              color: Color(0x99000000),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
                     SizedBox(
-                      width: 6 * fem,
-                    ),
-                    TextButton(
-                      // frame7bnW (318:2796)
-                      onPressed: () {},
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                      ),
-                      child: Container(
-                        width: 91 * fem,
-                        height: double.infinity,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xffc7b456)),
-                          borderRadius: BorderRadius.circular(10 * fem),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Flowers',
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontSize: 18 * ffem,
-                              fontWeight: FontWeight.w600,
-                              height: 1.2 * ffem / fem,
-                              letterSpacing: -0.36 * fem,
-                              color: Color(0x99000000),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 6 * fem,
-                    ),
-                    Container(
-                      // frame8eVt (318:2798)
-                      width: 91 * fem,
-                      height: double.infinity,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Color(0xffc7b456)),
-                        borderRadius: BorderRadius.circular(10 * fem),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Combo',
-                          style: MyGoogleFontStyle(
-                            fontFamily: 'Urbanist',
-                            fontSize: 18 * ffem,
-                            fontWeight: FontWeight.w600,
-                            height: 1.2 * ffem / fem,
-                            letterSpacing: -0.36 * fem,
-                            color: Color(0x99000000),
-                          ),
-                        ),
-                      ),
+                      width: 300,
+                      child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: widget.arguments['subCategory'].length,
+                          itemBuilder: (BuildContext context, index) {
+                            return Row(
+                              children: [
+                                TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      filteredProducts = _productModel
+                                          .categoryWiseproducts!
+                                          .where((cat) =>
+                                              cat.subCategoryId ==
+                                              widget.arguments['subCategory']
+                                                  [index]['id'])
+                                          .toList();
+                                    });
+                                  },
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                  child: Container(
+                                    width: 79 * fem,
+                                    height: double.infinity,
+                                    decoration: BoxDecoration(
+                                      border:
+                                          Border.all(color: Color(0xffc7b456)),
+                                      borderRadius:
+                                          BorderRadius.circular(10 * fem),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        widget.arguments['subCategory'][index]
+                                                ['name']
+                                            .toString(),
+                                        style: MyGoogleFontStyle(
+                                          fontFamily: 'Urbanist',
+                                          fontSize: 18 * ffem,
+                                          fontWeight: FontWeight.w600,
+                                          height: 1.2 * ffem / fem,
+                                          letterSpacing: -0.36 * fem,
+                                          color: Color(0x99000000),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 6 * fem,
+                                ),
+                              ],
+                            );
+                          }),
                     ),
                   ],
                 ),
               ),
               Container(
-                // group8994vyC (318:2804)
                 margin:
                     EdgeInsets.fromLTRB(12 * fem, 0 * fem, 22 * fem, 0 * fem),
                 width: double.infinity,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    _productModel.categoryWiseproducts != null
+                    filteredProducts!.isNotEmpty
                         ? Container(
                             width: double.infinity,
                             height: 782 * fem,
@@ -232,15 +226,13 @@ class _ProductsPageState extends State<ProductsPage> {
                                         childAspectRatio: 1 / 2,
                                         crossAxisSpacing: 20,
                                         mainAxisSpacing: 20),
-                                itemCount:
-                                    _productModel.categoryWiseproducts!.length,
+                                itemCount: filteredProducts!.length,
                                 itemBuilder: (BuildContext ctx, index) {
                                   return Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
                                       Container(
-                                        // group8949Yce (318:1997)
                                         width: 145 * fem,
                                         height: double.infinity,
                                         decoration: BoxDecoration(
@@ -315,7 +307,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                                           child: _wishListModel
                                                                       .wishLists!
                                                                       .where((wishList) =>
-                                                                          wishList.productId == _productModel.products![index].id &&
+                                                                          wishList.productId == _productModel.categoryWiseproducts![index].id &&
                                                                           wishList.userId ==
                                                                               _configModel.user.id)
                                                                       .toList()
@@ -371,33 +363,111 @@ class _ProductsPageState extends State<ProductsPage> {
                                                       ),
                                                     ),
                                                   ),
-                                                  Positioned(
-                                                    // frame494xX8 (318:2821)
-                                                    left: 31 * fem,
-                                                    top: 165 * fem,
-                                                    child: TextButton(
-                                                      onPressed: () async {
-                                                        bool type = true;
-                                                        await _addToCartModel
-                                                            .getAddToCart(
-                                                                _productModel
-                                                                    .categoryWiseproducts![
-                                                                        index]
-                                                                    .id,
-                                                                type,
-                                                                '');
-                                                        Navigator.pushNamed(
-                                                            context,
-                                                            '/cartPage');
-                                                      },
-                                                      style:
-                                                          TextButton.styleFrom(
-                                                        padding:
-                                                            EdgeInsets.zero,
+                                                  if (_addToCartModel
+                                                      .addToCarts!
+                                                      .where((cart) =>
+                                                          cart.productId ==
+                                                              _productModel
+                                                                  .categoryWiseproducts![
+                                                                      index]
+                                                                  .id &&
+                                                          cart.userId ==
+                                                              _configModel
+                                                                  .user.id)
+                                                      .toList()
+                                                      .isEmpty)
+                                                    Positioned(
+                                                      // frame494xX8 (318:2821)
+                                                      left: 31 * fem,
+                                                      top: 165 * fem,
+                                                      child: TextButton(
+                                                        onPressed: () async {
+                                                          bool type = true;
+                                                          await _addToCartModel
+                                                              .getAddToCart(
+                                                                  _productModel
+                                                                      .categoryWiseproducts![
+                                                                          index]
+                                                                      .id,
+                                                                  type,
+                                                                  _CartData);
+                                                        },
+                                                        style: TextButton
+                                                            .styleFrom(
+                                                          padding:
+                                                              EdgeInsets.zero,
+                                                        ),
+                                                        child: Container(
+                                                          width: 82 * fem,
+                                                          height: 27.33 * fem,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            border: Border.all(
+                                                                color: Color(
+                                                                    0xffeaeaea)),
+                                                            color: Color(
+                                                                0xffffffff),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        7.0163693428 *
+                                                                            fem),
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: Color(
+                                                                    0x3f000000),
+                                                                offset: Offset(
+                                                                    0 * fem,
+                                                                    2.1298701763 *
+                                                                        fem),
+                                                                blurRadius:
+                                                                    2.1298701763 *
+                                                                        fem,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          child: Center(
+                                                            child: Text(
+                                                              'ADD',
+                                                              style:
+                                                                  MyGoogleFontStyle(
+                                                                fontFamily:
+                                                                    'DM Sans',
+                                                                fontSize:
+                                                                    12 * ffem,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
+                                                                height: 1 *
+                                                                    ffem /
+                                                                    fem,
+                                                                color: Color(
+                                                                    0xffc7b456),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
                                                       ),
+                                                    ),
+                                                  if (_addToCartModel
+                                                      .addToCarts!
+                                                      .where((cart) =>
+                                                          cart.productId ==
+                                                              _productModel
+                                                                  .categoryWiseproducts![
+                                                                      index]
+                                                                  .id &&
+                                                          cart.userId ==
+                                                              _configModel
+                                                                  .user.id)
+                                                      .toList()
+                                                      .isNotEmpty)
+                                                    Positioned(
+                                                      left: 9 * fem,
+                                                      top: 175 * fem,
                                                       child: Container(
-                                                        width: 82 * fem,
-                                                        height: 27.33 * fem,
+                                                        width: 130 * fem,
+                                                        height: 30.33 * fem,
                                                         decoration:
                                                             BoxDecoration(
                                                           border: Border.all(
@@ -424,28 +494,112 @@ class _ProductsPageState extends State<ProductsPage> {
                                                           ],
                                                         ),
                                                         child: Center(
-                                                          child: Text(
-                                                            'ADD',
-                                                            style:
-                                                                MyGoogleFontStyle(
-                                                              fontFamily:
-                                                                  'DM Sans',
-                                                              fontSize:
-                                                                  12 * ffem,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w700,
-                                                              height: 1 *
-                                                                  ffem /
-                                                                  fem,
-                                                              color: Color(
-                                                                  0xffc7b456),
-                                                            ),
+                                                          child: Row(
+                                                            children: [
+                                                              TextButton(
+                                                                onPressed:
+                                                                    () async {
+                                                                  bool minus =
+                                                                      false;
+                                                                  await _addToCartModel.getAddToCart(
+                                                                      _productModel
+                                                                          .categoryWiseproducts![
+                                                                              index]
+                                                                          .id,
+                                                                      minus,
+                                                                      _CartData);
+                                                                },
+                                                                style: TextButton
+                                                                    .styleFrom(
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .zero,
+                                                                ),
+                                                                child:
+                                                                    Container(
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    border: Border
+                                                                        .all(),
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .all(
+                                                                      Radius
+                                                                          .circular(
+                                                                              5),
+                                                                    ),
+                                                                  ),
+                                                                  child: Icon(Icons
+                                                                      .remove),
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                // '1',
+                                                                _addToCartModel
+                                                                    .addToCarts!
+                                                                    .where((_aTC) =>
+                                                                        _aTC.productId ==
+                                                                        _productModel
+                                                                            .categoryWiseproducts![index]
+                                                                            .id)
+                                                                    .toList()[0]
+                                                                    .qty
+                                                                    .toString(),
+                                                                style:
+                                                                    MyGoogleFontStyle(
+                                                                  fontFamily:
+                                                                      'Poppins',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  color: Color(
+                                                                      0xff1e1e1e),
+                                                                ),
+                                                              ),
+                                                              TextButton(
+                                                                onPressed:
+                                                                    () async {
+                                                                  bool type =
+                                                                      true;
+
+                                                                  await _addToCartModel.getAddToCart(
+                                                                      _productModel
+                                                                          .categoryWiseproducts![
+                                                                              index]
+                                                                          .id,
+                                                                      type,
+                                                                      _CartData);
+                                                                },
+                                                                style: TextButton
+                                                                    .styleFrom(
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .zero,
+                                                                ),
+                                                                child:
+                                                                    Container(
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    border: Border
+                                                                        .all(),
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .all(
+                                                                      Radius
+                                                                          .circular(
+                                                                              5),
+                                                                    ),
+                                                                  ),
+                                                                  child: Icon(
+                                                                      Icons
+                                                                          .add),
+                                                                ),
+                                                              ),
+                                                            ],
                                                           ),
                                                         ),
                                                       ),
                                                     ),
-                                                  ),
                                                 ],
                                               ),
                                             ),
@@ -524,23 +678,11 @@ class _ProductsPageState extends State<ProductsPage> {
                                       ),
                                     ],
                                   );
-                                }
-
-                                // GridView.count(
-                                //   scrollDirection: Axis.vertical,
-                                //   crossAxisCount: 2,
-                                //   crossAxisSpacing: 10,
-                                //   // mainAxisSpacing: 135,
-                                //   children: List.generate(
-                                //       _productModel.categoryWiseproducts!.length,
-                                //       (index) {
-
-                                //   }),
-                                ),
+                                }),
                           )
                         : SizedBox(
                             height: 550,
-                            child: Center(child: CircularProgressIndicator())),
+                            child: Center(child: Text('No product found.'))),
                   ],
                 ),
               ),
