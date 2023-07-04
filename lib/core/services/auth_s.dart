@@ -51,7 +51,7 @@ class AuthService {
           json.decode(_responseUserRole.body);
     }
     if (registerData!['imagepath'] != 'null') {
-      var _id = _responseData['data']['id'];
+      var _id = _responseData['data']['id'].toString();
       var request = http.MultipartRequest(
         'POST',
         Uri.parse('${_apiConfig['baseURL']}/upload_user_photo'),
