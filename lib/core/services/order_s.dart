@@ -29,29 +29,34 @@ class OrderService {
     });
 
     Order order = Order(
-      couponAmount: 0,
-      couponId: null,
-      deliveryAmount:
-          _configModel.user.companies![0].deliveryCharges.toString(),
-      details: '-',
-      isApprovedByHotelier: 0,
-      orderCost: int.parse(cartTotal),
-      packagingAmount: _configModel.user.companies![0].packagingCharges,
-      taxAmount: double.parse(cartTotal) /
-          100 *
-          double.parse(_configModel.user.companies![0].taxPercent.toString()),
-      taxPercent: _configModel.user.companies![0].taxPercent.toString(),
-      tipAmount: 0,
-      totalAmount: ((double.parse(cartTotal)) +
-              (double.parse(cartTotal) /
-                  100 *
-                  double.parse(
-                      _configModel.user.companies![0].taxPercent.toString())))
-          .toString(),
-      totalCashback: 0,
-      walletAmountUsed: 0,
-      userId: _configModel.user.id,
-    );
+        couponAmount: 0,
+        couponId: null,
+        deliveryAmount: double.parse(
+            _configModel.user.companies![0].deliveryCharges.toString()),
+        details: '-',
+        isApprovedByHotelier: 0,
+        orderCost: int.parse(cartTotal),
+        packagingAmount: _configModel.user.companies![0].packagingCharges,
+        taxAmount: double.parse(cartTotal) /
+            100 *
+            double.parse(_configModel.user.companies![0].taxPercent.toString()),
+        taxPercent: _configModel.user.companies![0].taxPercent.toString(),
+        tipAmount: 0,
+        totalAmount: double.parse(((double.parse(cartTotal)) +
+                (double.parse(cartTotal) /
+                    100 *
+                    double.parse(
+                        _configModel.user.companies![0].taxPercent.toString())))
+            .toString()),
+        totalCashback: 0,
+        walletAmountUsed: 0,
+        userId: _configModel.user.id,
+        isDelivered: 0,
+        isDeliveryBoyAccepted: 0,
+        isDinein: 0,
+        storePayableAmount: 0,
+        comissionAmount: 0,
+        paymentmode: 'cashondelivery');
 
     var _orderJson = order.toJson();
     _orderJson['order_details'] = orderDetails;
@@ -63,5 +68,24 @@ class OrderService {
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
     return _responseData['success'];
+  }
+
+  List<Order> _orders = [];
+
+  getOrders() async {
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    var userId = _configModel.user.id;
+    http.Response _response = await http.get(
+      Uri.parse('${_apiConfig['baseURL']}/orders?userId=$userId'),
+      headers: _apiConfig['headers'],
+    );
+    Map<String, dynamic> _responseData = json.decode(_response.body);
+    if (_responseData['success']) {
+      _orders = [];
+      _responseData['data'].forEach((data) {
+        _orders.add(Order.fromJson(data));
+      });
+    }
+    return _orders;
   }
 }

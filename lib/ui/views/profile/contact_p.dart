@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:sales_app/core/providers/config_pr.dart';
+import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher_string.dart';
 
-class ContactPage extends StatelessWidget {
+class ContactPage extends StatefulWidget {
   const ContactPage({Key? key}) : super(key: key);
 
   @override
+  State<ContactPage> createState() => _ContactPageState();
+}
+
+class _ContactPageState extends State<ContactPage> {
+  @override
   Widget build(BuildContext context) {
+    final ConfigModel _configModel = locator<ConfigModel>();
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -114,8 +124,8 @@ class ContactPage extends StatelessWidget {
                                     height: 5,
                                   ),
                                   Text(
-                                    // alreadyhave10orders9Ca (I318:2511;0:1158)
-                                    'pinewraps@gmail.com',
+                                    _configModel.user.companies![0].email
+                                        .toString(),
                                     style: MyGoogleFontStyle(
                                       fontFamily: 'Urbanist',
                                       fontSize: 15,
@@ -173,32 +183,35 @@ class ContactPage extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Whatsapp',
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xff232323),
+                            InkWell(
+                              onTap: () {},
+                              child: Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Whatsapp',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xff232323),
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    // alreadyhave10orders9Ca (I318:2511;0:1158)
-                                    '6787656545',
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xff232323),
+                                    SizedBox(
+                                      height: 5,
                                     ),
-                                  ),
-                                ],
+                                    Text(
+                                      _configModel.user.companies![0].phone
+                                          .toString(),
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xff232323),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],

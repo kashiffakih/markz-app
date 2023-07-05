@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/product_pr.dart';
+import 'package:sales_app/core/providers/wish_list_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/products/product_id_p.dart';
@@ -16,9 +17,17 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   @override
+  void initState() {
+    super.initState();
+    var productId = '';
+    Provider.of<WishListModel>(context, listen: false).getWishLists(productId);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final ConfigModel _configModel = locator<ConfigModel>();
     final ProductModel _productModel = Provider.of<ProductModel>(context);
+    final WishListModel _wishListModel = Provider.of<WishListModel>(context);
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
@@ -275,134 +284,218 @@ class _HomePageState extends State<HomePage> {
                 ? LinearProgressIndicator()
                 : SizedBox(
                     height: 300,
-                    child: ListView.builder(
-                        padding: const EdgeInsets.only(left: 5, right: 8),
-                        scrollDirection: Axis.horizontal,
-                        shrinkWrap: true,
-                        itemCount: _productModel.products!.length,
-                        itemBuilder: (context, index) {
-                          return InkWell(
-                            onTap: () {
-                              // print(_productModel.products![index].id);
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => ProductIdPage(
-                                          arguments: {
-                                            'product': _productModel
-                                                .products![index]
-                                                .toJson()
-                                          })));
-                            },
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.only(left: 5, right: 8),
-                                  child: Container(
-                                    // group8949Yce (318:1997)
-                                    width: 145 * fem,
-                                    height: double.infinity,
-                                    decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.circular(15 * fem),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        // Text(
-                                        //     _configModel.apiConfig['mediaURL'] +
-                                        //         _productModel
-                                        //             .products![index].imagepath1
-                                        //             .toString()),
-                                        Container(
-                                          margin: EdgeInsets.fromLTRB(0 * fem,
-                                              0 * fem, 0 * fem, 5 * fem),
-                                          padding: EdgeInsets.fromLTRB(
-                                              106 * fem,
-                                              13 * fem,
-                                              14 * fem,
-                                              15 * fem),
-                                          width: double.infinity,
-                                          height: 193 * fem,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(15 * fem),
-                                            image: DecorationImage(
-                                                fit: BoxFit.cover,
-                                                image: NetworkImage(_configModel
-                                                        .apiConfig['mediaURL'] +
-                                                    _productModel
-                                                        .products![index]
-                                                        .imagepath2
-                                                        .toString())
-                                                // image: AssetImage(
-                                                //   'assets/images/shades-chocolate-cake-3-1-2-1-bg.png',
-                                                // ),
+                    child: _productModel.productsLoader
+                        ? SizedBox(
+                            // height: 20,
+                            child: Center(child: Text('No new arrivals')),
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.only(left: 5, right: 8),
+                            scrollDirection: Axis.horizontal,
+                            shrinkWrap: true,
+                            itemCount: _productModel.products!.length,
+                            itemBuilder: (context, index) {
+                              return Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 5, right: 8),
+                                    child: Container(
+                                      // group8949Yce (318:1997)
+                                      width: 145 * fem,
+                                      height: double.infinity,
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(15 * fem),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          InkWell(
+                                            onTap: () {
+                                              Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ProductIdPage(
+                                                              arguments: {
+                                                                'product':
+                                                                    _productModel
+                                                                        .products![
+                                                                            index]
+                                                                        .toJson()
+                                                              })));
+                                            },
+                                            child: Container(
+                                              margin: EdgeInsets.fromLTRB(
+                                                  0 * fem,
+                                                  0 * fem,
+                                                  0 * fem,
+                                                  5 * fem),
+                                              padding: EdgeInsets.fromLTRB(
+                                                  106 * fem,
+                                                  13 * fem,
+                                                  14 * fem,
+                                                  15 * fem),
+                                              width: double.infinity,
+                                              height: 193 * fem,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        15 * fem),
+                                                image: DecorationImage(
+                                                  fit: BoxFit.cover,
+                                                  image: NetworkImage(
+                                                      _configModel.apiConfig[
+                                                              'mediaURL'] +
+                                                          _productModel
+                                                              .products![index]
+                                                              .imagepath2
+                                                              .toString()),
                                                 ),
-                                          ),
-                                          child: Align(
-                                            // vectorRZx (318:2001)
-                                            alignment: Alignment.topRight,
-                                            child: SizedBox(
-                                              width: 25 * fem,
-                                              height: 22.4 * fem,
-                                              child: Image.asset(
-                                                'assets/images/vector-yse.png',
-                                                width: 25 * fem,
-                                                height: 22.4 * fem,
+                                              ),
+                                              child: InkWell(
+                                                onTap: () async {
+                                                  await _wishListModel
+                                                      .getWishLists(
+                                                          _productModel
+                                                              .products![index]
+                                                              .id);
+                                                },
+                                                child: _wishListModel
+                                                        .wishListLoader
+                                                    ? Align(
+                                                        // vectorRZx (318:2001)
+                                                        alignment:
+                                                            Alignment.topRight,
+                                                        child: SizedBox(
+                                                          width: 25 * fem,
+                                                          height: 22.4 * fem,
+                                                          child: Image.asset(
+                                                            'assets/images/vector-wXc.png',
+                                                            width: 25 * fem,
+                                                            height: 22.4 * fem,
+                                                          ),
+                                                        ),
+                                                      )
+                                                    : _wishListModel.wishLists!
+                                                                .where((wishList) =>
+                                                                    wishList.productId ==
+                                                                        _productModel
+                                                                            .products![
+                                                                                index]
+                                                                            .id &&
+                                                                    wishList.userId ==
+                                                                        _configModel
+                                                                            .user
+                                                                            .id)
+                                                                .toList()
+                                                                .length ==
+                                                            0
+                                                        ? Align(
+                                                            // vectorRZx (318:2001)
+                                                            alignment: Alignment
+                                                                .topRight,
+                                                            child: SizedBox(
+                                                              width: 25 * fem,
+                                                              height:
+                                                                  22.4 * fem,
+                                                              child:
+                                                                  Image.asset(
+                                                                'assets/images/vector-yse.png',
+                                                                width: 25 * fem,
+                                                                height:
+                                                                    22.4 * fem,
+                                                              ),
+                                                            ),
+                                                          )
+                                                        : Align(
+                                                            // vectorRZx (318:2001)
+                                                            alignment: Alignment
+                                                                .topRight,
+                                                            child: SizedBox(
+                                                              width: 25 * fem,
+                                                              height:
+                                                                  22.4 * fem,
+                                                              child:
+                                                                  Image.asset(
+                                                                'assets/images/vector-wXc.png',
+                                                                width: 25 * fem,
+                                                                height:
+                                                                    22.4 * fem,
+                                                              ),
+                                                            ),
+                                                          ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                        Container(
-                                          // shadechocolatecake3pc6 (318:2002)
-                                          margin: EdgeInsets.fromLTRB(0 * fem,
-                                              0 * fem, 0 * fem, 4 * fem),
-                                          constraints: BoxConstraints(
-                                            maxWidth: 123 * fem,
-                                          ),
-                                          child: Text(
-                                            _productModel.products![index].name
-                                                .toString(),
-                                            textAlign: TextAlign.center,
-                                            style: MyGoogleFontStyle(
-                                              fontFamily: 'Urbanist',
-                                              fontSize: 15 * ffem,
-                                              fontWeight: FontWeight.w700,
-                                              height: 1.2 * ffem / fem,
-                                              letterSpacing: -0.3 * fem,
-                                              color: Color(0xff000000),
+                                          InkWell(
+                                            onTap: () {
+                                              Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ProductIdPage(
+                                                              arguments: {
+                                                                'product':
+                                                                    _productModel
+                                                                        .products![
+                                                                            index]
+                                                                        .toJson()
+                                                              })));
+                                            },
+                                            child: Container(
+                                              // shadechocolatecake3pc6 (318:2002)
+                                              margin: EdgeInsets.fromLTRB(
+                                                  0 * fem,
+                                                  0 * fem,
+                                                  0 * fem,
+                                                  4 * fem),
+                                              constraints: BoxConstraints(
+                                                maxWidth: 123 * fem,
+                                              ),
+                                              child: Text(
+                                                _productModel
+                                                    .products![index].name
+                                                    .toString(),
+                                                textAlign: TextAlign.center,
+                                                style: MyGoogleFontStyle(
+                                                  fontFamily: 'Urbanist',
+                                                  fontSize: 15 * ffem,
+                                                  fontWeight: FontWeight.w700,
+                                                  height: 1.2 * ffem / fem,
+                                                  letterSpacing: -0.3 * fem,
+                                                  color: Color(0xff000000),
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        Container(
-                                          // 5H8 (318:2003)
-                                          margin: EdgeInsets.fromLTRB(0 * fem,
-                                              0 * fem, 1 * fem, 0 * fem),
-                                          child: Text(
-                                            _productModel.products![index]
-                                                .productPrices![0].offerPrice
-                                                .toString(),
-                                            style: MyGoogleFontStyle(
-                                              fontFamily: 'Poppins',
-                                              fontSize: 10.9543466568 * ffem,
-                                              fontWeight: FontWeight.w500,
-                                              height: 1.5 * ffem / fem,
-                                              letterSpacing:
-                                                  -0.2190869331 * fem,
-                                              color: Color(0x99000000),
+                                          Container(
+                                            // 5H8 (318:2003)
+                                            margin: EdgeInsets.fromLTRB(0 * fem,
+                                                0 * fem, 1 * fem, 0 * fem),
+                                            child: Text(
+                                              _productModel.products![index]
+                                                  .productPrices![0].offerPrice
+                                                  .toString(),
+                                              style: MyGoogleFontStyle(
+                                                fontFamily: 'Poppins',
+                                                fontSize: 10.9543466568 * ffem,
+                                                fontWeight: FontWeight.w500,
+                                                height: 1.5 * ffem / fem,
+                                                letterSpacing:
+                                                    -0.2190869331 * fem,
+                                                color: Color(0x99000000),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
+                                ],
+                              );
+                            }),
                   ),
             Container(
               child: Center(
@@ -431,8 +524,10 @@ class _HomePageState extends State<HomePage> {
                           onTap: () {
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => ProductsPage(arguments: {
-                                      'categoryId':
-                                          _productModel.categories![index]['id']
+                                      'categoryId': _productModel
+                                          .categories![index]['id'],
+                                      'subCategory': _productModel
+                                          .categories![index]['sub_categories']
                                     })));
                           },
                           child: Container(
@@ -873,37 +968,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ],
-              ),
-            ),
-            Container(
-              child: ListTile(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) => AlertDialog(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
-                      title: Text('Are you sure you want to logout?'),
-                      actions: <Widget>[
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text('NO'),
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            Navigator.of(context).pop();
-                            await _configModel.removeLoginData();
-                            Navigator.pushReplacementNamed(context, '/login');
-                          },
-                          child: Text('YES'),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-                title: Text('Logout'),
               ),
             ),
           ],

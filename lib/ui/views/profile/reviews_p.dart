@@ -1,11 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:sales_app/core/providers/config_pr.dart';
+import 'package:sales_app/core/providers/review_pr.dart';
+import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 
-class ReviewsPage extends StatelessWidget {
+class ReviewsPage extends StatefulWidget {
   const ReviewsPage({Key? key}) : super(key: key);
 
   @override
+  State<ReviewsPage> createState() => _ReviewsPageState();
+}
+
+class _ReviewsPageState extends State<ReviewsPage> {
+  DateFormat? _format;
+  @override
+  void initState() {
+    _format = DateFormat('yyyy-MM-dd');
+    var productId = '';
+    Provider.of<ReviewModel>(context, listen: false).getMyReviews(productId);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final ReviewModel _reviewModel = Provider.of<ReviewModel>(context);
+    final ConfigModel _configModel = locator<ConfigModel>();
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -51,239 +73,168 @@ class ReviewsPage extends StatelessWidget {
                 ),
                 // Body
                 Container(
+                  height: 650,
                   margin: EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      // 1st Review
-                      Container(
-                        margin: EdgeInsets.only(bottom: 10),
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xffc7b456)),
-                          color: Color(0xffffffff),
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(5),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0x338a959e),
-                              offset: Offset(0, 7.6690645218),
-                              blurRadius: 19.1726608276,
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            // Photo and Title
-                            Row(
+                  child: _reviewModel.reviews!.isEmpty
+                      ? Center(child: Text('No reviews'))
+                      : ListView.builder(
+                          itemCount: _reviewModel.reviews!.length,
+                          itemBuilder: (BuildContext context, index) =>
+                              SingleChildScrollView(
+                            child: Column(
                               children: [
-                                Expanded(
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 10),
+                                  padding: EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Color(0xffc7b456)),
+                                    color: Color(0xffffffff),
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(5),
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Color(0x338a959e),
+                                        offset: Offset(0, 7.6690645218),
+                                        blurRadius: 19.1726608276,
+                                      ),
+                                    ],
+                                  ),
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
                                     children: [
+                                      // Photo and Title
                                       Row(
                                         children: [
-                                          Container(
-                                            // mediaF3t (I318:2555;0:1388)
-                                            margin: EdgeInsets.fromLTRB(
-                                                0, 0, 15, 0),
-                                            width: 66.71,
-                                            height: 66.71,
-                                            child: Image.asset(
-                                              'assets/images/media.png',
-                                              width: 66.71,
-                                              height: 66.71,
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Container(
+                                                      // mediaF3t (I318:2555;0:1388)
+                                                      margin:
+                                                          EdgeInsets.fromLTRB(
+                                                              0, 0, 15, 0),
+                                                      width: 66.71,
+                                                      height: 66.71,
+                                                      child: Image.network(
+                                                        _configModel.apiConfig[
+                                                                'mediaURL'] +
+                                                            _reviewModel
+                                                                .reviews![index]
+                                                                .product!
+                                                                .imagepath1
+                                                                .toString(),
+                                                        // 'assets/images/media.png',
+                                                        width: 66.71,
+                                                        height: 66.71,
+                                                      ),
+                                                    ),
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          _reviewModel
+                                                              .reviews![index]
+                                                              .product!
+                                                              .name
+                                                              .toString(),
+                                                          style:
+                                                              MyGoogleFontStyle(
+                                                            fontFamily:
+                                                                'Poppins',
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            color: Color(
+                                                                0xff232323),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          // BLr (I318:2555;0:1392)
+                                                          '₹ ' +
+                                                              _reviewModel
+                                                                  .reviews![
+                                                                      index]
+                                                                  .product!
+                                                                  .productPrices![
+                                                                      0]
+                                                                  .price
+                                                                  .toString(),
+                                                          style:
+                                                              MyGoogleFontStyle(
+                                                            fontFamily:
+                                                                'Poppins',
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            color: Color(
+                                                                0xff232323),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
                                             ),
-                                          ),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Coffee Table',
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Poppins',
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w400,
-                                                  color: Color(0xff232323),
-                                                ),
-                                              ),
-                                              Text(
-                                                // BLr (I318:2555;0:1392)
-                                                '\$ 50.00',
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Poppins',
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Color(0xff232323),
-                                                ),
-                                              ),
-                                            ],
                                           ),
                                         ],
                                       ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      // Stars
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(_configModel
+                                                .user.firstName
+                                                .toString()),
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              _format!.format(DateTime.parse(
+                                                  _reviewModel
+                                                      .reviews![index].createdAt
+                                                      .toString())),
+                                              textAlign: TextAlign.right,
+                                              style: MyGoogleFontStyle(
+                                                fontFamily: 'Poppins',
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w400,
+                                                color: Color(0xff909090),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      // Description
+                                      Text(
+                                        _reviewModel.reviews![index].description
+                                            .toString(),
+                                        style: MyGoogleFontStyle(
+                                          fontFamily: 'Poppins',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400,
+                                          color: Color(0xff909090),
+                                        ),
+                                      )
                                     ],
                                   ),
                                 ),
                               ],
                             ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            // Stars
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text('Star Widget'),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    // 8hL (I318:2555;0:1369)
-                                    '20/03/2020',
-                                    textAlign: TextAlign.right,
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Poppins',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xff909090),
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            // Description
-                            Text(
-                              'Nice Furniture with good delivery. The delivery time is very fast. Then products look like exactly the picture in the app. Besides, color is also the same and quality is very good despite very cheap price',
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff909090),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      // 2nd Review
-                      Container(
-                        margin: EdgeInsets.only(bottom: 10),
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xffc7b456)),
-                          color: Color(0xffffffff),
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(5),
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0x338a959e),
-                              offset: Offset(0, 7.6690645218),
-                              blurRadius: 19.1726608276,
-                            ),
-                          ],
                         ),
-                        child: Column(
-                          children: [
-                            // Photo and Title
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Container(
-                                            // mediaF3t (I318:2555;0:1388)
-                                            margin: EdgeInsets.fromLTRB(
-                                                0, 0, 15, 0),
-                                            width: 66.71,
-                                            height: 66.71,
-                                            child: Image.asset(
-                                              'assets/images/media.png',
-                                              width: 66.71,
-                                              height: 66.71,
-                                            ),
-                                          ),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Coffee Table',
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Poppins',
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w400,
-                                                  color: Color(0xff232323),
-                                                ),
-                                              ),
-                                              Text(
-                                                // BLr (I318:2555;0:1392)
-                                                '\$ 50.00',
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Poppins',
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Color(0xff232323),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            // Stars
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text('Star Widget'),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    // 8hL (I318:2555;0:1369)
-                                    '20/03/2020',
-                                    textAlign: TextAlign.right,
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Poppins',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xff909090),
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            // Description
-                            Text(
-                              'Nice Furniture with good delivery. The delivery time is very fast. Then products look like exactly the picture in the app. Besides, color is also the same and quality is very good despite very cheap price',
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff909090),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
                 )
               ],
             ),

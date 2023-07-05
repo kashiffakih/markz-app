@@ -1,3 +1,5 @@
+import 'package:sales_app/core/models/review.dart';
+
 class Product {
   int? id;
   int? companyId;
@@ -27,6 +29,7 @@ class Product {
   List<ProductPack>? productPacks;
   List<Tags>? tags;
   Company? company;
+  List<Review>? reviews;
 
   Product(
       {this.id,
@@ -56,7 +59,8 @@ class Product {
       this.productPrices,
       this.productPacks,
       this.tags,
-      this.company});
+      this.company,
+      this.reviews});
 
   Product.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -107,6 +111,12 @@ class Product {
     }
     company =
         json['company'] != null ? new Company.fromJson(json['company']) : null;
+    if (json['reviews'] != null) {
+      reviews = <Review>[];
+      json['reviews'].forEach((v) {
+        reviews!.add(new Review.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -152,6 +162,9 @@ class Product {
     }
     if (this.company != null) {
       data['company'] = this.company!.toJson();
+    }
+    if (this.reviews != null) {
+      data['reviews'] = this.reviews!.map((v) => v.toJson()).toList();
     }
     return data;
   }

@@ -19,7 +19,7 @@ class DrawerWidget extends StatelessWidget {
                     BoxDecoration(color: Theme.of(context).primaryColor),
                 child: Row(
                   children: <Widget>[
-                    if (_configModel.user.imagePath != null)
+                    if (_configModel.user.imagepath != null)
                       InkWell(
                         onTap: () {},
                         child: Hero(
@@ -28,12 +28,12 @@ class DrawerWidget extends StatelessWidget {
                             radius: 32,
                             backgroundImage: NetworkImage(
                               _configModel.apiConfig['mediaURL'] +
-                                  _configModel.user.imagePath,
+                                  _configModel.user.imagepath,
                             ),
                           ),
                         ),
                       ),
-                    if (_configModel.user.imagePath == null)
+                    if (_configModel.user.imagepath == null)
                       InkWell(
                         onTap: () {},
                         child: Hero(
@@ -53,7 +53,7 @@ class DrawerWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _configModel.user.name.toString(),
+                            _configModel.user.firstName.toString(),
                             style: TextStyle(
                               color: Colors.white,
                             ),

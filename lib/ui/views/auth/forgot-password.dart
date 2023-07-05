@@ -305,7 +305,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               bool response =
                                   await authModel.verifyCode(data: _loginData);
                               if (response == true) {
-                                // print(_loginData);
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => ChangePasswordPage(
                                         arguments: _loginData)));

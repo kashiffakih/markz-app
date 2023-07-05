@@ -27,6 +27,12 @@ class _CartPageState extends State<CartPage> {
     super.initState();
   }
 
+  Map<String, dynamic> _CartData = {
+    'kindOfFlower': '',
+    'flavour': '',
+    'writeOnCake': '',
+  };
+
   @override
   Widget build(BuildContext context) {
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
@@ -58,7 +64,7 @@ class _CartPageState extends State<CartPage> {
                             ),
                             Expanded(
                               child: Text(
-                                'Cart',
+                                'My Cart',
                                 textAlign: TextAlign.center,
                                 style: MyGoogleFontStyle(
                                   fontFamily: 'Urbanist',
@@ -86,142 +92,189 @@ class _CartPageState extends State<CartPage> {
                           child: Container(
                             width: MediaQuery.of(context).size.width - 50,
                             height: MediaQuery.of(context).size.height - 250,
-                            child: ListView.builder(
-                              itemCount: _addToCartModel.addToCarts!.length,
-                              itemBuilder: (BuildContext context, index) =>
-                                  Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        margin:
-                                            EdgeInsets.fromLTRB(0, 0, 18, 0),
-                                        child: Image.network(
-                                          _configModel.apiConfig['mediaURL'] +
-                                              _addToCartModel.addToCarts![index]
-                                                  .product!.imagepath1
-                                                  .toString(),
-                                          // 'assets/images/mask-group-HvE.png',
-                                          width: 100,
-                                          height: 100,
-                                        ),
-                                      ),
-                                      Container(
-                                        child: Column(
+                            child: _addToCartModel.addToCarts!.isEmpty
+                                ? SizedBox(
+                                    height: 60,
+                                    child: Center(child: Text('Cart is empty')),
+                                  )
+                                : ListView.builder(
+                                    itemCount:
+                                        _addToCartModel.addToCarts!.length,
+                                    itemBuilder:
+                                        (BuildContext context, index) => Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
                                           children: [
-                                            Text(
-                                              _addToCartModel.addToCarts![index]
-                                                  .product!.name
-                                                  .toString(),
-                                              style: MyGoogleFontStyle(
-                                                fontFamily: 'Urbanist',
-                                                fontWeight: FontWeight.w500,
-                                                color: Color(0xff909090),
+                                            Expanded(
+                                              flex: 5,
+                                              child: Container(
+                                                margin: EdgeInsets.fromLTRB(
+                                                    0, 0, 18, 0),
+                                                child: Image.network(
+                                                  _configModel.apiConfig[
+                                                          'mediaURL'] +
+                                                      _addToCartModel
+                                                          .addToCarts![index]
+                                                          .product!
+                                                          .imagepath1
+                                                          .toString(),
+                                                  // 'assets/images/mask-group-HvE.png',
+                                                  width: 100,
+                                                  height: 100,
+                                                ),
                                               ),
                                             ),
-                                            Text(
-                                              '₹ ' +
-                                                  _addToCartModel
-                                                      .addToCarts![index]
-                                                      .product!
-                                                      .productPrices![0]
-                                                      .price
-                                                      .toString(),
-                                              style: MyGoogleFontStyle(
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.w600,
-                                                color: Color(0xff1e1e1e),
+                                            Expanded(
+                                              flex: 5,
+                                              child: Container(
+                                                child: Column(
+                                                  children: [
+                                                    Text(
+                                                      _addToCartModel
+                                                          .addToCarts![index]
+                                                          .product!
+                                                          .name
+                                                          .toString(),
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Urbanist',
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color:
+                                                            Color(0xff909090),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '₹ ' +
+                                                          _addToCartModel
+                                                              .addToCarts![
+                                                                  index]
+                                                              .product!
+                                                              .productPrices![0]
+                                                              .price
+                                                              .toString(),
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color:
+                                                            Color(0xff1e1e1e),
+                                                      ),
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        TextButton(
+                                                          onPressed: () async {
+                                                            bool minus = false;
+                                                            await _addToCartModel
+                                                                .getAddToCart(
+                                                                    _addToCartModel
+                                                                        .addToCarts![
+                                                                            index]
+                                                                        .product!
+                                                                        .id,
+                                                                    minus,
+                                                                    _CartData);
+                                                          },
+                                                          style: TextButton
+                                                              .styleFrom(
+                                                            padding:
+                                                                EdgeInsets.zero,
+                                                          ),
+                                                          child: Container(
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              border:
+                                                                  Border.all(),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .all(
+                                                                Radius.circular(
+                                                                    5),
+                                                              ),
+                                                            ),
+                                                            child: Icon(
+                                                                Icons.remove),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          _addToCartModel
+                                                              .addToCarts![
+                                                                  index]
+                                                              .qty
+                                                              .toString(),
+                                                          style:
+                                                              MyGoogleFontStyle(
+                                                            fontFamily:
+                                                                'Poppins',
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: Color(
+                                                                0xff1e1e1e),
+                                                          ),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () async {
+                                                            bool type = true;
+
+                                                            await _addToCartModel
+                                                                .getAddToCart(
+                                                                    _addToCartModel
+                                                                        .addToCarts![
+                                                                            index]
+                                                                        .product!
+                                                                        .id,
+                                                                    type,
+                                                                    _CartData);
+                                                          },
+                                                          style: TextButton
+                                                              .styleFrom(
+                                                            padding:
+                                                                EdgeInsets.zero,
+                                                          ),
+                                                          child: Container(
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              border:
+                                                                  Border.all(),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .all(
+                                                                Radius.circular(
+                                                                    5),
+                                                              ),
+                                                            ),
+                                                            child:
+                                                                Icon(Icons.add),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                            Row(
-                                              children: [
-                                                TextButton(
-                                                  onPressed: () async {
-                                                    bool minus = false;
-                                                    await _addToCartModel
-                                                        .getAddToCart(
-                                                            _addToCartModel
-                                                                .addToCarts![
-                                                                    index]
-                                                                .product!
-                                                                .id,
-                                                            minus,
-                                                            '');
-                                                  },
-                                                  style: TextButton.styleFrom(
-                                                    padding: EdgeInsets.zero,
-                                                  ),
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(),
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(5),
-                                                      ),
-                                                    ),
-                                                    child: Icon(Icons.remove),
-                                                  ),
-                                                ),
-                                                Text(
-                                                  _addToCartModel
-                                                      .addToCarts![index].qty
-                                                      .toString(),
-                                                  style: MyGoogleFontStyle(
-                                                    fontFamily: 'Poppins',
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Color(0xff1e1e1e),
-                                                  ),
-                                                ),
-                                                TextButton(
-                                                  onPressed: () async {
-                                                    bool type = true;
-                                                    await _addToCartModel
-                                                        .getAddToCart(
-                                                            _addToCartModel
-                                                                .addToCarts![
-                                                                    index]
-                                                                .product!
-                                                                .id,
-                                                            type,
-                                                            '');
-                                                  },
-                                                  style: TextButton.styleFrom(
-                                                    padding: EdgeInsets.zero,
-                                                  ),
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(),
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(5),
-                                                      ),
-                                                    ),
-                                                    child: Icon(Icons.add),
-                                                  ),
-                                                ),
-                                              ],
                                             )
                                           ],
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width - 50,
-                                    child: Divider(
-                                      thickness: 2,
-                                      color: Colors.black,
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width -
+                                              50,
+                                          child: Divider(
+                                            thickness: 2,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
                           ),
                         ),
                       ),
@@ -274,8 +327,12 @@ class _CartPageState extends State<CartPage> {
                                   ),
                                   Expanded(
                                     child: Text(
-                                      '₹ ' +
-                                          _addToCartModel.cartTotal.toString(),
+                                      _addToCartModel.cartTotal.toString() !=
+                                              null
+                                          ? '₹ ' +
+                                              _addToCartModel.cartTotal
+                                                  .toString()
+                                          : '₹ 0',
                                       textAlign: TextAlign.right,
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Inter',
@@ -289,49 +346,50 @@ class _CartPageState extends State<CartPage> {
                               SizedBox(
                                 height: 10,
                               ),
-                              Container(
-                                margin: EdgeInsets.fromLTRB(0.89, 0, 0, 0),
-                                child: TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                CheckoutPage(arguments: {
-                                                  'cartTotal': _addToCartModel
-                                                      .cartTotal
-                                                      .toString(),
-                                                  'cartItems':
-                                                      _addToCartModel.addToCarts
-                                                })));
-                                    // Navigator.pushNamed(
-                                    //     context, '/checkoutPage', arguments: {
-                                    //   'cartTotal':
-                                    //       _addToCartModel.cartTotal.toString()
-                                    // });
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                  ),
-                                  child: Container(
-                                    width: 321,
-                                    height: 53,
-                                    decoration: BoxDecoration(
-                                      color: Color(0xff1e1e1e),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        'Checkout',
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xffffffff),
+                              _addToCartModel.addToCarts!.length != 0
+                                  ? Container(
+                                      margin:
+                                          EdgeInsets.fromLTRB(0.89, 0, 0, 0),
+                                      child: TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      CheckoutPage(arguments: {
+                                                        'cartTotal':
+                                                            _addToCartModel
+                                                                .cartTotal
+                                                                .toString(),
+                                                        'cartItems':
+                                                            _addToCartModel
+                                                                .addToCarts
+                                                      })));
+                                        },
+                                        style: TextButton.styleFrom(
+                                          padding: EdgeInsets.zero,
+                                        ),
+                                        child: Container(
+                                          width: 321,
+                                          height: 53,
+                                          decoration: BoxDecoration(
+                                            color: Color(0xff1e1e1e),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              'Checkout',
+                                              style: MyGoogleFontStyle(
+                                                fontFamily: 'Urbanist',
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xffffffff),
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                                    )
+                                  : Text(''),
                             ],
                           ),
                         ),

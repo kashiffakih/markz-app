@@ -10,9 +10,9 @@ class AddToCartService {
   Future<Map<String, dynamic>> getAddToCart(productId, type, [cartData]) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
     var userId = _configModel.user.id;
-    var kindOfFlower = cartData['kindOfFlower'].toString();
-    var flavour = cartData['flavour'].toString();
-    var writeOnCake = cartData['writeOnCake'].toString();
+    var kindOfFlower = cartData!['kindOfFlower'].toString();
+    var flavour = cartData!['flavour'].toString();
+    var writeOnCake = cartData!['writeOnCake'].toString();
 
     http.Response _response = await http.get(
       Uri.parse(

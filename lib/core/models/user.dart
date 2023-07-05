@@ -2,315 +2,165 @@ import 'package:sales_app/core/models/product.dart';
 
 class User {
   int? id;
-  String? name;
+  String? firstName;
+  String? middleName;
+  String? lastName;
   String? email;
   String? emailVerifiedAt;
   int? active;
   int? phone;
   String? apiToken;
-  String? doj;
-  String? dob;
-  String? companyDesignationId;
-  String? companyStateBranchId;
-  String? pfNo;
-  String? uanNo;
-  String? esiNo;
+  String? gender;
+  String? add1;
+  String? add2;
+  String? add3;
+  String? state;
+  String? city;
+  String? nationality;
+  String? pincode;
+  int? isBillingSame;
+  String? billFirstName;
+  String? billMiddleName;
+  String? billLastName;
+  String? billAdd1;
+  String? billAdd2;
+  String? billAdd3;
+  String? billState;
+  String? billCity;
+  String? billNationality;
+  String? billEmail;
+  String? billPhone;
+  String? billPincode;
   String? createdAt;
   String? updatedAt;
-  String? salary;
-  String? imagePath;
-  String? employeeCode;
-  String? asmArea;
-  String? asmName;
-  String? uidNo;
-  String? termsAccepted;
-  String? companyStateId;
-  String? address;
-  String? uniqueId;
-  String? appointmentLetter;
-  String? contractExpiry;
-  String? resumePath;
-  String? photoPath;
-  String? residentialProofPath;
-  String? educationProofPath;
-  String? panCardPath;
-  String? adhaarCardPath;
-  String? esiCardPath;
-  String? cancelledChequePath;
-  String? salarySlipPath;
-  String? birthCertificatePath;
-  String? passportPath;
-  String? drivingLicensePath;
-  String? schoolLeavingCertificatePath;
-  String? markSheetPath;
-  String? experienceCertificatePath;
-  String? prevEmpAppLetterPath;
-  String? form2Path;
-  String? form11Path;
-  String? graduityFormPath;
-  String? appLetterPath;
-  String? pdsFormPath;
-  String? fullName;
-  String? fatherName;
-  String? surname;
-  String? motherName;
-  String? maritalStatus;
-  String? panNo;
-  String? adhaarNo;
-  String? preRoomNo;
-  String? preBuilding;
-  String? preArea;
-  String? preRoad;
-  String? preCity;
-  String? preState;
-  String? prePincode;
-  String? preMobile;
-  String? preEmail;
-  String? perRoomNo;
-  String? perBuilding;
-  String? perArea;
-  String? perRoad;
-  String? perCity;
-  String? perState;
-  String? perPincode;
-  String? perMobile;
-  String? perEmail;
-  String? bloodGroup;
-  String? bankName;
-  String? bankAccNo;
-  String? bankIfscCode;
-  String? bankBranchName;
-  int? dataSubmitted;
-  int? isFresher;
-  String? pdsFormSignPath;
-  String? form2SignPath;
-  String? form11SignPath;
-  String? graduityFormSignPath;
-  String? passwordBackup;
-  String? gender;
-  int? pdsFormChecked;
-  int? form2Checked;
-  int? form11Checked;
-  int? graduityFormChecked;
-  int? beatTypeId;
-  int? soId;
-  int? asmId;
-  int? rmsId;
-  int? nsmId;
-  int? distributorId;
-  String? baName;
-  String? brand;
-  String? channel;
+  String? isAvailable;
+  int? cityId;
+  int? otp;
+  String? accNo;
+  String? accName;
+  String? bank;
+  String? branch;
+  String? ifscCode;
+  String? accType;
+  int? isOccupied;
+  String? vehicleType;
+  String? vehicleNo;
+  String? vehicleName;
+  String? fcmToken;
+  String? referredCode;
+  int? referredCodeUser;
+  String? imagepath;
+  Location? location;
   List<Roles>? roles;
   List<Company>? companies;
-  Distributor? distributor;
 
   User(
       {this.id,
-      this.name,
+      this.firstName,
+      this.middleName,
+      this.lastName,
       this.email,
       this.emailVerifiedAt,
       this.active,
       this.phone,
       this.apiToken,
-      this.doj,
-      this.dob,
-      this.companyDesignationId,
-      this.companyStateBranchId,
-      this.pfNo,
-      this.uanNo,
-      this.esiNo,
+      this.gender,
+      this.add1,
+      this.add2,
+      this.add3,
+      this.state,
+      this.city,
+      this.nationality,
+      this.pincode,
+      this.isBillingSame,
+      this.billFirstName,
+      this.billMiddleName,
+      this.billLastName,
+      this.billAdd1,
+      this.billAdd2,
+      this.billAdd3,
+      this.billState,
+      this.billCity,
+      this.billNationality,
+      this.billEmail,
+      this.billPhone,
+      this.billPincode,
       this.createdAt,
       this.updatedAt,
-      this.salary,
-      this.imagePath,
-      this.employeeCode,
-      this.asmArea,
-      this.asmName,
-      this.uidNo,
-      this.termsAccepted,
-      this.companyStateId,
-      this.address,
-      this.uniqueId,
-      this.appointmentLetter,
-      this.contractExpiry,
-      this.resumePath,
-      this.photoPath,
-      this.residentialProofPath,
-      this.educationProofPath,
-      this.panCardPath,
-      this.adhaarCardPath,
-      this.esiCardPath,
-      this.cancelledChequePath,
-      this.salarySlipPath,
-      this.birthCertificatePath,
-      this.passportPath,
-      this.drivingLicensePath,
-      this.schoolLeavingCertificatePath,
-      this.markSheetPath,
-      this.experienceCertificatePath,
-      this.prevEmpAppLetterPath,
-      this.form2Path,
-      this.form11Path,
-      this.graduityFormPath,
-      this.appLetterPath,
-      this.pdsFormPath,
-      this.fullName,
-      this.fatherName,
-      this.surname,
-      this.motherName,
-      this.maritalStatus,
-      this.panNo,
-      this.adhaarNo,
-      this.preRoomNo,
-      this.preBuilding,
-      this.preArea,
-      this.preRoad,
-      this.preCity,
-      this.preState,
-      this.prePincode,
-      this.preMobile,
-      this.preEmail,
-      this.perRoomNo,
-      this.perBuilding,
-      this.perArea,
-      this.perRoad,
-      this.perCity,
-      this.perState,
-      this.perPincode,
-      this.perMobile,
-      this.perEmail,
-      this.bloodGroup,
-      this.bankName,
-      this.bankAccNo,
-      this.bankIfscCode,
-      this.bankBranchName,
-      this.dataSubmitted,
-      this.isFresher,
-      this.pdsFormSignPath,
-      this.form2SignPath,
-      this.form11SignPath,
-      this.graduityFormSignPath,
-      this.passwordBackup,
-      this.gender,
-      this.pdsFormChecked,
-      this.form2Checked,
-      this.form11Checked,
-      this.graduityFormChecked,
-      this.beatTypeId,
-      this.soId,
-      this.asmId,
-      this.rmsId,
-      this.nsmId,
-      this.distributorId,
-      this.baName,
-      this.brand,
-      this.channel,
+      this.isAvailable,
+      this.cityId,
+      this.otp,
+      this.accNo,
+      this.accName,
+      this.bank,
+      this.branch,
+      this.ifscCode,
+      this.accType,
+      this.isOccupied,
+      this.vehicleType,
+      this.vehicleNo,
+      this.vehicleName,
+      this.fcmToken,
+      this.referredCode,
+      this.referredCodeUser,
+      this.imagepath,
+      this.location,
       this.roles,
-      this.companies,
-      this.distributor});
+      this.companies});
 
   User.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    name = json['name'];
+    firstName = json['first_name'];
+    middleName = json['middle_name'];
+    lastName = json['last_name'];
     email = json['email'];
     emailVerifiedAt = json['email_verified_at'];
     active = json['active'];
     phone = json['phone'];
     apiToken = json['api_token'];
-    doj = json['doj'];
-    dob = json['dob'];
-    companyDesignationId = json['company_designation_id'];
-    companyStateBranchId = json['company_state_branch_id'];
-    pfNo = json['pf_no'];
-    uanNo = json['uan_no'];
-    esiNo = json['esi_no'];
+    gender = json['gender'];
+    add1 = json['add_1'];
+    add2 = json['add_2'];
+    add3 = json['add_3'];
+    state = json['state'];
+    city = json['city'];
+    nationality = json['nationality'];
+    pincode = json['pincode'];
+    isBillingSame = json['is_billing_same'];
+    billFirstName = json['bill_first_name'];
+    billMiddleName = json['bill_middle_name'];
+    billLastName = json['bill_last_name'];
+    billAdd1 = json['bill_add_1'];
+    billAdd2 = json['bill_add_2'];
+    billAdd3 = json['bill_add_3'];
+    billState = json['bill_state'];
+    billCity = json['bill_city'];
+    billNationality = json['bill_nationality'];
+    billEmail = json['bill_email'];
+    billPhone = json['bill_phone'];
+    billPincode = json['bill_pincode'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-    salary = json['salary'];
-    imagePath = json['image_path'];
-    employeeCode = json['employee_code'];
-    asmArea = json['asm_area'];
-    asmName = json['asm_name'];
-    uidNo = json['uid_no'];
-    termsAccepted = json['terms_accepted'];
-    companyStateId = json['company_state_id'];
-    address = json['address'];
-    uniqueId = json['unique_id'];
-    appointmentLetter = json['appointment_letter'];
-    contractExpiry = json['contract_expiry'];
-    resumePath = json['resume_path'];
-    photoPath = json['photo_path'];
-    residentialProofPath = json['residential_proof_path'];
-    educationProofPath = json['education_proof_path'];
-    panCardPath = json['pan_card_path'];
-    adhaarCardPath = json['adhaar_card_path'];
-    esiCardPath = json['esi_card_path'];
-    cancelledChequePath = json['cancelled_cheque_path'];
-    salarySlipPath = json['salary_slip_path'];
-    birthCertificatePath = json['birth_certificate_path'];
-    passportPath = json['passport_path'];
-    drivingLicensePath = json['driving_license_path'];
-    schoolLeavingCertificatePath = json['school_leaving_certificate_path'];
-    markSheetPath = json['mark_sheet_path'];
-    experienceCertificatePath = json['experience_certificate_path'];
-    prevEmpAppLetterPath = json['prev_emp_app_letter_path'];
-    form2Path = json['form_2_path'];
-    form11Path = json['form_11_path'];
-    graduityFormPath = json['graduity_form_path'];
-    appLetterPath = json['app_letter_path'];
-    pdsFormPath = json['pds_form_path'];
-    fullName = json['full_name'];
-    fatherName = json['father_name'];
-    surname = json['surname'];
-    motherName = json['mother_name'];
-    maritalStatus = json['marital_status'];
-    panNo = json['pan_no'];
-    adhaarNo = json['adhaar_no'];
-    preRoomNo = json['pre_room_no'];
-    preBuilding = json['pre_building'];
-    preArea = json['pre_area'];
-    preRoad = json['pre_road'];
-    preCity = json['pre_city'];
-    preState = json['pre_state'];
-    prePincode = json['pre_pincode'];
-    preMobile = json['pre_mobile'];
-    preEmail = json['pre_email'];
-    perRoomNo = json['per_room_no'];
-    perBuilding = json['per_building'];
-    perArea = json['per_area'];
-    perRoad = json['per_road'];
-    perCity = json['per_city'];
-    perState = json['per_state'];
-    perPincode = json['per_pincode'];
-    perMobile = json['per_mobile'];
-    perEmail = json['per_email'];
-    bloodGroup = json['blood_group'];
-    bankName = json['bank_name'];
-    bankAccNo = json['bank_acc_no'];
-    bankIfscCode = json['bank_ifsc_code'];
-    bankBranchName = json['bank_branch_name'];
-    dataSubmitted = json['data_submitted'];
-    isFresher = json['is_fresher'];
-    pdsFormSignPath = json['pds_form_sign_path'];
-    form2SignPath = json['form_2_sign_path'];
-    form11SignPath = json['form_11_sign_path'];
-    graduityFormSignPath = json['graduity_form_sign_path'];
-    passwordBackup = json['password_backup'];
-    gender = json['gender'];
-    pdsFormChecked = json['pds_form_checked'];
-    form2Checked = json['form_2_checked'];
-    form11Checked = json['form_11_checked'];
-    graduityFormChecked = json['graduity_form_checked'];
-    beatTypeId = json['beat_type_id'];
-    soId = json['so_id'];
-    asmId = json['asm_id'];
-    rmsId = json['rms_id'];
-    nsmId = json['nsm_id'];
-    distributorId = json['distributor_id'];
-    baName = json['ba_name'];
-    brand = json['brand'];
-    channel = json['channel'];
+    isAvailable = json['is_available'];
+    cityId = json['city_id'];
+    otp = json['otp'];
+    accNo = json['acc_no'];
+    accName = json['acc_name'];
+    bank = json['bank'];
+    branch = json['branch'];
+    ifscCode = json['ifsc_code'];
+    accType = json['acc_type'];
+    isOccupied = json['is_occupied'];
+    vehicleType = json['vehicle_type'];
+    vehicleNo = json['vehicle_no'];
+    vehicleName = json['vehicle_name'];
+    fcmToken = json['fcm_token'];
+    referredCode = json['referred_code'];
+    referredCodeUser = json['referred_code_user'];
+    imagepath = json['imagepath'];
+    location = json['location'] != null
+        ? new Location.fromJson(json['location'])
+        : null;
     if (json['roles'] != null) {
       roles = [];
       json['roles'].forEach((v) {
@@ -323,122 +173,69 @@ class User {
         companies!.add(new Company.fromJson(v));
       });
     }
-    distributor = json['distributor'] != null
-        ? new Distributor.fromJson(json['distributor'])
-        : null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
-    data['name'] = this.name;
+    data['first_name'] = this.firstName;
+    data['middle_name'] = this.middleName;
+    data['last_name'] = this.lastName;
     data['email'] = this.email;
     data['email_verified_at'] = this.emailVerifiedAt;
     data['active'] = this.active;
     data['phone'] = this.phone;
     data['api_token'] = this.apiToken;
-    data['doj'] = this.doj;
-    data['dob'] = this.dob;
-    data['company_designation_id'] = this.companyDesignationId;
-    data['company_state_branch_id'] = this.companyStateBranchId;
-    data['pf_no'] = this.pfNo;
-    data['uan_no'] = this.uanNo;
-    data['esi_no'] = this.esiNo;
+    data['gender'] = this.gender;
+    data['add_1'] = this.add1;
+    data['add_2'] = this.add2;
+    data['add_3'] = this.add3;
+    data['state'] = this.state;
+    data['city'] = this.city;
+    data['nationality'] = this.nationality;
+    data['pincode'] = this.pincode;
+    data['is_billing_same'] = this.isBillingSame;
+    data['bill_first_name'] = this.billFirstName;
+    data['bill_middle_name'] = this.billMiddleName;
+    data['bill_last_name'] = this.billLastName;
+    data['bill_add_1'] = this.billAdd1;
+    data['bill_add_2'] = this.billAdd2;
+    data['bill_add_3'] = this.billAdd3;
+    data['bill_state'] = this.billState;
+    data['bill_city'] = this.billCity;
+    data['bill_nationality'] = this.billNationality;
+    data['bill_email'] = this.billEmail;
+    data['bill_phone'] = this.billPhone;
+    data['bill_pincode'] = this.billPincode;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
-    data['salary'] = this.salary;
-    data['image_path'] = this.imagePath;
-    data['employee_code'] = this.employeeCode;
-    data['asm_area'] = this.asmArea;
-    data['asm_name'] = this.asmName;
-    data['uid_no'] = this.uidNo;
-    data['terms_accepted'] = this.termsAccepted;
-    data['company_state_id'] = this.companyStateId;
-    data['address'] = this.address;
-    data['unique_id'] = this.uniqueId;
-    data['appointment_letter'] = this.appointmentLetter;
-    data['contract_expiry'] = this.contractExpiry;
-    data['resume_path'] = this.resumePath;
-    data['photo_path'] = this.photoPath;
-    data['residential_proof_path'] = this.residentialProofPath;
-    data['education_proof_path'] = this.educationProofPath;
-    data['pan_card_path'] = this.panCardPath;
-    data['adhaar_card_path'] = this.adhaarCardPath;
-    data['esi_card_path'] = this.esiCardPath;
-    data['cancelled_cheque_path'] = this.cancelledChequePath;
-    data['salary_slip_path'] = this.salarySlipPath;
-    data['birth_certificate_path'] = this.birthCertificatePath;
-    data['passport_path'] = this.passportPath;
-    data['driving_license_path'] = this.drivingLicensePath;
-    data['school_leaving_certificate_path'] = this.schoolLeavingCertificatePath;
-    data['mark_sheet_path'] = this.markSheetPath;
-    data['experience_certificate_path'] = this.experienceCertificatePath;
-    data['prev_emp_app_letter_path'] = this.prevEmpAppLetterPath;
-    data['form_2_path'] = this.form2Path;
-    data['form_11_path'] = this.form11Path;
-    data['graduity_form_path'] = this.graduityFormPath;
-    data['app_letter_path'] = this.appLetterPath;
-    data['pds_form_path'] = this.pdsFormPath;
-    data['full_name'] = this.fullName;
-    data['father_name'] = this.fatherName;
-    data['surname'] = this.surname;
-    data['mother_name'] = this.motherName;
-    data['marital_status'] = this.maritalStatus;
-    data['pan_no'] = this.panNo;
-    data['adhaar_no'] = this.adhaarNo;
-    data['pre_room_no'] = this.preRoomNo;
-    data['pre_building'] = this.preBuilding;
-    data['pre_area'] = this.preArea;
-    data['pre_road'] = this.preRoad;
-    data['pre_city'] = this.preCity;
-    data['pre_state'] = this.preState;
-    data['pre_pincode'] = this.prePincode;
-    data['pre_mobile'] = this.preMobile;
-    data['pre_email'] = this.preEmail;
-    data['per_room_no'] = this.perRoomNo;
-    data['per_building'] = this.perBuilding;
-    data['per_area'] = this.perArea;
-    data['per_road'] = this.perRoad;
-    data['per_city'] = this.perCity;
-    data['per_state'] = this.perState;
-    data['per_pincode'] = this.perPincode;
-    data['per_mobile'] = this.perMobile;
-    data['per_email'] = this.perEmail;
-    data['blood_group'] = this.bloodGroup;
-    data['bank_name'] = this.bankName;
-    data['bank_acc_no'] = this.bankAccNo;
-    data['bank_ifsc_code'] = this.bankIfscCode;
-    data['bank_branch_name'] = this.bankBranchName;
-    data['data_submitted'] = this.dataSubmitted;
-    data['is_fresher'] = this.isFresher;
-    data['pds_form_sign_path'] = this.pdsFormSignPath;
-    data['form_2_sign_path'] = this.form2SignPath;
-    data['form_11_sign_path'] = this.form11SignPath;
-    data['graduity_form_sign_path'] = this.graduityFormSignPath;
-    data['password_backup'] = this.passwordBackup;
-    data['gender'] = this.gender;
-    data['pds_form_checked'] = this.pdsFormChecked;
-    data['form_2_checked'] = this.form2Checked;
-    data['form_11_checked'] = this.form11Checked;
-    data['graduity_form_checked'] = this.graduityFormChecked;
-    data['beat_type_id'] = this.beatTypeId;
-    data['so_id'] = this.soId;
-    data['asm_id'] = this.asmId;
-    data['rms_id'] = this.rmsId;
-    data['nsm_id'] = this.nsmId;
-    data['distributor_id'] = this.distributorId;
-    data['ba_name'] = this.baName;
-    data['brand'] = this.brand;
-    data['channel'] = this.channel;
+    data['is_available'] = this.isAvailable;
+    data['city_id'] = this.cityId;
+    data['otp'] = this.otp;
+    data['acc_no'] = this.accNo;
+    data['acc_name'] = this.accName;
+    data['bank'] = this.bank;
+    data['branch'] = this.branch;
+    data['ifsc_code'] = this.ifscCode;
+    data['acc_type'] = this.accType;
+    data['is_occupied'] = this.isOccupied;
+    data['vehicle_type'] = this.vehicleType;
+    data['vehicle_no'] = this.vehicleNo;
+    data['vehicle_name'] = this.vehicleName;
+    data['fcm_token'] = this.fcmToken;
+    data['referred_code'] = this.referredCode;
+    data['referred_code_user'] = this.referredCodeUser;
+    data['imagepath'] = this.imagepath;
+    if (this.location != null) {
+      data['location'] = this.location!.toJson();
+    }
     if (this.roles != null) {
       data['roles'] = this.roles!.map((v) => v.toJson()).toList();
     }
     if (this.companies != null) {
       data['companies'] = this.companies!.map((v) => v.toJson()).toList();
     }
-    if (this.distributor != null) {
-      data['distributor'] = this.distributor!.toJson();
-    }
+
     return data;
   }
 }
@@ -468,403 +265,27 @@ class Roles {
   }
 }
 
-class Distributor {
+class Location {
   int? id;
   String? name;
-  String? email;
-  String? emailVerifiedAt;
-  int? active;
-  int? phone;
-  String? apiToken;
-  String? doj;
-  String? dob;
-  String? companyDesignationId;
-  String? companyStateBranchId;
-  String? pfNo;
-  String? uanNo;
-  String? esiNo;
   String? createdAt;
   String? updatedAt;
-  String? salary;
-  String? imagePath;
-  String? employeeCode;
-  String? asmArea;
-  String? asmName;
-  String? uidNo;
-  String? termsAccepted;
-  String? companyStateId;
-  String? address;
-  String? uniqueId;
-  String? appointmentLetter;
-  String? contractExpiry;
-  String? resumePath;
-  String? photoPath;
-  String? residentialProofPath;
-  String? educationProofPath;
-  String? panCardPath;
-  String? adhaarCardPath;
-  String? esiCardPath;
-  String? cancelledChequePath;
-  String? salarySlipPath;
-  String? birthCertificatePath;
-  String? passportPath;
-  String? drivingLicensePath;
-  String? schoolLeavingCertificatePath;
-  String? markSheetPath;
-  String? experienceCertificatePath;
-  String? prevEmpAppLetterPath;
-  String? form2Path;
-  String? form11Path;
-  String? graduityFormPath;
-  String? appLetterPath;
-  String? pdsFormPath;
-  String? fullName;
-  String? fatherName;
-  String? surname;
-  String? motherName;
-  String? maritalStatus;
-  String? panNo;
-  String? adhaarNo;
-  String? preRoomNo;
-  String? preBuilding;
-  String? preArea;
-  String? preRoad;
-  String? preCity;
-  String? preState;
-  String? prePincode;
-  String? preMobile;
-  String? preEmail;
-  String? perRoomNo;
-  String? perBuilding;
-  String? perArea;
-  String? perRoad;
-  String? perCity;
-  String? perState;
-  String? perPincode;
-  String? perMobile;
-  String? perEmail;
-  String? bloodGroup;
-  String? bankName;
-  String? bankAccNo;
-  String? bankIfscCode;
-  String? bankBranchName;
-  int? dataSubmitted;
-  int? isFresher;
-  String? pdsFormSignPath;
-  String? form2SignPath;
-  String? form11SignPath;
-  String? graduityFormSignPath;
-  String? passwordBackup;
-  String? gender;
-  int? pdsFormChecked;
-  int? form2Checked;
-  int? form11Checked;
-  int? graduityFormChecked;
-  String? beatTypeId;
-  String? soId;
-  int? asmId;
-  String? rmsId;
-  String? nsmId;
-  String? distributorId;
 
-  Distributor(
-      {this.id,
-      this.name,
-      this.email,
-      this.emailVerifiedAt,
-      this.active,
-      this.phone,
-      this.apiToken,
-      this.doj,
-      this.dob,
-      this.companyDesignationId,
-      this.companyStateBranchId,
-      this.pfNo,
-      this.uanNo,
-      this.esiNo,
-      this.createdAt,
-      this.updatedAt,
-      this.salary,
-      this.imagePath,
-      this.employeeCode,
-      this.asmArea,
-      this.asmName,
-      this.uidNo,
-      this.termsAccepted,
-      this.companyStateId,
-      this.address,
-      this.uniqueId,
-      this.appointmentLetter,
-      this.contractExpiry,
-      this.resumePath,
-      this.photoPath,
-      this.residentialProofPath,
-      this.educationProofPath,
-      this.panCardPath,
-      this.adhaarCardPath,
-      this.esiCardPath,
-      this.cancelledChequePath,
-      this.salarySlipPath,
-      this.birthCertificatePath,
-      this.passportPath,
-      this.drivingLicensePath,
-      this.schoolLeavingCertificatePath,
-      this.markSheetPath,
-      this.experienceCertificatePath,
-      this.prevEmpAppLetterPath,
-      this.form2Path,
-      this.form11Path,
-      this.graduityFormPath,
-      this.appLetterPath,
-      this.pdsFormPath,
-      this.fullName,
-      this.fatherName,
-      this.surname,
-      this.motherName,
-      this.maritalStatus,
-      this.panNo,
-      this.adhaarNo,
-      this.preRoomNo,
-      this.preBuilding,
-      this.preArea,
-      this.preRoad,
-      this.preCity,
-      this.preState,
-      this.prePincode,
-      this.preMobile,
-      this.preEmail,
-      this.perRoomNo,
-      this.perBuilding,
-      this.perArea,
-      this.perRoad,
-      this.perCity,
-      this.perState,
-      this.perPincode,
-      this.perMobile,
-      this.perEmail,
-      this.bloodGroup,
-      this.bankName,
-      this.bankAccNo,
-      this.bankIfscCode,
-      this.bankBranchName,
-      this.dataSubmitted,
-      this.isFresher,
-      this.pdsFormSignPath,
-      this.form2SignPath,
-      this.form11SignPath,
-      this.graduityFormSignPath,
-      this.passwordBackup,
-      this.gender,
-      this.pdsFormChecked,
-      this.form2Checked,
-      this.form11Checked,
-      this.graduityFormChecked,
-      this.beatTypeId,
-      this.soId,
-      this.asmId,
-      this.rmsId,
-      this.nsmId,
-      this.distributorId});
+  Location({this.id, this.name, this.createdAt, this.updatedAt});
 
-  Distributor.fromJson(Map<String, dynamic> json) {
+  Location.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
-    email = json['email'];
-    emailVerifiedAt = json['email_verified_at'];
-    active = json['active'];
-    phone = json['phone'];
-    apiToken = json['api_token'];
-    doj = json['doj'];
-    dob = json['dob'];
-    companyDesignationId = json['company_designation_id'];
-    companyStateBranchId = json['company_state_branch_id'];
-    pfNo = json['pf_no'];
-    uanNo = json['uan_no'];
-    esiNo = json['esi_no'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-    salary = json['salary'];
-    imagePath = json['image_path'];
-    employeeCode = json['employee_code'];
-    asmArea = json['asm_area'];
-    asmName = json['asm_name'];
-    uidNo = json['uid_no'];
-    termsAccepted = json['terms_accepted'];
-    companyStateId = json['company_state_id'];
-    address = json['address'];
-    uniqueId = json['unique_id'];
-    appointmentLetter = json['appointment_letter'];
-    contractExpiry = json['contract_expiry'];
-    resumePath = json['resume_path'];
-    photoPath = json['photo_path'];
-    residentialProofPath = json['residential_proof_path'];
-    educationProofPath = json['education_proof_path'];
-    panCardPath = json['pan_card_path'];
-    adhaarCardPath = json['adhaar_card_path'];
-    esiCardPath = json['esi_card_path'];
-    cancelledChequePath = json['cancelled_cheque_path'];
-    salarySlipPath = json['salary_slip_path'];
-    birthCertificatePath = json['birth_certificate_path'];
-    passportPath = json['passport_path'];
-    drivingLicensePath = json['driving_license_path'];
-    schoolLeavingCertificatePath = json['school_leaving_certificate_path'];
-    markSheetPath = json['mark_sheet_path'];
-    experienceCertificatePath = json['experience_certificate_path'];
-    prevEmpAppLetterPath = json['prev_emp_app_letter_path'];
-    form2Path = json['form_2_path'];
-    form11Path = json['form_11_path'];
-    graduityFormPath = json['graduity_form_path'];
-    appLetterPath = json['app_letter_path'];
-    pdsFormPath = json['pds_form_path'];
-    fullName = json['full_name'];
-    fatherName = json['father_name'];
-    surname = json['surname'];
-    motherName = json['mother_name'];
-    maritalStatus = json['marital_status'];
-    panNo = json['pan_no'];
-    adhaarNo = json['adhaar_no'];
-    preRoomNo = json['pre_room_no'];
-    preBuilding = json['pre_building'];
-    preArea = json['pre_area'];
-    preRoad = json['pre_road'];
-    preCity = json['pre_city'];
-    preState = json['pre_state'];
-    prePincode = json['pre_pincode'];
-    preMobile = json['pre_mobile'];
-    preEmail = json['pre_email'];
-    perRoomNo = json['per_room_no'];
-    perBuilding = json['per_building'];
-    perArea = json['per_area'];
-    perRoad = json['per_road'];
-    perCity = json['per_city'];
-    perState = json['per_state'];
-    perPincode = json['per_pincode'];
-    perMobile = json['per_mobile'];
-    perEmail = json['per_email'];
-    bloodGroup = json['blood_group'];
-    bankName = json['bank_name'];
-    bankAccNo = json['bank_acc_no'];
-    bankIfscCode = json['bank_ifsc_code'];
-    bankBranchName = json['bank_branch_name'];
-    dataSubmitted = json['data_submitted'];
-    isFresher = json['is_fresher'];
-    pdsFormSignPath = json['pds_form_sign_path'];
-    form2SignPath = json['form_2_sign_path'];
-    form11SignPath = json['form_11_sign_path'];
-    graduityFormSignPath = json['graduity_form_sign_path'];
-    passwordBackup = json['password_backup'];
-    gender = json['gender'];
-    pdsFormChecked = json['pds_form_checked'];
-    form2Checked = json['form_2_checked'];
-    form11Checked = json['form_11_checked'];
-    graduityFormChecked = json['graduity_form_checked'];
-    beatTypeId = json['beat_type_id'];
-    soId = json['so_id'];
-    asmId = json['asm_id'];
-    rmsId = json['rms_id'];
-    nsmId = json['nsm_id'];
-    distributorId = json['distributor_id'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['name'] = this.name;
-    data['email'] = this.email;
-    data['email_verified_at'] = this.emailVerifiedAt;
-    data['active'] = this.active;
-    data['phone'] = this.phone;
-    data['api_token'] = this.apiToken;
-    data['doj'] = this.doj;
-    data['dob'] = this.dob;
-    data['company_designation_id'] = this.companyDesignationId;
-    data['company_state_branch_id'] = this.companyStateBranchId;
-    data['pf_no'] = this.pfNo;
-    data['uan_no'] = this.uanNo;
-    data['esi_no'] = this.esiNo;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
-    data['salary'] = this.salary;
-    data['image_path'] = this.imagePath;
-    data['employee_code'] = this.employeeCode;
-    data['asm_area'] = this.asmArea;
-    data['asm_name'] = this.asmName;
-    data['uid_no'] = this.uidNo;
-    data['terms_accepted'] = this.termsAccepted;
-    data['company_state_id'] = this.companyStateId;
-    data['address'] = this.address;
-    data['unique_id'] = this.uniqueId;
-    data['appointment_letter'] = this.appointmentLetter;
-    data['contract_expiry'] = this.contractExpiry;
-    data['resume_path'] = this.resumePath;
-    data['photo_path'] = this.photoPath;
-    data['residential_proof_path'] = this.residentialProofPath;
-    data['education_proof_path'] = this.educationProofPath;
-    data['pan_card_path'] = this.panCardPath;
-    data['adhaar_card_path'] = this.adhaarCardPath;
-    data['esi_card_path'] = this.esiCardPath;
-    data['cancelled_cheque_path'] = this.cancelledChequePath;
-    data['salary_slip_path'] = this.salarySlipPath;
-    data['birth_certificate_path'] = this.birthCertificatePath;
-    data['passport_path'] = this.passportPath;
-    data['driving_license_path'] = this.drivingLicensePath;
-    data['school_leaving_certificate_path'] = this.schoolLeavingCertificatePath;
-    data['mark_sheet_path'] = this.markSheetPath;
-    data['experience_certificate_path'] = this.experienceCertificatePath;
-    data['prev_emp_app_letter_path'] = this.prevEmpAppLetterPath;
-    data['form_2_path'] = this.form2Path;
-    data['form_11_path'] = this.form11Path;
-    data['graduity_form_path'] = this.graduityFormPath;
-    data['app_letter_path'] = this.appLetterPath;
-    data['pds_form_path'] = this.pdsFormPath;
-    data['full_name'] = this.fullName;
-    data['father_name'] = this.fatherName;
-    data['surname'] = this.surname;
-    data['mother_name'] = this.motherName;
-    data['marital_status'] = this.maritalStatus;
-    data['pan_no'] = this.panNo;
-    data['adhaar_no'] = this.adhaarNo;
-    data['pre_room_no'] = this.preRoomNo;
-    data['pre_building'] = this.preBuilding;
-    data['pre_area'] = this.preArea;
-    data['pre_road'] = this.preRoad;
-    data['pre_city'] = this.preCity;
-    data['pre_state'] = this.preState;
-    data['pre_pincode'] = this.prePincode;
-    data['pre_mobile'] = this.preMobile;
-    data['pre_email'] = this.preEmail;
-    data['per_room_no'] = this.perRoomNo;
-    data['per_building'] = this.perBuilding;
-    data['per_area'] = this.perArea;
-    data['per_road'] = this.perRoad;
-    data['per_city'] = this.perCity;
-    data['per_state'] = this.perState;
-    data['per_pincode'] = this.perPincode;
-    data['per_mobile'] = this.perMobile;
-    data['per_email'] = this.perEmail;
-    data['blood_group'] = this.bloodGroup;
-    data['bank_name'] = this.bankName;
-    data['bank_acc_no'] = this.bankAccNo;
-    data['bank_ifsc_code'] = this.bankIfscCode;
-    data['bank_branch_name'] = this.bankBranchName;
-    data['data_submitted'] = this.dataSubmitted;
-    data['is_fresher'] = this.isFresher;
-    data['pds_form_sign_path'] = this.pdsFormSignPath;
-    data['form_2_sign_path'] = this.form2SignPath;
-    data['form_11_sign_path'] = this.form11SignPath;
-    data['graduity_form_sign_path'] = this.graduityFormSignPath;
-    data['password_backup'] = this.passwordBackup;
-    data['gender'] = this.gender;
-    data['pds_form_checked'] = this.pdsFormChecked;
-    data['form_2_checked'] = this.form2Checked;
-    data['form_11_checked'] = this.form11Checked;
-    data['graduity_form_checked'] = this.graduityFormChecked;
-    data['beat_type_id'] = this.beatTypeId;
-    data['so_id'] = this.soId;
-    data['asm_id'] = this.asmId;
-    data['rms_id'] = this.rmsId;
-    data['nsm_id'] = this.nsmId;
-    data['distributor_id'] = this.distributorId;
     return data;
   }
 }
