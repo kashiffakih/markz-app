@@ -121,7 +121,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       });
     case addressPage:
       return MaterialPageRoute(builder: (BuildContext context) {
-        return AddressPage();
+        return AddressPage(
+            // arguments: null,
+            );
       });
 
     case wishlistPage:

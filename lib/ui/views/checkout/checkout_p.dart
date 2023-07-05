@@ -4,6 +4,7 @@ import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/order_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/profile/address_p.dart';
 
 class CheckoutPage extends StatefulWidget {
   final arguments;
@@ -15,10 +16,11 @@ class CheckoutPage extends StatefulWidget {
 
 class _CheckoutPageState extends State<CheckoutPage> {
   @override
+  @override
   Widget build(BuildContext context) {
     final OrderModel _orderModel = Provider.of<OrderModel>(context);
     final ConfigModel _configModel = locator<ConfigModel>();
-
+    print(widget.arguments['address'].toString());
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -88,57 +90,137 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       ),
                                     ),
                                   ),
-                                  Image.asset(
-                                    'assets/images/edit-2-mP4.png',
-                                    width: 15.34,
-                                    height: 19.15,
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  AddressPage(arguments: {
+                                                    'cartItems': widget
+                                                        .arguments['cartItems'],
+                                                    'cartTotal': widget
+                                                        .arguments['cartTotal'],
+                                                  })));
+                                    },
+                                    child: Image.asset(
+                                      'assets/images/edit-2-mP4.png',
+                                      width: 15.34,
+                                      height: 19.15,
+                                    ),
                                   )
                                 ],
                               ),
-                              Container(
-                                width: MediaQuery.of(context).size.width - 50,
-                                margin: EdgeInsets.only(top: 10, bottom: 10),
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xffc7b456)),
-                                  color: Color(0xffffffff),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(5),
+                              if (widget.arguments['address'] != null)
+                                Container(
+                                  width: MediaQuery.of(context).size.width - 50,
+                                  margin: EdgeInsets.only(top: 10, bottom: 10),
+                                  padding: EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Color(0xffc7b456)),
+                                    color: Color(0xffffffff),
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(5),
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Color(0x338a959e),
+                                        offset: Offset(0, 7.6690645218),
+                                        blurRadius: 19.1726608276,
+                                      ),
+                                    ],
                                   ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0x338a959e),
-                                      offset: Offset(0, 7.6690645218),
-                                      blurRadius: 19.1726608276,
-                                    ),
-                                  ],
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        _configModel.user.firstName.toString(),
+                                        style: MyGoogleFontStyle(
+                                          fontFamily: 'Urbanist',
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xff232323),
+                                        ),
+                                      ),
+                                      Divider(
+                                        thickness: 1,
+                                        color: Colors.grey,
+                                      ),
+                                      Text(
+                                        widget.arguments!['address']['add_1']
+                                                .toString() +
+                                            ', ' +
+                                            widget.arguments!['address']
+                                                    ['add_2']
+                                                .toString() +
+                                            ', ' +
+                                            widget.arguments!['address']
+                                                    ['add_3']
+                                                .toString() +
+                                            ', ' +
+                                            widget.arguments!['address']['city']
+                                                .toString() +
+                                            ', ' +
+                                            widget.arguments!['address']
+                                                    ['state']
+                                                .toString(),
+                                        style: MyGoogleFontStyle(
+                                          fontFamily: 'Urbanist',
+                                          fontWeight: FontWeight.w400,
+                                          color: Color(0xff909090),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      _configModel.user.firstName.toString(),
-                                      style: MyGoogleFontStyle(
-                                        fontFamily: 'Urbanist',
-                                        fontWeight: FontWeight.w700,
-                                        color: Color(0xff232323),
+                              if (widget.arguments['address'] == null)
+                                Center(
+                                  child: Container(
+                                    width: 150,
+                                    height: 40,
+                                    margin: EdgeInsets.fromLTRB(0.89, 10, 0, 0),
+                                    child: TextButton(
+                                      onPressed: () {
+                                        // widget.arguments['cartTotal']
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    AddressPage(arguments: {
+                                                      'cartItems':
+                                                          widget.arguments[
+                                                              'cartItems'],
+                                                      'cartTotal':
+                                                          widget.arguments[
+                                                              'cartTotal'],
+                                                    })));
+                                        // Navigator.pushNamed(
+                                        //     context, '/addressPage');
+                                      },
+                                      style: TextButton.styleFrom(
+                                        padding: EdgeInsets.zero,
+                                      ),
+                                      child: Container(
+                                        width: 321,
+                                        height: 53,
+                                        decoration: BoxDecoration(
+                                          color: Color(0xff1e1e1e),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            'Add Address',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontWeight: FontWeight.w700,
+                                              color: Color(0xffffffff),
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                    Divider(
-                                      thickness: 1,
-                                      color: Colors.grey,
-                                    ),
-                                    Text(
-                                      '25 rue Robert Latouche, Nice, 06200, Côte D’azur, France',
-                                      style: MyGoogleFontStyle(
-                                        fontFamily: 'Urbanist',
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xff909090),
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              ),
                               // Payment
                               Row(
                                 children: [
@@ -493,11 +575,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 margin: EdgeInsets.fromLTRB(0.89, 0, 0, 0),
                                 child: TextButton(
                                   onPressed: () async {
+                                    var addressId =
+                                        widget.arguments['address']['id'];
                                     bool response =
                                         await _orderModel.placedOrder(
                                             widget.arguments['cartItems'],
                                             widget.arguments['cartTotal']
-                                                .toString());
+                                                .toString(),
+                                            addressId);
                                     if (response == true) {
                                       Navigator.pushNamed(
                                           context, '/successPage');

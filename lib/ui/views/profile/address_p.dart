@@ -4,10 +4,12 @@ import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/user_address_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/checkout/checkout_p.dart';
 import 'package:sales_app/ui/views/profile/shipping_id_p.dart';
 
 class AddressPage extends StatefulWidget {
-  const AddressPage({Key? key}) : super(key: key);
+  final arguments;
+  const AddressPage({Key? key, this.arguments}) : super(key: key);
 
   @override
   State<AddressPage> createState() => _AddressPageState();
@@ -27,6 +29,11 @@ class _AddressPageState extends State<AddressPage> {
     final UserAddressModel _userAddressModel =
         Provider.of<UserAddressModel>(context);
     final ConfigModel _configModel = locator<ConfigModel>();
+    print(widget.arguments!['cartItems']);
+    print(widget.arguments!['cartTotal']);
+    var cartItems = widget.arguments!['cartItems'];
+    var cartTotal = widget.arguments!['cartTotal'];
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -87,8 +94,25 @@ class _AddressPageState extends State<AddressPage> {
                                 children: [
                                   Checkbox(
                                     value: _isShipping,
-                                    onChanged: (value) {
-                                      _isShipping = true;
+                                    activeColor: Colors.black,
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        _isShipping = value ?? false;
+                                        if (_isShipping == true) {
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      CheckoutPage(arguments: {
+                                                        'cartItems': cartItems,
+                                                        'cartTotal': cartTotal,
+                                                        'address':
+                                                            _userAddressModel
+                                                                .userAddresses![
+                                                                    index]
+                                                                .toJson()
+                                                      })));
+                                        }
+                                      });
                                     },
                                   ),
                                   Expanded(
