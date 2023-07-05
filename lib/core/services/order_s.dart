@@ -2,8 +2,6 @@ import 'dart:convert';
 
 import 'package:sales_app/core/models/add_to_cart.dart';
 import 'package:sales_app/core/models/order.dart';
-import 'package:sales_app/core/models/product.dart';
-import 'package:sales_app/core/models/user.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:http/http.dart' as http;
@@ -21,7 +19,7 @@ class OrderService {
         'order_detail_cost': item.product!.productPrices![0].price,
         'product_id': item.productId,
         'quantity': item.qty,
-        'product_pack': "1 Kg",
+        'product_pack': item.pack,
         'kind_of_flower': item.kindOfFlower,
         'flavour': item.flavour,
         'write_on_cake': item.writeOnCake,

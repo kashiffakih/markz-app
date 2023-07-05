@@ -50,7 +50,7 @@ class AuthService {
       Map<String, dynamic> _responseUserRoleData =
           json.decode(_responseUserRole.body);
     }
-    if (registerData!['imagepath'] != 'null') {
+    if (registerData!['imagepath'] != null) {
       var _id = _responseData['data']['id'].toString();
       var request = http.MultipartRequest(
         'POST',

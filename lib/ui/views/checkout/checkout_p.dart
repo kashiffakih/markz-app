@@ -117,7 +117,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Bruno Fernandes',
+                                      _configModel.user.firstName.toString(),
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontWeight: FontWeight.w700,

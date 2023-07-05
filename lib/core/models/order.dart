@@ -1,4 +1,5 @@
 import 'package:sales_app/core/models/user.dart';
+import 'package:sales_app/core/models/user_address.dart';
 
 class Order {
   int? id;
@@ -49,6 +50,7 @@ class Order {
   List<OrderStatuses>? orderStatuses;
   Company? company;
   Null? deliveryBoy;
+  UserAddress? address;
 
   Order(
       {this.id,
@@ -99,7 +101,8 @@ class Order {
       this.orderStatuses,
       this.company,
       this.deliveryBoy,
-      required String taxPercent});
+      required String taxPercent,
+      this.address});
 
   Order.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -161,6 +164,9 @@ class Order {
     company =
         json['company'] != null ? new Company.fromJson(json['company']) : null;
     deliveryBoy = json['delivery_boy'];
+    address = json['address'] != null
+        ? new UserAddress.fromJson(json['address'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -223,6 +229,9 @@ class Order {
       data['company'] = this.company!.toJson();
     }
     data['delivery_boy'] = this.deliveryBoy;
+    if (this.address != null) {
+      data['address'] = this.address!.toJson();
+    }
     return data;
   }
 }
