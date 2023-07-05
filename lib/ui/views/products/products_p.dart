@@ -23,6 +23,7 @@ class _ProductsPageState extends State<ProductsPage> {
     'kindOfFlower': '',
     'flavour': '',
     'writeOnCake': '',
+    'pack': ''
   };
   List<Product>? filteredProducts = [];
   bool _isInitialLoad = false;
@@ -49,7 +50,8 @@ class _ProductsPageState extends State<ProductsPage> {
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
     setState(() {
-      if (!_isInitialLoad && _productModel.categoryWiseproducts!.length > 0) {
+      if (!_isInitialLoad &&
+          _productModel?.categoryWiseproducts?.isNotEmpty == true) {
         filteredProducts = _productModel.categoryWiseproducts;
         _isInitialLoad = true;
       }

@@ -31,6 +31,7 @@ class _CartPageState extends State<CartPage> {
     'kindOfFlower': '',
     'flavour': '',
     'writeOnCake': '',
+    'pack': ''
   };
 
   @override

@@ -355,7 +355,7 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                               ),
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
