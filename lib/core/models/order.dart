@@ -37,7 +37,7 @@ class Order {
   int? isDinein;
   int? storePayableAmount;
   int? comissionAmount;
-  Null? addressId;
+  int? addressId;
   Null? acceptedById;
   Null? rpyPaymentStatus;
   Null? rpyPaymentId;

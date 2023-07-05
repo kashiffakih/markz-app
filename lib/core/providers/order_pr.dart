@@ -20,8 +20,9 @@ class OrderModel with ChangeNotifier {
 
   Order? get order => _order;
 
-  Future<bool> placedOrder(List<AddToCart> cartItems, String cartTotal) async {
-    return await _orderService.placedOrder(cartItems, cartTotal);
+  Future<bool> placedOrder(
+      List<AddToCart> cartItems, String cartTotal, addressId) async {
+    return await _orderService.placedOrder(cartItems, cartTotal, addressId);
   }
 
   List<Order> _orders = [];
