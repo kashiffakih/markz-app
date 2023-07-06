@@ -72,7 +72,8 @@ class _ProductsPageState extends State<ProductsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                margin: EdgeInsets.all(20),
+                margin:
+                    EdgeInsets.only(left: 20, top: 30, bottom: 20, right: 20),
                 width: double.infinity,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/order_pr.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/profile/order-details-processing.dart';
 
 class OrdersPage extends StatefulWidget {
   const OrdersPage({Key? key}) : super(key: key);
@@ -311,35 +312,47 @@ class _OrdersPageState extends State<OrdersPage> {
                                                         ),
                                                         Row(
                                                           children: [
-                                                            Container(
-                                                              width: 74.5,
-                                                              height: 30,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Color(
-                                                                    0xff232323),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            8),
-                                                              ),
-                                                              child: Center(
-                                                                child: Text(
-                                                                  'Detail',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style:
-                                                                      MyGoogleFontStyle(
-                                                                    fontFamily:
-                                                                        'Poppins',
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400,
-                                                                    color: Color(
-                                                                        0xffffffff),
+                                                            InkWell(
+                                                              onTap: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .push(MaterialPageRoute(
+                                                                        builder: (context) =>
+                                                                            OrderDetailsPage(arguments: {
+                                                                              'order': _order.toJson(),
+                                                                              'status': 'Order Placed'
+                                                                            })));
+                                                              },
+                                                              child: Container(
+                                                                width: 74.5,
+                                                                height: 30,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: Color(
+                                                                      0xff232323),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              8),
+                                                                ),
+                                                                child: Center(
+                                                                  child: Text(
+                                                                    'Detail',
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    style:
+                                                                        MyGoogleFontStyle(
+                                                                      fontFamily:
+                                                                          'Poppins',
+                                                                      fontSize:
+                                                                          12,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400,
+                                                                      color: Color(
+                                                                          0xffffffff),
+                                                                    ),
                                                                   ),
                                                                 ),
                                                               ),
@@ -557,31 +570,40 @@ class _OrdersPageState extends State<OrdersPage> {
                                                                   ),
                                                                   Row(
                                                                     children: [
-                                                                      Container(
-                                                                        width:
-                                                                            74.5,
-                                                                        height:
-                                                                            30,
-                                                                        decoration:
-                                                                            BoxDecoration(
-                                                                          color:
-                                                                              Color(0xff232323),
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(8),
-                                                                        ),
+                                                                      InkWell(
+                                                                        onTap:
+                                                                            () {
+                                                                          Navigator.of(context).push(MaterialPageRoute(
+                                                                              builder: (context) => OrderDetailsPage(arguments: {
+                                                                                    'order': _order.toJson(),
+                                                                                    'status': 'Delivered'
+                                                                                  })));
+                                                                        },
                                                                         child:
-                                                                            Center(
+                                                                            Container(
+                                                                          width:
+                                                                              74.5,
+                                                                          height:
+                                                                              30,
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            color:
+                                                                                Color(0xff232323),
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(8),
+                                                                          ),
                                                                           child:
-                                                                              Text(
-                                                                            'Detail',
-                                                                            textAlign:
-                                                                                TextAlign.center,
-                                                                            style:
-                                                                                MyGoogleFontStyle(
-                                                                              fontFamily: 'Poppins',
-                                                                              fontSize: 12,
-                                                                              fontWeight: FontWeight.w400,
-                                                                              color: Color(0xffffffff),
+                                                                              Center(
+                                                                            child:
+                                                                                Text(
+                                                                              'Detail',
+                                                                              textAlign: TextAlign.center,
+                                                                              style: MyGoogleFontStyle(
+                                                                                fontFamily: 'Poppins',
+                                                                                fontSize: 12,
+                                                                                fontWeight: FontWeight.w400,
+                                                                                color: Color(0xffffffff),
+                                                                              ),
                                                                             ),
                                                                           ),
                                                                         ),
@@ -817,34 +839,46 @@ class _OrdersPageState extends State<OrdersPage> {
                                                               ),
                                                               Row(
                                                                 children: [
-                                                                  Container(
-                                                                    width: 74.5,
-                                                                    height: 30,
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      color: Color(
-                                                                          0xff232323),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8),
-                                                                    ),
+                                                                  InkWell(
+                                                                    onTap: () {
+                                                                      Navigator.of(context).push(MaterialPageRoute(
+                                                                          builder: (context) =>
+                                                                              OrderDetailsPage(arguments: {
+                                                                                'order': _order.toJson(),
+                                                                                'status': 'Order in processing'
+                                                                              })));
+                                                                    },
                                                                     child:
-                                                                        Center(
+                                                                        Container(
+                                                                      width:
+                                                                          74.5,
+                                                                      height:
+                                                                          30,
+                                                                      decoration:
+                                                                          BoxDecoration(
+                                                                        color: Color(
+                                                                            0xff232323),
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(8),
+                                                                      ),
                                                                       child:
-                                                                          Text(
-                                                                        'Detail',
-                                                                        textAlign:
-                                                                            TextAlign.center,
-                                                                        style:
-                                                                            MyGoogleFontStyle(
-                                                                          fontFamily:
-                                                                              'Poppins',
-                                                                          fontSize:
-                                                                              12,
-                                                                          fontWeight:
-                                                                              FontWeight.w400,
-                                                                          color:
-                                                                              Color(0xffffffff),
+                                                                          Center(
+                                                                        child:
+                                                                            Text(
+                                                                          'Detail',
+                                                                          textAlign:
+                                                                              TextAlign.center,
+                                                                          style:
+                                                                              MyGoogleFontStyle(
+                                                                            fontFamily:
+                                                                                'Poppins',
+                                                                            fontSize:
+                                                                                12,
+                                                                            fontWeight:
+                                                                                FontWeight.w400,
+                                                                            color:
+                                                                                Color(0xffffffff),
+                                                                          ),
                                                                         ),
                                                                       ),
                                                                     ),
@@ -1067,31 +1101,40 @@ class _OrdersPageState extends State<OrdersPage> {
                                                                   ),
                                                                   Row(
                                                                     children: [
-                                                                      Container(
-                                                                        width:
-                                                                            74.5,
-                                                                        height:
-                                                                            30,
-                                                                        decoration:
-                                                                            BoxDecoration(
-                                                                          color:
-                                                                              Color(0xff232323),
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(8),
-                                                                        ),
+                                                                      InkWell(
+                                                                        onTap:
+                                                                            () {
+                                                                          Navigator.of(context).push(MaterialPageRoute(
+                                                                              builder: (context) => OrderDetailsPage(arguments: {
+                                                                                    'order': _order.toJson(),
+                                                                                    'status': 'Cancelled'
+                                                                                  })));
+                                                                        },
                                                                         child:
-                                                                            Center(
+                                                                            Container(
+                                                                          width:
+                                                                              74.5,
+                                                                          height:
+                                                                              30,
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            color:
+                                                                                Color(0xff232323),
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(8),
+                                                                          ),
                                                                           child:
-                                                                              Text(
-                                                                            'Detail',
-                                                                            textAlign:
-                                                                                TextAlign.center,
-                                                                            style:
-                                                                                MyGoogleFontStyle(
-                                                                              fontFamily: 'Poppins',
-                                                                              fontSize: 12,
-                                                                              fontWeight: FontWeight.w400,
-                                                                              color: Color(0xffffffff),
+                                                                              Center(
+                                                                            child:
+                                                                                Text(
+                                                                              'Detail',
+                                                                              textAlign: TextAlign.center,
+                                                                              style: MyGoogleFontStyle(
+                                                                                fontFamily: 'Poppins',
+                                                                                fontSize: 12,
+                                                                                fontWeight: FontWeight.w400,
+                                                                                color: Color(0xffffffff),
+                                                                              ),
                                                                             ),
                                                                           ),
                                                                         ),

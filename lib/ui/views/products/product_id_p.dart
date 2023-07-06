@@ -84,7 +84,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
             child: Column(
               children: [
                 Container(
-                  margin: EdgeInsets.only(top: 20, left: 20),
+                  margin: EdgeInsets.only(top: 30, left: 20, bottom: 10),
                   width: double.infinity,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,7 +140,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                         widget.arguments['product']
                                                 ['imagepath1']
                                             .toString(),
-                                    // 'assets/images/shades-chocolate-cake-3-1-2-1-YTY.png',
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
                                 // Rounded Section
@@ -165,7 +165,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                 ),
                                 Positioned(
                                   left: 25,
-                                  top: 380,
+                                  top: 370,
                                   child: Container(
                                     width:
                                         MediaQuery.of(context).size.width - 50,
@@ -176,17 +176,90 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                             children: [
                                               // Name
                                               Expanded(
-                                                child: Text(
-                                                  widget.arguments!['product']
-                                                          ['name']
-                                                      .toString(),
-                                                  style: MyGoogleFontStyle(
-                                                    fontSize: 17,
-                                                    fontFamily: 'Urbanist',
-                                                    fontWeight: FontWeight.w700,
-                                                    color: Color(0xff000000),
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 8.0),
+                                                  child: Column(
+                                                    children: [
+                                                      Text(
+                                                        widget.arguments![
+                                                                'product']
+                                                                ['name']
+                                                            .toString(),
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontSize: 17,
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                          color:
+                                                              Color(0xff000000),
+                                                        ),
+                                                      ),
+                                                      // Reviews
+                                                      Container(
+                                                        child: Row(
+                                                          children: [
+                                                            Image.asset(
+                                                              'assets/images/vector-TXk.png',
+                                                              width: 20,
+                                                              height: 15,
+                                                            ),
+                                                            Image.asset(
+                                                              'assets/images/vector-TXk.png',
+                                                              width: 20,
+                                                              height: 15,
+                                                            ),
+                                                            Image.asset(
+                                                              'assets/images/vector-TXk.png',
+                                                              width: 20,
+                                                              height: 15,
+                                                            ),
+                                                            Image.asset(
+                                                              'assets/images/vector-TXk.png',
+                                                              width: 20,
+                                                              height: 15,
+                                                            ),
+                                                            Image.asset(
+                                                              'assets/images/vector-TXk.png',
+                                                              width: 20,
+                                                              height: 15,
+                                                            ),
+                                                            Text(
+                                                              '( ' +
+                                                                  widget
+                                                                      .arguments[
+                                                                          'product']
+                                                                          [
+                                                                          'reviews']
+                                                                      .length
+                                                                      .toString() +
+                                                                  ' )',
+                                                              style:
+                                                                  MyGoogleFontStyle(
+                                                                fontFamily:
+                                                                    'Urbanist',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                color: Color(
+                                                                    0xff000000),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )
+                                                    ],
                                                   ),
                                                 ),
+                                              ),
+                                              SizedBox(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    5,
                                               ),
                                               // Qty
                                               Column(
@@ -212,8 +285,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                             _formKey
                                                                 .currentState!
                                                                 .save();
-                                                            print(_CartData
-                                                                .toString());
                                                             bool type = true;
                                                             await _addToCartModel
                                                                 .getAddToCart(
@@ -410,52 +481,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                             ],
                                           ),
                                         ),
-                                        // Reviews
-                                        Container(
-                                          child: Row(
-                                            children: [
-                                              Image.asset(
-                                                'assets/images/vector-TXk.png',
-                                                width: 20,
-                                                height: 15,
-                                              ),
-                                              Image.asset(
-                                                'assets/images/vector-TXk.png',
-                                                width: 20,
-                                                height: 15,
-                                              ),
-                                              Image.asset(
-                                                'assets/images/vector-TXk.png',
-                                                width: 20,
-                                                height: 15,
-                                              ),
-                                              Image.asset(
-                                                'assets/images/vector-TXk.png',
-                                                width: 20,
-                                                height: 15,
-                                              ),
-                                              Image.asset(
-                                                'assets/images/vector-TXk.png',
-                                                width: 20,
-                                                height: 15,
-                                              ),
-                                              Text(
-                                                '( ' +
-                                                    widget
-                                                        .arguments['product']
-                                                            ['reviews']
-                                                        .length
-                                                        .toString() +
-                                                    ' )',
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Urbanist',
-                                                  fontWeight: FontWeight.w400,
-                                                  color: Color(0xff000000),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        )
                                       ],
                                     ),
                                   ),
@@ -463,7 +488,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                 // Size
                                 Positioned(
                                   left: 25,
-                                  top: 502,
+                                  top: 450,
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -535,7 +560,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                         'Cakes & Flowers')
                                   Positioned(
                                     left: 25,
-                                    top: 600,
+                                    top: 550,
                                     child: Container(
                                       width: MediaQuery.of(context).size.width -
                                           50,
@@ -597,22 +622,11 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                     ),
                                   ),
                                 if (widget.arguments['product']['category']
-                                            ['name'] ==
-                                        'Flower' ||
-                                    widget.arguments['product']['category']
-                                            ['name'] ==
-                                        'Cakes & Flowers')
+                                        ['name'] ==
+                                    'Flower')
                                   Positioned(
                                     left: 25,
-                                    top: widget.arguments['product']['category']
-                                                ['name'] ==
-                                            'Flower'
-                                        ? 590
-                                        : widget.arguments['product']
-                                                    ['category']['name'] ==
-                                                'Cakes & Flowers'
-                                            ? 800
-                                            : 590,
+                                    top: 560,
                                     child: Container(
                                       width: MediaQuery.of(context).size.width -
                                           50,
@@ -682,12 +696,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                     top: widget.arguments['product']['category']
                                                 ['name'] !=
                                             'Flower'
-                                        ? 700
+                                        ? 660
                                         : widget.arguments['product']
                                                     ['category']['name'] ==
                                                 'Cakes & Flowers'
                                             ? 800
-                                            : 700,
+                                            : 660,
                                     child: Container(
                                       width: MediaQuery.of(context).size.width -
                                           50,
@@ -741,21 +755,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 return null;
                                               },
                                             ),
-                                            // TextFormField(
-                                            //   decoration: InputDecoration(
-                                            //       border: InputBorder.none,
-                                            //       focusedBorder: InputBorder.none,
-                                            //       enabledBorder: InputBorder.none,
-                                            //       errorBorder: InputBorder.none,
-                                            //       disabledBorder:
-                                            //           InputBorder.none,
-                                            //       labelText: 'Add your text here',
-                                            //       contentPadding:
-                                            //           EdgeInsets.all(10)),
-                                            //   onSaved: (newValue) {
-                                            //     WriteOnCake = newValue.toString();
-                                            //   },
-                                            // ),
                                           )
                                         ],
                                       ),
@@ -767,12 +766,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                   top: widget.arguments['product']['category']
                                               ['name'] ==
                                           'Flower'
-                                      ? 700
+                                      ? 670
                                       : widget.arguments['product']['category']
                                                   ['name'] ==
                                               'Cake'
-                                          ? 800
-                                          : 900,
+                                          ? 770
+                                          : 760,
                                   child: Container(
                                     child: Column(
                                       crossAxisAlignment:
@@ -1169,12 +1168,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                   top: widget.arguments['product']['category']
                                               ['name'] ==
                                           'Flower'
-                                      ? 950
+                                      ? 910
                                       : widget.arguments['product']['category']
                                                   ['name'] ==
                                               'Cake'
-                                          ? 1050
-                                          : 1150,
+                                          ? 1010
+                                          : 1020,
                                   child: Container(
                                     child: DefaultTabController(
                                       length: 2,
@@ -1341,9 +1340,11 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                             false;
                                                                       });
 
-                                                                      Navigator.pushNamed(
-                                                                          context,
-                                                                          '/productIdPage');
+                                                                      Navigator.of(context).push(MaterialPageRoute(
+                                                                          builder: (context) =>
+                                                                              ProductIdPage(arguments: {
+                                                                                'product': widget.arguments!['product']
+                                                                              })));
                                                                     }
                                                                   },
                                                                   style: TextButton
@@ -1608,15 +1609,17 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       ),
                                                     ),
                                                     TextSpan(
-                                                      text: widget
-                                                          .arguments!['product']
-                                                              ['product_prices']
-                                                              [0]['price']
-                                                          .toString(),
+                                                      text: '₹ ' +
+                                                          widget.arguments![
+                                                                  'product'][
+                                                                  'product_prices']
+                                                                  [0]['price']
+                                                              .toString(),
                                                       style: MyGoogleFontStyle(
                                                         fontFamily: 'Poppins',
                                                         fontWeight:
                                                             FontWeight.w700,
+                                                        fontSize: 20,
                                                         color:
                                                             Color(0xff000000),
                                                       ),
