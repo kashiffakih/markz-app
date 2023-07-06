@@ -3,9 +3,11 @@ import 'package:provider/provider.dart';
 import 'package:sales_app/core/models/user_address.dart';
 import 'package:sales_app/core/providers/user_address_pr.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/profile/address_p.dart';
 
 class ShippingCreatePage extends StatefulWidget {
-  const ShippingCreatePage({Key? key}) : super(key: key);
+  final arguments;
+  const ShippingCreatePage({Key? key, this.arguments}) : super(key: key);
 
   @override
   State<ShippingCreatePage> createState() => _ShippingCreatePageState();
@@ -27,6 +29,14 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
   Widget build(BuildContext context) {
     final UserAddressModel _userAddressModel =
         Provider.of<UserAddressModel>(context);
+    var cartItems = [];
+    var cartTotal = '';
+    // print(widget.arguments!['cartItems']);
+    // print(widget.arguments!['cartTotal']);
+    if (widget.arguments != null) {
+      cartItems = widget.arguments!['cartItems'];
+      cartTotal = widget.arguments!['cartTotal'];
+    }
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -315,7 +325,14 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                                 bool response = await _userAddressModel
                                     .saveUserAddress(userAddress: _userAddress);
                                 if (response == true) {
-                                  Navigator.pushNamed(context, '/addressPage');
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => AddressPage(
+                                              arguments: {
+                                                'cartItems': cartItems,
+                                                'cartTotal': cartTotal,
+                                                'address': []
+                                              })));
+                                  // Navigator.pushNamed(context, '/addressPage');
                                 }
                                 setState(() {
                                   _loading = false;
