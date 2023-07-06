@@ -191,14 +191,15 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                               // Qty
                                               Column(
                                                 children: [
-                                                  if (_addToCartModel
-                                                      .addToCarts!
-                                                      .where((cart) =>
-                                                          cart.productId ==
-                                                          widget.arguments[
-                                                              'product']['id'])
-                                                      .toList()
-                                                      .isEmpty)
+                                                  if (_addToCartModel.addToCarts
+                                                          ?.where((cart) =>
+                                                              cart.productId ==
+                                                              widget.arguments[
+                                                                      'product']
+                                                                  ['id'])
+                                                          ?.toList()
+                                                          ?.isEmpty ??
+                                                      true)
                                                     Positioned(
                                                       // frame494xX8 (318:2821)
                                                       // left: 31,
@@ -274,14 +275,15 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                         ),
                                                       ),
                                                     ),
-                                                  if (_addToCartModel
-                                                      .addToCarts!
-                                                      .where((cart) =>
-                                                          cart.productId ==
-                                                          widget.arguments[
-                                                              'product']['id'])
-                                                      .toList()
-                                                      .isNotEmpty)
+                                                  if (_addToCartModel.addToCarts
+                                                          ?.where((cart) =>
+                                                              cart.productId ==
+                                                              widget.arguments[
+                                                                      'product']
+                                                                  ['id'])
+                                                          ?.toList()
+                                                          ?.isNotEmpty ==
+                                                      true)
                                                     Center(
                                                       child: Row(
                                                         children: [
@@ -1212,7 +1214,13 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                     .size
                                                     .width -
                                                 50,
-                                            height: 210,
+                                            height: widget
+                                                        .arguments!['product']
+                                                            ['reviews']
+                                                        .length ==
+                                                    1
+                                                ? 160
+                                                : 210,
                                             child: TabBarView(
                                               children: [
                                                 Padding(
@@ -1249,7 +1257,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                 ),
                                                                 child:
                                                                     TextFormField(
-                                                                  maxLines: 5,
+                                                                  maxLines: 3,
                                                                   decoration:
                                                                       InputDecoration(
                                                                     border:
@@ -1387,7 +1395,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                         ),
                                                       ),
                                                       Container(
-                                                        height: 100,
+                                                        height: 200,
                                                         margin:
                                                             EdgeInsets.all(20),
                                                         child: widget
@@ -1461,29 +1469,32 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                                               height: 66.71,
                                                                                             ),
                                                                                           ),
-                                                                                          Column(
-                                                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                            children: [
-                                                                                              Text(
-                                                                                                widget.arguments!['product']['name'].toString(),
-                                                                                                style: MyGoogleFontStyle(
-                                                                                                  fontFamily: 'Poppins',
-                                                                                                  fontSize: 16,
-                                                                                                  fontWeight: FontWeight.w400,
-                                                                                                  color: Color(0xff232323),
+                                                                                          SizedBox(
+                                                                                            width: 190,
+                                                                                            child: Column(
+                                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                              children: [
+                                                                                                Text(
+                                                                                                  widget.arguments!['product']['name'].toString(),
+                                                                                                  style: MyGoogleFontStyle(
+                                                                                                    fontFamily: 'Poppins',
+                                                                                                    fontSize: 16,
+                                                                                                    fontWeight: FontWeight.w400,
+                                                                                                    color: Color(0xff232323),
+                                                                                                  ),
                                                                                                 ),
-                                                                                              ),
-                                                                                              Text(
-                                                                                                // BLr (I318:2555;0:1392)
-                                                                                                '₹ ' + widget.arguments!['product']['product_prices']![0]['price'].toString(),
-                                                                                                style: MyGoogleFontStyle(
-                                                                                                  fontFamily: 'Poppins',
-                                                                                                  fontSize: 16,
-                                                                                                  fontWeight: FontWeight.w600,
-                                                                                                  color: Color(0xff232323),
+                                                                                                Text(
+                                                                                                  // BLr (I318:2555;0:1392)
+                                                                                                  '₹ ' + widget.arguments!['product']['product_prices']![0]['price'].toString(),
+                                                                                                  style: MyGoogleFontStyle(
+                                                                                                    fontFamily: 'Poppins',
+                                                                                                    fontSize: 16,
+                                                                                                    fontWeight: FontWeight.w600,
+                                                                                                    color: Color(0xff232323),
+                                                                                                  ),
                                                                                                 ),
-                                                                                              ),
-                                                                                            ],
+                                                                                              ],
+                                                                                            ),
                                                                                           ),
                                                                                         ],
                                                                                       ),

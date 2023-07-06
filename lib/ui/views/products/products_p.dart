@@ -25,9 +25,8 @@ class _ProductsPageState extends State<ProductsPage> {
     'writeOnCake': '',
     'pack': ''
   };
-  List<Product>? filteredProducts = [];
   bool _isInitialLoad = false;
-
+  List<Product>? filteredProducts = [];
   @override
   void initState() {
     super.initState();
@@ -49,18 +48,21 @@ class _ProductsPageState extends State<ProductsPage> {
     final ProductModel _productModel = Provider.of<ProductModel>(context);
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
+
     setState(() {
       if (!_isInitialLoad &&
-          _productModel?.categoryWiseproducts?.isNotEmpty == true) {
+          _productModel.categoryWiseproducts?.isNotEmpty == true) {
         filteredProducts = _productModel.categoryWiseproducts;
         _isInitialLoad = true;
+        // filteredProducts = [];
+      } else {
+        _isInitialLoad = false;
       }
     });
 
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          // shoppaget3Y (318:2791)
           padding: EdgeInsets.fromLTRB(9 * fem, 16 * fem, 0 * fem, 22 * fem),
           width: double.infinity,
           decoration: BoxDecoration(

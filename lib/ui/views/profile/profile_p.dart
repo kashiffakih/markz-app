@@ -127,26 +127,28 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                   ),
                                 ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _configModel.user.firstName.toString(),
-                                style: MyGoogleFontStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xff303030),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _configModel.user.firstName.toString(),
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xff303030),
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                _configModel.user.email.toString(),
-                                style: MyGoogleFontStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xff808080),
+                                Text(
+                                  _configModel.user.email.toString(),
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xff808080),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                           Expanded(
                             child: Column(

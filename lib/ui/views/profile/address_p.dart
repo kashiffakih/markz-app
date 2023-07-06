@@ -5,6 +5,7 @@ import 'package:sales_app/core/providers/user_address_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/checkout/checkout_p.dart';
+import 'package:sales_app/ui/views/profile/shipping_create_p.dart';
 import 'package:sales_app/ui/views/profile/shipping_id_p.dart';
 
 class AddressPage extends StatefulWidget {
@@ -29,11 +30,18 @@ class _AddressPageState extends State<AddressPage> {
     final UserAddressModel _userAddressModel =
         Provider.of<UserAddressModel>(context);
     final ConfigModel _configModel = locator<ConfigModel>();
-    print(widget.arguments!['cartItems']);
-    print(widget.arguments!['cartTotal']);
-    var cartItems = widget.arguments!['cartItems'];
-    var cartTotal = widget.arguments!['cartTotal'];
+    var cartItems = [];
+    var cartTotal = '';
+    // print(widget.arguments!['cartItems']);
+    // print(widget.arguments!['cartTotal']);
+    setState(() {
+      if (widget.arguments != null) {
+        cartItems = widget.arguments!['cartItems'];
+        cartTotal = widget.arguments!['cartTotal'];
+      }
+    });
 
+    print(cartItems);
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -221,7 +229,13 @@ class _AddressPageState extends State<AddressPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, '/shippingCreatePage');
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => ShippingCreatePage(arguments: {
+                    'cartItems': cartItems,
+                    'cartTotal': cartTotal,
+                    'address': []
+                  })));
+          // Navigator.pushNamed(context, '/shippingCreatePage');
         },
         child: Icon(
           Icons.add,

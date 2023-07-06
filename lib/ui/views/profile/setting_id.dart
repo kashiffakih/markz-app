@@ -156,37 +156,37 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                             },
                           ),
                         ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ElevatedButton(
-                                style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(
-                                        Colors.green)),
-                                child: const Text(
-                                    'Select Image from Gallery and Camera'),
-                                onPressed: () {
-                                  _showPicker(context: context);
-                                },
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              SizedBox(
-                                height: 200.0,
-                                width: 300.0,
-                                child: galleryFile == null
-                                    ? const Center(
-                                        child: Text('Sorry nothing selected!!'))
-                                    : Center(child: Image.file(galleryFile!)),
-                              )
-                            ],
-                          ),
-                        ),
+                        // SizedBox(
+                        //   height: 20,
+                        // ),
+                        // Center(
+                        //   child: Column(
+                        //     mainAxisAlignment: MainAxisAlignment.center,
+                        //     children: [
+                        //       ElevatedButton(
+                        //         style: ButtonStyle(
+                        //             backgroundColor: MaterialStateProperty.all(
+                        //                 Colors.green)),
+                        //         child: const Text(
+                        //             'Select Image from Gallery and Camera'),
+                        //         onPressed: () {
+                        //           _showPicker(context: context);
+                        //         },
+                        //       ),
+                        //       const SizedBox(
+                        //         height: 20,
+                        //       ),
+                        //       SizedBox(
+                        //         height: 200.0,
+                        //         width: 300.0,
+                        //         child: galleryFile == null
+                        //             ? const Center(
+                        //                 child: Text('Sorry nothing selected!!'))
+                        //             : Center(child: Image.file(galleryFile!)),
+                        //       )
+                        //     ],
+                        //   ),
+                        // ),
                         SizedBox(
                           height: 20,
                         ),
@@ -202,10 +202,11 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                                 setState(() {
                                   _loading = true;
                                 });
-                                // print(galleryFile.toString().split('/').last);
-                                _user.imagepath =
-                                    galleryFile.toString().split('/').last;
-                                print(galleryFile.toString().split('/').last);
+                                // print(galleryFile.toString());
+                                // _user.imagepath =
+                                //     galleryFile.toString() != 'null'
+                                //         ? galleryFile.toString().split('/').last
+                                //         : '';
                                 bool response = await _userModel.register(
                                     registerData: _user.toJson());
                                 if (response == true) {
