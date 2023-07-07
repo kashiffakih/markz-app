@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
               child: Container(
                 // homedashboardLCW (318:1931)
                 padding:
-                    EdgeInsets.fromLTRB(0 * fem, 20 * fem, 0 * fem, 8 * fem),
+                    EdgeInsets.fromLTRB(0 * fem, 30 * fem, 0 * fem, 8 * fem),
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: Color(0xffffffff),
@@ -283,7 +283,7 @@ class _HomePageState extends State<HomePage> {
             _productModel.productsLoader
                 ? LinearProgressIndicator()
                 : SizedBox(
-                    height: 300,
+                    height: 320,
                     child: _productModel.productsLoader
                         ? SizedBox(
                             // height: 20,
