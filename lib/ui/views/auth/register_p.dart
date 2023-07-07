@@ -32,7 +32,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.fromLTRB(6, 16, 6, 80),
+          padding: EdgeInsets.fromLTRB(6, 36, 6, 80),
           decoration: BoxDecoration(
             color: Color(0xffffffff),
           ),
@@ -260,7 +260,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     Container(
                       margin: EdgeInsets.fromLTRB(
-                          20 * fem, 0 * fem, 20 * fem, 86 * fem),
+                          20 * fem, 0 * fem, 20 * fem, 46 * fem),
                       width: double.infinity,
                       height: 52 * fem,
                       decoration: BoxDecoration(
@@ -354,7 +354,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.all(20),
+                margin: EdgeInsets.only(left: 20, right: 20, bottom: 10),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -400,14 +400,14 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.all(20),
+                margin: EdgeInsets.only(left: 20, right: 20, bottom: 10),
                 child: Row(
                   children: [
                     Expanded(
                       child: Container(
                         margin: EdgeInsets.all(5),
                         padding: EdgeInsets.fromLTRB(
-                            41.47 * fem, 15.08 * fem, 46.19 * fem, 15.08 * fem),
+                            31.47 * fem, 15.08 * fem, 36.19 * fem, 15.08 * fem),
                         decoration: BoxDecoration(
                           border: Border.all(color: Color(0xffe8ecf4)),
                           color: Color(0xffffffff),
@@ -419,9 +419,9 @@ class _RegisterPageState extends State<RegisterPage> {
                             width: 11.31 * fem,
                             height: 22.62 * fem,
                             child: Image.asset(
-                              'assets/images/facebookic-Srt.png',
+                              'assets/images/facebookic.png',
                               width: 11.31 * fem,
-                              height: 22.62 * fem,
+                              height: 52.62 * fem,
                             ),
                           ),
                         ),
@@ -431,7 +431,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: Container(
                         margin: EdgeInsets.all(5),
                         padding: EdgeInsets.fromLTRB(
-                            35.99 * fem, 15.25 * fem, 40.7 * fem, 15.25 * fem),
+                            30.99 * fem, 15.25 * fem, 35.7 * fem, 15.25 * fem),
                         decoration: BoxDecoration(
                           border: Border.all(color: Color(0xffe8ecf4)),
                           color: Color(0xffffffff),
@@ -454,7 +454,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     Expanded(
                       child: Container(
                         padding: EdgeInsets.fromLTRB(
-                            34.88 * fem, 14.14 * fem, 39.59 * fem, 14.14 * fem),
+                            30.88 * fem, 14.14 * fem, 35.59 * fem, 14.14 * fem),
                         decoration: BoxDecoration(
                           border: Border.all(color: Color(0xffe8ecf4)),
                           color: Color(0xffffffff),
