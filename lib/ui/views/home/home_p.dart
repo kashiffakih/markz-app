@@ -528,7 +528,6 @@ class _HomePageState extends State<HomePage> {
                                           })));
                             },
                             child: Container(
-                              // group89937cS (318:1962)
                               width: 344 * fem,
                               height: 110 * fem,
                               child: Stack(
