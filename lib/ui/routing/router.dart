@@ -23,6 +23,7 @@ import 'package:sales_app/ui/views/products/products_p.dart';
 import 'package:sales_app/ui/views/profile/address_p.dart';
 import 'package:sales_app/ui/views/profile/contact_p.dart';
 import 'package:sales_app/ui/views/profile/notifications_p.dart';
+import 'package:sales_app/ui/views/profile/order-details-processing.dart';
 import 'package:sales_app/ui/views/profile/orders_p.dart';
 import 'package:sales_app/ui/views/profile/profile_p.dart';
 import 'package:sales_app/ui/views/profile/reviews_p.dart';
@@ -119,9 +120,15 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (BuildContext context) {
         return OrdersPage();
       });
+    case orderDetailsPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return OrderDetailsPage();
+      });
     case addressPage:
       return MaterialPageRoute(builder: (BuildContext context) {
-        return AddressPage();
+        return AddressPage(
+            // arguments: null,
+            );
       });
 
     case wishlistPage:

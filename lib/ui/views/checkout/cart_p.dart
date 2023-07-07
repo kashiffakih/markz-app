@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 // import 'package:sales_app/core/models/add_to_cart.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
+import 'package:sales_app/core/providers/order_pr.dart';
 import 'package:sales_app/locator.dart';
 // import 'package:provider/provider.dart';
 // import 'package:sales_app/core/providers/add_to_cart_pr.dart';
@@ -24,6 +25,7 @@ class _CartPageState extends State<CartPage> {
   void initState() {
     Provider.of<AddToCartModel>(context, listen: false)
         .getAddToCart('', '', '');
+    Provider.of<OrderModel>(context, listen: false).getOrder();
     super.initState();
   }
 
@@ -31,12 +33,14 @@ class _CartPageState extends State<CartPage> {
     'kindOfFlower': '',
     'flavour': '',
     'writeOnCake': '',
+    'pack': ''
   };
 
   @override
   Widget build(BuildContext context) {
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     final ConfigModel _configModel = locator<ConfigModel>();
+    final OrderModel _orderModel = Provider.of<OrderModel>(context);
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -362,7 +366,15 @@ class _CartPageState extends State<CartPage> {
                                                                 .toString(),
                                                         'cartItems':
                                                             _addToCartModel
-                                                                .addToCarts
+                                                                .addToCarts,
+                                                        'address': _orderModel
+                                                                .orders
+                                                                .isNotEmpty
+                                                            ? _orderModel
+                                                                .orders[0]
+                                                                .address!
+                                                                .toJson()
+                                                            : null
                                                       })));
                                         },
                                         style: TextButton.styleFrom(

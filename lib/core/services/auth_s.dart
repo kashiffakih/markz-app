@@ -50,25 +50,32 @@ class AuthService {
       Map<String, dynamic> _responseUserRoleData =
           json.decode(_responseUserRole.body);
     }
-    if (registerData!['imagepath'] != 'null') {
-      var _id = _responseData['data']['id'].toString();
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse('${_apiConfig['baseURL']}/upload_user_photo'),
-      )
-        ..fields['userid'] = _id
-        // ..fields['attachment'] = registerData['imagepath']
-        ..files.add(
-          await http.MultipartFile.fromPath(
-            'attachment',
-            registerData['imagepath'],
-          ),
-        )
-        ..headers.addAll(_apiConfig['headers']);
-      http.StreamedResponse _responseImage = await request.send();
-      http.Response response = await http.Response.fromStream(_responseImage);
-      print(response.body);
-    }
+    // if (registerData!['imagepath'] != null ||
+    //     registerData!['imagepath'] != 'null' ||
+    //     registerData!['imagepath'] != '' ||
+    //     registerData!['imagepath'].toString() != null ||
+    //     registerData!['imagepath'].toString() != 'null' ||
+    //     registerData!['imagepath'].toString() != '' ||
+    //     registerData!['imagepath'].toString().isNotEmpty) {
+    //   print(registerData!['imagepath']);
+    //   var _id = _responseData['data']['id'].toString();
+    //   var request = http.MultipartRequest(
+    //     'POST',
+    //     Uri.parse('${_apiConfig['baseURL']}/upload_user_photo'),
+    //   )
+    //     ..fields['userid'] = _id
+    //     // ..fields['attachment'] = registerData['imagepath']
+    //     ..files.add(
+    //       await http.MultipartFile.fromPath(
+    //         'attachment',
+    //         registerData['imagepath'],
+    //       ),
+    //     )
+    //     ..headers.addAll(_apiConfig['headers']);
+    //   http.StreamedResponse _responseImage = await request.send();
+    //   http.Response response = await http.Response.fromStream(_responseImage);
+    //   print(response.body);
+    // }
     return true;
   }
 

@@ -21,12 +21,15 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     var productId = '';
+    var reviewDescription = '';
     Map<String, dynamic> _CartData = {
       'kindOfFlower': '',
       'flavour': '',
       'writeOnCake': '',
+      'pack': ''
     };
-    Provider.of<ReviewModel>(context, listen: false).getMyReviews(productId);
+    Provider.of<ReviewModel>(context, listen: false)
+        .getMyReviews(productId, reviewDescription);
     Provider.of<WishListModel>(context, listen: false).getWishLists(productId);
     Provider.of<OrderModel>(context, listen: false).getOrder();
     Provider.of<AddToCartModel>(context, listen: false)
@@ -94,43 +97,58 @@ class _ProfilePageState extends State<ProfilePage> {
                       // Photo and Name
                       Row(
                         children: [
-                          Container(
-                            margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
-                            width: 80,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(40),
-                              image: DecorationImage(
-                                  fit: BoxFit.cover,
-                                  image: NetworkImage(
-                                      _configModel.apiConfig['mediaURL'] +
-                                          _configModel.user.imagepath)
-                                  // image: AssetImage(
-                                  //   'assets/images/avatar-bg.png',
-                                  // ),
+                          _configModel.user.imagepath != null
+                              ? Container(
+                                  margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                                  width: 80,
+                                  height: 80,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(40),
+                                    image: DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: NetworkImage(
+                                          _configModel.apiConfig['mediaURL'] +
+                                              _configModel.user.imagepath
+                                                  .toString()),
+                                    ),
                                   ),
+                                )
+                              : Container(
+                                  margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                                  width: 80,
+                                  height: 80,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(40),
+                                    image: DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: AssetImage(
+                                        'assets/images/group-8990.png',
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _configModel.user.firstName.toString(),
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xff303030),
+                                  ),
+                                ),
+                                Text(
+                                  _configModel.user.email.toString(),
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xff808080),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _configModel.user.firstName.toString(),
-                                style: MyGoogleFontStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xff303030),
-                                ),
-                              ),
-                              Text(
-                                _configModel.user.email.toString(),
-                                style: MyGoogleFontStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xff808080),
-                                ),
-                              ),
-                            ],
                           ),
                           Expanded(
                             child: Column(
@@ -399,6 +417,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             'kindOfFlower': '',
                             'flavour': '',
                             'writeOnCake': '',
+                            'pack': ''
                           };
                           await _addToCartModel.getAddToCart('', '', _CartData);
                           Navigator.pushNamed(context, '/cartPage');

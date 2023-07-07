@@ -19,7 +19,9 @@ class _ReviewsPageState extends State<ReviewsPage> {
   void initState() {
     _format = DateFormat('yyyy-MM-dd');
     var productId = '';
-    Provider.of<ReviewModel>(context, listen: false).getMyReviews(productId);
+    var reviewDescription = '';
+    Provider.of<ReviewModel>(context, listen: false)
+        .getMyReviews(productId, reviewDescription);
     super.initState();
   }
 

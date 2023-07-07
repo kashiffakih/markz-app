@@ -19,6 +19,7 @@ const String successPage = '/successPage';
 const String profilePage = '/profilePage';
 const String notificationPage = '/notificationPage';
 const String ordersPage = '/ordersPage';
+const String orderDetailsPage = '/orderDetailsPage';
 const String addressPage = '/addressPage';
 const String wishlistPage = '/wishlistPage';
 const String reviewsPage = '/reviewsPage';

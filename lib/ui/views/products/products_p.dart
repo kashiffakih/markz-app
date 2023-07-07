@@ -23,10 +23,10 @@ class _ProductsPageState extends State<ProductsPage> {
     'kindOfFlower': '',
     'flavour': '',
     'writeOnCake': '',
+    'pack': ''
   };
-  List<Product>? filteredProducts = [];
   bool _isInitialLoad = false;
-
+  List<Product>? filteredProducts = [];
   @override
   void initState() {
     super.initState();
@@ -48,17 +48,21 @@ class _ProductsPageState extends State<ProductsPage> {
     final ProductModel _productModel = Provider.of<ProductModel>(context);
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
+
     setState(() {
-      if (!_isInitialLoad && _productModel.categoryWiseproducts!.length > 0) {
+      if (!_isInitialLoad &&
+          _productModel.categoryWiseproducts?.isNotEmpty == true) {
         filteredProducts = _productModel.categoryWiseproducts;
         _isInitialLoad = true;
+        // filteredProducts = [];
+      } else {
+        _isInitialLoad = false;
       }
     });
 
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          // shoppaget3Y (318:2791)
           padding: EdgeInsets.fromLTRB(9 * fem, 16 * fem, 0 * fem, 22 * fem),
           width: double.infinity,
           decoration: BoxDecoration(
@@ -68,7 +72,8 @@ class _ProductsPageState extends State<ProductsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                margin: EdgeInsets.all(20),
+                margin:
+                    EdgeInsets.only(left: 20, top: 30, bottom: 20, right: 20),
                 width: double.infinity,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
