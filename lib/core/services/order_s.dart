@@ -20,7 +20,7 @@ class OrderService {
         'order_detail_cost': item.product!.productPrices![0].price,
         'product_id': item.productId,
         'quantity': item.qty,
-        'product_pack': item.pack,
+        'product_pack': item.pack != null ? item.pack : '1 Kg',
         'kind_of_flower': item.kindOfFlower,
         'flavour': item.flavour,
         'write_on_cake': item.writeOnCake,
@@ -67,6 +67,7 @@ class OrderService {
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
+    print(_responseData);
     return _responseData['success'];
   }
 
