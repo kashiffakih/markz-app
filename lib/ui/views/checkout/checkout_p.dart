@@ -571,46 +571,59 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               SizedBox(
                                 height: 10,
                               ),
-                              Container(
-                                margin: EdgeInsets.fromLTRB(0.89, 0, 0, 0),
-                                child: TextButton(
-                                  onPressed: () async {
-                                    var addressId =
-                                        widget.arguments['address']['id'];
-                                    bool response =
-                                        await _orderModel.placedOrder(
-                                            widget.arguments['cartItems'],
-                                            widget.arguments['cartTotal']
-                                                .toString(),
-                                            addressId);
-                                    if (response == true) {
-                                      Navigator.pushNamed(
-                                          context, '/successPage');
-                                    }
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                  ),
-                                  child: Container(
-                                    width: 321,
-                                    height: 53,
-                                    decoration: BoxDecoration(
-                                      color: Color(0xff1e1e1e),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        'Submit Order',
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xffffffff),
+                              widget.arguments['address'] != null
+                                  ? Center(
+                                      child: Container(
+                                        margin:
+                                            EdgeInsets.fromLTRB(0.89, 0, 0, 0),
+                                        child: TextButton(
+                                          onPressed: () async {
+                                            var addressId = widget
+                                                .arguments['address']['id'];
+                                            bool response =
+                                                await _orderModel.placedOrder(
+                                                    widget
+                                                        .arguments['cartItems'],
+                                                    widget
+                                                        .arguments['cartTotal']
+                                                        .toString(),
+                                                    addressId);
+                                            if (response == true) {
+                                              Navigator.pushNamed(
+                                                  context, '/successPage');
+                                            }
+                                          },
+                                          style: TextButton.styleFrom(
+                                            padding: EdgeInsets.zero,
+                                          ),
+                                          child: Container(
+                                            width: 321,
+                                            height: 53,
+                                            decoration: BoxDecoration(
+                                              color: Color(0xff1e1e1e),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                'Submit Order',
+                                                style: MyGoogleFontStyle(
+                                                  fontFamily: 'Urbanist',
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xffffffff),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                                    )
+                                  : Center(
+                                      child: Text(
+                                      'Select/Add Address befor checkout.',
+                                      style: TextStyle(
+                                          fontSize: 16, color: Colors.red),
+                                    )),
                             ],
                           ),
                         ),
