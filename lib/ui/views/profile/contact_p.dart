@@ -183,35 +183,32 @@ class _ContactPageState extends State<ContactPage> {
                                 ),
                               ),
                             ),
-                            InkWell(
-                              onTap: () {},
-                              child: Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Whatsapp',
-                                      style: MyGoogleFontStyle(
-                                        fontFamily: 'Urbanist',
-                                        fontWeight: FontWeight.w700,
-                                        color: Color(0xff232323),
-                                      ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Whatsapp',
+                                    style: MyGoogleFontStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xff232323),
                                     ),
-                                    SizedBox(
-                                      height: 5,
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    _configModel.user.companies![0].phone
+                                        .toString(),
+                                    style: MyGoogleFontStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xff232323),
                                     ),
-                                    Text(
-                                      _configModel.user.companies![0].phone
-                                          .toString(),
-                                      style: MyGoogleFontStyle(
-                                        fontFamily: 'Urbanist',
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xff232323),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
