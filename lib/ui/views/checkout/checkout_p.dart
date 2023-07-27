@@ -370,7 +370,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       children: [
                                         Expanded(
                                           child: Text(
-                                            'Order',
+                                            'Sub Total',
                                             style: MyGoogleFontStyle(
                                               fontFamily: 'Urbanist',
                                               fontWeight: FontWeight.w500,
@@ -379,7 +379,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           ),
                                         ),
                                         Text(
-                                          '₹ ' +
+                                          'د.إ' +
+                                              ' ' +
                                               widget.arguments['cartTotal']
                                                   .toString(),
                                           textAlign: TextAlign.right,
@@ -407,7 +408,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           ),
                                         ),
                                         Text(
-                                          '₹ ' +
+                                          'د.إ' +
+                                              ' ' +
                                               _configModel.user.companies![0]
                                                   .deliveryCharges
                                                   .toString(),
@@ -436,7 +438,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           ),
                                         ),
                                         Text(
-                                          '₹ ' +
+                                          'د.إ' +
+                                              ' ' +
                                               _configModel
                                                   .user.companies![0].taxPercent
                                                   .toString(),
@@ -465,7 +468,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           ),
                                         ),
                                         Text(
-                                          '₹ ' +
+                                          'د.إ' +
+                                              ' ' +
                                               (int.parse(widget.arguments[
                                                               'cartTotal']
                                                           .toString()) /
@@ -488,38 +492,38 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            'Packaging',
-                                            style: MyGoogleFontStyle(
-                                              fontFamily: 'Urbanist',
-                                              fontWeight: FontWeight.w500,
-                                              color: Color(0xff909090),
-                                            ),
-                                          ),
-                                        ),
-                                        Text(
-                                          '₹ ' +
-                                              (int.parse(_configModel
-                                                      .user
-                                                      .companies![0]
-                                                      .packagingCharges
-                                                      .toString()))
-                                                  .toString(),
-                                          textAlign: TextAlign.right,
-                                          style: MyGoogleFontStyle(
-                                            fontFamily: 'Inter',
-                                            fontWeight: FontWeight.w700,
-                                            color: Color(0xff303030),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
+                                    // Row(
+                                    //   children: [
+                                    //     Expanded(
+                                    //       child: Text(
+                                    //         'Packaging',
+                                    //         style: MyGoogleFontStyle(
+                                    //           fontFamily: 'Urbanist',
+                                    //           fontWeight: FontWeight.w500,
+                                    //           color: Color(0xff909090),
+                                    //         ),
+                                    //       ),
+                                    //     ),
+                                    //     Text(
+                                    //       '₹ ' +
+                                    //           (int.parse(_configModel
+                                    //                   .user
+                                    //                   .companies![0]
+                                    //                   .packagingCharges
+                                    //                   .toString()))
+                                    //               .toString(),
+                                    //       textAlign: TextAlign.right,
+                                    //       style: MyGoogleFontStyle(
+                                    //         fontFamily: 'Inter',
+                                    //         fontWeight: FontWeight.w700,
+                                    //         color: Color(0xff303030),
+                                    //       ),
+                                    //     )
+                                    //   ],
+                                    // ),
+                                    // SizedBox(
+                                    //   height: 10,
+                                    // ),
                                     Row(
                                       children: [
                                         Expanded(
@@ -533,7 +537,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           ),
                                         ),
                                         Text(
-                                          '₹ ' +
+                                          'د.إ' +
+                                              ' ' +
                                               (int.parse(widget.arguments['cartTotal'].toString()) +
                                                       int.parse(_configModel
                                                           .user

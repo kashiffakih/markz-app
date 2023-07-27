@@ -34,6 +34,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
+            padding: EdgeInsets.only(top: 20),
             child: Column(
               children: [
                 // Title

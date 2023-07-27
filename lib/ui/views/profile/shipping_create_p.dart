@@ -41,6 +41,7 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
+            padding: EdgeInsets.only(top: 20),
             child: Column(
               children: [
                 // Title

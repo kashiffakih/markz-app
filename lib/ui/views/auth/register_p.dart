@@ -75,11 +75,23 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
               SizedBox(
-                height: 30,
+                height: 10,
               ),
               Container(
                 child: Text(
-                  'Hello! Register to get started',
+                  'Hello !',
+                  textAlign: TextAlign.center,
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 29,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xff1e232c),
+                  ),
+                ),
+              ),
+              Container(
+                child: Text(
+                  'Register to get started',
                   textAlign: TextAlign.center,
                   style: MyGoogleFontStyle(
                     fontFamily: 'Urbanist',
@@ -90,7 +102,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
               SizedBox(
-                height: 30,
+                height: 20,
               ),
               Form(
                 key: _registerKey,
@@ -111,8 +123,8 @@ class _RegisterPageState extends State<RegisterPage> {
                           enabledBorder: InputBorder.none,
                           errorBorder: InputBorder.none,
                           disabledBorder: InputBorder.none,
-                          contentPadding: EdgeInsets.fromLTRB(16.94 * fem,
-                              20.26 * fem, 16.94 * fem, 13.74 * fem),
+                          contentPadding: EdgeInsets.fromLTRB(17.94 * fem,
+                              16.34 * fem, 17.94 * fem, 17.66 * fem),
                           hintText: 'Full Name',
                           hintStyle: TextStyle(color: Color(0xff8390a1)),
                         ),
@@ -187,7 +199,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           errorBorder: InputBorder.none,
                           disabledBorder: InputBorder.none,
                           contentPadding: EdgeInsets.fromLTRB(17.94 * fem,
-                              15.39 * fem, 17.94 * fem, 18.61 * fem),
+                              16.34 * fem, 17.94 * fem, 17.66 * fem),
                           hintText: 'Phone',
                           hintStyle: TextStyle(color: Color(0xff8390a1)),
                         ),
@@ -224,8 +236,8 @@ class _RegisterPageState extends State<RegisterPage> {
                           enabledBorder: InputBorder.none,
                           errorBorder: InputBorder.none,
                           disabledBorder: InputBorder.none,
-                          contentPadding: EdgeInsets.fromLTRB(14.95 * fem,
-                              15.36 * fem, 14.95 * fem, 18.64 * fem),
+                          contentPadding: EdgeInsets.fromLTRB(17.94 * fem,
+                              16.34 * fem, 17.94 * fem, 17.66 * fem),
                           hintText: 'Password',
                           hintStyle: TextStyle(color: Color(0xff8390a1)),
                           suffixIcon: GestureDetector(
@@ -260,7 +272,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     Container(
                       margin: EdgeInsets.fromLTRB(
-                          20 * fem, 0 * fem, 20 * fem, 46 * fem),
+                          20 * fem, 10 * fem, 20 * fem, 46 * fem),
                       width: double.infinity,
                       height: 52 * fem,
                       decoration: BoxDecoration(

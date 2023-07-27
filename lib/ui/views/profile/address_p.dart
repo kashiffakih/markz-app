@@ -41,11 +41,11 @@ class _AddressPageState extends State<AddressPage> {
       }
     });
 
-    print(cartItems);
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
+            padding: EdgeInsets.only(top: 20),
             child: Column(
               children: [
                 // Title

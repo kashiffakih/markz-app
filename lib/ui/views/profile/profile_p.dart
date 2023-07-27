@@ -54,7 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 // Title
                 Container(
-                  margin: EdgeInsets.all(20),
+                  margin: EdgeInsets.only(top: 40, left: 20, bottom: 20),
                   width: double.infinity,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,9 +99,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         children: [
                           _configModel.user.imagepath != null
                               ? Container(
-                                  margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
-                                  width: 80,
-                                  height: 80,
+                                  margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                                  width: 65,
+                                  height: 65,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(40),
                                     image: DecorationImage(
@@ -114,9 +114,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ),
                                 )
                               : Container(
-                                  margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
-                                  width: 80,
-                                  height: 80,
+                                  margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                                  width: 65,
+                                  height: 65,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(40),
                                     image: DecorationImage(

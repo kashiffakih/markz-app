@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:icon_forest/don_icons.dart';
+import 'package:icon_forest/iconoir.dart';
 import 'package:provider/provider.dart';
+import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/product_pr.dart';
 import 'package:sales_app/core/providers/wish_list_pr.dart';
@@ -28,6 +31,7 @@ class _HomePageState extends State<HomePage> {
     final ConfigModel _configModel = locator<ConfigModel>();
     final ProductModel _productModel = Provider.of<ProductModel>(context);
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
+    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
@@ -222,6 +226,10 @@ class _HomePageState extends State<HomePage> {
                                           onTap: () {},
                                           child: Padding(
                                             padding: const EdgeInsets.all(10.0),
+                                            // child: Icon(
+                                            //   Icons.search,
+                                            //   size: 28,
+                                            // ),
                                             child: Image.asset(
                                               'assets/images/search.png',
                                               width: 18.58 * fem,
@@ -437,18 +445,23 @@ class _HomePageState extends State<HomePage> {
                                                       builder: (context) =>
                                                           ProductIdPage(
                                                               arguments: {
-                                                                'product':
-                                                                    _productModel
-                                                                        .products![
-                                                                            index]
-                                                                        .toJson()
+                                                                'product': _productModel
+                                                                    .products![
+                                                                        index]
+                                                                    .toJson(),
+                                                                'category': _productModel
+                                                                    .products![
+                                                                        index]
+                                                                    .category!
+                                                                    .name
+                                                                    .toString()
                                                               })));
                                             },
                                             child: Container(
                                               // shadechocolatecake3pc6 (318:2002)
                                               margin: EdgeInsets.fromLTRB(
                                                   0 * fem,
-                                                  0 * fem,
+                                                  6 * fem,
                                                   0 * fem,
                                                   4 * fem),
                                               constraints: BoxConstraints(
@@ -475,12 +488,16 @@ class _HomePageState extends State<HomePage> {
                                             margin: EdgeInsets.fromLTRB(0 * fem,
                                                 0 * fem, 1 * fem, 0 * fem),
                                             child: Text(
-                                              _productModel.products![index]
-                                                  .productPrices![0].offerPrice
-                                                  .toString(),
+                                              _productModel
+                                                      .products![index]
+                                                      .productPrices![0]
+                                                      .offerPrice
+                                                      .toString() +
+                                                  ' ' +
+                                                  'د.إ',
                                               style: MyGoogleFontStyle(
                                                 fontFamily: 'Poppins',
-                                                fontSize: 10.9543466568 * ffem,
+                                                fontSize: 13 * ffem,
                                                 fontWeight: FontWeight.w500,
                                                 height: 1.5 * ffem / fem,
                                                 letterSpacing:
@@ -520,12 +537,13 @@ class _HomePageState extends State<HomePage> {
                           child: InkWell(
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => ProductsPage(
-                                          arguments: {
-                                            'categoryId': _category['id'],
-                                            'subCategory':
-                                                _category['sub_categories']
-                                          })));
+                                  builder: (context) =>
+                                      ProductsPage(arguments: {
+                                        'categoryId': _category['id'],
+                                        'subCategory':
+                                            _category['sub_categories'],
+                                        'category': _category['name'].toString()
+                                      })));
                             },
                             child: Container(
                               width: 344 * fem,
@@ -957,6 +975,57 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        elevation: 10,
+        iconSize: 30,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.black,
+        selectedFontSize: 14,
+        unselectedFontSize: 14,
+        onTap: (value) async {
+          if (value == 0) {
+            Navigator.pushNamed(context, '/homePage');
+          }
+          if (value == 1) {
+            Navigator.pushNamed(context, '/wishlistPage');
+          }
+
+          if (value == 2) {
+            Map<String, dynamic> _CartData = {
+              'kindOfFlower': '',
+              'flavour': '',
+              'writeOnCake': '',
+              'pack': ''
+            };
+            await _addToCartModel.getAddToCart('', '', _CartData);
+            Navigator.pushNamed(context, '/cartPage');
+          }
+          if (value == 3) {
+            Navigator.pushNamed(context, '/profilePage');
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(
+            label: 'Home',
+            icon: Iconoir(Iconoir.home_simple),
+            // icon: Icon(DonIcons.wap_home, size: 23),
+          ),
+          BottomNavigationBarItem(label: 'Saved', icon: Iconoir(Iconoir.heart)),
+          BottomNavigationBarItem(
+            label: 'Cart',
+            icon: Iconoir(Iconoir.shopping_bag),
+          ),
+          BottomNavigationBarItem(
+            label: 'Profile',
+            icon: Icon(
+              DonIcons.user_o,
+              size: 23,
+            ),
+          ),
+        ],
       ),
     );
   }

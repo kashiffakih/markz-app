@@ -17,6 +17,7 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
     double ffem = fem * 0.97;
     return Scaffold(
       body: Container(
+        padding: EdgeInsets.only(top: 20),
         width: double.infinity,
         child: Container(
           width: double.infinity,
@@ -71,8 +72,8 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                 left: 19 * fem,
                 top: 90 * fem,
                 child: Container(
-                  width: 136 * fem,
-                  height: 45 * fem,
+                  width: 320 * fem,
+                  height: 60 * fem,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -101,6 +102,9 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                                         : Colors.black,
                           ),
                         ),
+                      ),
+                      Divider(
+                        color: Colors.black,
                       ),
                       Container(
                         width: double.infinity,
@@ -182,8 +186,14 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                                   ),
                                   TextSpan(
                                     text: widget.arguments['order']
-                                            ['order_details'][index]['flavour']
-                                        .toString(),
+                                                    ['order_details'][index]
+                                                ['flavour'] !=
+                                            null
+                                        ? widget.arguments['order']
+                                                ['order_details'][index]
+                                                ['flavour']
+                                            .toString()
+                                        : '',
                                     style: MyGoogleFontStyle(
                                       fontFamily: 'Urbanist',
                                       fontSize: 12 * ffem,
@@ -274,7 +284,8 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                                   ),
                                 ),
                                 Text(
-                                  '₹ ' +
+                                  'د.إ' +
+                                      ' ' +
                                       widget.arguments['order']['order_details']
                                               [index]['order_detail_cost']
                                           .toString(),
@@ -290,6 +301,9 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                               ],
                             ),
                           ),
+                          Divider(
+                            color: Colors.black,
+                          )
                         ],
                       ),
                     )),
@@ -298,233 +312,262 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
               Positioned(
                 left: 19 * fem,
                 top: 250 * fem,
-                child: Container(
-                  width: 321 * fem,
-                  height: 100 * fem,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0 * fem,
-                        top: 0 * fem,
-                        child: Container(
-                          width: 321 * fem,
-                          height: 24 * fem,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                margin: EdgeInsets.fromLTRB(
-                                    0 * fem, 0 * fem, 218 * fem, 0 * fem),
-                                child: Text(
-                                  'Item total',
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 15 * ffem,
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.6 * ffem / fem,
-                                    color: Color(0xff1e1e1e),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 321 * fem,
+                      height: 100 * fem,
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            left: 0 * fem,
+                            top: 0 * fem,
+                            child: Container(
+                              width: 321 * fem,
+                              height: 24 * fem,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    margin: EdgeInsets.fromLTRB(
+                                        0 * fem, 0 * fem, 218 * fem, 0 * fem),
+                                    child: Text(
+                                      'Item total',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 15 * ffem,
+                                        fontWeight: FontWeight.w500,
+                                        height: 1.6 * ffem / fem,
+                                        color: Color(0xff1e1e1e),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.fromLTRB(
-                                    0 * fem, 1 * fem, 0 * fem, 0 * fem),
-                                child: Text(
-                                  '₹ ' +
-                                      widget.arguments['order']['order_cost']
-                                          .toString(),
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 12 * ffem,
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.2 * ffem / fem,
-                                    letterSpacing: -0.24 * fem,
-                                    color: Color(0xff1e1e1e),
+                                  Container(
+                                    margin: EdgeInsets.fromLTRB(
+                                        0 * fem, 1 * fem, 0 * fem, 0 * fem),
+                                    child: Text(
+                                      'د.إ' +
+                                          ' ' +
+                                          widget.arguments['order']
+                                                  ['order_cost']
+                                              .toString(),
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 12 * ffem,
+                                        fontWeight: FontWeight.w500,
+                                        height: 1.2 * ffem / fem,
+                                        letterSpacing: -0.24 * fem,
+                                        color: Color(0xff1e1e1e),
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 0 * fem,
-                        top: 23 * fem,
-                        child: Container(
-                          width: 321 * fem,
-                          height: 24 * fem,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                margin: EdgeInsets.fromLTRB(
-                                    0 * fem, 0 * fem, 256 * fem, 0 * fem),
-                                child: Text(
-                                  'Taxes',
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 12 * ffem,
-                                    fontWeight: FontWeight.w400,
-                                    height: 2 * ffem / fem,
-                                    color: Color(0xff1e1e1e),
+                          Positioned(
+                            left: 0 * fem,
+                            top: 23 * fem,
+                            child: Container(
+                              width: 321 * fem,
+                              height: 24 * fem,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    margin: EdgeInsets.fromLTRB(
+                                        0 * fem, 0 * fem, 256 * fem, 0 * fem),
+                                    child: Text(
+                                      'Taxes',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 12 * ffem,
+                                        fontWeight: FontWeight.w400,
+                                        height: 2 * ffem / fem,
+                                        color: Color(0xff1e1e1e),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.fromLTRB(
-                                    0 * fem, 1 * fem, 0 * fem, 0 * fem),
-                                child: Text(
-                                  '₹ ' +
-                                      widget.arguments['order']['tax_amount']
-                                          .toString(),
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 12 * ffem,
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.2 * ffem / fem,
-                                    letterSpacing: -0.24 * fem,
-                                    color: Color(0xff1e1e1e),
+                                  Container(
+                                    margin: EdgeInsets.fromLTRB(
+                                        0 * fem, 1 * fem, 0 * fem, 0 * fem),
+                                    child: Text(
+                                      'د.إ' +
+                                          ' ' +
+                                          widget.arguments['order']
+                                                  ['tax_amount']
+                                              .toString(),
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 12 * ffem,
+                                        fontWeight: FontWeight.w500,
+                                        height: 1.2 * ffem / fem,
+                                        letterSpacing: -0.24 * fem,
+                                        color: Color(0xff1e1e1e),
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 0 * fem,
-                        top: 42 * fem,
-                        child: Container(
-                          width: 320 * fem,
-                          height: 24 * fem,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                margin: EdgeInsets.fromLTRB(
-                                    0 * fem, 0 * fem, 205 * fem, 0 * fem),
-                                child: Text(
-                                  'Delivery charge',
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 12 * ffem,
-                                    fontWeight: FontWeight.w400,
-                                    height: 2 * ffem / fem,
-                                    color: Color(0xff1e1e1e),
+                          Positioned(
+                            left: 0 * fem,
+                            top: 42 * fem,
+                            child: Container(
+                              width: 320 * fem,
+                              height: 24 * fem,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    margin: EdgeInsets.fromLTRB(
+                                        0 * fem, 0 * fem, 205 * fem, 0 * fem),
+                                    child: Text(
+                                      'Delivery charge',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 12 * ffem,
+                                        fontWeight: FontWeight.w400,
+                                        height: 2 * ffem / fem,
+                                        color: Color(0xff1e1e1e),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.fromLTRB(
-                                    0 * fem, 1 * fem, 0 * fem, 0 * fem),
-                                child: Text(
-                                  '₹ ' +
-                                      widget.arguments['order']
-                                              ['delivery_amount']
-                                          .toString(),
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 12 * ffem,
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.2 * ffem / fem,
-                                    letterSpacing: -0.24 * fem,
-                                    color: Color(0xff1e1e1e),
+                                  Container(
+                                    margin: EdgeInsets.fromLTRB(
+                                        0 * fem, 1 * fem, 0 * fem, 0 * fem),
+                                    child: Text(
+                                      'د.إ' +
+                                          ' ' +
+                                          widget.arguments['order']
+                                                  ['delivery_amount']
+                                              .toString(),
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 12 * ffem,
+                                        fontWeight: FontWeight.w500,
+                                        height: 1.2 * ffem / fem,
+                                        letterSpacing: -0.24 * fem,
+                                        color: Color(0xff1e1e1e),
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 0 * fem,
-                        top: 62 * fem,
-                        child: Container(
-                          width: 320 * fem,
-                          height: 24 * fem,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                margin: EdgeInsets.fromLTRB(
-                                    0 * fem, 0 * fem, 205 * fem, 0 * fem),
-                                child: Text(
-                                  'Packing charge',
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 12 * ffem,
-                                    fontWeight: FontWeight.w400,
-                                    height: 2 * ffem / fem,
-                                    color: Color(0xff1e1e1e),
+                          Positioned(
+                            left: 0 * fem,
+                            top: 62 * fem,
+                            child: Container(
+                              width: 320 * fem,
+                              height: 24 * fem,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    margin: EdgeInsets.fromLTRB(
+                                        0 * fem, 0 * fem, 205 * fem, 0 * fem),
+                                    child: Text(
+                                      'Packing charge',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 12 * ffem,
+                                        fontWeight: FontWeight.w400,
+                                        height: 2 * ffem / fem,
+                                        color: Color(0xff1e1e1e),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.fromLTRB(
-                                    0 * fem, 1 * fem, 0 * fem, 0 * fem),
-                                child: Text(
-                                  '₹ ' +
-                                      widget.arguments['order']
-                                              ['packaging_amount']
-                                          .toString(),
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 12 * ffem,
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.2 * ffem / fem,
-                                    letterSpacing: -0.24 * fem,
-                                    color: Color(0xff1e1e1e),
+                                  Container(
+                                    margin: EdgeInsets.fromLTRB(
+                                        0 * fem, 1 * fem, 0 * fem, 0 * fem),
+                                    child: Text(
+                                      'د.إ' +
+                                          ' ' +
+                                          widget.arguments['order']
+                                                  ['packaging_amount']
+                                              .toString(),
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 12 * ffem,
+                                        fontWeight: FontWeight.w500,
+                                        height: 1.2 * ffem / fem,
+                                        letterSpacing: -0.24 * fem,
+                                        color: Color(0xff1e1e1e),
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    SizedBox(
+                      width: 320,
+                      child: Divider(
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
                 ),
               ),
+
               Positioned(
                 left: 19 * fem,
                 top: 386 * fem,
-                child: Container(
-                  width: 320 * fem,
-                  height: 24 * fem,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        margin: EdgeInsets.fromLTRB(
-                            0 * fem, 0 * fem, 191 * fem, 0 * fem),
-                        child: Text(
-                          'Grand Total',
-                          style: MyGoogleFontStyle(
-                            fontFamily: 'Urbanist',
-                            fontSize: 15 * ffem,
-                            fontWeight: FontWeight.w500,
-                            height: 1.6 * ffem / fem,
-                            color: Color(0xff1e1e1e),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 320 * fem,
+                      height: 24 * fem,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.fromLTRB(
+                                0 * fem, 0 * fem, 191 * fem, 0 * fem),
+                            child: Text(
+                              'Grand Total',
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 15 * ffem,
+                                fontWeight: FontWeight.w500,
+                                height: 1.6 * ffem / fem,
+                                color: Color(0xff1e1e1e),
+                              ),
+                            ),
                           ),
-                        ),
+                          Text(
+                            'د.إ' +
+                                ' ' +
+                                widget.arguments['order']['total_amount']
+                                    .toString(),
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 15 * ffem,
+                              fontWeight: FontWeight.w500,
+                              height: 1.2 * ffem / fem,
+                              letterSpacing: -0.3 * fem,
+                              color: Color(0xff1e1e1e),
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        '₹ ' +
-                            widget.arguments['order']['total_amount']
-                                .toString(),
-                        style: MyGoogleFontStyle(
-                          fontFamily: 'Urbanist',
-                          fontSize: 15 * ffem,
-                          fontWeight: FontWeight.w500,
-                          height: 1.2 * ffem / fem,
-                          letterSpacing: -0.3 * fem,
-                          color: Color(0xff1e1e1e),
-                        ),
+                    ),
+                    SizedBox(
+                      width: 320,
+                      child: Divider(
+                        color: Colors.black,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
+
               Positioned(
                 left: 19 * fem,
                 top: 440 * fem,

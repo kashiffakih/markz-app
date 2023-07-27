@@ -20,6 +20,7 @@ class _ContactPageState extends State<ContactPage> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
+            padding: EdgeInsets.only(top: 20),
             child: Column(
               children: [
                 // Title

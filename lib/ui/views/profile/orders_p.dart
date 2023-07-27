@@ -28,6 +28,7 @@ class _OrdersPageState extends State<OrdersPage> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
+            padding: EdgeInsets.only(top: 20),
             child: Column(
               children: [
                 // Title
@@ -76,13 +77,16 @@ class _OrdersPageState extends State<OrdersPage> {
                         // Tabs
                         Container(
                           child: TabBar(
+                            labelPadding: EdgeInsets.all(8),
+                            indicatorColor: Colors.black,
+                            isScrollable: true,
                             tabs: [
                               Padding(
                                 padding: const EdgeInsets.all(2.0),
                                 child: Text(
                                   'Order Placed',
                                   style: TextStyle(
-                                      color: Colors.black, fontSize: 12),
+                                      color: Colors.black, fontSize: 14),
                                 ),
                               ),
                               Padding(
@@ -90,7 +94,7 @@ class _OrdersPageState extends State<OrdersPage> {
                                 child: Text(
                                   'Delivered',
                                   style: TextStyle(
-                                      color: Colors.black, fontSize: 12),
+                                      color: Colors.black, fontSize: 14),
                                 ),
                               ),
                               Padding(
@@ -98,7 +102,7 @@ class _OrdersPageState extends State<OrdersPage> {
                                 child: Text(
                                   'Processing',
                                   style: TextStyle(
-                                      color: Colors.black, fontSize: 12),
+                                      color: Colors.black, fontSize: 14),
                                 ),
                               ),
                               Padding(
@@ -106,7 +110,7 @@ class _OrdersPageState extends State<OrdersPage> {
                                 child: Text(
                                   'Cancelled',
                                   style: TextStyle(
-                                      color: Colors.black, fontSize: 12),
+                                      color: Colors.black, fontSize: 14),
                                 ),
                               ),
                             ],
