@@ -189,7 +189,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                             .toString(),
                                                         style:
                                                             MyGoogleFontStyle(
-                                                          fontSize: 17,
+                                                          fontSize: 19,
                                                           fontFamily:
                                                               'Urbanist',
                                                           fontWeight:
@@ -198,54 +198,63 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                               Color(0xff000000),
                                                         ),
                                                       ),
+                                                      SizedBox(
+                                                        height: 8,
+                                                      ),
                                                       // Reviews
                                                       Container(
                                                         child: Row(
                                                           children: [
                                                             Image.asset(
                                                               'assets/images/vector-TXk.png',
-                                                              width: 20,
-                                                              height: 15,
+                                                              width: 12,
+                                                              height: 12,
                                                             ),
                                                             Image.asset(
                                                               'assets/images/vector-TXk.png',
-                                                              width: 20,
-                                                              height: 15,
+                                                              width: 12,
+                                                              height: 12,
                                                             ),
                                                             Image.asset(
                                                               'assets/images/vector-TXk.png',
-                                                              width: 20,
-                                                              height: 15,
+                                                              width: 12,
+                                                              height: 12,
                                                             ),
                                                             Image.asset(
                                                               'assets/images/vector-TXk.png',
-                                                              width: 20,
-                                                              height: 15,
+                                                              width: 12,
+                                                              height: 12,
                                                             ),
                                                             Image.asset(
                                                               'assets/images/vector-TXk.png',
-                                                              width: 20,
-                                                              height: 15,
+                                                              width: 12,
+                                                              height: 12,
                                                             ),
-                                                            Text(
-                                                              '( ' +
-                                                                  widget
-                                                                      .arguments[
-                                                                          'product']
-                                                                          [
-                                                                          'reviews']
-                                                                      .length
-                                                                      .toString() +
-                                                                  ' )',
-                                                              style:
-                                                                  MyGoogleFontStyle(
-                                                                fontFamily:
-                                                                    'Urbanist',
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w400,
-                                                                color: Color(
-                                                                    0xff000000),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .only(
+                                                                      left: 8),
+                                                              child: Text(
+                                                                '( ' +
+                                                                    widget
+                                                                        .arguments[
+                                                                            'product']
+                                                                            [
+                                                                            'reviews']
+                                                                        .length
+                                                                        .toString() +
+                                                                    ' )',
+                                                                style:
+                                                                    MyGoogleFontStyle(
+                                                                  fontFamily:
+                                                                      'Urbanist',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                  color: Color(
+                                                                      0xff000000),
+                                                                ),
                                                               ),
                                                             ),
                                                           ],
@@ -384,7 +393,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                 ),
                                                               ),
                                                               child: Icon(
-                                                                  Icons.remove),
+                                                                  Icons.remove,
+                                                                  color: Colors
+                                                                      .black),
                                                             ),
                                                           ),
                                                           Text(
@@ -454,7 +465,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                 ),
                                                               ),
                                                               child: Icon(
-                                                                  Icons.add),
+                                                                  Icons.add,
+                                                                  color: Colors
+                                                                      .black),
                                                             ),
                                                           ),
                                                         ],
@@ -477,10 +490,11 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                     ),
                                   ),
                                 ),
+
                                 // Size
                                 Positioned(
                                   left: 25,
-                                  top: 450,
+                                  top: 470,
                                   child: Container(
                                     width:
                                         MediaQuery.of(context).size.width - 50,
@@ -506,7 +520,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 color: Color(0xffdadada)),
                                             color: Color(0xffffffff),
                                             borderRadius:
-                                                BorderRadius.circular(20),
+                                                BorderRadius.circular(5),
                                           ),
                                           child: DropdownButtonFormField(
                                               decoration: InputDecoration(
@@ -559,7 +573,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                         'Cakes & Flowers')
                                   Positioned(
                                     left: 25,
-                                    top: 550,
+                                    top: 570,
                                     child: Container(
                                       width: MediaQuery.of(context).size.width -
                                           50,
@@ -584,7 +598,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   color: Color(0xffdadada)),
                                               color: Color(0xffffffff),
                                               borderRadius:
-                                                  BorderRadius.circular(20),
+                                                  BorderRadius.circular(5),
                                             ),
                                             child: DropdownButtonFormField(
                                                 decoration: InputDecoration(
@@ -625,7 +639,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                     'Flower')
                                   Positioned(
                                     left: 25,
-                                    top: 560,
+                                    top: 580,
                                     child: Container(
                                       width: MediaQuery.of(context).size.width -
                                           50,
@@ -650,7 +664,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   color: Color(0xffdadada)),
                                               color: Color(0xffffffff),
                                               borderRadius:
-                                                  BorderRadius.circular(20),
+                                                  BorderRadius.circular(5),
                                             ),
                                             child: DropdownButtonFormField(
                                                 decoration: InputDecoration(
@@ -693,14 +707,14 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                   Positioned(
                                     left: 25,
                                     top: widget.arguments['product']['category']
-                                                ['name'] !=
-                                            'Flower'
-                                        ? 660
+                                                ['name'] ==
+                                            'Combos'
+                                        ? 580
                                         : widget.arguments['product']
                                                     ['category']['name'] ==
-                                                'Cakes & Flowers'
-                                            ? 800
-                                            : 660,
+                                                'Cake'
+                                            ? 680
+                                            : 580,
                                     child: Container(
                                       width: MediaQuery.of(context).size.width -
                                           50,
@@ -725,7 +739,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   color: Color(0xffdadada)),
                                               color: Color(0xffffffff),
                                               borderRadius:
-                                                  BorderRadius.circular(20),
+                                                  BorderRadius.circular(5),
                                             ),
                                             child: TextFormField(
                                               decoration: InputDecoration(
@@ -747,12 +761,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 _CartData['writeOnCake'] =
                                                     value.toString();
                                               },
-                                              validator: (value) {
-                                                if (value!.isEmpty) {
-                                                  return 'Please write someting.';
-                                                }
-                                                return null;
-                                              },
+                                              // validator: (value) {
+                                              //   if (value!.isEmpty) {
+                                              //     return 'Please write someting.';
+                                              //   }
+                                              //   return null;
+                                              // },
                                             ),
                                           )
                                         ],
@@ -772,7 +786,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       ['category']['name'] ==
                                                   'Cake'
                                               ? 770
-                                              : 760,
+                                              : 670,
                                       child: Container(
                                         child: Column(
                                           crossAxisAlignment:
@@ -912,7 +926,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                                   child: TextButton(
                                                                                     onPressed: () async {
                                                                                       _formKey.currentState!.save();
-                                                                                      print(_CartData.toString());
                                                                                       bool type = true;
                                                                                       // await _addToCartModel.getAddToCart(_productModel.categoryWiseproducts![index].id, type, _CartData);
                                                                                     },
@@ -988,7 +1001,11 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                                                     Radius.circular(5),
                                                                                                   ),
                                                                                                 ),
-                                                                                                child: Icon(Icons.remove),
+                                                                                                child: Icon(
+                                                                                                  Icons.remove,
+                                                                                                  color: Colors.black,
+                                                                                                  size: 16,
+                                                                                                ),
                                                                                               ),
                                                                                             ),
                                                                                           ),
@@ -1019,7 +1036,11 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                                                     Radius.circular(5),
                                                                                                   ),
                                                                                                 ),
-                                                                                                child: Icon(Icons.add),
+                                                                                                child: Icon(
+                                                                                                  Icons.add,
+                                                                                                  color: Colors.black,
+                                                                                                  size: 16,
+                                                                                                ),
                                                                                               ),
                                                                                             ),
                                                                                           ),
@@ -1104,10 +1125,10 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                               Container(
                                                                             child:
                                                                                 Text(
-                                                                              _productModel.categoryWiseproducts![index].productPrices![0].price.toString(),
+                                                                              _productModel.categoryWiseproducts![index].productPrices![0].price.toString() + " " + 'د.إ',
                                                                               style: MyGoogleFontStyle(
                                                                                 fontFamily: 'Poppins',
-                                                                                fontSize: 10.9543466568,
+                                                                                fontSize: 13,
                                                                                 fontWeight: FontWeight.w500,
                                                                                 height: 1.5,
                                                                                 letterSpacing: -0.2190869331,
@@ -1144,8 +1165,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   ['name'] ==
                                               'Cake'
                                           ? 1010
-                                          : 1020,
+                                          : 930,
                                   child: Container(
+                                    height: 320,
                                     child: DefaultTabController(
                                       length: 2,
                                       child: Column(
@@ -1184,13 +1206,10 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                     .size
                                                     .width -
                                                 50,
-                                            height: widget
-                                                        .arguments!['product']
-                                                            ['reviews']
-                                                        .length ==
-                                                    1
-                                                ? 160
-                                                : 250,
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height -
+                                                470,
                                             child: TabBarView(
                                               children: [
                                                 Padding(
@@ -1227,7 +1246,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                 ),
                                                                 child:
                                                                     TextFormField(
-                                                                  maxLines: 3,
+                                                                  maxLines: 2,
                                                                   decoration:
                                                                       InputDecoration(
                                                                     border:
@@ -1383,157 +1402,101 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                             ? Center(
                                                                 child: Text(
                                                                     'No reviews'))
-                                                            : ListView.builder(
-                                                                itemCount: widget
-                                                                    .arguments![
-                                                                        'product']
-                                                                        [
-                                                                        'reviews']!
-                                                                    .length,
-                                                                itemBuilder: (BuildContext
-                                                                            context,
-                                                                        index) =>
-                                                                    Container(
-                                                                  margin: EdgeInsets
-                                                                      .only(
-                                                                          bottom:
-                                                                              10),
-                                                                  padding:
-                                                                      EdgeInsets
-                                                                          .all(
-                                                                              10),
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    border: Border.all(
-                                                                        color: Color(
-                                                                            0xffc7b456)),
-                                                                    color: Color(
-                                                                        0xffffffff),
-                                                                    borderRadius:
-                                                                        BorderRadius
-                                                                            .all(
-                                                                      Radius
-                                                                          .circular(
-                                                                              5),
-                                                                    ),
-                                                                    boxShadow: [
-                                                                      BoxShadow(
-                                                                        color: Color(
-                                                                            0x338a959e),
-                                                                        offset: Offset(
-                                                                            0,
-                                                                            7.6690645218),
-                                                                        blurRadius:
-                                                                            19.1726608276,
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                  child: Column(
-                                                                    children: [
-                                                                      // Photo and Title
-                                                                      Row(
-                                                                        children: [
-                                                                          Expanded(
-                                                                            child:
-                                                                                Column(
-                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                              children: [
-                                                                                Row(
-                                                                                  children: [
-                                                                                    Container(
-                                                                                      // mediaF3t (I318:2555;0:1388)
-                                                                                      margin: EdgeInsets.fromLTRB(0, 0, 15, 0),
-                                                                                      width: 66.71,
-                                                                                      height: 66.71,
-                                                                                      child: Image.network(
-                                                                                        _configModel.apiConfig['mediaURL'] + widget.arguments!['product']['imagepath1'].toString(),
-                                                                                        // 'assets/images/media.png',
-                                                                                        width: 66.71,
-                                                                                        height: 66.71,
-                                                                                      ),
-                                                                                    ),
-                                                                                    SizedBox(
-                                                                                      width: 190,
-                                                                                      child: Column(
-                                                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                        children: [
-                                                                                          Text(
-                                                                                            widget.arguments!['product']['name'].toString(),
-                                                                                            style: MyGoogleFontStyle(
-                                                                                              fontFamily: 'Poppins',
-                                                                                              fontSize: 16,
-                                                                                              fontWeight: FontWeight.w400,
-                                                                                              color: Color(0xff232323),
-                                                                                            ),
-                                                                                          ),
-                                                                                          Text(
-                                                                                            // BLr (I318:2555;0:1392)
-                                                                                            '₹ ' + widget.arguments!['product']['product_prices']![0]['price'].toString(),
-                                                                                            style: MyGoogleFontStyle(
-                                                                                              fontFamily: 'Poppins',
-                                                                                              fontSize: 16,
-                                                                                              fontWeight: FontWeight.w600,
-                                                                                              color: Color(0xff232323),
-                                                                                            ),
-                                                                                          ),
-                                                                                        ],
-                                                                                      ),
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                              ],
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                      SizedBox(
-                                                                        height:
-                                                                            10,
-                                                                      ),
-                                                                      // Stars
-                                                                      Row(
-                                                                        children: [
-                                                                          Expanded(
-                                                                            child:
-                                                                                Text(_configModel.user.firstName.toString()),
-                                                                          ),
-                                                                          Expanded(
-                                                                            child:
-                                                                                Text(
-                                                                              _format!.format(DateTime.parse(widget.arguments!['product']['reviews']![index]['created_at'].toString())),
-                                                                              textAlign: TextAlign.right,
-                                                                              style: MyGoogleFontStyle(
-                                                                                fontFamily: 'Poppins',
-                                                                                fontSize: 12,
-                                                                                fontWeight: FontWeight.w400,
-                                                                                color: Color(0xff909090),
-                                                                              ),
-                                                                            ),
-                                                                          )
-                                                                        ],
-                                                                      ),
-                                                                      SizedBox(
-                                                                        height:
-                                                                            10,
-                                                                      ),
-                                                                      // Description
-                                                                      Text(
-                                                                        widget
-                                                                            .arguments!['product']['reviews']![index]['description']
-                                                                            .toString(),
-                                                                        style:
-                                                                            MyGoogleFontStyle(
-                                                                          fontFamily:
-                                                                              'Poppins',
-                                                                          fontSize:
-                                                                              12,
-                                                                          fontWeight:
-                                                                              FontWeight.w400,
+                                                            : SizedBox(
+                                                                height: 100,
+                                                                child: ListView
+                                                                    .builder(
+                                                                  scrollDirection:
+                                                                      Axis.vertical,
+                                                                  itemCount: widget
+                                                                      .arguments![
+                                                                          'product']
+                                                                          [
+                                                                          'reviews']!
+                                                                      .length,
+                                                                  itemBuilder: (BuildContext
+                                                                              context,
+                                                                          index) =>
+                                                                      Container(
+                                                                    margin: EdgeInsets.only(
+                                                                        bottom:
+                                                                            10),
+                                                                    padding:
+                                                                        EdgeInsets.all(
+                                                                            10),
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      border: Border.all(
                                                                           color:
-                                                                              Color(0xff909090),
+                                                                              Color(0xffc7b456)),
+                                                                      color: Color(
+                                                                          0xffffffff),
+                                                                      borderRadius:
+                                                                          BorderRadius
+                                                                              .all(
+                                                                        Radius.circular(
+                                                                            5),
+                                                                      ),
+                                                                      boxShadow: [
+                                                                        BoxShadow(
+                                                                          color:
+                                                                              Color(0x338a959e),
+                                                                          offset: Offset(
+                                                                              0,
+                                                                              7.6690645218),
+                                                                          blurRadius:
+                                                                              19.1726608276,
                                                                         ),
-                                                                      )
-                                                                    ],
+                                                                      ],
+                                                                    ),
+                                                                    child:
+                                                                        Column(
+                                                                      children: [
+                                                                        // Photo and Title
+
+                                                                        // Stars
+                                                                        Row(
+                                                                          children: [
+                                                                            Expanded(
+                                                                              child: Text(_configModel.user.firstName.toString()),
+                                                                            ),
+                                                                            Expanded(
+                                                                              child: Text(
+                                                                                _format!.format(DateTime.parse(widget.arguments!['product']['reviews']![index]['created_at'].toString())),
+                                                                                textAlign: TextAlign.right,
+                                                                                style: MyGoogleFontStyle(
+                                                                                  fontFamily: 'Poppins',
+                                                                                  fontSize: 12,
+                                                                                  fontWeight: FontWeight.w400,
+                                                                                  color: Color(0xff909090),
+                                                                                ),
+                                                                              ),
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                        SizedBox(
+                                                                          height:
+                                                                              10,
+                                                                        ),
+                                                                        // Description
+                                                                        Text(
+                                                                          widget
+                                                                              .arguments!['product']['reviews']![index]['description']
+                                                                              .toString(),
+                                                                          style:
+                                                                              MyGoogleFontStyle(
+                                                                            fontFamily:
+                                                                                'Poppins',
+                                                                            fontSize:
+                                                                                12,
+                                                                            fontWeight:
+                                                                                FontWeight.w400,
+                                                                            color:
+                                                                                Color(0xff909090),
+                                                                          ),
+                                                                        )
+                                                                      ],
+                                                                    ),
                                                                   ),
                                                                 ),
                                                               ),
@@ -1599,7 +1562,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       ),
                                                     ),
                                                     TextSpan(
-                                                      text: '₹ ' +
+                                                      text: 'د.إ' +
+                                                          ' ' +
                                                           widget.arguments![
                                                                   'product'][
                                                                   'product_prices']
@@ -1624,6 +1588,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                     .validate()) {
                                                   _formKey.currentState!.save();
                                                   bool type = true;
+
                                                   await _addToCartModel
                                                       .getAddToCart(
                                                           widget.arguments![

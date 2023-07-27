@@ -19,6 +19,7 @@ class _SettingsPageState extends State<SettingsPage> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
+            padding: EdgeInsets.only(top: 20),
             child: Column(
               children: [
                 // Title

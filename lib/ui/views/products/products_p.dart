@@ -41,6 +41,7 @@ class _ProductsPageState extends State<ProductsPage> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.arguments['category'].toString());
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
@@ -63,6 +64,7 @@ class _ProductsPageState extends State<ProductsPage> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
+          margin: EdgeInsets.only(top: 20),
           padding: EdgeInsets.fromLTRB(9 * fem, 16 * fem, 0 * fem, 22 * fem),
           width: double.infinity,
           decoration: BoxDecoration(
@@ -92,7 +94,7 @@ class _ProductsPageState extends State<ProductsPage> {
                           ),
                           Expanded(
                             child: Text(
-                              'Shop',
+                              widget.arguments['category'].toString(),
                               textAlign: TextAlign.center,
                               style: MyGoogleFontStyle(
                                 fontFamily: 'Urbanist',
@@ -109,10 +111,9 @@ class _ProductsPageState extends State<ProductsPage> {
                 ),
               ),
               Container(
-                margin:
-                    EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 14 * fem),
-                width: 371 * fem,
-                height: 28 * fem,
+                margin: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 8 * fem),
+                width: 381 * fem,
+                height: 35 * fem,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -130,18 +131,18 @@ class _ProductsPageState extends State<ProductsPage> {
                         padding: EdgeInsets.zero,
                       ),
                       child: Container(
-                        width: 45 * fem,
+                        width: 50 * fem,
                         height: double.infinity,
                         decoration: BoxDecoration(
-                          color: Color(0xffc7b456),
-                          borderRadius: BorderRadius.circular(10 * fem),
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(5 * fem),
                         ),
                         child: Center(
                           child: Text(
                             'All',
                             style: MyGoogleFontStyle(
                               fontFamily: 'Urbanist',
-                              fontSize: 18 * ffem,
+                              fontSize: 15 * ffem,
                               fontWeight: FontWeight.w700,
                               height: 1.2 * ffem / fem,
                               letterSpacing: -0.36 * fem,
@@ -155,7 +156,7 @@ class _ProductsPageState extends State<ProductsPage> {
                       width: 2 * fem,
                     ),
                     SizedBox(
-                      width: 300,
+                      width: 280,
                       child: ListView.builder(
                           scrollDirection: Axis.horizontal,
                           itemCount: widget.arguments['subCategory'].length,
@@ -184,7 +185,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                       border:
                                           Border.all(color: Color(0xffc7b456)),
                                       borderRadius:
-                                          BorderRadius.circular(10 * fem),
+                                          BorderRadius.circular(5 * fem),
                                     ),
                                     child: Center(
                                       child: Text(
@@ -193,7 +194,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                             .toString(),
                                         style: MyGoogleFontStyle(
                                           fontFamily: 'Urbanist',
-                                          fontSize: 18 * ffem,
+                                          fontSize: 15 * ffem,
                                           fontWeight: FontWeight.w600,
                                           height: 1.2 * ffem / fem,
                                           letterSpacing: -0.36 * fem,
@@ -404,7 +405,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                                         ),
                                                         child: Container(
                                                           width: 82 * fem,
-                                                          height: 27.33 * fem,
+                                                          height: 30 * fem,
                                                           decoration:
                                                               BoxDecoration(
                                                             border: Border.all(
@@ -426,8 +427,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                                                     2.1298701763 *
                                                                         fem),
                                                                 blurRadius:
-                                                                    2.1298701763 *
-                                                                        fem,
+                                                                    1 * fem,
                                                               ),
                                                             ],
                                                           ),
@@ -468,74 +468,93 @@ class _ProductsPageState extends State<ProductsPage> {
                                                       .toList()
                                                       .isNotEmpty)
                                                     Positioned(
-                                                      left: 9 * fem,
+                                                      left: 5 * fem,
                                                       top: 175 * fem,
-                                                      child: Container(
-                                                        width: 130 * fem,
-                                                        height: 30.33 * fem,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          border: Border.all(
-                                                              color: Color(
-                                                                  0xffeaeaea)),
-                                                          color:
-                                                              Color(0xffffffff),
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                  7.0163693428 *
-                                                                      fem),
-                                                          boxShadow: [
-                                                            BoxShadow(
-                                                              color: Color(
-                                                                  0x3f000000),
-                                                              offset: Offset(
-                                                                  0 * fem,
-                                                                  2.1298701763 *
-                                                                      fem),
-                                                              blurRadius:
-                                                                  2.1298701763 *
-                                                                      fem,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        child: Center(
+                                                      child: Center(
+                                                        child: Container(
+                                                          width: 135 * fem,
+                                                          height: 30 * fem,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            border: Border.all(
+                                                                color: Color(
+                                                                    0xffeaeaea)),
+                                                            color: Color(
+                                                                0xffffffff),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        7.0163693428 *
+                                                                            fem),
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: Color(
+                                                                    0x3f000000),
+                                                                offset: Offset(
+                                                                    0 * fem,
+                                                                    2.1298701763 *
+                                                                        fem),
+                                                                blurRadius:
+                                                                    2.1298701763 *
+                                                                        fem,
+                                                              ),
+                                                            ],
+                                                          ),
                                                           child: Row(
                                                             children: [
-                                                              TextButton(
-                                                                onPressed:
-                                                                    () async {
-                                                                  bool minus =
-                                                                      false;
-                                                                  await _addToCartModel.getAddToCart(
-                                                                      _productModel
-                                                                          .categoryWiseproducts![
-                                                                              index]
-                                                                          .id,
-                                                                      minus,
-                                                                      _CartData);
-                                                                },
-                                                                style: TextButton
-                                                                    .styleFrom(
-                                                                  padding:
-                                                                      EdgeInsets
-                                                                          .zero,
-                                                                ),
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .only(
+                                                                        top:
+                                                                            4.0,
+                                                                        bottom:
+                                                                            4),
                                                                 child:
-                                                                    Container(
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    border: Border
-                                                                        .all(),
-                                                                    borderRadius:
-                                                                        BorderRadius
-                                                                            .all(
-                                                                      Radius
-                                                                          .circular(
-                                                                              5),
+                                                                    TextButton(
+                                                                  onPressed:
+                                                                      () async {
+                                                                    bool minus =
+                                                                        false;
+                                                                    await _addToCartModel.getAddToCart(
+                                                                        _productModel
+                                                                            .categoryWiseproducts![index]
+                                                                            .id,
+                                                                        minus,
+                                                                        _CartData);
+                                                                  },
+                                                                  style: TextButton
+                                                                      .styleFrom(
+                                                                    padding:
+                                                                        EdgeInsets
+                                                                            .zero,
+                                                                  ),
+                                                                  child:
+                                                                      Container(
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      border: Border
+                                                                          .all(),
+                                                                      borderRadius:
+                                                                          BorderRadius
+                                                                              .all(
+                                                                        Radius.circular(
+                                                                            5),
+                                                                      ),
+                                                                    ),
+                                                                    child:
+                                                                        Center(
+                                                                      child:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .remove,
+                                                                        size:
+                                                                            20,
+                                                                        color: Colors
+                                                                            .black,
+                                                                      ),
                                                                     ),
                                                                   ),
-                                                                  child: Icon(Icons
-                                                                      .remove),
                                                                 ),
                                                               ),
                                                               Text(
@@ -561,43 +580,54 @@ class _ProductsPageState extends State<ProductsPage> {
                                                                       0xff1e1e1e),
                                                                 ),
                                                               ),
-                                                              TextButton(
-                                                                onPressed:
-                                                                    () async {
-                                                                  bool type =
-                                                                      true;
-
-                                                                  await _addToCartModel.getAddToCart(
-                                                                      _productModel
-                                                                          .categoryWiseproducts![
-                                                                              index]
-                                                                          .id,
-                                                                      type,
-                                                                      _CartData);
-                                                                },
-                                                                style: TextButton
-                                                                    .styleFrom(
-                                                                  padding:
-                                                                      EdgeInsets
-                                                                          .zero,
-                                                                ),
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .only(
+                                                                        top:
+                                                                            4.0,
+                                                                        bottom:
+                                                                            4),
                                                                 child:
-                                                                    Container(
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    border: Border
-                                                                        .all(),
-                                                                    borderRadius:
-                                                                        BorderRadius
-                                                                            .all(
-                                                                      Radius
-                                                                          .circular(
-                                                                              5),
+                                                                    TextButton(
+                                                                  onPressed:
+                                                                      () async {
+                                                                    bool type =
+                                                                        true;
+
+                                                                    await _addToCartModel.getAddToCart(
+                                                                        _productModel
+                                                                            .categoryWiseproducts![index]
+                                                                            .id,
+                                                                        type,
+                                                                        _CartData);
+                                                                  },
+                                                                  style: TextButton
+                                                                      .styleFrom(
+                                                                    padding:
+                                                                        EdgeInsets
+                                                                            .zero,
+                                                                  ),
+                                                                  child:
+                                                                      Container(
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      border: Border
+                                                                          .all(),
+                                                                      borderRadius:
+                                                                          BorderRadius
+                                                                              .all(
+                                                                        Radius.circular(
+                                                                            5),
+                                                                      ),
+                                                                    ),
+                                                                    child: Icon(
+                                                                      Icons.add,
+                                                                      size: 20,
+                                                                      color: Colors
+                                                                          .black,
                                                                     ),
                                                                   ),
-                                                                  child: Icon(
-                                                                      Icons
-                                                                          .add),
                                                                 ),
                                                               ),
                                                             ],
@@ -661,15 +691,16 @@ class _ProductsPageState extends State<ProductsPage> {
                                                   0 * fem),
                                               child: Text(
                                                 _productModel
-                                                    .categoryWiseproducts![
-                                                        index]
-                                                    .productPrices![0]
-                                                    .price
-                                                    .toString(),
+                                                        .categoryWiseproducts![
+                                                            index]
+                                                        .productPrices![0]
+                                                        .price
+                                                        .toString() +
+                                                    ' ' +
+                                                    'د.إ',
                                                 style: MyGoogleFontStyle(
                                                   fontFamily: 'Poppins',
-                                                  fontSize:
-                                                      10.9543466568 * ffem,
+                                                  fontSize: 13 * ffem,
                                                   fontWeight: FontWeight.w500,
                                                   height: 1.5 * ffem / fem,
                                                   letterSpacing:

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/auth_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
+import 'package:sales_app/core/providers/notification_pr.dart';
 import 'package:sales_app/core/providers/order_pr.dart';
 import 'package:sales_app/core/providers/product_pr.dart';
 import 'package:sales_app/core/providers/review_pr.dart';
@@ -45,6 +46,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => UserAddressModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => NotificationModel(),
         ),
       ],
       child: MaterialApp(

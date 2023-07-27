@@ -37,6 +37,7 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
+            padding: EdgeInsets.only(top: 20),
             child: Column(
               children: [
                 // Title
