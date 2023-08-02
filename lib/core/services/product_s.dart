@@ -58,4 +58,23 @@ class ProductService {
 
     return _categoryWiseproducts;
   }
+
+  List<Product> _allProducts = [];
+
+  getAllProducts() async {
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    http.Response _response = await http.get(
+      Uri.parse('${_apiConfig['baseURL']}/products'),
+      headers: _apiConfig['headers'],
+    );
+    Map<String, dynamic> _responseData = json.decode(_response.body);
+    if (_responseData['success']) {
+      _allProducts = [];
+      _responseData['data'].forEach((data) {
+        _allProducts.add(Product.fromJson(data));
+      });
+    }
+
+    return _allProducts;
+  }
 }

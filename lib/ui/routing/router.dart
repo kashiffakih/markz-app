@@ -20,6 +20,7 @@ import 'package:sales_app/ui/views/checkout/success_p.dart';
 import 'package:sales_app/ui/views/home/home_p.dart';
 import 'package:sales_app/ui/views/products/product_id_p.dart';
 import 'package:sales_app/ui/views/products/products_p.dart';
+import 'package:sales_app/ui/views/products/shops_p.dart';
 import 'package:sales_app/ui/views/profile/address_p.dart';
 import 'package:sales_app/ui/views/profile/contact_p.dart';
 import 'package:sales_app/ui/views/profile/notifications_p.dart';
@@ -33,6 +34,7 @@ import 'package:sales_app/ui/views/profile/settings_p.dart';
 import 'package:sales_app/ui/views/profile/shipping_create_p.dart';
 import 'package:sales_app/ui/views/profile/shipping_id_p.dart';
 import 'package:sales_app/ui/views/profile/wishlist_p.dart';
+import 'package:sales_app/ui/widgets/menu-drawer.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
@@ -166,6 +168,14 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case contactPage:
       return MaterialPageRoute(builder: (BuildContext context) {
         return ContactPage();
+      });
+    case menuWidget:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return MenuWidget();
+      });
+    case shopsPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return ShopsPage();
       });
     default:
       return MaterialPageRoute(builder: (BuildContext context) {

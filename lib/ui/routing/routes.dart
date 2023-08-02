@@ -29,3 +29,5 @@ const String settingsPage = '/settingsPage';
 const String settingUpdatePage = '/settingUpdatePage';
 const String rewardsPage = '/rewardsPage';
 const String contactPage = '/contactPage';
+const String menuWidget = '/menuWidget';
+const String shopsPage = '/shopsPage';
