@@ -19,12 +19,102 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // OverlayEntry? sideSheetOverlayEntry;
+  // final sideSheetOverlayLayerLink = LayerLink();
+  // bool isSidebarShown = false;
+
   @override
   void initState() {
     super.initState();
     var productId = '';
     Provider.of<WishListModel>(context, listen: false).getWishLists(productId);
   }
+
+  // void showSideSheet() {
+  //   final sideSheetOverlay = Overlay.of(context)!;
+  //   sideSheetOverlayEntry = OverlayEntry(
+  //     builder: (context) => Positioned(
+  //       height: MediaQuery.of(context).size.height,
+  //       child: isSidebarShown
+  //           ? CompositedTransformFollower(
+  //               link: sideSheetOverlayLayerLink,
+  //               child: TweenAnimationBuilder(
+  //                 tween: Tween<double>(begin: 150, end: 300),
+  //                 duration: const Duration(milliseconds: 300),
+  //                 builder: (BuildContext context, double size, Widget? child) {
+  //                   return Material(
+  //                     child: SafeArea(
+  //                       child: Container(
+  //                           width: size,
+  //                           padding: const EdgeInsets.all(10.0),
+  //                           decoration: BoxDecoration(
+  //                             color: Theme.of(context).colorScheme.surface,
+  //                           ),
+  //                           child: Column(
+  //                             children: [
+  //                               Row(
+  //                                 mainAxisAlignment: MainAxisAlignment.end,
+  //                                 children: [
+  //                                   InkWell(
+  //                                     onTap: () {
+  //                                       setState(() {
+  //                                         isSidebarShown = false;
+  //                                         showSideSheet();
+  //                                       });
+  //                                     },
+  //                                     onHover: (value) {},
+  //                                     child: const Icon(
+  //                                       Icons.close,
+  //                                       color: Colors.redAccent,
+  //                                       size: 25.0,
+  //                                     ),
+  //                                   )
+  //                                 ],
+  //                               ),
+  //                               Column(
+  //                                 children: [
+  //                                   Container(
+  //                                     child: Text(
+  //                                       "Custom Side Sheet",
+  //                                       overflow: TextOverflow.ellipsis,
+  //                                       style: const TextStyle(
+  //                                           color: Colors.blueGrey),
+  //                                     ),
+  //                                   ),
+  //                                   const Divider(
+  //                                     height: 5.0,
+  //                                     color: Colors.black,
+  //                                   ),
+  //                                   Container(
+  //                                     child: Row(children: [
+  //                                       Icon(
+  //                                         Icons.dashboard,
+  //                                         size: 25.0,
+  //                                         color: Colors.blueGrey,
+  //                                       ),
+  //                                       Text(
+  //                                         "Home",
+  //                                         overflow: TextOverflow.ellipsis,
+  //                                         style: TextStyle(
+  //                                             color: Colors.blueGrey,
+  //                                             fontSize: 25.0,
+  //                                             fontWeight: FontWeight.w300),
+  //                                       )
+  //                                     ]),
+  //                                   )
+  //                                 ],
+  //                               )
+  //                             ],
+  //                           )),
+  //                     ),
+  //                   );
+  //                 },
+  //               ))
+  //           : SizedBox.shrink(),
+  //     ),
+  //   );
+  //   sideSheetOverlay.insert(sideSheetOverlayEntry!);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -254,16 +344,24 @@ class _HomePageState extends State<HomePage> {
                                         InkWell(
                                           onTap: () {
                                             Navigator.pushNamed(
-                                                context, '/profilePage');
+                                                context, '/menuWidget');
+                                            // setState(() {
+                                            //   isSidebarShown = true;
+                                            //   showSideSheet();
+                                            // });
                                           },
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Image.asset(
-                                              'assets/images/group-8990.png',
-                                              width: 18.58 * fem,
-                                              height: 18.58 * fem,
-                                            ),
+                                          child: Icon(
+                                            Icons.menu_sharp,
+                                            size: 30.0,
                                           ),
+
+                                          // child: Padding(
+                                          //   padding: const EdgeInsets.all(10.0),
+                                          //   child: Icon(
+                                          //     Icons.menu_sharp,
+                                          //     size: 30.0,
+                                          //   ),
+                                          // ),
                                         ),
                                       ],
                                     ),

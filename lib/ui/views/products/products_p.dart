@@ -29,6 +29,8 @@ class _ProductsPageState extends State<ProductsPage> {
   };
   bool _isInitialLoad = false;
   List<Product>? filteredProducts = [];
+
+  int activeIndex = -1;
   @override
   void initState() {
     super.initState();
@@ -122,6 +124,8 @@ class _ProductsPageState extends State<ProductsPage> {
                     TextButton(
                       onPressed: () {
                         setState(() {
+                          activeIndex =
+                              -1; // Set activeIndex to -1 for "All" button
                           filteredProducts = _productModel.categoryWiseproducts!
                               .where((element) =>
                                   element.categoryId ==
@@ -131,12 +135,17 @@ class _ProductsPageState extends State<ProductsPage> {
                       },
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,
+                        backgroundColor: activeIndex == -1
+                            ? Colors.black // Set the active color here
+                            : Colors.white,
                       ),
                       child: Container(
                         width: 50 * fem,
                         height: double.infinity,
                         decoration: BoxDecoration(
-                          color: Colors.black,
+                          border: activeIndex == -1
+                              ? null
+                              : Border.all(color: Color(0xffc7b456)),
                           borderRadius: BorderRadius.circular(5 * fem),
                         ),
                         child: Center(
@@ -148,7 +157,9 @@ class _ProductsPageState extends State<ProductsPage> {
                               fontWeight: FontWeight.w700,
                               height: 1.2 * ffem / fem,
                               letterSpacing: -0.36 * fem,
-                              color: Color(0xffffffff),
+                              color: activeIndex == -1
+                                  ? Colors.white // Set the active color here
+                                  : Colors.black,
                             ),
                           ),
                         ),
@@ -160,58 +171,66 @@ class _ProductsPageState extends State<ProductsPage> {
                     SizedBox(
                       width: 280,
                       child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: widget.arguments['subCategory'].length,
-                          itemBuilder: (BuildContext context, index) {
-                            return Row(
-                              children: [
-                                TextButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      filteredProducts = _productModel
-                                          .categoryWiseproducts!
-                                          .where((cat) =>
-                                              cat.subCategoryId ==
-                                              widget.arguments['subCategory']
-                                                  [index]['id'])
-                                          .toList();
-                                    });
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets.zero,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: widget.arguments['subCategory'].length,
+                        itemBuilder: (BuildContext context, index) {
+                          final isActive = index == activeIndex;
+                          return Row(
+                            children: [
+                              TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    activeIndex = index;
+                                    filteredProducts = _productModel
+                                        .categoryWiseproducts!
+                                        .where((cat) =>
+                                            cat.subCategoryId ==
+                                            widget.arguments['subCategory']
+                                                [index]['id'])
+                                        .toList();
+                                  });
+                                },
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                  backgroundColor: isActive
+                                      ? Colors
+                                          .black // Set the active color here
+                                      : null,
+                                ),
+                                child: Container(
+                                  width: 79 * fem,
+                                  height: double.infinity,
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Color(0xffc7b456)),
+                                    borderRadius:
+                                        BorderRadius.circular(5 * fem),
                                   ),
-                                  child: Container(
-                                    width: 79 * fem,
-                                    height: double.infinity,
-                                    decoration: BoxDecoration(
-                                      border:
-                                          Border.all(color: Color(0xffc7b456)),
-                                      borderRadius:
-                                          BorderRadius.circular(5 * fem),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        widget.arguments['subCategory'][index]
-                                                ['name']
-                                            .toString(),
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontSize: 15 * ffem,
-                                          fontWeight: FontWeight.w600,
-                                          height: 1.2 * ffem / fem,
-                                          letterSpacing: -0.36 * fem,
-                                          color: Color(0x99000000),
-                                        ),
+                                  child: Center(
+                                    child: Text(
+                                      widget.arguments['subCategory'][index]
+                                              ['name']
+                                          .toString(),
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 15 * ffem,
+                                        fontWeight: FontWeight.w600,
+                                        height: 1.2 * ffem / fem,
+                                        letterSpacing: -0.36 * fem,
+                                        color: isActive
+                                            ? Colors.white
+                                            : Color(0x99000000),
+                                        // Set the text color based on active state
                                       ),
                                     ),
                                   ),
                                 ),
-                                SizedBox(
-                                  width: 6 * fem,
-                                ),
-                              ],
-                            );
-                          }),
+                              ),
+                              SizedBox(width: 6 * fem),
+                            ],
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -308,7 +327,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                                             await _wishListModel
                                                                 .getWishLists(
                                                                     _productModel
-                                                                        .products![
+                                                                        .categoryWiseproducts![
                                                                             index]
                                                                         .id);
                                                           },
