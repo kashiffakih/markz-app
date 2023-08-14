@@ -45,7 +45,6 @@ class _ProductsPageState extends State<ProductsPage> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.arguments['category'].toString());
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
@@ -64,7 +63,7 @@ class _ProductsPageState extends State<ProductsPage> {
         _isInitialLoad = false;
       }
     });
-
+    // print(filteredProducts);
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -79,7 +78,7 @@ class _ProductsPageState extends State<ProductsPage> {
             children: [
               Container(
                 margin:
-                    EdgeInsets.only(left: 20, top: 30, bottom: 20, right: 20),
+                    EdgeInsets.only(left: 20, top: 30, bottom: 20, right: 30),
                 width: double.infinity,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,14 +96,16 @@ class _ProductsPageState extends State<ProductsPage> {
                             ),
                           ),
                           Expanded(
-                            child: Text(
-                              widget.arguments['category'].toString(),
-                              textAlign: TextAlign.center,
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Urbanist',
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xff1e232c),
+                            child: Center(
+                              child: Text(
+                                widget.arguments['category'].toString(),
+                                textAlign: TextAlign.center,
+                                style: MyGoogleFontStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xff1e232c),
+                                ),
                               ),
                             ),
                           ),
@@ -115,7 +116,8 @@ class _ProductsPageState extends State<ProductsPage> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 8 * fem),
+                margin:
+                    EdgeInsets.fromLTRB(12 * fem, 0 * fem, 0 * fem, 8 * fem),
                 width: 381 * fem,
                 height: 35 * fem,
                 child: Row(
@@ -126,11 +128,9 @@ class _ProductsPageState extends State<ProductsPage> {
                         setState(() {
                           activeIndex =
                               -1; // Set activeIndex to -1 for "All" button
-                          filteredProducts = _productModel.categoryWiseproducts!
-                              .where((element) =>
-                                  element.categoryId ==
-                                  widget.arguments['categoryId'])
-                              .toList();
+                          filteredProducts =
+                              _productModel.getCategoryWiseProduct(
+                                  widget.arguments['categoryId']);
                         });
                       },
                       style: TextButton.styleFrom(

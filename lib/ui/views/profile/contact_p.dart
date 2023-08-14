@@ -72,153 +72,179 @@ class _ContactPageState extends State<ContactPage> {
                   child: Column(
                     children: [
                       // Email
-                      Container(
-                        margin: EdgeInsets.only(top: 10, bottom: 10),
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xffc7b456)),
-                          color: Color(0xffffffff),
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(5),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0x338a959e),
-                              offset: Offset(0, 7.6690645218),
-                              blurRadius: 19.1726608276,
+                      InkWell(
+                        onTap: () async {
+                          final Uri _emailLaunchUri = Uri(
+                            scheme: 'mailto',
+                            path: _configModel.user.companies![0].email
+                                .toString(),
+                            queryParameters: {
+                              'subject': 'Subject of the email',
+                              'body': 'Body of the email'
+                            },
+                          );
+
+                          final String url = _emailLaunchUri.toString();
+                          if (await canLaunchUrlString(url)) {
+                            await launchUrlString(url);
+                          } else {
+                            throw 'Could not launch $url';
+                          }
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(top: 10, bottom: 10),
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Color(0xffc7b456)),
+                            color: Color(0xffffffff),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(5),
                             ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              margin: EdgeInsets.fromLTRB(0, 0, 18, 0),
-                              padding: EdgeInsets.fromLTRB(4, 5, 4, 5),
-                              decoration: BoxDecoration(
-                                color: Color(0xfffbfbfb),
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color(0x3f000000),
-                                    offset: Offset(0, 4),
-                                    blurRadius: 2,
-                                  ),
-                                ],
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0x338a959e),
+                                offset: Offset(0, 7.6690645218),
+                                blurRadius: 19.1726608276,
                               ),
-                              child: Center(
-                                child: SizedBox(
-                                  width: 32,
-                                  height: 30,
-                                  child: Image.asset(
-                                    'assets/images/image-25.png',
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                margin: EdgeInsets.fromLTRB(0, 0, 18, 0),
+                                padding: EdgeInsets.fromLTRB(4, 5, 4, 5),
+                                decoration: BoxDecoration(
+                                  color: Color(0xfffbfbfb),
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0x3f000000),
+                                      offset: Offset(0, 4),
+                                      blurRadius: 2,
+                                    ),
+                                  ],
+                                ),
+                                child: Center(
+                                  child: SizedBox(
+                                    width: 32,
+                                    height: 30,
+                                    child: Image.asset(
+                                      'assets/images/image-25.png',
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Email',
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xff232323),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Email',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xff232323),
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    _configModel.user.companies![0].email
-                                        .toString(),
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xff232323),
+                                    SizedBox(
+                                      height: 5,
                                     ),
-                                  ),
-                                ],
+                                    Text(
+                                      _configModel.user.companies![0].email
+                                          .toString(),
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xff232323),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                       // Whatsapp
-                      Container(
-                        margin: EdgeInsets.only(top: 10, bottom: 10),
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xffc7b456)),
-                          color: Color(0xffffffff),
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(5),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0x338a959e),
-                              offset: Offset(0, 7.6690645218),
-                              blurRadius: 19.1726608276,
+                      InkWell(
+                        onTap: () {
+                          launchWhatsApp('Hello',
+                              _configModel.user.companies![0].phone.toString());
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(top: 10, bottom: 10),
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Color(0xffc7b456)),
+                            color: Color(0xffffffff),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(5),
                             ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              margin: EdgeInsets.fromLTRB(0, 0, 18, 0),
-                              padding: EdgeInsets.fromLTRB(4, 5, 4, 5),
-                              decoration: BoxDecoration(
-                                color: Color(0xfffbfbfb),
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color(0x3f000000),
-                                    offset: Offset(0, 4),
-                                    blurRadius: 2,
-                                  ),
-                                ],
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0x338a959e),
+                                offset: Offset(0, 7.6690645218),
+                                blurRadius: 19.1726608276,
                               ),
-                              child: Center(
-                                child: SizedBox(
-                                  width: 32,
-                                  height: 30,
-                                  child: Image.asset(
-                                    'assets/images/image-26.png',
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                margin: EdgeInsets.fromLTRB(0, 0, 18, 0),
+                                padding: EdgeInsets.fromLTRB(4, 5, 4, 5),
+                                decoration: BoxDecoration(
+                                  color: Color(0xfffbfbfb),
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0x3f000000),
+                                      offset: Offset(0, 4),
+                                      blurRadius: 2,
+                                    ),
+                                  ],
+                                ),
+                                child: Center(
+                                  child: SizedBox(
+                                    width: 32,
+                                    height: 30,
+                                    child: Image.asset(
+                                      'assets/images/image-26.png',
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Whatsapp',
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xff232323),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Whatsapp',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xff232323),
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    _configModel.user.companies![0].phone
-                                        .toString(),
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xff232323),
+                                    SizedBox(
+                                      height: 5,
                                     ),
-                                  ),
-                                ],
+                                    Text(
+                                      _configModel.user.companies![0].phone
+                                          .toString(),
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xff232323),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -281,5 +307,14 @@ class _ContactPageState extends State<ContactPage> {
         ],
       ),
     );
+  }
+}
+
+void launchWhatsApp(String message, phone) async {
+  String url = "https://wa.me/${phone}?text=${Uri.parse(message)}";
+  if (await canLaunchUrlString(url)) {
+    await launchUrlString(url);
+  } else {
+    throw 'Could not launch $url';
   }
 }

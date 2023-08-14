@@ -10,6 +10,7 @@ import 'package:sales_app/core/providers/user_address_pr.dart';
 import 'package:sales_app/core/providers/wish_list_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/profile/address_p.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -48,6 +49,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final ReviewModel _reviewModel = Provider.of<ReviewModel>(context);
     final UserAddressModel _userAddressModel =
         Provider.of<UserAddressModel>(context);
+    String initials = getInitials(_configModel.user.firstName.toString());
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -121,10 +123,22 @@ class _ProfilePageState extends State<ProfilePage> {
                                   height: 65,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(40),
-                                    image: DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: AssetImage(
-                                        'assets/images/group-8990.png',
+                                    // image: DecorationImage(
+                                    //   fit: BoxFit.cover,
+                                    //   image: AssetImage(
+                                    //     'assets/images/group-8990.png',
+                                    //   ),
+                                    // ),
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 50,
+                                    backgroundColor: Colors.black,
+                                    child: Text(
+                                      initials,
+                                      style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
                                       ),
                                     ),
                                   ),
@@ -559,7 +573,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       // Shipping Addresses
                       InkWell(
                         onTap: () {
-                          Navigator.pushNamed(context, '/addressPage');
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => AddressPage(arguments: {
+                                    'cartItems': [],
+                                    'cartTotal': '',
+                                    'isAddress': false
+                                  })));
                         },
                         child: Container(
                           margin: EdgeInsets.only(bottom: 10),
@@ -865,4 +884,17 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+}
+
+String getInitials(String name) {
+  List<String> nameParts = name.split(' ');
+  String initials = '';
+
+  for (String part in nameParts) {
+    if (part.isNotEmpty) {
+      initials += part[0];
+    }
+  }
+
+  return initials;
 }

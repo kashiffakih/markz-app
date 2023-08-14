@@ -74,7 +74,7 @@ class SuccessPage extends StatelessWidget {
                   margin: EdgeInsets.fromLTRB(0.89, 10, 0, 0),
                   child: TextButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/');
+                      Navigator.pushNamed(context, '/homePage');
                     },
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
