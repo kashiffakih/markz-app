@@ -77,9 +77,10 @@ class _ContactPageState extends State<ContactPage> {
                         onTap: () async {
                           String email = Uri.encodeComponent(
                               _configModel.user.companies![0].email.toString());
-                          String subject = Uri.encodeComponent("Hello Flutter");
-                          String body =
-                              Uri.encodeComponent("Hi! I'm Flutter Developer");
+                          String subject =
+                              Uri.encodeComponent("Hello PineWraps");
+                          String body = Uri.encodeComponent(
+                              "Hello! I would like to order a delicious cake.");
                           print(subject); //output: Hello%20Flutter
                           Uri mail = Uri.parse(
                               "mailto:$email?subject=$subject&body=$body");
@@ -167,7 +168,8 @@ class _ContactPageState extends State<ContactPage> {
                       // Whatsapp
                       InkWell(
                         onTap: () async {
-                          final message = 'Hello';
+                          final message =
+                              'Hello! I would like to order a delicious cake.';
                           final phone =
                               _configModel.user.companies![0].phone.toString();
                           var whatsappUrl =

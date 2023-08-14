@@ -742,7 +742,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                     Text(
                                       // alreadyhave10orders9Ca (I318:2511;0:1158)
-                                      'Already have 10 orders',
+                                      'Email & Whatsapp',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontSize: 11,
