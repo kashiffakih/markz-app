@@ -6,6 +6,7 @@ import 'package:sales_app/core/models/user_address.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/user_address_pr.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/profile/address_p.dart';
 
 class ShippingUpdatePage extends StatefulWidget {
   final arguments;
@@ -26,6 +27,35 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
     super.initState();
     _userAddress = widget.arguments['userAddress'];
   }
+
+  String selectedChip = '';
+
+  List<String> countries = ['USA', 'Canada', 'India', 'Dubai'];
+  Map<String, List<String>> states = {
+    'USA': ['New York', 'California', 'Texas'],
+    'Canada': ['Ontario', 'Quebec', 'Alberta'],
+    'India': ['Delhi', 'Maharashtra', 'Karnataka'],
+    'Dubai': [
+      'Abo Dhabi',
+      'Ajman',
+      'Dubai',
+      'Fujairah',
+      'Ras Al Khaimah',
+      'Sharjah',
+      'Umm Al Quwain'
+    ]
+  };
+  Map<String, List<String>> cities = {
+    'New York': ['New York City', 'Buffalo'],
+    'California': ['Los Angeles', 'San Francisco'],
+    'Texas': ['Houston', 'Dallas'],
+    'Ontario': ['Toronto', 'Ottawa'],
+    'Quebec': ['Montreal', 'Quebec City'],
+    'Alberta': ['Calgary', 'Edmonton'],
+    'Delhi': ['New Delhi', 'Noida'],
+    'Maharashtra': ['Mumbai', 'Pune'],
+    'Karnataka': ['Bangalore', 'Mysore'],
+  };
 
   bool _loading = false;
   @override
@@ -163,115 +193,117 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                         ),
                         Container(
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Color(0xffe3e3e3)),
-                            color: Color(0xfffbfbfb),
+                            border: Border.all(color: Color(0xffdadada)),
+                            color: Color(0xffffffff),
+                            borderRadius: BorderRadius.circular(5),
                           ),
-                          child: TextFormField(
-                            initialValue: _userAddress.add3,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-                              hintText: 'Address 3',
-                              hintStyle: TextStyle(color: Color(0x3f000000)),
-                            ),
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff000000),
-                            ),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return "Address 3 Cannot be empty.";
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _userAddress.add3 = value;
-                            },
-                          ),
+                          child: DropdownButtonFormField(
+                              value: _userAddress.nationality,
+                              decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  errorBorder: InputBorder.none,
+                                  disabledBorder: InputBorder.none,
+                                  labelText: 'Select Country',
+                                  contentPadding: EdgeInsets.all(10)),
+                              items: countries
+                                  .map(
+                                    (_country) => DropdownMenuItem(
+                                      child: Text(
+                                        _country,
+                                      ),
+                                      value: _country,
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  // selectedCountry = value.toString();
+                                  _userAddress.state = null;
+                                  _userAddress.city = null;
+                                  _userAddress.nationality = value.toString();
+                                });
+                                print(_userAddress.state);
+                              }),
                         ),
                         SizedBox(
                           height: 20,
                         ),
                         Container(
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Color(0xffe3e3e3)),
-                            color: Color(0xfffbfbfb),
+                            border: Border.all(color: Color(0xffdadada)),
+                            color: Color(0xffffffff),
+                            borderRadius: BorderRadius.circular(5),
                           ),
-                          child: TextFormField(
-                            initialValue: _userAddress.city,
+                          child: DropdownButtonFormField<String>(
+                            // value: _userAddress.state,
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               focusedBorder: InputBorder.none,
                               enabledBorder: InputBorder.none,
                               errorBorder: InputBorder.none,
                               disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-                              hintText: 'City',
-                              hintStyle: TextStyle(color: Color(0x3f000000)),
+                              labelText: _userAddress.nationality == 'Dubai'
+                                  ? 'Selecte Emirate'
+                                  : 'Select State',
+                              contentPadding: EdgeInsets.all(10),
                             ),
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff000000),
-                            ),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return "City Cannot be empty.";
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _userAddress.city = value;
-                            },
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Color(0xffe3e3e3)),
-                            color: Color(0xfffbfbfb),
-                          ),
-                          child: TextFormField(
-                            initialValue: _userAddress.state,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-                              hintText: 'State',
-                              hintStyle: TextStyle(color: Color(0x3f000000)),
-                            ),
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff000000),
-                            ),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return "State Cannot be empty.";
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _userAddress.state = value;
+                            value: _userAddress.state,
+                            items:
+                                states[_userAddress.nationality]?.map((state) {
+                                      return DropdownMenuItem<String>(
+                                        value: state,
+                                        child: Text(state),
+                                      );
+                                    }).toList() ??
+                                    [],
+                            onChanged: (value) {
+                              setState(() {
+                                _userAddress.city = null;
+                                _userAddress.state = value.toString();
+                              });
                             },
                           ),
                         ),
                         SizedBox(
                           height: 20,
                         ),
+                        if (_userAddress.nationality != 'Dubai')
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Color(0xffdadada)),
+                              color: Color(0xffffffff),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: DropdownButtonFormField<String>(
+                                // value: _userAddress.city,
+                                decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    errorBorder: InputBorder.none,
+                                    disabledBorder: InputBorder.none,
+                                    labelText: 'Select City',
+                                    contentPadding: EdgeInsets.all(10)),
+                                items: cities[_userAddress.state]?.map((city) {
+                                      return DropdownMenuItem<String>(
+                                        value: city,
+                                        child: Text(city),
+                                      );
+                                    }).toList() ??
+                                    [],
+                                onChanged: (value) {
+                                  setState(() {
+                                    _userAddress.city = value.toString();
+                                  });
+                                }),
+                          ),
+                        if (_userAddress.nationality != 'Dubai')
+                          SizedBox(
+                            height: 20,
+                          ),
+
                         Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
@@ -309,6 +341,49 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                         SizedBox(
                           height: 20,
                         ),
+                        Wrap(
+                          spacing: 8.0,
+                          children: [
+                            ChoiceChip(
+                              selected: selectedChip == 'Home',
+                              onSelected: (bool selected) {
+                                setState(() {
+                                  selectedChip = selected ? 'Home' : '';
+                                  _userAddress.label = selectedChip;
+                                });
+                              },
+                              selectedColor: Colors.green,
+                              label: Text('Home'),
+                            ),
+                            ChoiceChip(
+                              selected: selectedChip == 'Work',
+                              onSelected: (bool selected) {
+                                setState(() {
+                                  selectedChip = selected ? 'Work' : '';
+                                  _userAddress.label = selectedChip;
+                                });
+                              },
+                              selectedColor: Colors.blue,
+                              label: Text('Work'),
+                            ),
+                            ChoiceChip(
+                              selected: selectedChip == 'Other',
+                              onSelected: (bool selected) {
+                                setState(() {
+                                  selectedChip = selected ? 'Other' : '';
+                                  _userAddress.label = selectedChip;
+                                });
+                              },
+                              selectedColor: Colors.orange,
+                              label: Text('Other'),
+                            ),
+                            // Add more ChoiceChip widgets here as needed
+                          ],
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+
                         // Save address
                         Container(
                           // primaryXwC (318:2628)
@@ -325,7 +400,13 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                                     await _userAddressModel.updateUserAddress(
                                         userAddress: _userAddress);
                                 if (response == true) {
-                                  Navigator.pushNamed(context, '/addressPage');
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => AddressPage(
+                                              arguments: {
+                                                'cartItems': [],
+                                                'cartTotal': '',
+                                                'isAddress': false
+                                              })));
                                 }
                                 setState(() {
                                   _loading = false;

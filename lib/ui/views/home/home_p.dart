@@ -10,6 +10,8 @@ import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/products/product_id_p.dart';
 import 'package:sales_app/ui/views/products/products_p.dart';
+import 'package:sales_app/ui/widgets/drawer_w.dart';
+import 'package:sales_app/ui/widgets/menu-drawer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -115,7 +117,7 @@ class _HomePageState extends State<HomePage> {
   //   );
   //   sideSheetOverlay.insert(sideSheetOverlayEntry!);
   // }
-
+  final GlobalKey<ScaffoldState> _key = GlobalKey();
   @override
   Widget build(BuildContext context) {
     final ConfigModel _configModel = locator<ConfigModel>();
@@ -126,6 +128,8 @@ class _HomePageState extends State<HomePage> {
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
     return Scaffold(
+      key: _key,
+      drawer: DrawerWidget(),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -343,25 +347,12 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                         InkWell(
                                           onTap: () {
-                                            Navigator.pushNamed(
-                                                context, '/menuWidget');
-                                            // setState(() {
-                                            //   isSidebarShown = true;
-                                            //   showSideSheet();
-                                            // });
+                                            _key.currentState!.openDrawer();
                                           },
                                           child: Icon(
                                             Icons.menu_sharp,
                                             size: 30.0,
                                           ),
-
-                                          // child: Padding(
-                                          //   padding: const EdgeInsets.all(10.0),
-                                          //   child: Icon(
-                                          //     Icons.menu_sharp,
-                                          //     size: 30.0,
-                                          //   ),
-                                          // ),
                                         ),
                                       ],
                                     ),
@@ -389,7 +380,7 @@ class _HomePageState extends State<HomePage> {
             _productModel.productsLoader
                 ? LinearProgressIndicator()
                 : SizedBox(
-                    height: 300,
+                    height: 320,
                     child: _productModel.productsLoader
                         ? SizedBox(
                             // height: 20,
@@ -624,7 +615,7 @@ class _HomePageState extends State<HomePage> {
             ),
             Container(
               width: 345 * fem,
-              height: 405,
+              height: 435,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -681,15 +672,25 @@ class _HomePageState extends State<HomePage> {
                                           decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(
                                                 10.1176462173 * fem),
-                                            gradient: LinearGradient(
-                                              begin: Alignment(-1, 0.138),
-                                              end: Alignment(1, 0.128),
-                                              colors: <Color>[
-                                                Color(0x99000000),
-                                                Color(0x00d9d9d9)
-                                              ],
-                                              stops: <double>[0, 1],
-                                            ),
+                                            gradient: _category['id'] == 2
+                                                ? LinearGradient(
+                                                    begin: Alignment(1, 0.138),
+                                                    end: Alignment(-1, 0.128),
+                                                    colors: <Color>[
+                                                      Color(0x99000000),
+                                                      Color(0x00d9d9d9)
+                                                    ],
+                                                    stops: <double>[0, 1],
+                                                  )
+                                                : LinearGradient(
+                                                    begin: Alignment(-1, 0.138),
+                                                    end: Alignment(1, 0.128),
+                                                    colors: <Color>[
+                                                      Color(0x99000000),
+                                                      Color(0x00d9d9d9)
+                                                    ],
+                                                    stops: <double>[0, 1],
+                                                  ),
                                           ),
                                         ),
                                       ),
@@ -826,7 +827,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             SizedBox(
-              height: 20,
+              height: 10,
             ),
             Container(
               // group81Wvi (318:1936)

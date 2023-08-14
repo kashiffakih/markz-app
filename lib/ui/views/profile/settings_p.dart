@@ -38,7 +38,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     children: [
                       InkWell(
                         onTap: () {
-                          Navigator.pop(context);
+                          Navigator.pushNamed(context, '/profilePage');
                         },
                         child: Row(
                           children: [

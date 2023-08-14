@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/locator.dart';
+import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/shared/images_sh.dart';
 
 class DrawerWidget extends StatelessWidget {
@@ -15,97 +16,154 @@ class DrawerWidget extends StatelessWidget {
             SizedBox(
               height: 180,
               child: DrawerHeader(
-                decoration:
-                    BoxDecoration(color: Theme.of(context).primaryColor),
+                // decoration: BoxDecoration(color: Colors.white),
                 child: Row(
                   children: <Widget>[
-                    if (_configModel.user.imagepath != null)
-                      InkWell(
-                        onTap: () {},
-                        child: Hero(
-                          tag: '123',
-                          child: CircleAvatar(
-                            radius: 32,
-                            backgroundImage: NetworkImage(
-                              _configModel.apiConfig['mediaURL'] +
-                                  _configModel.user.imagepath,
-                            ),
-                          ),
-                        ),
+                    Container(
+                      // pinewrapslogo1MaZ (617:1924)
+                      margin: EdgeInsets.fromLTRB(0, 0, 0, 14.7),
+                      width: 50,
+                      height: 100,
+                      child: Image.asset(
+                        'assets/images/pinewrapslogo-1-kg1.png',
+                        fit: BoxFit.cover,
                       ),
-                    if (_configModel.user.imagepath == null)
-                      InkWell(
-                        onTap: () {},
-                        child: Hero(
-                          tag: '123',
-                          child: CircleAvatar(
-                            radius: 32,
-                            backgroundImage: AssetImage(Images.avatar),
-                          ),
-                        ),
-                      ),
-                    SizedBox(
-                      width: 10,
                     ),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    Container(
+                      width: 143,
+                      height: 55.63,
+                      child: Stack(
                         children: [
-                          Text(
-                            _configModel.user.firstName.toString(),
-                            style: TextStyle(
-                              color: Colors.white,
+                          Positioned(
+                            left: 0,
+                            top: 0,
+                            child: Align(
+                              child: SizedBox(
+                                width: 95,
+                                height: 24,
+                                child: Text(
+                                  'Welcome to',
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Poppins',
+                                    fontSize: 15.346613884,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.4999999689,
+                                    color: Color(0xff303030),
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                          Text(
-                            _configModel.user.roles!.length > 0
-                                ? _configModel.user.roles![0].name.toString()
-                                : '',
-                            style: TextStyle(
-                              color: Colors.white,
+                          Positioned(
+                            // pinewraps59B (617:1925)
+                            left: 0,
+                            top: 16.6254882812,
+                            child: Align(
+                              child: SizedBox(
+                                width: 143,
+                                height: 39,
+                                child: Text(
+                                  'PINEWRAPS',
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Righteous',
+                                    fontSize: 25.5776882172,
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.4999999627,
+                                    color: Color(0xff303030),
+                                  ),
+                                ),
+                              ),
                             ),
-                          )
+                          ),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
             ),
-            ListTile(
+            InkWell(
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/homePage');
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(top: 10, left: 15, bottom: 10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.fromLTRB(0, 0, 23.66, 0.03),
+                      width: 19.18,
+                      height: 21.34,
+                      child: Image.asset(
+                        'assets/images/u-home-alt.png',
+                        width: 19.18,
+                        height: 21.34,
+                      ),
+                    ),
+                    Text(
+                      'Home',
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 20.4621505737,
+                        fontWeight: FontWeight.w500,
+                        height: 1.25,
+                        color: Color(0xff232323),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            InkWell(
               onTap: () {
                 Navigator.pop(context);
-                Navigator.pushReplacementNamed(context, '/home');
+                Navigator.pushReplacementNamed(context, '/shopsPage');
               },
-              title: Text('Home'),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 20, left: 15, bottom: 10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.fromLTRB(0, 0, 23.66, 0.03),
+                      width: 19.18,
+                      height: 21.34,
+                      child: Image.asset(
+                        'assets/images/u-create-dashboard.png',
+                        width: 19.18,
+                        height: 21.34,
+                      ),
+                    ),
+                    Text(
+                      'Shop',
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 20.4621505737,
+                        fontWeight: FontWeight.w500,
+                        height: 1.25,
+                        color: Color(0xff232323),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            ListTile(
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/profile');
-              },
-              title: Text('Profile'),
-            ),
-            ListTile(
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/attendance');
-              },
-              title: Text('Attendance'),
-            ),
-            ListTile(
+            InkWell(
               onTap: () {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) => AlertDialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
                     title: Text('Are you sure you want to logout?'),
                     actions: <Widget>[
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
-                        child: Text('NO'),
+                        child:
+                            Text('NO', style: TextStyle(color: Colors.black)),
                       ),
                       TextButton(
                         onPressed: () async {
@@ -113,13 +171,43 @@ class DrawerWidget extends StatelessWidget {
                           await _configModel.removeLoginData();
                           Navigator.pushReplacementNamed(context, '/login');
                         },
-                        child: Text('YES'),
+                        child: Text(
+                          'YES',
+                          style: TextStyle(color: Colors.black),
+                        ),
                       ),
                     ],
                   ),
                 );
               },
-              title: Text('Logout'),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 20, left: 15, bottom: 10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.fromLTRB(0, 0, 23.66, 0.03),
+                      width: 19.18,
+                      height: 21.34,
+                      child: Image.asset(
+                        'assets/images/u-sign-out-alt.png',
+                        width: 19.18,
+                        height: 21.34,
+                      ),
+                    ),
+                    Text(
+                      'Logout',
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 20.4621505737,
+                        fontWeight: FontWeight.w500,
+                        height: 1.25,
+                        color: Color(0xff232323),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),

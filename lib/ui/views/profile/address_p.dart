@@ -94,52 +94,57 @@ class _AddressPageState extends State<AddressPage> {
                 Container(
                   height: 600,
                   padding: EdgeInsets.all(15),
-                  child: _userAddressModel.userAddresses!.isEmpty
+                  child: _userAddressModel.userAddresses?.length == 0
                       ? SizedBox(
                           height: 60,
                           child: Center(child: Text('No address found.')),
                         )
                       : ListView.builder(
-                          itemCount: _userAddressModel.userAddresses!.length,
+                          itemCount: _userAddressModel.userAddresses?.length,
                           itemBuilder: (BuildContext context, index) => Column(
                             children: [
                               Row(
                                 children: [
-                                  Checkbox(
-                                    value: _isShipping,
-                                    activeColor: Colors.black,
-                                    onChanged: (bool? value) {
-                                      setState(() {
-                                        _isShipping = value ?? false;
-                                        if (_isShipping == true) {
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      CheckoutPage(arguments: {
-                                                        'cartItems': cartItems,
-                                                        'cartTotal': cartTotal,
-                                                        'address':
-                                                            _userAddressModel
-                                                                .userAddresses![
-                                                                    index]
-                                                                .toJson()
-                                                      })));
-                                        }
-                                      });
-                                    },
-                                  ),
-                                  Expanded(
-                                    flex: 4,
-                                    child: Text(
-                                      'Use as the shipping address',
-                                      style: MyGoogleFontStyle(
-                                        fontFamily: 'Poppins',
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xff232323),
+                                  if (widget.arguments['isAddress'] == true)
+                                    Checkbox(
+                                      value: _isShipping,
+                                      activeColor: Colors.black,
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          _isShipping = value ?? false;
+                                          if (_isShipping == true) {
+                                            Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        CheckoutPage(
+                                                            arguments: {
+                                                              'cartItems':
+                                                                  cartItems,
+                                                              'cartTotal':
+                                                                  cartTotal,
+                                                              'address':
+                                                                  _userAddressModel
+                                                                      .userAddresses![
+                                                                          index]
+                                                                      .toJson()
+                                                            })));
+                                          }
+                                        });
+                                      },
+                                    ),
+                                  if (widget.arguments['isAddress'] == true)
+                                    Expanded(
+                                      flex: 4,
+                                      child: Text(
+                                        'Use as the shipping address',
+                                        style: MyGoogleFontStyle(
+                                          fontFamily: 'Poppins',
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w400,
+                                          color: Color(0xff232323),
+                                        ),
                                       ),
                                     ),
-                                  ),
                                   Expanded(
                                       child: InkWell(
                                           onTap: () {
@@ -154,7 +159,9 @@ class _AddressPageState extends State<AddressPage> {
                                                                       index]
                                                             })));
                                           },
-                                          child: Icon(Icons.edit))),
+                                          child: Align(
+                                              alignment: Alignment.centerRight,
+                                              child: Icon(Icons.edit)))),
                                 ],
                               ),
                               Container(
@@ -178,7 +185,13 @@ class _AddressPageState extends State<AddressPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      _configModel.user.firstName.toString(),
+                                      _userAddressModel.userAddresses![index]
+                                                  .label !=
+                                              null
+                                          ? _userAddressModel
+                                              .userAddresses![index].label
+                                              .toString()
+                                          : '',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontWeight: FontWeight.w700,
@@ -199,17 +212,23 @@ class _AddressPageState extends State<AddressPage> {
                                               .toString() +
                                           ', ' +
                                           _userAddressModel
-                                              .userAddresses![index].add3
-                                              .toString() +
-                                          ', ' +
-                                          _userAddressModel
-                                              .userAddresses![index].city
+                                              .userAddresses![index].nationality
                                               .toString() +
                                           ', ' +
                                           _userAddressModel
                                               .userAddresses![index].state
                                               .toString() +
-                                          '. ' +
+                                          ', ' +
+                                          (_userAddressModel
+                                                      .userAddresses![index]
+                                                      .city !=
+                                                  null
+                                              ? _userAddressModel
+                                                      .userAddresses![index]
+                                                      .city
+                                                      .toString() +
+                                                  ', '
+                                              : '') +
                                           _userAddressModel
                                               .userAddresses![index].pincode
                                               .toString() +
