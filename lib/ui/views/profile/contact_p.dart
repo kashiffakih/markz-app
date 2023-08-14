@@ -7,6 +7,7 @@ import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class ContactPage extends StatefulWidget {
@@ -74,21 +75,18 @@ class _ContactPageState extends State<ContactPage> {
                       // Email
                       InkWell(
                         onTap: () async {
-                          final Uri _emailLaunchUri = Uri(
-                            scheme: 'mailto',
-                            path: _configModel.user.companies![0].email
-                                .toString(),
-                            queryParameters: {
-                              'subject': 'Subject of the email',
-                              'body': 'Body of the email'
-                            },
-                          );
-
-                          final String url = _emailLaunchUri.toString();
-                          if (await canLaunchUrlString(url)) {
-                            await launchUrlString(url);
+                          String email = Uri.encodeComponent(
+                              _configModel.user.companies![0].email.toString());
+                          String subject = Uri.encodeComponent("Hello Flutter");
+                          String body =
+                              Uri.encodeComponent("Hi! I'm Flutter Developer");
+                          print(subject); //output: Hello%20Flutter
+                          Uri mail = Uri.parse(
+                              "mailto:$email?subject=$subject&body=$body");
+                          if (await launchUrl(mail)) {
+                            //email app opened
                           } else {
-                            throw 'Could not launch $url';
+                            //email app is not opened
                           }
                         },
                         child: Container(
@@ -168,9 +166,21 @@ class _ContactPageState extends State<ContactPage> {
                       ),
                       // Whatsapp
                       InkWell(
-                        onTap: () {
-                          launchWhatsApp('Hello',
-                              _configModel.user.companies![0].phone.toString());
+                        onTap: () async {
+                          final message = 'Hello';
+                          final phone =
+                              _configModel.user.companies![0].phone.toString();
+                          var whatsappUrl =
+                              "whatsapp://send?phone=${'+91 ' + phone}" +
+                                  "&text=${Uri.encodeComponent(message)}";
+                          try {
+                            launch(whatsappUrl);
+                          } catch (e) {
+                            //To handle error and display error message
+                            // Helper.errorSnackBar(
+                            //     context: context,
+                            //     message: "Unable to open whatsapp");
+                          }
                         },
                         child: Container(
                           margin: EdgeInsets.only(top: 10, bottom: 10),
