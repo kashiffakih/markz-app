@@ -189,7 +189,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                             .toString(),
                                                         style:
                                                             MyGoogleFontStyle(
-                                                          fontSize: 17,
+                                                          fontSize: 19,
                                                           fontFamily:
                                                               'Urbanist',
                                                           fontWeight:
@@ -198,54 +198,63 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                               Color(0xff000000),
                                                         ),
                                                       ),
+                                                      SizedBox(
+                                                        height: 8,
+                                                      ),
                                                       // Reviews
                                                       Container(
                                                         child: Row(
                                                           children: [
                                                             Image.asset(
                                                               'assets/images/vector-TXk.png',
-                                                              width: 20,
-                                                              height: 15,
+                                                              width: 12,
+                                                              height: 12,
                                                             ),
                                                             Image.asset(
                                                               'assets/images/vector-TXk.png',
-                                                              width: 20,
-                                                              height: 15,
+                                                              width: 12,
+                                                              height: 12,
                                                             ),
                                                             Image.asset(
                                                               'assets/images/vector-TXk.png',
-                                                              width: 20,
-                                                              height: 15,
+                                                              width: 12,
+                                                              height: 12,
                                                             ),
                                                             Image.asset(
                                                               'assets/images/vector-TXk.png',
-                                                              width: 20,
-                                                              height: 15,
+                                                              width: 12,
+                                                              height: 12,
                                                             ),
                                                             Image.asset(
                                                               'assets/images/vector-TXk.png',
-                                                              width: 20,
-                                                              height: 15,
+                                                              width: 12,
+                                                              height: 12,
                                                             ),
-                                                            Text(
-                                                              '( ' +
-                                                                  widget
-                                                                      .arguments[
-                                                                          'product']
-                                                                          [
-                                                                          'reviews']
-                                                                      .length
-                                                                      .toString() +
-                                                                  ' )',
-                                                              style:
-                                                                  MyGoogleFontStyle(
-                                                                fontFamily:
-                                                                    'Urbanist',
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w400,
-                                                                color: Color(
-                                                                    0xff000000),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .only(
+                                                                      left: 8),
+                                                              child: Text(
+                                                                '( ' +
+                                                                    widget
+                                                                        .arguments[
+                                                                            'product']
+                                                                            [
+                                                                            'reviews']
+                                                                        .length
+                                                                        .toString() +
+                                                                    ' )',
+                                                                style:
+                                                                    MyGoogleFontStyle(
+                                                                  fontFamily:
+                                                                      'Urbanist',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                  color: Color(
+                                                                      0xff000000),
+                                                                ),
                                                               ),
                                                             ),
                                                           ],
@@ -259,7 +268,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 width: MediaQuery.of(context)
                                                         .size
                                                         .width /
-                                                    5,
+                                                    10,
                                               ),
                                               // Qty
                                               Column(
@@ -273,74 +282,66 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                           ?.toList()
                                                           ?.isEmpty ??
                                                       true)
-                                                    Positioned(
-                                                      // frame494xX8 (318:2821)
-                                                      // left: 31,
-                                                      // top: 165,
-                                                      child: TextButton(
-                                                        onPressed: () async {
-                                                          if (_formKey
-                                                              .currentState!
-                                                              .validate()) {
-                                                            _formKey
-                                                                .currentState!
-                                                                .save();
-                                                            bool type = true;
-                                                            await _addToCartModel
-                                                                .getAddToCart(
-                                                                    widget.arguments![
-                                                                            'product']
-                                                                        ['id'],
-                                                                    type,
-                                                                    _CartData);
-                                                          }
-                                                        },
-                                                        style: TextButton
-                                                            .styleFrom(
-                                                          padding:
-                                                              EdgeInsets.zero,
+                                                    TextButton(
+                                                      onPressed: () async {
+                                                        if (_formKey
+                                                            .currentState!
+                                                            .validate()) {
+                                                          _formKey.currentState!
+                                                              .save();
+                                                          bool type = true;
+                                                          await _addToCartModel
+                                                              .getAddToCart(
+                                                                  widget.arguments![
+                                                                          'product']
+                                                                      ['id'],
+                                                                  type,
+                                                                  _CartData);
+                                                        }
+                                                      },
+                                                      style:
+                                                          TextButton.styleFrom(
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                      ),
+                                                      child: Container(
+                                                        width: 82,
+                                                        height: 27.33,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          border: Border.all(
+                                                              color: Color(
+                                                                  0xffeaeaea)),
+                                                          color:
+                                                              Color(0xffffffff),
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                  7.0163693428),
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              color: Color(
+                                                                  0x3f000000),
+                                                              offset: Offset(0,
+                                                                  2.1298701763),
+                                                              blurRadius:
+                                                                  2.1298701763,
+                                                            ),
+                                                          ],
                                                         ),
-                                                        child: Container(
-                                                          width: 82,
-                                                          height: 27.33,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            border: Border.all(
-                                                                color: Color(
-                                                                    0xffeaeaea)),
-                                                            color: Color(
-                                                                0xffffffff),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        7.0163693428),
-                                                            boxShadow: [
-                                                              BoxShadow(
-                                                                color: Color(
-                                                                    0x3f000000),
-                                                                offset: Offset(
-                                                                    0,
-                                                                    2.1298701763),
-                                                                blurRadius:
-                                                                    2.1298701763,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          child: Center(
-                                                            child: Text(
-                                                              'ADD',
-                                                              style:
-                                                                  MyGoogleFontStyle(
-                                                                fontFamily:
-                                                                    'DM Sans',
-                                                                fontSize: 12,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w700,
-                                                                height: 1,
-                                                                color: Color(
-                                                                    0xffc7b456),
-                                                              ),
+                                                        child: Center(
+                                                          child: Text(
+                                                            'ADD',
+                                                            style:
+                                                                MyGoogleFontStyle(
+                                                              fontFamily:
+                                                                  'DM Sans',
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              height: 1,
+                                                              color: Color(
+                                                                  0xffc7b456),
                                                             ),
                                                           ),
                                                         ),
@@ -392,7 +393,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                 ),
                                                               ),
                                                               child: Icon(
-                                                                  Icons.remove),
+                                                                  Icons.remove,
+                                                                  color: Colors
+                                                                      .black),
                                                             ),
                                                           ),
                                                           Text(
@@ -462,7 +465,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                 ),
                                                               ),
                                                               child: Icon(
-                                                                  Icons.add),
+                                                                  Icons.add,
+                                                                  color: Colors
+                                                                      .black),
                                                             ),
                                                           ),
                                                         ],
@@ -485,69 +490,77 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                     ),
                                   ),
                                 ),
+
                                 // Size
                                 Positioned(
                                   left: 25,
-                                  top: 450,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Size',
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xff000000),
+                                  top: 470,
+                                  child: Container(
+                                    width:
+                                        MediaQuery.of(context).size.width - 50,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Size',
+                                          style: MyGoogleFontStyle(
+                                            fontFamily: 'Urbanist',
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xff000000),
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Container(
-                                        width: 340,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                              color: Color(0xffdadada)),
-                                          color: Color(0xffffffff),
-                                          borderRadius:
-                                              BorderRadius.circular(20),
+                                        SizedBox(
+                                          height: 10,
                                         ),
-                                        child: DropdownButtonFormField(
-                                            decoration: InputDecoration(
-                                                border: InputBorder.none,
-                                                focusedBorder: InputBorder.none,
-                                                enabledBorder: InputBorder.none,
-                                                errorBorder: InputBorder.none,
-                                                disabledBorder:
-                                                    InputBorder.none,
-                                                labelText: 'Select Size',
-                                                contentPadding:
-                                                    EdgeInsets.all(10)),
-                                            items: _sizes
-                                                .map(
-                                                  (_size) => DropdownMenuItem(
-                                                    child: Text(
-                                                      _size['value']
+                                        Container(
+                                          width: 340,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: Color(0xffdadada)),
+                                            color: Color(0xffffffff),
+                                            borderRadius:
+                                                BorderRadius.circular(5),
+                                          ),
+                                          child: DropdownButtonFormField(
+                                              decoration: InputDecoration(
+                                                  border: InputBorder.none,
+                                                  focusedBorder:
+                                                      InputBorder.none,
+                                                  enabledBorder:
+                                                      InputBorder.none,
+                                                  errorBorder: InputBorder.none,
+                                                  disabledBorder:
+                                                      InputBorder.none,
+                                                  labelText: 'Select Size',
+                                                  contentPadding:
+                                                      EdgeInsets.all(10)),
+                                              items: _sizes
+                                                  .map(
+                                                    (_size) => DropdownMenuItem(
+                                                      child: Text(
+                                                        _size['value']
+                                                                .toString() +
+                                                            ' ' +
+                                                            _size['unit']
+                                                                    ['name']
+                                                                .toString(),
+                                                      ),
+                                                      value: _size['value']
                                                               .toString() +
                                                           ' ' +
                                                           _size['unit']['name']
                                                               .toString(),
                                                     ),
-                                                    value: _size['value']
-                                                            .toString() +
-                                                        ' ' +
-                                                        _size['unit']['name']
-                                                            .toString(),
-                                                  ),
-                                                )
-                                                .toList(),
-                                            onChanged: (value) {
-                                              _CartData['pack'] =
-                                                  value.toString();
-                                            }),
-                                      ),
-                                    ],
+                                                  )
+                                                  .toList(),
+                                              onChanged: (value) {
+                                                _CartData['pack'] =
+                                                    value.toString();
+                                              }),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
 
@@ -560,7 +573,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                         'Cakes & Flowers')
                                   Positioned(
                                     left: 25,
-                                    top: 550,
+                                    top: 570,
                                     child: Container(
                                       width: MediaQuery.of(context).size.width -
                                           50,
@@ -585,7 +598,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   color: Color(0xffdadada)),
                                               color: Color(0xffffffff),
                                               borderRadius:
-                                                  BorderRadius.circular(20),
+                                                  BorderRadius.circular(5),
                                             ),
                                             child: DropdownButtonFormField(
                                                 decoration: InputDecoration(
@@ -626,7 +639,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                     'Flower')
                                   Positioned(
                                     left: 25,
-                                    top: 560,
+                                    top: 580,
                                     child: Container(
                                       width: MediaQuery.of(context).size.width -
                                           50,
@@ -651,7 +664,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   color: Color(0xffdadada)),
                                               color: Color(0xffffffff),
                                               borderRadius:
-                                                  BorderRadius.circular(20),
+                                                  BorderRadius.circular(5),
                                             ),
                                             child: DropdownButtonFormField(
                                                 decoration: InputDecoration(
@@ -694,14 +707,14 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                   Positioned(
                                     left: 25,
                                     top: widget.arguments['product']['category']
-                                                ['name'] !=
-                                            'Flower'
-                                        ? 660
+                                                ['name'] ==
+                                            'Combos'
+                                        ? 580
                                         : widget.arguments['product']
                                                     ['category']['name'] ==
-                                                'Cakes & Flowers'
-                                            ? 800
-                                            : 660,
+                                                'Cake'
+                                            ? 680
+                                            : 580,
                                     child: Container(
                                       width: MediaQuery.of(context).size.width -
                                           50,
@@ -726,7 +739,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   color: Color(0xffdadada)),
                                               color: Color(0xffffffff),
                                               borderRadius:
-                                                  BorderRadius.circular(20),
+                                                  BorderRadius.circular(5),
                                             ),
                                             child: TextFormField(
                                               decoration: InputDecoration(
@@ -748,12 +761,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 _CartData['writeOnCake'] =
                                                     value.toString();
                                               },
-                                              validator: (value) {
-                                                if (value!.isEmpty) {
-                                                  return 'Please write someting.';
-                                                }
-                                                return null;
-                                              },
+                                              // validator: (value) {
+                                              //   if (value!.isEmpty) {
+                                              //     return 'Please write someting.';
+                                              //   }
+                                              //   return null;
+                                              // },
                                             ),
                                           )
                                         ],
@@ -761,406 +774,385 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                     ),
                                   ),
                                 // Add More Items
-                                Positioned(
-                                  left: 25,
-                                  top: widget.arguments['product']['category']
-                                              ['name'] ==
-                                          'Flower'
-                                      ? 670
-                                      : widget.arguments['product']['category']
-                                                  ['name'] ==
-                                              'Cake'
-                                          ? 770
-                                          : 760,
-                                  child: Container(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Add More Items',
-                                          style: MyGoogleFontStyle(
-                                            fontFamily: 'Urbanist',
-                                            fontWeight: FontWeight.w700,
-                                            color: Color(0xff000000),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        Container(
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          height: 220,
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: _productModel
-                                                        .categoryWiseproductsLoader
-                                                    ? Center(
-                                                        child:
-                                                            LinearProgressIndicator())
-                                                    : ListView.builder(
-                                                        itemCount: _productModel
-                                                            .categoryWiseproducts!
-                                                            .length,
-                                                        scrollDirection:
-                                                            Axis.horizontal,
-                                                        itemBuilder:
-                                                            (BuildContext
-                                                                        context,
-                                                                    index) =>
-                                                                InkWell(
-                                                          onTap: () {
-                                                            Navigator.of(
-                                                                    context)
-                                                                .push(MaterialPageRoute(
-                                                                    builder: (context) =>
-                                                                        ProductIdPage(
-                                                                            arguments: {
+                                Stack(
+                                  children: [
+                                    Positioned(
+                                      left: 25,
+                                      top: widget.arguments['product']
+                                                  ['category']['name'] ==
+                                              'Flower'
+                                          ? 670
+                                          : widget.arguments['product']
+                                                      ['category']['name'] ==
+                                                  'Cake'
+                                              ? 770
+                                              : 670,
+                                      child: Container(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Add More Items',
+                                              style: MyGoogleFontStyle(
+                                                fontFamily: 'Urbanist',
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xff000000),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Container(
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                              height: 220,
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: _productModel
+                                                            .categoryWiseproductsLoader
+                                                        ? Center(
+                                                            child:
+                                                                LinearProgressIndicator())
+                                                        : ListView.builder(
+                                                            itemCount: _productModel
+                                                                .categoryWiseproducts!
+                                                                .length,
+                                                            scrollDirection:
+                                                                Axis.horizontal,
+                                                            itemBuilder:
+                                                                (BuildContext
+                                                                            context,
+                                                                        index) =>
+                                                                    InkWell(
+                                                              onTap: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .push(MaterialPageRoute(
+                                                                        builder: (context) =>
+                                                                            ProductIdPage(arguments: {
                                                                               'product': _productModel.categoryWiseproducts![index].toJson()
                                                                             })));
-                                                          },
-                                                          child: Row(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Container(
-                                                                // margin: EdgeInsets.fromLTRB(
-                                                                //     0, 0, 0, 0),
-                                                                width: 170,
-                                                                height: 320,
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
+                                                              },
+                                                              child: Row(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  Container(
+                                                                    // margin: EdgeInsets.fromLTRB(
+                                                                    //     0, 0, 0, 0),
+                                                                    width: 170,
+                                                                    height: 320,
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
                                                                               15),
-                                                                ),
-                                                                child: Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .center,
-                                                                  children: [
-                                                                    Container(
-                                                                      width: double
-                                                                          .infinity,
-                                                                      height:
-                                                                          160,
-                                                                      child:
-                                                                          Stack(
-                                                                        children: [
-                                                                          Positioned(
-                                                                            // frame9SvA (318:2815)
-                                                                            left:
-                                                                                0,
-                                                                            top:
-                                                                                0,
-                                                                            child:
-                                                                                Container(
-                                                                              padding: EdgeInsets.fromLTRB(106, 13, 14, 13),
-                                                                              width: 145,
-                                                                              height: 133,
-                                                                              decoration: BoxDecoration(
-                                                                                borderRadius: BorderRadius.circular(15),
-                                                                                color: Color(0x0c000000),
-                                                                                image: DecorationImage(
-                                                                                  fit: BoxFit.cover,
-                                                                                  image: NetworkImage(_configModel.apiConfig['mediaURL'] + _productModel.categoryWiseproducts![index].imagepath1.toString()
-                                                                                      // 'assets/images/shades-chocolate-cake-3-1-2-1-bg.png',
-                                                                                      ),
-                                                                                ),
-                                                                              ),
-                                                                              child: InkWell(
-                                                                                onTap: () async {
-                                                                                  await _wishListModel.getWishLists(_productModel.categoryWiseproducts![index].id);
-                                                                                },
-                                                                                child: _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.categoryWiseproducts![index].id && wishList.userId == _configModel.user.id).toList().length == 0
-                                                                                    ? Align(
-                                                                                        // vectorRZx (318:2001)
-                                                                                        alignment: Alignment.topRight,
-                                                                                        child: SizedBox(
-                                                                                          width: 25,
-                                                                                          height: 22.4,
-                                                                                          child: Image.asset(
-                                                                                            'assets/images/vector-yse.png',
-                                                                                            width: 25,
-                                                                                            height: 22.4,
-                                                                                          ),
-                                                                                        ),
-                                                                                      )
-                                                                                    : Align(
-                                                                                        // vectorRZx (318:2001)
-                                                                                        alignment: Alignment.topRight,
-                                                                                        child: SizedBox(
-                                                                                          width: 25,
-                                                                                          height: 22.4,
-                                                                                          child: Image.asset(
-                                                                                            'assets/images/vector-wXc.png',
-                                                                                            width: 25,
-                                                                                            height: 22.4,
-                                                                                          ),
-                                                                                        ),
-                                                                                      ),
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                          if (_addToCartModel
-                                                                              .addToCarts!
-                                                                              .where((cart) => cart.productId == _productModel.categoryWiseproducts![index].id && cart.userId == _configModel.user.id)
-                                                                              .toList()
-                                                                              .isEmpty)
-                                                                            Positioned(
-                                                                              // frame494xX8 (318:2821)
-                                                                              left: 31,
-                                                                              top: 165,
-                                                                              child: TextButton(
-                                                                                onPressed: () async {
-                                                                                  _formKey.currentState!.save();
-                                                                                  print(_CartData.toString());
-                                                                                  bool type = true;
-                                                                                  // await _addToCartModel.getAddToCart(_productModel.categoryWiseproducts![index].id, type, _CartData);
-                                                                                },
-                                                                                style: TextButton.styleFrom(
-                                                                                  padding: EdgeInsets.zero,
-                                                                                ),
-                                                                                child: Container(
-                                                                                  width: 82,
-                                                                                  height: 27.33,
-                                                                                  decoration: BoxDecoration(
-                                                                                    border: Border.all(color: Color(0xffeaeaea)),
-                                                                                    color: Color(0xffffffff),
-                                                                                    borderRadius: BorderRadius.circular(7.0163693428),
-                                                                                    boxShadow: [
-                                                                                      BoxShadow(
-                                                                                        color: Color(0x3f000000),
-                                                                                        offset: Offset(0, 2.1298701763),
-                                                                                        blurRadius: 2.1298701763,
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                  child: Center(
-                                                                                    child: Text(
-                                                                                      'ADD',
-                                                                                      style: MyGoogleFontStyle(
-                                                                                        fontFamily: 'DM Sans',
-                                                                                        fontSize: 12,
-                                                                                        fontWeight: FontWeight.w700,
-                                                                                        height: 1,
-                                                                                        color: Color(0xffc7b456),
-                                                                                      ),
-                                                                                    ),
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          if (_addToCartModel
-                                                                              .addToCarts!
-                                                                              .where((cart) => cart.productId == _productModel.categoryWiseproducts![index].id && cart.userId == _configModel.user.id)
-                                                                              .toList()
-                                                                              .isNotEmpty)
-                                                                            Positioned(
-                                                                              left: 17,
-                                                                              top: 115,
-                                                                              child: Container(
-                                                                                width: 115,
-                                                                                height: 30.33,
-                                                                                decoration: BoxDecoration(
-                                                                                  border: Border.all(color: Color(0xffeaeaea)),
-                                                                                  color: Color(0xffffffff),
-                                                                                  borderRadius: BorderRadius.circular(7.0163693428),
-                                                                                  boxShadow: [
-                                                                                    BoxShadow(
-                                                                                      color: Color(0x3f000000),
-                                                                                      offset: Offset(0, 2.1298701763),
-                                                                                      blurRadius: 2.1298701763,
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                                child: Center(
-                                                                                  child: Row(
-                                                                                    children: [
-                                                                                      SizedBox(
-                                                                                        width: 50,
-                                                                                        child: TextButton(
-                                                                                          onPressed: () async {
-                                                                                            bool minus = false;
-                                                                                            await _addToCartModel.getAddToCart(_productModel.categoryWiseproducts![index].id, minus, _CartData);
-                                                                                          },
-                                                                                          style: TextButton.styleFrom(
-                                                                                            padding: EdgeInsets.zero,
-                                                                                          ),
-                                                                                          child: Container(
-                                                                                            decoration: BoxDecoration(
-                                                                                              border: Border.all(),
-                                                                                              borderRadius: BorderRadius.all(
-                                                                                                Radius.circular(5),
-                                                                                              ),
-                                                                                            ),
-                                                                                            child: Icon(Icons.remove),
-                                                                                          ),
-                                                                                        ),
-                                                                                      ),
-                                                                                      Text(
-                                                                                        // '1',
-                                                                                        _addToCartModel.addToCarts!.where((_aTC) => _aTC.productId == _productModel.categoryWiseproducts![index].id).toList()[0].qty.toString(),
-                                                                                        style: MyGoogleFontStyle(
-                                                                                          fontFamily: 'Poppins',
-                                                                                          fontWeight: FontWeight.w500,
-                                                                                          color: Color(0xff1e1e1e),
-                                                                                        ),
-                                                                                      ),
-                                                                                      SizedBox(
-                                                                                        width: 50,
-                                                                                        child: TextButton(
-                                                                                          onPressed: () async {
-                                                                                            bool type = true;
-
-                                                                                            await _addToCartModel.getAddToCart(_productModel.categoryWiseproducts![index].id, type, _CartData);
-                                                                                          },
-                                                                                          style: TextButton.styleFrom(
-                                                                                            padding: EdgeInsets.zero,
-                                                                                          ),
-                                                                                          child: Container(
-                                                                                            decoration: BoxDecoration(
-                                                                                              border: Border.all(),
-                                                                                              borderRadius: BorderRadius.all(
-                                                                                                Radius.circular(5),
-                                                                                              ),
-                                                                                            ),
-                                                                                            child: Icon(Icons.add),
-                                                                                          ),
-                                                                                        ),
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            )
-                                                                          else
-                                                                            Positioned(
-                                                                              // frame494xX8 (318:2821)
-                                                                              left: 31,
-                                                                              top: 110,
-                                                                              child: TextButton(
-                                                                                onPressed: () async {
-                                                                                  bool type = true;
-                                                                                  await _addToCartModel.getAddToCart(_productModel.categoryWiseproducts![index].id, type, _CartData);
-                                                                                  // Navigator.pushNamed(context, '/cartPage');
-                                                                                },
-                                                                                style: TextButton.styleFrom(
-                                                                                  padding: EdgeInsets.zero,
-                                                                                ),
-                                                                                child: Container(
-                                                                                  width: 82,
-                                                                                  height: 27.33,
-                                                                                  decoration: BoxDecoration(
-                                                                                    border: Border.all(color: Color(0xffeaeaea)),
-                                                                                    color: Color(0xffffffff),
-                                                                                    borderRadius: BorderRadius.circular(7.0163693428),
-                                                                                    boxShadow: [
-                                                                                      BoxShadow(
-                                                                                        color: Color(0x3f000000),
-                                                                                        offset: Offset(0, 2.1298701763),
-                                                                                        blurRadius: 2.1298701763,
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                  child: Center(
-                                                                                    child: Text(
-                                                                                      'ADD',
-                                                                                      style: MyGoogleFontStyle(
-                                                                                        fontFamily: 'DM Sans',
-                                                                                        fontSize: 12,
-                                                                                        fontWeight: FontWeight.w700,
-                                                                                        height: 1,
-                                                                                        color: Color(0xffc7b456),
-                                                                                      ),
-                                                                                    ),
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                        ],
-                                                                      ),
                                                                     ),
-                                                                    Container(
-                                                                      child:
-                                                                          Text(
-                                                                        _productModel
-                                                                            .categoryWiseproducts![index]
-                                                                            .name
-                                                                            .toString(),
-                                                                        textAlign:
-                                                                            TextAlign.center,
-                                                                        style:
-                                                                            MyGoogleFontStyle(
-                                                                          fontFamily:
-                                                                              'Urbanist',
-                                                                          fontSize:
-                                                                              15,
-                                                                          fontWeight:
-                                                                              FontWeight.w700,
+                                                                    child:
+                                                                        Column(
+                                                                      crossAxisAlignment:
+                                                                          CrossAxisAlignment
+                                                                              .center,
+                                                                      children: [
+                                                                        Container(
+                                                                          width:
+                                                                              double.infinity,
                                                                           height:
-                                                                              1.2,
-                                                                          letterSpacing:
-                                                                              -0.3,
-                                                                          color:
-                                                                              Color(0xff000000),
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                    InkWell(
-                                                                      onTap:
-                                                                          () {
-                                                                        Navigator.of(context).push(MaterialPageRoute(
-                                                                            builder: (context) =>
-                                                                                ProductIdPage(arguments: {
-                                                                                  'product': _productModel.categoryWiseproducts![index].toJson()
-                                                                                })));
-                                                                      },
-                                                                      child:
-                                                                          Container(
-                                                                        child:
-                                                                            Text(
-                                                                          _productModel
-                                                                              .categoryWiseproducts![index]
-                                                                              .productPrices![0]
-                                                                              .price
-                                                                              .toString(),
-                                                                          style:
-                                                                              MyGoogleFontStyle(
-                                                                            fontFamily:
-                                                                                'Poppins',
-                                                                            fontSize:
-                                                                                10.9543466568,
-                                                                            fontWeight:
-                                                                                FontWeight.w500,
-                                                                            height:
-                                                                                1.5,
-                                                                            letterSpacing:
-                                                                                -0.2190869331,
-                                                                            color:
-                                                                                Color(0x99000000),
+                                                                              160,
+                                                                          child:
+                                                                              Stack(
+                                                                            children: [
+                                                                              Positioned(
+                                                                                // frame9SvA (318:2815)
+                                                                                left: 0,
+                                                                                top: 0,
+                                                                                child: Container(
+                                                                                  padding: EdgeInsets.fromLTRB(106, 13, 14, 13),
+                                                                                  width: 145,
+                                                                                  height: 133,
+                                                                                  decoration: BoxDecoration(
+                                                                                    borderRadius: BorderRadius.circular(15),
+                                                                                    color: Color(0x0c000000),
+                                                                                    image: DecorationImage(
+                                                                                      fit: BoxFit.cover,
+                                                                                      image: NetworkImage(_configModel.apiConfig['mediaURL'] + _productModel.categoryWiseproducts![index].imagepath1.toString()
+                                                                                          // 'assets/images/shades-chocolate-cake-3-1-2-1-bg.png',
+                                                                                          ),
+                                                                                    ),
+                                                                                  ),
+                                                                                  child: InkWell(
+                                                                                    onTap: () async {
+                                                                                      await _wishListModel.getWishLists(_productModel.categoryWiseproducts![index].id);
+                                                                                    },
+                                                                                    child: _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.categoryWiseproducts![index].id && wishList.userId == _configModel.user.id).toList().length == 0
+                                                                                        ? Align(
+                                                                                            // vectorRZx (318:2001)
+                                                                                            alignment: Alignment.topRight,
+                                                                                            child: SizedBox(
+                                                                                              width: 25,
+                                                                                              height: 22.4,
+                                                                                              child: Image.asset(
+                                                                                                'assets/images/vector-yse.png',
+                                                                                                width: 25,
+                                                                                                height: 22.4,
+                                                                                              ),
+                                                                                            ),
+                                                                                          )
+                                                                                        : Align(
+                                                                                            // vectorRZx (318:2001)
+                                                                                            alignment: Alignment.topRight,
+                                                                                            child: SizedBox(
+                                                                                              width: 25,
+                                                                                              height: 22.4,
+                                                                                              child: Image.asset(
+                                                                                                'assets/images/vector-wXc.png',
+                                                                                                width: 25,
+                                                                                                height: 22.4,
+                                                                                              ),
+                                                                                            ),
+                                                                                          ),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                              if (_addToCartModel.addToCarts!.where((cart) => cart.productId == _productModel.categoryWiseproducts![index].id && cart.userId == _configModel.user.id).toList().isEmpty)
+                                                                                Positioned(
+                                                                                  // frame494xX8 (318:2821)
+                                                                                  left: 31,
+                                                                                  top: 165,
+                                                                                  child: TextButton(
+                                                                                    onPressed: () async {
+                                                                                      _formKey.currentState!.save();
+                                                                                      bool type = true;
+                                                                                      // await _addToCartModel.getAddToCart(_productModel.categoryWiseproducts![index].id, type, _CartData);
+                                                                                    },
+                                                                                    style: TextButton.styleFrom(
+                                                                                      padding: EdgeInsets.zero,
+                                                                                    ),
+                                                                                    child: Container(
+                                                                                      width: 82,
+                                                                                      height: 27.33,
+                                                                                      decoration: BoxDecoration(
+                                                                                        border: Border.all(color: Color(0xffeaeaea)),
+                                                                                        color: Color(0xffffffff),
+                                                                                        borderRadius: BorderRadius.circular(7.0163693428),
+                                                                                        boxShadow: [
+                                                                                          BoxShadow(
+                                                                                            color: Color(0x3f000000),
+                                                                                            offset: Offset(0, 2.1298701763),
+                                                                                            blurRadius: 2.1298701763,
+                                                                                          ),
+                                                                                        ],
+                                                                                      ),
+                                                                                      child: Center(
+                                                                                        child: Text(
+                                                                                          'ADD',
+                                                                                          style: MyGoogleFontStyle(
+                                                                                            fontFamily: 'DM Sans',
+                                                                                            fontSize: 12,
+                                                                                            fontWeight: FontWeight.w700,
+                                                                                            height: 1,
+                                                                                            color: Color(0xffc7b456),
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              if (_addToCartModel.addToCarts!.where((cart) => cart.productId == _productModel.categoryWiseproducts![index].id && cart.userId == _configModel.user.id).toList().isNotEmpty)
+                                                                                Positioned(
+                                                                                  left: 17,
+                                                                                  top: 115,
+                                                                                  child: Container(
+                                                                                    width: 115,
+                                                                                    height: 30.33,
+                                                                                    decoration: BoxDecoration(
+                                                                                      border: Border.all(color: Color(0xffeaeaea)),
+                                                                                      color: Color(0xffffffff),
+                                                                                      borderRadius: BorderRadius.circular(7.0163693428),
+                                                                                      boxShadow: [
+                                                                                        BoxShadow(
+                                                                                          color: Color(0x3f000000),
+                                                                                          offset: Offset(0, 2.1298701763),
+                                                                                          blurRadius: 2.1298701763,
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                    child: Center(
+                                                                                      child: Row(
+                                                                                        children: [
+                                                                                          SizedBox(
+                                                                                            width: 50,
+                                                                                            child: TextButton(
+                                                                                              onPressed: () async {
+                                                                                                bool minus = false;
+                                                                                                await _addToCartModel.getAddToCart(_productModel.categoryWiseproducts![index].id, minus, _CartData);
+                                                                                              },
+                                                                                              style: TextButton.styleFrom(
+                                                                                                padding: EdgeInsets.zero,
+                                                                                              ),
+                                                                                              child: Container(
+                                                                                                decoration: BoxDecoration(
+                                                                                                  border: Border.all(),
+                                                                                                  borderRadius: BorderRadius.all(
+                                                                                                    Radius.circular(5),
+                                                                                                  ),
+                                                                                                ),
+                                                                                                child: Icon(
+                                                                                                  Icons.remove,
+                                                                                                  color: Colors.black,
+                                                                                                  size: 16,
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                          ),
+                                                                                          Text(
+                                                                                            // '1',
+                                                                                            _addToCartModel.addToCarts!.where((_aTC) => _aTC.productId == _productModel.categoryWiseproducts![index].id).toList()[0].qty.toString(),
+                                                                                            style: MyGoogleFontStyle(
+                                                                                              fontFamily: 'Poppins',
+                                                                                              fontWeight: FontWeight.w500,
+                                                                                              color: Color(0xff1e1e1e),
+                                                                                            ),
+                                                                                          ),
+                                                                                          SizedBox(
+                                                                                            width: 50,
+                                                                                            child: TextButton(
+                                                                                              onPressed: () async {
+                                                                                                bool type = true;
+
+                                                                                                await _addToCartModel.getAddToCart(_productModel.categoryWiseproducts![index].id, type, _CartData);
+                                                                                              },
+                                                                                              style: TextButton.styleFrom(
+                                                                                                padding: EdgeInsets.zero,
+                                                                                              ),
+                                                                                              child: Container(
+                                                                                                decoration: BoxDecoration(
+                                                                                                  border: Border.all(),
+                                                                                                  borderRadius: BorderRadius.all(
+                                                                                                    Radius.circular(5),
+                                                                                                  ),
+                                                                                                ),
+                                                                                                child: Icon(
+                                                                                                  Icons.add,
+                                                                                                  color: Colors.black,
+                                                                                                  size: 16,
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                          ),
+                                                                                        ],
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                )
+                                                                              else
+                                                                                Positioned(
+                                                                                  // frame494xX8 (318:2821)
+                                                                                  left: 31,
+                                                                                  top: 110,
+                                                                                  child: TextButton(
+                                                                                    onPressed: () async {
+                                                                                      bool type = true;
+                                                                                      await _addToCartModel.getAddToCart(_productModel.categoryWiseproducts![index].id, type, _CartData);
+                                                                                      // Navigator.pushNamed(context, '/cartPage');
+                                                                                    },
+                                                                                    style: TextButton.styleFrom(
+                                                                                      padding: EdgeInsets.zero,
+                                                                                    ),
+                                                                                    child: Container(
+                                                                                      width: 82,
+                                                                                      height: 27.33,
+                                                                                      decoration: BoxDecoration(
+                                                                                        border: Border.all(color: Color(0xffeaeaea)),
+                                                                                        color: Color(0xffffffff),
+                                                                                        borderRadius: BorderRadius.circular(7.0163693428),
+                                                                                        boxShadow: [
+                                                                                          BoxShadow(
+                                                                                            color: Color(0x3f000000),
+                                                                                            offset: Offset(0, 2.1298701763),
+                                                                                            blurRadius: 2.1298701763,
+                                                                                          ),
+                                                                                        ],
+                                                                                      ),
+                                                                                      child: Center(
+                                                                                        child: Text(
+                                                                                          'ADD',
+                                                                                          style: MyGoogleFontStyle(
+                                                                                            fontFamily: 'DM Sans',
+                                                                                            fontSize: 12,
+                                                                                            fontWeight: FontWeight.w700,
+                                                                                            height: 1,
+                                                                                            color: Color(0xffc7b456),
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                            ],
                                                                           ),
                                                                         ),
-                                                                      ),
+                                                                        Container(
+                                                                          child:
+                                                                              Text(
+                                                                            _productModel.categoryWiseproducts![index].name.toString(),
+                                                                            textAlign:
+                                                                                TextAlign.center,
+                                                                            style:
+                                                                                MyGoogleFontStyle(
+                                                                              fontFamily: 'Urbanist',
+                                                                              fontSize: 15,
+                                                                              fontWeight: FontWeight.w700,
+                                                                              height: 1.2,
+                                                                              letterSpacing: -0.3,
+                                                                              color: Color(0xff000000),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                        InkWell(
+                                                                          onTap:
+                                                                              () {
+                                                                            Navigator.of(context).push(MaterialPageRoute(
+                                                                                builder: (context) => ProductIdPage(arguments: {
+                                                                                      'product': _productModel.categoryWiseproducts![index].toJson()
+                                                                                    })));
+                                                                          },
+                                                                          child:
+                                                                              Container(
+                                                                            child:
+                                                                                Text(
+                                                                              _productModel.categoryWiseproducts![index].productPrices![0].price.toString() + " " + 'د.إ',
+                                                                              style: MyGoogleFontStyle(
+                                                                                fontFamily: 'Poppins',
+                                                                                fontSize: 13,
+                                                                                fontWeight: FontWeight.w500,
+                                                                                height: 1.5,
+                                                                                letterSpacing: -0.2190869331,
+                                                                                color: Color(0x99000000),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ],
                                                                     ),
-                                                                  ],
-                                                                ),
+                                                                  ),
+                                                                ],
                                                               ),
-                                                            ],
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ),
-                                              )
-                                            ],
-                                          ),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
+                                  ],
                                 ),
                                 // Description and Reviews
                                 Positioned(
@@ -1173,8 +1165,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   ['name'] ==
                                               'Cake'
                                           ? 1010
-                                          : 1020,
+                                          : 930,
                                   child: Container(
+                                    height: 320,
                                     child: DefaultTabController(
                                       length: 2,
                                       child: Column(
@@ -1213,13 +1206,10 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                     .size
                                                     .width -
                                                 50,
-                                            height: widget
-                                                        .arguments!['product']
-                                                            ['reviews']
-                                                        .length ==
-                                                    1
-                                                ? 160
-                                                : 210,
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height -
+                                                470,
                                             child: TabBarView(
                                               children: [
                                                 Padding(
@@ -1256,7 +1246,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                 ),
                                                                 child:
                                                                     TextFormField(
-                                                                  maxLines: 3,
+                                                                  maxLines: 2,
                                                                   decoration:
                                                                       InputDecoration(
                                                                     border:
@@ -1396,9 +1386,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                         ),
                                                       ),
                                                       Container(
-                                                        height: 200,
-                                                        margin:
-                                                            EdgeInsets.all(20),
+                                                        height: MediaQuery.of(
+                                                                context)
+                                                            .size
+                                                            .height,
+                                                        // margin:
+                                                        //     EdgeInsets.all(5),
                                                         child: widget
                                                                     .arguments![
                                                                         'product']
@@ -1409,141 +1402,101 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                             ? Center(
                                                                 child: Text(
                                                                     'No reviews'))
-                                                            : ListView.builder(
-                                                                itemCount: widget
-                                                                    .arguments![
-                                                                        'product']
-                                                                        [
-                                                                        'reviews']!
-                                                                    .length,
-                                                                itemBuilder: (BuildContext
-                                                                            context,
-                                                                        index) =>
-                                                                    SingleChildScrollView(
-                                                                  child: Column(
-                                                                    children: [
+                                                            : SizedBox(
+                                                                height: 100,
+                                                                child: ListView
+                                                                    .builder(
+                                                                  scrollDirection:
+                                                                      Axis.vertical,
+                                                                  itemCount: widget
+                                                                      .arguments![
+                                                                          'product']
+                                                                          [
+                                                                          'reviews']!
+                                                                      .length,
+                                                                  itemBuilder: (BuildContext
+                                                                              context,
+                                                                          index) =>
                                                                       Container(
-                                                                        margin: EdgeInsets.only(
-                                                                            bottom:
-                                                                                10),
-                                                                        padding:
-                                                                            EdgeInsets.all(10),
-                                                                        decoration:
-                                                                            BoxDecoration(
-                                                                          border:
-                                                                              Border.all(color: Color(0xffc7b456)),
+                                                                    margin: EdgeInsets.only(
+                                                                        bottom:
+                                                                            10),
+                                                                    padding:
+                                                                        EdgeInsets.all(
+                                                                            10),
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      border: Border.all(
                                                                           color:
-                                                                              Color(0xffffffff),
-                                                                          borderRadius:
-                                                                              BorderRadius.all(
-                                                                            Radius.circular(5),
-                                                                          ),
-                                                                          boxShadow: [
-                                                                            BoxShadow(
-                                                                              color: Color(0x338a959e),
-                                                                              offset: Offset(0, 7.6690645218),
-                                                                              blurRadius: 19.1726608276,
-                                                                            ),
-                                                                          ],
+                                                                              Color(0xffc7b456)),
+                                                                      color: Color(
+                                                                          0xffffffff),
+                                                                      borderRadius:
+                                                                          BorderRadius
+                                                                              .all(
+                                                                        Radius.circular(
+                                                                            5),
+                                                                      ),
+                                                                      boxShadow: [
+                                                                        BoxShadow(
+                                                                          color:
+                                                                              Color(0x338a959e),
+                                                                          offset: Offset(
+                                                                              0,
+                                                                              7.6690645218),
+                                                                          blurRadius:
+                                                                              19.1726608276,
                                                                         ),
-                                                                        child:
-                                                                            Column(
+                                                                      ],
+                                                                    ),
+                                                                    child:
+                                                                        Column(
+                                                                      children: [
+                                                                        // Photo and Title
+
+                                                                        // Stars
+                                                                        Row(
                                                                           children: [
-                                                                            // Photo and Title
-                                                                            Row(
-                                                                              children: [
-                                                                                Expanded(
-                                                                                  child: Column(
-                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                    children: [
-                                                                                      Row(
-                                                                                        children: [
-                                                                                          Container(
-                                                                                            // mediaF3t (I318:2555;0:1388)
-                                                                                            margin: EdgeInsets.fromLTRB(0, 0, 15, 0),
-                                                                                            width: 66.71,
-                                                                                            height: 66.71,
-                                                                                            child: Image.network(
-                                                                                              _configModel.apiConfig['mediaURL'] + widget.arguments!['product']['imagepath1'].toString(),
-                                                                                              // 'assets/images/media.png',
-                                                                                              width: 66.71,
-                                                                                              height: 66.71,
-                                                                                            ),
-                                                                                          ),
-                                                                                          SizedBox(
-                                                                                            width: 190,
-                                                                                            child: Column(
-                                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                              children: [
-                                                                                                Text(
-                                                                                                  widget.arguments!['product']['name'].toString(),
-                                                                                                  style: MyGoogleFontStyle(
-                                                                                                    fontFamily: 'Poppins',
-                                                                                                    fontSize: 16,
-                                                                                                    fontWeight: FontWeight.w400,
-                                                                                                    color: Color(0xff232323),
-                                                                                                  ),
-                                                                                                ),
-                                                                                                Text(
-                                                                                                  // BLr (I318:2555;0:1392)
-                                                                                                  '₹ ' + widget.arguments!['product']['product_prices']![0]['price'].toString(),
-                                                                                                  style: MyGoogleFontStyle(
-                                                                                                    fontFamily: 'Poppins',
-                                                                                                    fontSize: 16,
-                                                                                                    fontWeight: FontWeight.w600,
-                                                                                                    color: Color(0xff232323),
-                                                                                                  ),
-                                                                                                ),
-                                                                                              ],
-                                                                                            ),
-                                                                                          ),
-                                                                                        ],
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
+                                                                            Expanded(
+                                                                              child: Text(_configModel.user.firstName.toString()),
+                                                                            ),
+                                                                            Expanded(
+                                                                              child: Text(
+                                                                                _format!.format(DateTime.parse(widget.arguments!['product']['reviews']![index]['created_at'].toString())),
+                                                                                textAlign: TextAlign.right,
+                                                                                style: MyGoogleFontStyle(
+                                                                                  fontFamily: 'Poppins',
+                                                                                  fontSize: 12,
+                                                                                  fontWeight: FontWeight.w400,
+                                                                                  color: Color(0xff909090),
                                                                                 ),
-                                                                              ],
-                                                                            ),
-                                                                            SizedBox(
-                                                                              height: 10,
-                                                                            ),
-                                                                            // Stars
-                                                                            Row(
-                                                                              children: [
-                                                                                Expanded(
-                                                                                  child: Text(_configModel.user.firstName.toString()),
-                                                                                ),
-                                                                                Expanded(
-                                                                                  child: Text(
-                                                                                    _format!.format(DateTime.parse(widget.arguments!['product']['reviews']![index]['created_at'].toString())),
-                                                                                    textAlign: TextAlign.right,
-                                                                                    style: MyGoogleFontStyle(
-                                                                                      fontFamily: 'Poppins',
-                                                                                      fontSize: 12,
-                                                                                      fontWeight: FontWeight.w400,
-                                                                                      color: Color(0xff909090),
-                                                                                    ),
-                                                                                  ),
-                                                                                )
-                                                                              ],
-                                                                            ),
-                                                                            SizedBox(
-                                                                              height: 10,
-                                                                            ),
-                                                                            // Description
-                                                                            Text(
-                                                                              widget.arguments!['product']['reviews']![index]['description'].toString(),
-                                                                              style: MyGoogleFontStyle(
-                                                                                fontFamily: 'Poppins',
-                                                                                fontSize: 12,
-                                                                                fontWeight: FontWeight.w400,
-                                                                                color: Color(0xff909090),
                                                                               ),
                                                                             )
                                                                           ],
                                                                         ),
-                                                                      ),
-                                                                    ],
+                                                                        SizedBox(
+                                                                          height:
+                                                                              10,
+                                                                        ),
+                                                                        // Description
+                                                                        Text(
+                                                                          widget
+                                                                              .arguments!['product']['reviews']![index]['description']
+                                                                              .toString(),
+                                                                          style:
+                                                                              MyGoogleFontStyle(
+                                                                            fontFamily:
+                                                                                'Poppins',
+                                                                            fontSize:
+                                                                                12,
+                                                                            fontWeight:
+                                                                                FontWeight.w400,
+                                                                            color:
+                                                                                Color(0xff909090),
+                                                                          ),
+                                                                        )
+                                                                      ],
+                                                                    ),
                                                                   ),
                                                                 ),
                                                               ),
@@ -1609,7 +1562,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       ),
                                                     ),
                                                     TextSpan(
-                                                      text: '₹ ' +
+                                                      text: 'د.إ' +
+                                                          ' ' +
                                                           widget.arguments![
                                                                   'product'][
                                                                   'product_prices']
@@ -1634,6 +1588,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                     .validate()) {
                                                   _formKey.currentState!.save();
                                                   bool type = true;
+
                                                   await _addToCartModel
                                                       .getAddToCart(
                                                           widget.arguments![

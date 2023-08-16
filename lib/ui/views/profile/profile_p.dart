@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:icon_forest/don_icons.dart';
+import 'package:icon_forest/iconoir.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
@@ -8,6 +10,7 @@ import 'package:sales_app/core/providers/user_address_pr.dart';
 import 'package:sales_app/core/providers/wish_list_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/profile/address_p.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -46,6 +49,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final ReviewModel _reviewModel = Provider.of<ReviewModel>(context);
     final UserAddressModel _userAddressModel =
         Provider.of<UserAddressModel>(context);
+    String initials = getInitials(_configModel.user.firstName.toString());
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -54,7 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 // Title
                 Container(
-                  margin: EdgeInsets.all(20),
+                  margin: EdgeInsets.only(top: 40, left: 20, bottom: 20),
                   width: double.infinity,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,9 +103,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         children: [
                           _configModel.user.imagepath != null
                               ? Container(
-                                  margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
-                                  width: 80,
-                                  height: 80,
+                                  margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                                  width: 65,
+                                  height: 65,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(40),
                                     image: DecorationImage(
@@ -114,15 +118,27 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ),
                                 )
                               : Container(
-                                  margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
-                                  width: 80,
-                                  height: 80,
+                                  margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                                  width: 65,
+                                  height: 65,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(40),
-                                    image: DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: AssetImage(
-                                        'assets/images/group-8990.png',
+                                    // image: DecorationImage(
+                                    //   fit: BoxFit.cover,
+                                    //   image: AssetImage(
+                                    //     'assets/images/group-8990.png',
+                                    //   ),
+                                    // ),
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 50,
+                                    backgroundColor: Colors.black,
+                                    child: Text(
+                                      initials,
+                                      style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
                                       ),
                                     ),
                                   ),
@@ -150,73 +166,73 @@ class _ProfilePageState extends State<ProfilePage> {
                               ],
                             ),
                           ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Container(
-                                  // margin: EdgeInsets.fromLTRB(5, 0, 6.34, 0),
-                                  child: TextButton(
-                                    onPressed: () async {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) =>
-                                            AlertDialog(
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20)),
-                                          title: Text(
-                                              'Are you sure you want to logout?'),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: Text('NO'),
-                                            ),
-                                            TextButton(
-                                              onPressed: () async {
-                                                Navigator.of(context).pop();
-                                                await _configModel
-                                                    .removeLoginData();
-                                                Navigator.pushReplacementNamed(
-                                                    context, '/login');
-                                              },
-                                              child: Text('YES'),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                    style: TextButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                    ),
-                                    child: Container(
-                                      width: 80,
-                                      height: 35,
-                                      decoration: BoxDecoration(
-                                        color: Color(0xff1e1e1e),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          'Logout',
-                                          textAlign: TextAlign.center,
-                                          style: MyGoogleFontStyle(
-                                            fontFamily: 'Urbanist',
-                                            fontSize: 15.1428556442,
-                                            fontWeight: FontWeight.w700,
-                                            height: 1.4999999685,
-                                            color: Color(0xffffffff),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                          // Expanded(
+                          //   child: Column(
+                          //     crossAxisAlignment: CrossAxisAlignment.end,
+                          //     children: [
+                          //       Container(
+                          //         // margin: EdgeInsets.fromLTRB(5, 0, 6.34, 0),
+                          //         child: TextButton(
+                          //           onPressed: () async {
+                          //             showDialog(
+                          //               context: context,
+                          //               builder: (BuildContext context) =>
+                          //                   AlertDialog(
+                          //                 shape: RoundedRectangleBorder(
+                          //                     borderRadius:
+                          //                         BorderRadius.circular(20)),
+                          //                 title: Text(
+                          //                     'Are you sure you want to logout?'),
+                          //                 actions: <Widget>[
+                          //                   TextButton(
+                          //                     onPressed: () {
+                          //                       Navigator.of(context).pop();
+                          //                     },
+                          //                     child: Text('NO'),
+                          //                   ),
+                          //                   TextButton(
+                          //                     onPressed: () async {
+                          //                       Navigator.of(context).pop();
+                          //                       await _configModel
+                          //                           .removeLoginData();
+                          //                       Navigator.pushReplacementNamed(
+                          //                           context, '/login');
+                          //                     },
+                          //                     child: Text('YES'),
+                          //                   ),
+                          //                 ],
+                          //               ),
+                          //             );
+                          //           },
+                          //           style: TextButton.styleFrom(
+                          //             padding: EdgeInsets.zero,
+                          //           ),
+                          //           child: Container(
+                          //             width: 80,
+                          //             height: 35,
+                          //             decoration: BoxDecoration(
+                          //               color: Color(0xff1e1e1e),
+                          //               borderRadius: BorderRadius.circular(10),
+                          //             ),
+                          //             child: Center(
+                          //               child: Text(
+                          //                 'Logout',
+                          //                 textAlign: TextAlign.center,
+                          //                 style: MyGoogleFontStyle(
+                          //                   fontFamily: 'Urbanist',
+                          //                   fontSize: 15.1428556442,
+                          //                   fontWeight: FontWeight.w700,
+                          //                   height: 1.4999999685,
+                          //                   color: Color(0xffffffff),
+                          //                 ),
+                          //               ),
+                          //             ),
+                          //           ),
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
                         ],
                       ),
                       // My Orders
@@ -557,7 +573,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       // Shipping Addresses
                       InkWell(
                         onTap: () {
-                          Navigator.pushNamed(context, '/addressPage');
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => AddressPage(arguments: {
+                                    'cartItems': [],
+                                    'cartTotal': '',
+                                    'isAddress': false
+                                  })));
                         },
                         child: Container(
                           margin: EdgeInsets.only(bottom: 10),
@@ -721,7 +742,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                     Text(
                                       // alreadyhave10orders9Ca (I318:2511;0:1158)
-                                      'Already have 10 orders',
+                                      'Email & Whatsapp',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontSize: 11,
@@ -810,6 +831,70 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        elevation: 10,
+        iconSize: 30,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.black,
+        selectedFontSize: 14,
+        unselectedFontSize: 14,
+        onTap: (value) async {
+          if (value == 0) {
+            Navigator.pushNamed(context, '/homePage');
+          }
+          if (value == 1) {
+            Navigator.pushNamed(context, '/wishlistPage');
+          }
+
+          if (value == 2) {
+            Map<String, dynamic> _CartData = {
+              'kindOfFlower': '',
+              'flavour': '',
+              'writeOnCake': '',
+              'pack': ''
+            };
+            await _addToCartModel.getAddToCart('', '', _CartData);
+            Navigator.pushNamed(context, '/cartPage');
+          }
+          if (value == 3) {
+            Navigator.pushNamed(context, '/profilePage');
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(
+            label: 'Home',
+            icon: Iconoir(Iconoir.home_simple),
+            // icon: Icon(DonIcons.wap_home, size: 23),
+          ),
+          BottomNavigationBarItem(label: 'Saved', icon: Iconoir(Iconoir.heart)),
+          BottomNavigationBarItem(
+            label: 'Cart',
+            icon: Iconoir(Iconoir.shopping_bag),
+          ),
+          BottomNavigationBarItem(
+            label: 'Profile',
+            icon: Icon(
+              DonIcons.user_o,
+              size: 23,
+            ),
+          ),
+        ],
+      ),
     );
   }
+}
+
+String getInitials(String name) {
+  List<String> nameParts = name.split(' ');
+  String initials = '';
+
+  for (String part in nameParts) {
+    if (part.isNotEmpty) {
+      initials += part[0];
+    }
+  }
+
+  return initials;
 }

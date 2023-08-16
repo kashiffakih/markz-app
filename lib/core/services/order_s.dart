@@ -9,10 +9,10 @@ import 'package:http/http.dart' as http;
 class OrderService {
   final ConfigModel _configModel = locator<ConfigModel>();
 
-  Future<bool> placedOrder(List<AddToCart> cartItems, String cartTotal,
-      [addressId]) async {
+  Future<bool> placedOrder(
+      List<AddToCart> cartItems, String cartTotal, addressId, isGift) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    print(addressId);
+    print(isGift);
     var orderDetails = [];
     cartItems.forEach((item) {
       orderDetails.add({
@@ -20,7 +20,7 @@ class OrderService {
         'order_detail_cost': item.product!.productPrices![0].price,
         'product_id': item.productId,
         'quantity': item.qty,
-        'product_pack': item.pack,
+        'product_pack': item.pack != null ? item.pack : '1 Kg',
         'kind_of_flower': item.kindOfFlower,
         'flavour': item.flavour,
         'write_on_cake': item.writeOnCake,
@@ -56,17 +56,18 @@ class OrderService {
         storePayableAmount: 0,
         comissionAmount: 0,
         paymentmode: 'cashondelivery',
+        isGift: isGift,
         addressId: int.parse(addressId.toString()));
 
     var _orderJson = order.toJson();
     _orderJson['order_details'] = orderDetails;
-
     http.Response _response = await http.post(
       Uri.parse('${_apiConfig['baseURL']}/orders'),
       body: json.encode(_orderJson),
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
+    print(_responseData);
     return _responseData['success'];
   }
 

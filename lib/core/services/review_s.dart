@@ -19,7 +19,6 @@ class ReviewService {
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
-    print(_responseData);
     if (_responseData['success']) {
       _reviews = [];
       _responseData['data'].forEach((data) {

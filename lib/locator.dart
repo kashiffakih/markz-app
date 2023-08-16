@@ -3,6 +3,7 @@ import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/services/add_to_cart_s.dart';
 import 'package:sales_app/core/services/auth_s.dart';
 import 'package:sales_app/core/services/config_s.dart';
+import 'package:sales_app/core/services/notification_s.dart';
 import 'package:sales_app/core/services/order_s.dart';
 import 'package:sales_app/core/services/product_s.dart';
 import 'package:sales_app/core/services/review_s.dart';
@@ -21,4 +22,5 @@ void setupLocator() {
   locator.registerLazySingleton(() => WishListService());
   locator.registerLazySingleton(() => ReviewService());
   locator.registerLazySingleton(() => UserAddressService());
+  locator.registerLazySingleton(() => NotificationService());
 }

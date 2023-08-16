@@ -3,6 +3,7 @@ class UserAddress {
   String? add1;
   String? add2;
   String? add3;
+  String? label;
   String? state;
   String? city;
   String? nationality;
@@ -31,6 +32,7 @@ class UserAddress {
     add1 = json['add_1'];
     add2 = json['add_2'];
     add3 = json['add_3'];
+    label = json['label'];
     state = json['state'];
     city = json['city'];
     nationality = json['nationality'];
@@ -47,6 +49,7 @@ class UserAddress {
     data['add_1'] = this.add1;
     data['add_2'] = this.add2;
     data['add_3'] = this.add3;
+    data['label'] = this.label;
     data['state'] = this.state;
     data['city'] = this.city;
     data['nationality'] = this.nationality;

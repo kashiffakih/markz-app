@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:icon_forest/don_icons.dart';
+import 'package:icon_forest/iconoir.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/order_pr.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/profile/order-details-processing.dart';
@@ -23,11 +26,13 @@ class _OrdersPageState extends State<OrdersPage> {
 
   @override
   Widget build(BuildContext context) {
+    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     final OrderModel _orderModel = Provider.of<OrderModel>(context);
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
+            padding: EdgeInsets.only(top: 20),
             child: Column(
               children: [
                 // Title
@@ -76,13 +81,16 @@ class _OrdersPageState extends State<OrdersPage> {
                         // Tabs
                         Container(
                           child: TabBar(
+                            labelPadding: EdgeInsets.all(8),
+                            indicatorColor: Colors.black,
+                            isScrollable: true,
                             tabs: [
                               Padding(
                                 padding: const EdgeInsets.all(2.0),
                                 child: Text(
                                   'Order Placed',
                                   style: TextStyle(
-                                      color: Colors.black, fontSize: 12),
+                                      color: Colors.black, fontSize: 14),
                                 ),
                               ),
                               Padding(
@@ -90,7 +98,7 @@ class _OrdersPageState extends State<OrdersPage> {
                                 child: Text(
                                   'Delivered',
                                   style: TextStyle(
-                                      color: Colors.black, fontSize: 12),
+                                      color: Colors.black, fontSize: 14),
                                 ),
                               ),
                               Padding(
@@ -98,7 +106,7 @@ class _OrdersPageState extends State<OrdersPage> {
                                 child: Text(
                                   'Processing',
                                   style: TextStyle(
-                                      color: Colors.black, fontSize: 12),
+                                      color: Colors.black, fontSize: 14),
                                 ),
                               ),
                               Padding(
@@ -106,7 +114,7 @@ class _OrdersPageState extends State<OrdersPage> {
                                 child: Text(
                                   'Cancelled',
                                   style: TextStyle(
-                                      color: Colors.black, fontSize: 12),
+                                      color: Colors.black, fontSize: 14),
                                 ),
                               ),
                             ],
@@ -1185,6 +1193,57 @@ class _OrdersPageState extends State<OrdersPage> {
             ),
           ),
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        elevation: 10,
+        iconSize: 30,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.black,
+        selectedFontSize: 14,
+        unselectedFontSize: 14,
+        onTap: (value) async {
+          if (value == 0) {
+            Navigator.pushNamed(context, '/homePage');
+          }
+          if (value == 1) {
+            Navigator.pushNamed(context, '/wishlistPage');
+          }
+
+          if (value == 2) {
+            Map<String, dynamic> _CartData = {
+              'kindOfFlower': '',
+              'flavour': '',
+              'writeOnCake': '',
+              'pack': ''
+            };
+            await _addToCartModel.getAddToCart('', '', _CartData);
+            Navigator.pushNamed(context, '/cartPage');
+          }
+          if (value == 3) {
+            Navigator.pushNamed(context, '/profilePage');
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(
+            label: 'Home',
+            icon: Iconoir(Iconoir.home_simple),
+            // icon: Icon(DonIcons.wap_home, size: 23),
+          ),
+          BottomNavigationBarItem(label: 'Saved', icon: Iconoir(Iconoir.heart)),
+          BottomNavigationBarItem(
+            label: 'Cart',
+            icon: Iconoir(Iconoir.shopping_bag),
+          ),
+          BottomNavigationBarItem(
+            label: 'Profile',
+            icon: Icon(
+              DonIcons.user_o,
+              size: 23,
+            ),
+          ),
+        ],
       ),
     );
   }

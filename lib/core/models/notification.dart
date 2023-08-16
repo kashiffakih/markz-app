@@ -1,4 +1,4 @@
-class Notification {
+class MyNotification {
   int? id;
   Null? text;
   String? to;
@@ -18,7 +18,7 @@ class Notification {
   int? uInactive;
   int? userId;
 
-  Notification(
+  MyNotification(
       {this.id,
       this.text,
       this.to,
@@ -38,7 +38,7 @@ class Notification {
       this.uInactive,
       this.userId});
 
-  Notification.fromJson(Map<String, dynamic> json) {
+  MyNotification.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     text = json['text'];
     to = json['to'];

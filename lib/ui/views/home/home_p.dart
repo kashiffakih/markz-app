@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:icon_forest/don_icons.dart';
+import 'package:icon_forest/iconoir.dart';
 import 'package:provider/provider.dart';
+import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/product_pr.dart';
 import 'package:sales_app/core/providers/wish_list_pr.dart';
@@ -7,6 +10,8 @@ import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/products/product_id_p.dart';
 import 'package:sales_app/ui/views/products/products_p.dart';
+import 'package:sales_app/ui/widgets/drawer_w.dart';
+import 'package:sales_app/ui/widgets/menu-drawer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -16,6 +21,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // OverlayEntry? sideSheetOverlayEntry;
+  // final sideSheetOverlayLayerLink = LayerLink();
+  // bool isSidebarShown = false;
+
   @override
   void initState() {
     super.initState();
@@ -23,15 +32,104 @@ class _HomePageState extends State<HomePage> {
     Provider.of<WishListModel>(context, listen: false).getWishLists(productId);
   }
 
+  // void showSideSheet() {
+  //   final sideSheetOverlay = Overlay.of(context)!;
+  //   sideSheetOverlayEntry = OverlayEntry(
+  //     builder: (context) => Positioned(
+  //       height: MediaQuery.of(context).size.height,
+  //       child: isSidebarShown
+  //           ? CompositedTransformFollower(
+  //               link: sideSheetOverlayLayerLink,
+  //               child: TweenAnimationBuilder(
+  //                 tween: Tween<double>(begin: 150, end: 300),
+  //                 duration: const Duration(milliseconds: 300),
+  //                 builder: (BuildContext context, double size, Widget? child) {
+  //                   return Material(
+  //                     child: SafeArea(
+  //                       child: Container(
+  //                           width: size,
+  //                           padding: const EdgeInsets.all(10.0),
+  //                           decoration: BoxDecoration(
+  //                             color: Theme.of(context).colorScheme.surface,
+  //                           ),
+  //                           child: Column(
+  //                             children: [
+  //                               Row(
+  //                                 mainAxisAlignment: MainAxisAlignment.end,
+  //                                 children: [
+  //                                   InkWell(
+  //                                     onTap: () {
+  //                                       setState(() {
+  //                                         isSidebarShown = false;
+  //                                         showSideSheet();
+  //                                       });
+  //                                     },
+  //                                     onHover: (value) {},
+  //                                     child: const Icon(
+  //                                       Icons.close,
+  //                                       color: Colors.redAccent,
+  //                                       size: 25.0,
+  //                                     ),
+  //                                   )
+  //                                 ],
+  //                               ),
+  //                               Column(
+  //                                 children: [
+  //                                   Container(
+  //                                     child: Text(
+  //                                       "Custom Side Sheet",
+  //                                       overflow: TextOverflow.ellipsis,
+  //                                       style: const TextStyle(
+  //                                           color: Colors.blueGrey),
+  //                                     ),
+  //                                   ),
+  //                                   const Divider(
+  //                                     height: 5.0,
+  //                                     color: Colors.black,
+  //                                   ),
+  //                                   Container(
+  //                                     child: Row(children: [
+  //                                       Icon(
+  //                                         Icons.dashboard,
+  //                                         size: 25.0,
+  //                                         color: Colors.blueGrey,
+  //                                       ),
+  //                                       Text(
+  //                                         "Home",
+  //                                         overflow: TextOverflow.ellipsis,
+  //                                         style: TextStyle(
+  //                                             color: Colors.blueGrey,
+  //                                             fontSize: 25.0,
+  //                                             fontWeight: FontWeight.w300),
+  //                                       )
+  //                                     ]),
+  //                                   )
+  //                                 ],
+  //                               )
+  //                             ],
+  //                           )),
+  //                     ),
+  //                   );
+  //                 },
+  //               ))
+  //           : SizedBox.shrink(),
+  //     ),
+  //   );
+  //   sideSheetOverlay.insert(sideSheetOverlayEntry!);
+  // }
+  final GlobalKey<ScaffoldState> _key = GlobalKey();
   @override
   Widget build(BuildContext context) {
     final ConfigModel _configModel = locator<ConfigModel>();
     final ProductModel _productModel = Provider.of<ProductModel>(context);
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
+    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
     return Scaffold(
+      key: _key,
+      drawer: DrawerWidget(),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -222,6 +320,10 @@ class _HomePageState extends State<HomePage> {
                                           onTap: () {},
                                           child: Padding(
                                             padding: const EdgeInsets.all(10.0),
+                                            // child: Icon(
+                                            //   Icons.search,
+                                            //   size: 28,
+                                            // ),
                                             child: Image.asset(
                                               'assets/images/search.png',
                                               width: 18.58 * fem,
@@ -245,16 +347,11 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                         InkWell(
                                           onTap: () {
-                                            Navigator.pushNamed(
-                                                context, '/profilePage');
+                                            _key.currentState!.openDrawer();
                                           },
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Image.asset(
-                                              'assets/images/group-8990.png',
-                                              width: 18.58 * fem,
-                                              height: 18.58 * fem,
-                                            ),
+                                          child: Icon(
+                                            Icons.menu_sharp,
+                                            size: 30.0,
                                           ),
                                         ),
                                       ],
@@ -283,7 +380,7 @@ class _HomePageState extends State<HomePage> {
             _productModel.productsLoader
                 ? LinearProgressIndicator()
                 : SizedBox(
-                    height: 300,
+                    height: 320,
                     child: _productModel.productsLoader
                         ? SizedBox(
                             // height: 20,
@@ -437,18 +534,23 @@ class _HomePageState extends State<HomePage> {
                                                       builder: (context) =>
                                                           ProductIdPage(
                                                               arguments: {
-                                                                'product':
-                                                                    _productModel
-                                                                        .products![
-                                                                            index]
-                                                                        .toJson()
+                                                                'product': _productModel
+                                                                    .products![
+                                                                        index]
+                                                                    .toJson(),
+                                                                'category': _productModel
+                                                                    .products![
+                                                                        index]
+                                                                    .category!
+                                                                    .name
+                                                                    .toString()
                                                               })));
                                             },
                                             child: Container(
                                               // shadechocolatecake3pc6 (318:2002)
                                               margin: EdgeInsets.fromLTRB(
                                                   0 * fem,
-                                                  0 * fem,
+                                                  6 * fem,
                                                   0 * fem,
                                                   4 * fem),
                                               constraints: BoxConstraints(
@@ -475,12 +577,16 @@ class _HomePageState extends State<HomePage> {
                                             margin: EdgeInsets.fromLTRB(0 * fem,
                                                 0 * fem, 1 * fem, 0 * fem),
                                             child: Text(
-                                              _productModel.products![index]
-                                                  .productPrices![0].offerPrice
-                                                  .toString(),
+                                              _productModel
+                                                      .products![index]
+                                                      .productPrices![0]
+                                                      .offerPrice
+                                                      .toString() +
+                                                  ' ' +
+                                                  'د.إ',
                                               style: MyGoogleFontStyle(
                                                 fontFamily: 'Poppins',
-                                                fontSize: 10.9543466568 * ffem,
+                                                fontSize: 13 * ffem,
                                                 fontWeight: FontWeight.w500,
                                                 height: 1.5 * ffem / fem,
                                                 letterSpacing:
@@ -509,7 +615,7 @@ class _HomePageState extends State<HomePage> {
             ),
             Container(
               width: 345 * fem,
-              height: 405,
+              height: 435,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -520,12 +626,13 @@ class _HomePageState extends State<HomePage> {
                           child: InkWell(
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => ProductsPage(
-                                          arguments: {
-                                            'categoryId': _category['id'],
-                                            'subCategory':
-                                                _category['sub_categories']
-                                          })));
+                                  builder: (context) =>
+                                      ProductsPage(arguments: {
+                                        'categoryId': _category['id'],
+                                        'subCategory':
+                                            _category['sub_categories'],
+                                        'category': _category['name'].toString()
+                                      })));
                             },
                             child: Container(
                               width: 344 * fem,
@@ -565,15 +672,25 @@ class _HomePageState extends State<HomePage> {
                                           decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(
                                                 10.1176462173 * fem),
-                                            gradient: LinearGradient(
-                                              begin: Alignment(-1, 0.138),
-                                              end: Alignment(1, 0.128),
-                                              colors: <Color>[
-                                                Color(0x99000000),
-                                                Color(0x00d9d9d9)
-                                              ],
-                                              stops: <double>[0, 1],
-                                            ),
+                                            gradient: _category['id'] == 2
+                                                ? LinearGradient(
+                                                    begin: Alignment(1, 0.138),
+                                                    end: Alignment(-1, 0.128),
+                                                    colors: <Color>[
+                                                      Color(0x99000000),
+                                                      Color(0x00d9d9d9)
+                                                    ],
+                                                    stops: <double>[0, 1],
+                                                  )
+                                                : LinearGradient(
+                                                    begin: Alignment(-1, 0.138),
+                                                    end: Alignment(1, 0.128),
+                                                    colors: <Color>[
+                                                      Color(0x99000000),
+                                                      Color(0x00d9d9d9)
+                                                    ],
+                                                    stops: <double>[0, 1],
+                                                  ),
                                           ),
                                         ),
                                       ),
@@ -710,7 +827,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             SizedBox(
-              height: 20,
+              height: 10,
             ),
             Container(
               // group81Wvi (318:1936)
@@ -957,6 +1074,57 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        elevation: 10,
+        iconSize: 30,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.black,
+        selectedFontSize: 14,
+        unselectedFontSize: 14,
+        onTap: (value) async {
+          if (value == 0) {
+            Navigator.pushNamed(context, '/homePage');
+          }
+          if (value == 1) {
+            Navigator.pushNamed(context, '/wishlistPage');
+          }
+
+          if (value == 2) {
+            Map<String, dynamic> _CartData = {
+              'kindOfFlower': '',
+              'flavour': '',
+              'writeOnCake': '',
+              'pack': ''
+            };
+            await _addToCartModel.getAddToCart('', '', _CartData);
+            Navigator.pushNamed(context, '/cartPage');
+          }
+          if (value == 3) {
+            Navigator.pushNamed(context, '/profilePage');
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(
+            label: 'Home',
+            icon: Iconoir(Iconoir.home_simple),
+            // icon: Icon(DonIcons.wap_home, size: 23),
+          ),
+          BottomNavigationBarItem(label: 'Saved', icon: Iconoir(Iconoir.heart)),
+          BottomNavigationBarItem(
+            label: 'Cart',
+            icon: Iconoir(Iconoir.shopping_bag),
+          ),
+          BottomNavigationBarItem(
+            label: 'Profile',
+            icon: Icon(
+              DonIcons.user_o,
+              size: 23,
+            ),
+          ),
+        ],
       ),
     );
   }

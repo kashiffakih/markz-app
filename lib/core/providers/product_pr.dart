@@ -46,4 +46,18 @@ class ProductModel with ChangeNotifier {
     categoryWiseproducts =
         await _productService.getCategoryWiseProducts(categoryId);
   }
+
+// List of products
+  List<Product>? _allProducts;
+
+  set allProducts(List<Product>? newProduct) {
+    _allProducts = newProduct;
+    productsLoader = false;
+    notifyListeners();
+  }
+
+  List<Product>? get allProducts => _allProducts;
+  getAllProducts() async {
+    allProducts = await _productService.getAllProducts();
+  }
 }
