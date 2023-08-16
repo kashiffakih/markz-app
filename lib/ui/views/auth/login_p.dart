@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+// import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/auth_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -15,27 +15,27 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+  // GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
 
-  Future<void> _handleSignIn() async {
-    try {
-      final GoogleSignInAccount? gUser = await _googleSignIn.signIn();
-      // print(gUser);
-      final GoogleSignInAuthentication gAuth = await gUser!.authentication;
-      print(gAuth);
-      final credential = GoogleAuthProvider.credential(
-        accessToken: gAuth.accessToken,
-        idToken: gAuth.idToken,
-      );
-      // print(credential);
-      var user = await FirebaseAuth.instance.signInWithCredential(credential);
-      // print(user);
+  // Future<void> _handleSignIn() async {
+  //   try {
+  //     final GoogleSignInAccount? gUser = await _googleSignIn.signIn();
+  //     // print(gUser);
+  //     final GoogleSignInAuthentication gAuth = await gUser!.authentication;
+  //     print(gAuth);
+  //     final credential = GoogleAuthProvider.credential(
+  //       accessToken: gAuth.accessToken,
+  //       idToken: gAuth.idToken,
+  //     );
+  //     // print(credential);
+  //     var user = await FirebaseAuth.instance.signInWithCredential(credential);
+  //     // print(user);
 
-      // Handle successful sign-in
-    } catch (error) {
-      print('Google Sign-In Error: $error');
-    }
-  }
+  //     // Handle successful sign-in
+  //   } catch (error) {
+  //     print('Google Sign-In Error: $error');
+  //   }
+  // }
 
   bool _obscurePassword = true;
 
