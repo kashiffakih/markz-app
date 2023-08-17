@@ -121,15 +121,18 @@ class _ProfilePageState extends State<ProfilePage> {
                                   margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
                                   width: 65,
                                   height: 65,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(40),
-                                    image: DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: AssetImage(
-                                        'assets/images/group-8990.png',
+                                  child:CircleAvatar(
+                                      radius: 50,
+                                      backgroundColor: Colors.black,
+                                      child: Text(
+                                        initials,
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
-                                  ),
                                 ),
                           Expanded(
                             child: Column(
@@ -567,12 +570,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     'cartTotal': '',
                                     'isAddress': false
                                   })));
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => AddressPage(arguments: {
-                                    'cartItems': [],
-                                    'cartTotal': '',
-                                    'isAddress': false
-                                  })));
+                          
                         },
                         child: Container(
                           margin: EdgeInsets.only(bottom: 10),
