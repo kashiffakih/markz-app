@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+// import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/auth_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -13,6 +15,28 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  // GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+
+  // Future<void> _handleSignIn() async {
+  //   try {
+  //     final GoogleSignInAccount? gUser = await _googleSignIn.signIn();
+  //     // print(gUser);
+  //     final GoogleSignInAuthentication gAuth = await gUser!.authentication;
+  //     print(gAuth);
+  //     final credential = GoogleAuthProvider.credential(
+  //       accessToken: gAuth.accessToken,
+  //       idToken: gAuth.idToken,
+  //     );
+  //     // print(credential);
+  //     var user = await FirebaseAuth.instance.signInWithCredential(credential);
+  //     // print(user);
+
+  //     // Handle successful sign-in
+  //   } catch (error) {
+  //     print('Google Sign-In Error: $error');
+  //   }
+  // }
+
   bool _obscurePassword = true;
 
   final GlobalKey<FormState> _loginKey = GlobalKey<FormState>();
@@ -36,6 +60,8 @@ class _LoginPageState extends State<LoginPage> {
   fetchLoginData() async {
     await _configModel.fetchLoginData();
   }
+
+  //  GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
 
   @override
   Widget build(BuildContext context) {
@@ -352,24 +378,29 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       Expanded(
-                        child: Container(
-                          margin: EdgeInsets.all(5),
-                          padding: EdgeInsets.fromLTRB(30.99 * fem, 15.25 * fem,
-                              35.7 * fem, 15.25 * fem),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Color(0xffe8ecf4)),
-                            color: Color(0xffffffff),
-                            borderRadius:
-                                BorderRadius.circular(7.5407857895 * fem),
-                          ),
-                          child: Center(
-                            child: SizedBox(
-                              width: 22.28 * fem,
-                              height: 22.28 * fem,
-                              child: Image.asset(
-                                'assets/images/googleic-3Lc.png',
+                        child: InkWell(
+                          onTap: () {
+                            // _handleSignIn();
+                          },
+                          child: Container(
+                            margin: EdgeInsets.all(5),
+                            padding: EdgeInsets.fromLTRB(30.99 * fem,
+                                15.25 * fem, 35.7 * fem, 15.25 * fem),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Color(0xffe8ecf4)),
+                              color: Color(0xffffffff),
+                              borderRadius:
+                                  BorderRadius.circular(7.5407857895 * fem),
+                            ),
+                            child: Center(
+                              child: SizedBox(
                                 width: 22.28 * fem,
                                 height: 22.28 * fem,
+                                child: Image.asset(
+                                  'assets/images/googleic-3Lc.png',
+                                  width: 22.28 * fem,
+                                  height: 22.28 * fem,
+                                ),
                               ),
                             ),
                           ),

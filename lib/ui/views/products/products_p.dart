@@ -95,16 +95,14 @@ class _ProductsPageState extends State<ProductsPage> {
                             ),
                           ),
                           Expanded(
-                            child: Center(
-                              child: Text(
-                                widget.arguments['category'].toString(),
-                                textAlign: TextAlign.center,
-                                style: MyGoogleFontStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xff1e232c),
-                                ),
+                            child: Text(
+                              widget.arguments['category'].toString(),
+                              textAlign: TextAlign.center,
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xff1e232c),
                               ),
                             ),
                           ),
@@ -118,8 +116,7 @@ class _ProductsPageState extends State<ProductsPage> {
                       height: 2 * fem,
                     ),
               Container(
-                margin:
-                    EdgeInsets.fromLTRB(5 * fem, 0 * fem, 0 * fem, 8 * fem),
+                margin: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 8 * fem),
                 width: 381 * fem,
                 height: 35 * fem,
                 child: Row(
@@ -130,9 +127,11 @@ class _ProductsPageState extends State<ProductsPage> {
                         setState(() {
                           activeIndex =
                               -1; // Set activeIndex to -1 for "All" button
-                          filteredProducts =
-                              _productModel.getCategoryWiseProduct(
-                                  widget.arguments['categoryId']);
+                          filteredProducts = _productModel.categoryWiseproducts!
+                              .where((element) =>
+                                  element.categoryId ==
+                                  widget.arguments['categoryId'])
+                              .toList();
                         });
                       },
                       style: TextButton.styleFrom(
