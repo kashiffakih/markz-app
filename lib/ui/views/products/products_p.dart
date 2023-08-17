@@ -58,7 +58,6 @@ class _ProductsPageState extends State<ProductsPage> {
           _productModel.categoryWiseproducts?.isNotEmpty == true) {
         filteredProducts = _productModel.categoryWiseproducts;
         _isInitialLoad = true;
-        // filteredProducts = [];
       } else {
         _isInitialLoad = false;
       }
@@ -96,16 +95,14 @@ class _ProductsPageState extends State<ProductsPage> {
                             ),
                           ),
                           Expanded(
-                            child: Center(
-                              child: Text(
-                                widget.arguments['category'].toString(),
-                                textAlign: TextAlign.center,
-                                style: MyGoogleFontStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xff1e232c),
-                                ),
+                            child: Text(
+                              widget.arguments['category'].toString(),
+                              textAlign: TextAlign.center,
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xff1e232c),
                               ),
                             ),
                           ),
@@ -115,9 +112,11 @@ class _ProductsPageState extends State<ProductsPage> {
                   ],
                 ),
               ),
+             SizedBox(
+                      height: 2 * fem,
+                    ),
               Container(
-                margin:
-                    EdgeInsets.fromLTRB(12 * fem, 0 * fem, 0 * fem, 8 * fem),
+                margin: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 8 * fem),
                 width: 381 * fem,
                 height: 35 * fem,
                 child: Row(
@@ -128,9 +127,11 @@ class _ProductsPageState extends State<ProductsPage> {
                         setState(() {
                           activeIndex =
                               -1; // Set activeIndex to -1 for "All" button
-                          filteredProducts =
-                              _productModel.getCategoryWiseProduct(
-                                  widget.arguments['categoryId']);
+                          filteredProducts = _productModel.categoryWiseproducts!
+                              .where((element) =>
+                                  element.categoryId ==
+                                  widget.arguments['categoryId'])
+                              .toList();
                         });
                       },
                       style: TextButton.styleFrom(
@@ -169,7 +170,7 @@ class _ProductsPageState extends State<ProductsPage> {
                       width: 2 * fem,
                     ),
                     SizedBox(
-                      width: 280,
+                      width: 295,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: widget.arguments['subCategory'].length,
@@ -245,14 +246,17 @@ class _ProductsPageState extends State<ProductsPage> {
                     filteredProducts!.isNotEmpty
                         ? Container(
                             width: double.infinity,
-                            height: 782 * fem,
+                            // height: double.infinity,
+                            height: 582 * fem,
                             child: GridView.builder(
                                 gridDelegate:
                                     const SliverGridDelegateWithMaxCrossAxisExtent(
-                                        maxCrossAxisExtent: 200,
-                                        childAspectRatio: 1 / 2,
-                                        crossAxisSpacing: 20,
-                                        mainAxisSpacing: 20),
+                                        childAspectRatio: 1/2,
+                                                maxCrossAxisExtent: 200,
+                                                // mainAxisSpacing: 20,
+                                                // crossAxisSpacing: 0,
+
+                                        ),
                                 itemCount: filteredProducts!.length,
                                 itemBuilder: (BuildContext ctx, index) {
                                   return Row(
@@ -404,7 +408,6 @@ class _ProductsPageState extends State<ProductsPage> {
                                                       .toList()
                                                       .isEmpty)
                                                     Positioned(
-                                                      // frame494xX8 (318:2821)
                                                       left: 31 * fem,
                                                       top: 165 * fem,
                                                       child: TextButton(

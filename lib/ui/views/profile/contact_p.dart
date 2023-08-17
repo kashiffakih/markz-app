@@ -165,6 +165,98 @@ class _ContactPageState extends State<ContactPage> {
                           ),
                         ),
                       ),
+                      InkWell(
+                        onTap: () async {
+                          String email = Uri.encodeComponent(
+                              _configModel.user.companies![0].email.toString());
+                          String subject =
+                              Uri.encodeComponent("Hello PineWraps");
+                          String body = Uri.encodeComponent(
+                              "Hello! I would like to order a delicious cake.");
+                          print(subject); //output: Hello%20Flutter
+                          Uri mail = Uri.parse(
+                              "mailto:$email?subject=$subject&body=$body");
+                          if (await launchUrl(mail)) {
+                            //email app opened
+                          } else {
+                            //email app is not opened
+                          }
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(top: 10, bottom: 10),
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Color(0xffc7b456)),
+                            color: Color(0xffffffff),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(5),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0x338a959e),
+                                offset: Offset(0, 7.6690645218),
+                                blurRadius: 19.1726608276,
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                margin: EdgeInsets.fromLTRB(0, 0, 18, 0),
+                                padding: EdgeInsets.fromLTRB(4, 5, 4, 5),
+                                decoration: BoxDecoration(
+                                  color: Color(0xfffbfbfb),
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0x3f000000),
+                                      offset: Offset(0, 4),
+                                      blurRadius: 2,
+                                    ),
+                                  ],
+                                ),
+                                child: Center(
+                                  child: SizedBox(
+                                    width: 32,
+                                    height: 30,
+                                    child: Image.asset(
+                                      'assets/images/image-25.png',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Email',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xff232323),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      _configModel.user.companies![0].email
+                                          .toString(),
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xff232323),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                       // Whatsapp
                       InkWell(
                         onTap: () async {
@@ -319,14 +411,5 @@ class _ContactPageState extends State<ContactPage> {
         ],
       ),
     );
-  }
-}
-
-void launchWhatsApp(String message, phone) async {
-  String url = "https://wa.me/${phone}?text=${Uri.parse(message)}";
-  if (await canLaunchUrlString(url)) {
-    await launchUrlString(url);
-  } else {
-    throw 'Could not launch $url';
   }
 }

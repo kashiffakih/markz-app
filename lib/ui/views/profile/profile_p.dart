@@ -123,22 +123,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                   height: 65,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(40),
-                                    // image: DecorationImage(
-                                    //   fit: BoxFit.cover,
-                                    //   image: AssetImage(
-                                    //     'assets/images/group-8990.png',
-                                    //   ),
-                                    // ),
-                                  ),
-                                  child: CircleAvatar(
-                                    radius: 50,
-                                    backgroundColor: Colors.black,
-                                    child: Text(
-                                      initials,
-                                      style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                                    image: DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: AssetImage(
+                                        'assets/images/group-8990.png',
                                       ),
                                     ),
                                   ),
@@ -573,6 +561,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       // Shipping Addresses
                       InkWell(
                         onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => AddressPage(arguments: {
+                                    'cartItems': [],
+                                    'cartTotal': '',
+                                    'isAddress': false
+                                  })));
                           Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => AddressPage(arguments: {
                                     'cartItems': [],
