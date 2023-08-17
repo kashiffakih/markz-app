@@ -15,16 +15,16 @@ class CheckoutPage extends StatefulWidget {
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
-  @override
+  bool isGift = false;
   @override
   Widget build(BuildContext context) {
     final OrderModel _orderModel = Provider.of<OrderModel>(context);
     final ConfigModel _configModel = locator<ConfigModel>();
-    print(widget.arguments['address'].toString());
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
+            margin: EdgeInsets.only(top: 20),
             child: Column(
               children: [
                 // Title
@@ -100,6 +100,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                         .arguments['cartItems'],
                                                     'cartTotal': widget
                                                         .arguments['cartTotal'],
+                                                    'isAddress': true
                                                   })));
                                     },
                                     child: Image.asset(
@@ -135,7 +136,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        _configModel.user.firstName.toString(),
+                                        _configModel.user.firstName.toString() +
+                                            " [${widget.arguments!['address']['label'].toString()}]",
                                         style: MyGoogleFontStyle(
                                           fontFamily: 'Urbanist',
                                           fontWeight: FontWeight.w700,
@@ -155,7 +157,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                 .toString() +
                                             ', ' +
                                             widget.arguments!['address']
-                                                    ['add_3']
+                                                    ['nationality']
                                                 .toString() +
                                             ', ' +
                                             widget.arguments!['address']['city']
@@ -338,10 +340,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       ),
                                     ),
                                   ),
-                                  Image.asset(
-                                    'assets/images/edit-2-mP4.png',
-                                    width: 15.34,
-                                    height: 19.15,
+                                  Checkbox(
+                                    value: isGift,
+                                    activeColor: Colors.black,
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        isGift = value ?? false;
+                                      });
+                                    },
                                   )
                                 ],
                               ),
@@ -572,70 +578,63 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   ],
                                 ),
                               ),
-                              // Submit Order
-                              SizedBox(
-                                height: 10,
-                              ),
-                              widget.arguments['address'] != null
-                                  ? Center(
-                                      child: Container(
-                                        margin:
-                                            EdgeInsets.fromLTRB(0.89, 0, 0, 0),
-                                        child: TextButton(
-                                          onPressed: () async {
-                                            var addressId = widget
-                                                .arguments['address']['id'];
-                                            bool response =
-                                                await _orderModel.placedOrder(
-                                                    widget
-                                                        .arguments['cartItems'],
-                                                    widget
-                                                        .arguments['cartTotal']
-                                                        .toString(),
-                                                    addressId);
-                                            if (response == true) {
-                                              Navigator.pushNamed(
-                                                  context, '/successPage');
-                                            }
-                                          },
-                                          style: TextButton.styleFrom(
-                                            padding: EdgeInsets.zero,
-                                          ),
-                                          child: Container(
-                                            width: 321,
-                                            height: 53,
-                                            decoration: BoxDecoration(
-                                              color: Color(0xff1e1e1e),
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                'Submit Order',
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Urbanist',
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color(0xffffffff),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  : Center(
-                                      child: Text(
-                                      'Select/Add Address befor checkout.',
-                                      style: TextStyle(
-                                          fontSize: 16, color: Colors.red),
-                                    )),
                             ],
                           ),
                         ),
                       )
                     ],
                   ),
-                )
+                ),
+                SizedBox(
+                  height: 120,
+                ),
+                widget.arguments['address'] != null
+                    ? Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Container(
+                          margin: EdgeInsets.fromLTRB(0.89, 0, 0, 0),
+                          child: TextButton(
+                            onPressed: () async {
+                              var addressId = widget.arguments['address']['id'];
+                              bool response = await _orderModel.placedOrder(
+                                  widget.arguments['cartItems'],
+                                  widget.arguments['cartTotal'].toString(),
+                                  addressId,
+                                  isGift);
+                              if (response == true) {
+                                Navigator.pushNamed(context, '/successPage');
+                              }
+                            },
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                            ),
+                            child: Container(
+                              width: 321,
+                              height: 53,
+                              decoration: BoxDecoration(
+                                color: Color(0xff1e1e1e),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'Submit Order',
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xffffffff),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    : Center(
+                        child: Text(
+                          'Select/Add Address befor checkout.',
+                          style: TextStyle(fontSize: 16, color: Colors.red),
+                        ),
+                      )
               ],
             ),
           ),

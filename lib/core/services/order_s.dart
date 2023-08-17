@@ -9,10 +9,10 @@ import 'package:http/http.dart' as http;
 class OrderService {
   final ConfigModel _configModel = locator<ConfigModel>();
 
-  Future<bool> placedOrder(List<AddToCart> cartItems, String cartTotal,
-      [addressId]) async {
+  Future<bool> placedOrder(
+      List<AddToCart> cartItems, String cartTotal, addressId, isGift) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    print(addressId);
+    print(isGift);
     var orderDetails = [];
     cartItems.forEach((item) {
       orderDetails.add({
@@ -56,11 +56,11 @@ class OrderService {
         storePayableAmount: 0,
         comissionAmount: 0,
         paymentmode: 'cashondelivery',
+        isGift: isGift,
         addressId: int.parse(addressId.toString()));
 
     var _orderJson = order.toJson();
     _orderJson['order_details'] = orderDetails;
-
     http.Response _response = await http.post(
       Uri.parse('${_apiConfig['baseURL']}/orders'),
       body: json.encode(_orderJson),

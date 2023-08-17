@@ -45,7 +45,6 @@ class _ProductsPageState extends State<ProductsPage> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.arguments['category'].toString());
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
@@ -59,12 +58,11 @@ class _ProductsPageState extends State<ProductsPage> {
           _productModel.categoryWiseproducts?.isNotEmpty == true) {
         filteredProducts = _productModel.categoryWiseproducts;
         _isInitialLoad = true;
-        // filteredProducts = [];
       } else {
         _isInitialLoad = false;
       }
     });
-
+    // print(filteredProducts);
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -79,7 +77,7 @@ class _ProductsPageState extends State<ProductsPage> {
             children: [
               Container(
                 margin:
-                    EdgeInsets.only(left: 20, top: 30, bottom: 20, right: 20),
+                    EdgeInsets.only(left: 20, top: 30, bottom: 20, right: 30),
                 width: double.infinity,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,14 +95,16 @@ class _ProductsPageState extends State<ProductsPage> {
                             ),
                           ),
                           Expanded(
-                            child: Text(
-                              widget.arguments['category'].toString(),
-                              textAlign: TextAlign.center,
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Urbanist',
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xff1e232c),
+                            child: Center(
+                              child: Text(
+                                widget.arguments['category'].toString(),
+                                textAlign: TextAlign.center,
+                                style: MyGoogleFontStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xff1e232c),
+                                ),
                               ),
                             ),
                           ),
@@ -114,8 +114,12 @@ class _ProductsPageState extends State<ProductsPage> {
                   ],
                 ),
               ),
+             SizedBox(
+                      height: 2 * fem,
+                    ),
               Container(
-                margin: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 8 * fem),
+                margin:
+                    EdgeInsets.fromLTRB(5 * fem, 0 * fem, 0 * fem, 8 * fem),
                 width: 381 * fem,
                 height: 35 * fem,
                 child: Row(
@@ -126,11 +130,9 @@ class _ProductsPageState extends State<ProductsPage> {
                         setState(() {
                           activeIndex =
                               -1; // Set activeIndex to -1 for "All" button
-                          filteredProducts = _productModel.categoryWiseproducts!
-                              .where((element) =>
-                                  element.categoryId ==
-                                  widget.arguments['categoryId'])
-                              .toList();
+                          filteredProducts =
+                              _productModel.getCategoryWiseProduct(
+                                  widget.arguments['categoryId']);
                         });
                       },
                       style: TextButton.styleFrom(
@@ -169,7 +171,7 @@ class _ProductsPageState extends State<ProductsPage> {
                       width: 2 * fem,
                     ),
                     SizedBox(
-                      width: 280,
+                      width: 295,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: widget.arguments['subCategory'].length,
@@ -245,14 +247,17 @@ class _ProductsPageState extends State<ProductsPage> {
                     filteredProducts!.isNotEmpty
                         ? Container(
                             width: double.infinity,
-                            height: 782 * fem,
+                            // height: double.infinity,
+                            height: 582 * fem,
                             child: GridView.builder(
                                 gridDelegate:
                                     const SliverGridDelegateWithMaxCrossAxisExtent(
-                                        maxCrossAxisExtent: 200,
-                                        childAspectRatio: 1 / 2,
-                                        crossAxisSpacing: 20,
-                                        mainAxisSpacing: 20),
+                                        childAspectRatio: 1/2,
+                                                maxCrossAxisExtent: 200,
+                                                // mainAxisSpacing: 20,
+                                                // crossAxisSpacing: 0,
+
+                                        ),
                                 itemCount: filteredProducts!.length,
                                 itemBuilder: (BuildContext ctx, index) {
                                   return Row(
@@ -404,7 +409,6 @@ class _ProductsPageState extends State<ProductsPage> {
                                                       .toList()
                                                       .isEmpty)
                                                     Positioned(
-                                                      // frame494xX8 (318:2821)
                                                       left: 31 * fem,
                                                       top: 165 * fem,
                                                       child: TextButton(

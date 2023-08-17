@@ -33,7 +33,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.fromLTRB(6, 16, 6, 80),
+          padding: EdgeInsets.fromLTRB(6, 36, 6, 80),
           // height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
             color: Color(0xffffffff),

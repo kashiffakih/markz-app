@@ -81,7 +81,7 @@ class ShopsPageState extends State<ShopsPage> {
                   children: [
                     InkWell(
                       onTap: () {
-                        Navigator.pop(context);
+                        Navigator.pushNamed(context, '/homePage');
                       },
                       child: Row(
                         children: [

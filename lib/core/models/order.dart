@@ -45,6 +45,7 @@ class Order {
   Null? rpySignature;
   Null? rpyCode;
   Null? rpyMessage;
+  bool? isGift;
   User? user;
   List<OrderDetails>? orderDetails;
   List<OrderStatuses>? orderStatuses;
@@ -96,6 +97,7 @@ class Order {
       this.rpySignature,
       this.rpyCode,
       this.rpyMessage,
+      this.isGift,
       this.user,
       this.orderDetails,
       this.orderStatuses,
@@ -214,6 +216,7 @@ class Order {
     data['rpy_signature'] = this.rpySignature;
     data['rpy_code'] = this.rpyCode;
     data['rpy_message'] = this.rpyMessage;
+    data['is_gift'] = this.isGift;
     if (this.user != null) {
       data['user'] = this.user!.toJson();
     }
