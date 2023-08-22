@@ -23,7 +23,7 @@ class DrawerWidget extends StatelessWidget {
                       // pinewrapslogo1MaZ (617:1924)
                       margin: EdgeInsets.fromLTRB(0, 0, 0, 14.7),
                       width: 50,
-                      height: 100,
+                      height: 80,
                       child: Image.asset(
                         'assets/images/pinewrapslogo-1-kg1.png',
                         fit: BoxFit.cover,
@@ -60,18 +60,28 @@ class DrawerWidget extends StatelessWidget {
                             top: 16.6254882812,
                             child: Align(
                               child: SizedBox(
-                                width: 143,
-                                height: 39,
-                                child: Text(
-                                  'PINEWRAPS',
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Righteous',
-                                    fontSize: 25.5776882172,
-                                    fontWeight: FontWeight.w400,
-                                    height: 1.4999999627,
-                                    color: Color(0xff303030),
-                                  ),
-                                ),
+                                width: 120 ,
+                                                    height: 25 ,
+                                child: Container(
+                                          margin: EdgeInsets.fromLTRB(0 ,
+                                              2 , 0 , 4.7 ),
+                                          width: 150 ,
+                                          height: 70 ,
+                                          child: Image.asset(
+                                            'assets/images/NewPineWrapsText.jpeg',
+                                            fit: BoxFit.fill,
+                                          ),
+                                        )
+                                // Text(
+                                //   'PINEWRAPS',
+                                //   style: MyGoogleFontStyle(
+                                //     fontFamily: 'Righteous',
+                                //     fontSize: 25.5776882172,
+                                //     fontWeight: FontWeight.w400,
+                                //     height: 1.4999999627,
+                                //     color: Color(0xff303030),
+                                //   ),
+                                // ),
                               ),
                             ),
                           ),
@@ -105,7 +115,7 @@ class DrawerWidget extends StatelessWidget {
                       'Home',
                       style: MyGoogleFontStyle(
                         fontFamily: 'Inter',
-                        fontSize: 20.4621505737,
+                        fontSize: 17,
                         fontWeight: FontWeight.w500,
                         height: 1.25,
                         color: Color(0xff232323),
@@ -139,7 +149,7 @@ class DrawerWidget extends StatelessWidget {
                       'Shop',
                       style: MyGoogleFontStyle(
                         fontFamily: 'Inter',
-                        fontSize: 20.4621505737,
+                        fontSize: 17,
                         fontWeight: FontWeight.w500,
                         height: 1.25,
                         color: Color(0xff232323),
@@ -199,7 +209,7 @@ class DrawerWidget extends StatelessWidget {
                       'Logout',
                       style: MyGoogleFontStyle(
                         fontFamily: 'Inter',
-                        fontSize: 20.4621505737,
+                        fontSize: 17,
                         fontWeight: FontWeight.w500,
                         height: 1.25,
                         color: Color(0xff232323),

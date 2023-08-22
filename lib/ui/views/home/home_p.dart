@@ -283,24 +283,34 @@ class _HomePageState extends State<HomePage> {
                                                 top: 11.8349609375 * fem,
                                                 child: Align(
                                                   child: SizedBox(
-                                                    width: 102 * fem,
-                                                    height: 28 * fem,
-                                                    child: Text(
-                                                      'PINEWRAPS',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Righteous',
-                                                        fontSize:
-                                                            18.2076663971 *
-                                                                ffem,
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        height: 1.5000000524 *
-                                                            ffem /
-                                                            fem,
-                                                        color:
-                                                            Color(0xff303030),
-                                                      ),
-                                                    ),
+                                                    width: 120 * fem,
+                                                    height: 25 * fem,
+                                                    child: Container(
+                                          margin: EdgeInsets.fromLTRB(0 * fem,
+                                              2 * fem, 0 * fem, 4.7 * fem),
+                                          width: 150 * fem,
+                                          height: 70 * fem,
+                                          child: Image.asset(
+                                            'assets/images/NewPineWrapsText.jpeg',
+                                            fit: BoxFit.fill,
+                                          ),
+                                        )
+                                                    // Text(
+                                                    //   'PINEWRAPS',
+                                                    //   style: MyGoogleFontStyle(
+                                                    //     fontFamily: 'PT Serif Regular 400 Italy',
+                                                    //     fontSize:
+                                                    //         18.2076663971 *
+                                                    //             ffem,
+                                                    //     fontWeight:
+                                                    //         FontWeight.w400,
+                                                    //     height: 1.5000000524 *
+                                                    //         ffem /
+                                                    //         fem,
+                                                    //     color:
+                                                    //         Color(0xff303030),
+                                                    //   ),
+                                                    // ),
                                                   ),
                                                 ),
                                               ),
@@ -448,7 +458,7 @@ class _HomePageState extends State<HomePage> {
                                                               'mediaURL'] +
                                                           _productModel
                                                               .products![index]
-                                                              .imagepath2
+                                                              .imagepath1
                                                               .toString()),
                                                 ),
                                               ),

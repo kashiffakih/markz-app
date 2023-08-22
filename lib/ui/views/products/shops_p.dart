@@ -28,14 +28,16 @@ class ShopsPageState extends State<ShopsPage> {
   };
   bool _isInitialLoad = false;
   List<Product>? filteredProducts = [];
+  int activeIndex = -1;
+
   @override
   void initState() {
     super.initState();
+    Provider.of<ProductModel>(context, listen: false).getCategories();
+    Provider.of<ProductModel>(context, listen: false).getAllProducts();
     var productId = '';
     Provider.of<AddToCartModel>(context, listen: false)
         .getAddToCart(productId, '', _CartData);
-    Provider.of<ProductModel>(context, listen: false).getAllProducts();
-    Provider.of<ProductModel>(context, listen: false).getCategories();
     Provider.of<WishListModel>(context, listen: false).getWishLists(productId);
   }
 
@@ -119,21 +121,24 @@ class ShopsPageState extends State<ShopsPage> {
                     TextButton(
                       onPressed: () {
                         setState(() {
-                          // filteredProducts = _productModel.allProducts!
-                          //     .where((element) =>
-                          //         element.categoryId ==
-                          //         widget.arguments['categoryId'])
-                          //     .toList();
+                          activeIndex =
+                              -1; // Set activeIndex to -1 for "All" button
+                          filteredProducts = _productModel.allProducts;
                         });
                       },
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,
+                        backgroundColor: activeIndex == -1
+                            ? Colors.black // Set the active color here
+                            : Colors.white,
                       ),
                       child: Container(
                         width: 50 * fem,
                         height: double.infinity,
                         decoration: BoxDecoration(
-                          color: Colors.black,
+                          border: activeIndex == -1
+                              ? null
+                              : Border.all(color: Color(0xffc7b456)),
                           borderRadius: BorderRadius.circular(5 * fem),
                         ),
                         child: Center(
@@ -145,7 +150,9 @@ class ShopsPageState extends State<ShopsPage> {
                               fontWeight: FontWeight.w700,
                               height: 1.2 * ffem / fem,
                               letterSpacing: -0.36 * fem,
-                              color: Color(0xffffffff),
+                              color: activeIndex == -1
+                                  ? Colors.white // Set the active color here
+                                  : Colors.black,
                             ),
                           ),
                         ),
@@ -155,35 +162,48 @@ class ShopsPageState extends State<ShopsPage> {
                       width: 2 * fem,
                     ),
                     SizedBox(
-                      width: 280,
+                      width: 295,
                       child: ListView.builder(
                           scrollDirection: Axis.horizontal,
                           itemCount: _productModel.categories!.length,
                           itemBuilder: (BuildContext context, index) {
+                             final isActive = index == activeIndex;
                             return Row(
                               children: [
                                 TextButton(
-                                  onPressed: () {
+                                  onPressed: () async{
                                     setState(() {
-                                      Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ProductsPage(arguments: {
-                                                    'categoryId': _productModel
-                                                            .categories![index]
-                                                        ['id'],
-                                                    'subCategory': _productModel
-                                                            .categories![index]
-                                                        ['sub_categories'],
-                                                    'category': _productModel
-                                                            .categories![index]
-                                                        ['name']
-                                                  })));
+                                      activeIndex = index;
+                                      filteredProducts = _productModel.allProducts!
+                              .where((element) =>
+                                  element.categoryId ==
+                                   _productModel.categories![index]['id'])
+                              .toList();
+                                      // filteredProducts =  Provider.of<ProductModel>(context, listen: false).getCategoryWiseProduct(_productModel.categories![index]['id']);
+                              
+                                      // Navigator.of(context).push(
+                                      //     MaterialPageRoute(
+                                      //         builder: (context) =>
+                                      //             ProductsPage(arguments: {
+                                      //               'categoryId': _productModel
+                                      //                       .categories![index]
+                                      //                   ['id'],
+                                      //               'subCategory': _productModel
+                                      //                       .categories![index]
+                                      //                   ['sub_categories'],
+                                      //               'category': _productModel
+                                      //                       .categories![index]
+                                      //                   ['name']
+                                      //             })));
                                     });
                                   },
                                   style: TextButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                  ),
+                                  padding: EdgeInsets.zero,
+                                  backgroundColor: isActive
+                                      ? Colors
+                                          .black // Set the active color here
+                                      : null,
+                                ),
                                   child: Container(
                                     width: 79 * fem,
                                     height: double.infinity,
@@ -203,7 +223,9 @@ class ShopsPageState extends State<ShopsPage> {
                                           fontWeight: FontWeight.w600,
                                           height: 1.2 * ffem / fem,
                                           letterSpacing: -0.36 * fem,
-                                          color: Color(0x99000000),
+                                          color: isActive
+                                            ? Colors.white
+                                            : Color(0x99000000),
                                         ),
                                       ),
                                     ),
@@ -229,14 +251,16 @@ class ShopsPageState extends State<ShopsPage> {
                     filteredProducts!.isNotEmpty
                         ? Container(
                             width: double.infinity,
-                            height: 782 * fem,
+                            // height: double.infinity,
+                            height: 582 * fem,
                             child: GridView.builder(
                                 gridDelegate:
-                                    const SliverGridDelegateWithMaxCrossAxisExtent(
-                                        maxCrossAxisExtent: 200,
+                                     SliverGridDelegateWithMaxCrossAxisExtent(
+                                        maxCrossAxisExtent: 179,
                                         childAspectRatio: 1 / 2,
-                                        crossAxisSpacing: 20,
-                                        mainAxisSpacing: 20),
+                                        crossAxisSpacing: 10,
+                                        // mainAxisSpacing: 10
+                                        ),
                                 itemCount: filteredProducts!.length,
                                 itemBuilder: (BuildContext ctx, index) {
                                   return Row(
