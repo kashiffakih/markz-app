@@ -474,6 +474,28 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
+                 SizedBox(
+                  height: 30,
+                ),
+                InkWell(
+                  onTap: () {
+                    
+                    Navigator.pushNamed(context, '/homePage');
+                  },
+                  child: Container(
+                  child: Text(
+                    'Skip for now',
+                    textAlign: TextAlign.center,
+                    style: MyGoogleFontStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 16,
+                      
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xff1e232c),
+                    ),
+                  ),
+                ),
+                ),
               ],
             ),
           ),

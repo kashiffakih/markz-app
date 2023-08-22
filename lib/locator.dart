@@ -9,6 +9,7 @@ import 'package:sales_app/core/services/product_s.dart';
 import 'package:sales_app/core/services/review_s.dart';
 import 'package:sales_app/core/services/user_address_s.dart';
 import 'package:sales_app/core/services/wish_list_s.dart';
+import 'package:sales_app/core/services/coupon_s.dart';
 
 GetIt locator = GetIt.instance;
 
@@ -22,5 +23,6 @@ void setupLocator() {
   locator.registerLazySingleton(() => WishListService());
   locator.registerLazySingleton(() => ReviewService());
   locator.registerLazySingleton(() => UserAddressService());
+  locator.registerLazySingleton(() => CouponService());
   locator.registerLazySingleton(() => NotificationService());
 }

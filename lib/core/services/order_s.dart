@@ -12,7 +12,6 @@ class OrderService {
   Future<bool> placedOrder(
       List<AddToCart> cartItems, String cartTotal, addressId, isGift) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    print(isGift);
     var orderDetails = [];
     cartItems.forEach((item) {
       orderDetails.add({

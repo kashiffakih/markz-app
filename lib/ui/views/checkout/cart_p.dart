@@ -4,6 +4,7 @@ import 'package:icon_forest/iconoir.dart';
 import 'package:provider/provider.dart';
 // import 'package:sales_app/core/models/add_to_cart.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
+import 'package:sales_app/core/providers/coupon_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/order_pr.dart';
 import 'package:sales_app/locator.dart';
@@ -22,6 +23,9 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  String coupon = '';
   // bool type = true;
   @override
   void initState() {
@@ -43,6 +47,7 @@ class _CartPageState extends State<CartPage> {
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     final ConfigModel _configModel = locator<ConfigModel>();
     final OrderModel _orderModel = Provider.of<OrderModel>(context);
+    final CouponModel _couponModel = Provider.of<CouponModel>(context);
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -99,7 +104,7 @@ class _CartPageState extends State<CartPage> {
                               child: Center(child: Text('Cart is empty')),
                             )
                           : SizedBox(
-                              height: MediaQuery.of(context).size.width + 150,
+                              height: MediaQuery.of(context).size.width + 130,
                               child: ListView.builder(
                                 itemCount: _addToCartModel.addToCarts!.length,
                                 itemBuilder: (BuildContext context, index) =>
@@ -107,10 +112,13 @@ class _CartPageState extends State<CartPage> {
                                   children: [
                                     Row(
                                       children: [
-                                        Container(
+                                        Expanded(
+                                          flex: 3,
+                                          child:Container(
                                           margin:
                                               EdgeInsets.fromLTRB(0, 0, 10, 0),
-                                          child: Image.network(
+                                          child: Center(
+                                            child:Image.network(
                                             _configModel.apiConfig['mediaURL'] +
                                                 _addToCartModel
                                                     .addToCarts![index]
@@ -120,9 +128,13 @@ class _CartPageState extends State<CartPage> {
                                             // 'assets/images/mask-group-HvE.png',
                                             width: 80,
                                             height: 100,
+                                          )
                                           ),
                                         ),
-                                        Container(
+                                        ),
+                                        Expanded(
+                                          flex: 4,
+                                          child:Container(
                                           child: Column(
                                             children: [
                                               Align(
@@ -158,7 +170,16 @@ class _CartPageState extends State<CartPage> {
                                                   ),
                                                 ),
                                               ),
-                                              Row(
+                                              
+                                            ],
+                                          ),
+                                        ),
+                                        ),
+                                              Expanded(
+                                                flex:4,
+                                                child:Align(
+                                                alignment: Alignment.centerRight,
+                                                child: Row(
                                                 children: [
                                                   TextButton(
                                                     onPressed: () async {
@@ -184,7 +205,7 @@ class _CartPageState extends State<CartPage> {
                                                           Radius.circular(5),
                                                         ),
                                                       ),
-                                                      child: Icon(Icons.remove),
+                                                      child: Icon(Icons.remove,color: Colors.black),
                                                     ),
                                                   ),
                                                   Text(
@@ -195,7 +216,7 @@ class _CartPageState extends State<CartPage> {
                                                       fontFamily: 'Poppins',
                                                       fontWeight:
                                                           FontWeight.w500,
-                                                      color: Color(0xff1e1e1e),
+                                                      color: Colors.black,
                                                     ),
                                                   ),
                                                   TextButton(
@@ -223,19 +244,19 @@ class _CartPageState extends State<CartPage> {
                                                           Radius.circular(5),
                                                         ),
                                                       ),
-                                                      child: Icon(Icons.add),
+                                                      child: Icon(Icons.add, color: Colors.black),
                                                     ),
                                                   ),
                                                 ],
-                                              )
-                                            ],
-                                          ),
-                                        )
+                                              ),
+                                              ),
+                                              ),
+                                        
                                       ],
                                     ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
+                                    // SizedBox(
+                                    //   height: 5,
+                                    // ),
                                     Container(
                                       width: MediaQuery.of(context).size.width -
                                           50,
@@ -252,18 +273,26 @@ class _CartPageState extends State<CartPage> {
                   ],
                 ),
               ),
+              if(_addToCartModel.addToCarts!.length != 0
+                        )
               Container(
                 width: MediaQuery.of(context).size.width - 50,
                 child: Column(
                   children: [
-                    // Promo Code
-                    Container(
+                    Form(
+                      key:_formKey,
+                     child: Row(
+                      children:[
+
+                        Expanded(
+                          flex:8,
+                          child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: Color(0xffe3e3e3)),
                         color: Color(0xfffbfbfb),
                       ),
-                      child: TextField(
+                      child: TextFormField(
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           focusedBorder: InputBorder.none,
@@ -279,11 +308,75 @@ class _CartPageState extends State<CartPage> {
                           fontWeight: FontWeight.w500,
                           color: Color(0xff000000),
                         ),
+                        onSaved: (value) {
+                      coupon  = value.toString();
+                    },
+                         
                       ),
                     ),
+                        ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                      flex:3,
+                      child: InkWell(
+                        onTap: ()  async{
+                        _formKey.currentState!.save();
+                        
+                        bool response = await _couponModel.verifyCoupon(coupon);
+                        if (response == true) {
+                          // Navigator.pushNamed(context, '/successPassword');
+                        } else {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              title: Text(
+                                  "Invalid coupon."),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text('Ok'),
+                                ),
+                              ],
+                            ),
+                          );
+                      }
+                        },
+                        child:Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: Color(0xff1e1e1e),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'Apply',
+                                    style: MyGoogleFontStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xffffffff),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                      ),
+                    )
+                      ]
+                    ),
+                    ),
+                    // Promo Code
+                    
                     SizedBox(
                       height: 10,
                     ),
+                    if(_addToCartModel.addToCarts!.length != 0
+                        )
                     Row(
                       children: [
                         Text(

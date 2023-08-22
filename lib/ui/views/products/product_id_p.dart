@@ -182,7 +182,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                           top: 8.0),
                                                   child: Column(
                                                     children: [
-                                                      Text(
+                                                      Align(
+                                                        alignment: Alignment.centerLeft,
+                                                        child: Text(
                                                         widget.arguments![
                                                                 'product']
                                                                 ['name']
@@ -197,6 +199,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                           color:
                                                               Color(0xff000000),
                                                         ),
+                                                      ),
                                                       ),
                                                       SizedBox(
                                                         height: 8,

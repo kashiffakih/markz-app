@@ -174,7 +174,7 @@ class _ContactPageState extends State<ContactPage> {
                           final phone =
                               _configModel.user.companies![0].phone.toString();
                           var whatsappUrl =
-                              "whatsapp://send?phone=${'+91 ' + phone}" +
+                              "whatsapp://send?phone=${phone}" +
                                   "&text=${Uri.encodeComponent(message)}";
                           try {
                             launch(whatsappUrl);
