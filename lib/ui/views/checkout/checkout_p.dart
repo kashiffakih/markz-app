@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/order_pr.dart';
+import 'package:sales_app/core/providers/user_wallet_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/profile/address_p.dart';
@@ -20,6 +21,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
   Widget build(BuildContext context) {
     final OrderModel _orderModel = Provider.of<OrderModel>(context);
     final ConfigModel _configModel = locator<ConfigModel>();
+    setState(() {
+      Provider.of<UserWalletModel>(context, listen: false).getMyUserWallets();
+    });
+    final UserWalletModel _userWaletModel =
+        Provider.of<UserWalletModel>(context);
+    // print(_userWaletModel.totalEarnPoint.toString());
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -194,6 +201,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                       'cartTotal':
                                                           widget.arguments[
                                                               'cartTotal'],
+                                                      'couponValue':
+                                                          widget.arguments[
+                                                              'couponValue'],
+                                                      'isAddress': true
                                                     })));
                                         // Navigator.pushNamed(
                                         //     context, '/addressPage');
@@ -498,38 +509,67 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    // Row(
-                                    //   children: [
-                                    //     Expanded(
-                                    //       child: Text(
-                                    //         'Packaging',
-                                    //         style: MyGoogleFontStyle(
-                                    //           fontFamily: 'Urbanist',
-                                    //           fontWeight: FontWeight.w500,
-                                    //           color: Color(0xff909090),
-                                    //         ),
-                                    //       ),
-                                    //     ),
-                                    //     Text(
-                                    //       '₹ ' +
-                                    //           (int.parse(_configModel
-                                    //                   .user
-                                    //                   .companies![0]
-                                    //                   .packagingCharges
-                                    //                   .toString()))
-                                    //               .toString(),
-                                    //       textAlign: TextAlign.right,
-                                    //       style: MyGoogleFontStyle(
-                                    //         fontFamily: 'Inter',
-                                    //         fontWeight: FontWeight.w700,
-                                    //         color: Color(0xff303030),
-                                    //       ),
-                                    //     )
-                                    //   ],
-                                    // ),
-                                    // SizedBox(
-                                    //   height: 10,
-                                    // ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            'Coupon (-)',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xff909090),
+                                            ),
+                                          ),
+                                        ),
+                                        Text(
+                                          'د.إ' +
+                                              ' ' +
+                                              widget.arguments['couponValue']
+                                                  .toString(),
+                                          textAlign: TextAlign.right,
+                                          style: MyGoogleFontStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xff303030),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            'Wallet (-)',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xff909090),
+                                            ),
+                                          ),
+                                        ),
+                                        Text(
+                                          'د.إ' +
+                                              ' ' +
+                                              (int.parse(_userWaletModel
+                                                          .totaRemainingPoint
+                                                          .toString()) /
+                                                      3)
+                                                  .toStringAsFixed(0),
+                                          textAlign: TextAlign.right,
+                                          style: MyGoogleFontStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xff303030),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
                                     Row(
                                       children: [
                                         Expanded(
@@ -551,21 +591,21 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                           .companies![0]
                                                           .deliveryCharges
                                                           .toString()) +
-                                                      (int.parse(widget.arguments[
-                                                                  'cartTotal']
-                                                              .toString()) /
+                                                      (int.parse(widget.arguments['cartTotal'].toString()) /
                                                           100 *
                                                           int.parse(_configModel
                                                               .user
                                                               .companies![0]
                                                               .taxPercent
                                                               .toString())) +
-                                                      (int.parse(_configModel
-                                                          .user
-                                                          .companies![0]
-                                                          .packagingCharges
-                                                          .toString())))
-                                                  .toString(),
+                                                      -(int.parse(
+                                                          widget.arguments['couponValue']
+                                                              .toString())) -
+                                                      (int.parse(_userWaletModel
+                                                              .totaRemainingPoint
+                                                              .toString()) /
+                                                          3))
+                                                  .toStringAsFixed(0),
                                           textAlign: TextAlign.right,
                                           style: MyGoogleFontStyle(
                                             fontFamily: 'Inter',
@@ -595,12 +635,39 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           margin: EdgeInsets.fromLTRB(0.89, 0, 0, 0),
                           child: TextButton(
                             onPressed: () async {
+                              var orderCost = (int.parse(widget
+                                          .arguments['cartTotal']
+                                          .toString()) +
+                                      int.parse(_configModel
+                                          .user.companies![0].deliveryCharges
+                                          .toString()) +
+                                      (int.parse(widget.arguments['cartTotal'].toString()) /
+                                          100 *
+                                          int.parse(_configModel
+                                              .user.companies![0].taxPercent
+                                              .toString())) +
+                                      -(int.parse(widget
+                                          .arguments['couponValue']
+                                          .toString())) -
+                                      (int.parse(_userWaletModel.totaRemainingPoint.toString()) /
+                                          3))
+                                  .toStringAsFixed(0);
+
+                              var userWalletUsed = (int.parse(_userWaletModel
+                                          .totaRemainingPoint
+                                          .toString()) /
+                                      3)
+                                  .toStringAsFixed(0);
                               var addressId = widget.arguments['address']['id'];
                               bool response = await _orderModel.placedOrder(
-                                  widget.arguments['cartItems'],
-                                  widget.arguments['cartTotal'].toString(),
-                                  addressId,
-                                  isGift);
+                                widget.arguments['cartItems'],
+                                widget.arguments['cartTotal'].toString(),
+                                addressId,
+                                isGift,
+                                userWalletUsed,
+                                widget.arguments['couponId'].toString(),
+                                widget.arguments['couponValue'].toString(),
+                              );
                               if (response == true) {
                                 Navigator.pushNamed(context, '/successPage');
                               }

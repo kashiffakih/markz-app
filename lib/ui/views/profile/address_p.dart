@@ -37,12 +37,14 @@ class _AddressPageState extends State<AddressPage> {
 
     var cartItems = [];
     var cartTotal = '';
+    int couponValue = 0;
     // print(widget.arguments!['cartItems']);
     // print(widget.arguments!['cartTotal']);
     setState(() {
       if (widget.arguments != null) {
         cartItems = widget.arguments!['cartItems'];
         cartTotal = widget.arguments!['cartTotal'];
+        couponValue = int.parse(widget.arguments!['couponValue'].toString());
       }
     });
 
@@ -122,11 +124,13 @@ class _AddressPageState extends State<AddressPage> {
                                                                   cartItems,
                                                               'cartTotal':
                                                                   cartTotal,
+                                                              'couponValue':
+                                                                  couponValue,
                                                               'address':
                                                                   _userAddressModel
                                                                       .userAddresses![
                                                                           index]
-                                                                      .toJson()
+                                                                      .toJson(),
                                                             })));
                                           }
                                         });
@@ -257,6 +261,7 @@ class _AddressPageState extends State<AddressPage> {
               builder: (context) => ShippingCreatePage(arguments: {
                     'cartItems': cartItems,
                     'cartTotal': cartTotal,
+                    'couponValue': couponValue,
                     'address': []
                   })));
           // Navigator.pushNamed(context, '/shippingCreatePage');
