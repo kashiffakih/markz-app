@@ -572,6 +572,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               builder: (context) => AddressPage(arguments: {
                                     'cartItems': [],
                                     'cartTotal': '',
+                                    'couponValue': 0,
                                     'isAddress': false
                                   })));
                         },

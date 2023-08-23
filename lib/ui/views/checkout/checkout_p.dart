@@ -107,6 +107,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                         .arguments['cartItems'],
                                                     'cartTotal': widget
                                                         .arguments['cartTotal'],
+                                                    'couponValue':
+                                                        widget.arguments[
+                                                            'couponValue'],
                                                     'isAddress': true
                                                   })));
                                     },
