@@ -15,6 +15,18 @@ class CheckoutPage extends StatefulWidget {
   State<CheckoutPage> createState() => _CheckoutPageState();
 }
 
+List<String> timeSlotForDubai = [
+  '11 AM - 1 PM',
+  '2 PM - 5 PM',
+  '4 PM - 7 PM',
+  '7 PM - 9:30 PM'
+];
+List<String> timeSlotForOther = ['4 PM - 7:30 PM', '7 PM - 9:30 PM'];
+List<String> paymentOptions = ['Cash on Delivery', 'Online'];
+
+var paymentOption = '';
+var deliveryMethod = '';
+
 class _CheckoutPageState extends State<CheckoutPage> {
   bool isGift = false;
   @override
@@ -250,45 +262,52 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       ),
                                     ),
                                   ),
-                                  Image.asset(
-                                    'assets/images/edit-2-mP4.png',
-                                    width: 15.34,
-                                    height: 19.15,
-                                  )
+                                  // Image.asset(
+                                  //   'assets/images/edit-2-mP4.png',
+                                  //   width: 15.34,
+                                  //   height: 19.15,
+                                  // )
                                 ],
                               ),
-                              Container(
-                                width: MediaQuery.of(context).size.width - 50,
-                                margin: EdgeInsets.only(top: 10, bottom: 10),
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xffc7b456)),
-                                  color: Color(0xffffffff),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(5),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0x338a959e),
-                                      offset: Offset(0, 7.6690645218),
-                                      blurRadius: 19.1726608276,
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Cash On Delivery',
-                                      style: MyGoogleFontStyle(
-                                        fontFamily: 'Urbanist',
-                                        fontWeight: FontWeight.w700,
-                                        color: Color(0xff232323),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              SizedBox(
+                                height: 10,
                               ),
+                              Container(
+                                  decoration: BoxDecoration(
+                                    // border: Border.all(color: Color(0xffdadada)),
+                                    color: Color(0xffffffff),
+                                    borderRadius: BorderRadius.circular(5),
+                                    border:
+                                        Border.all(color: Color(0xffc7b456)),
+                                  ),
+                                  child: DropdownButtonFormField(
+                                      // value: paymentOption,
+                                      decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          focusedBorder: InputBorder.none,
+                                          enabledBorder: InputBorder.none,
+                                          errorBorder: InputBorder.none,
+                                          disabledBorder: InputBorder.none,
+                                          labelText: 'Select Payment Method',
+                                          contentPadding: EdgeInsets.all(10)),
+                                      items: paymentOptions
+                                          .map(
+                                            (_payment) => DropdownMenuItem(
+                                              child: Text(
+                                                _payment,
+                                              ),
+                                              value: _payment,
+                                            ),
+                                          )
+                                          .toList(),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          print(value.toString);
+                                          paymentOption = value.toString();
+
+                                          // _userAddress.nationality = value.toString();
+                                        });
+                                      })),
                               // Delivery Method
                               Row(
                                 children: [
@@ -302,44 +321,83 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       ),
                                     ),
                                   ),
-                                  Image.asset(
-                                    'assets/images/edit-2-mP4.png',
-                                    width: 15.34,
-                                    height: 19.15,
-                                  )
                                 ],
                               ),
+                              SizedBox(
+                                height: 10,
+                              ),
                               Container(
-                                width: MediaQuery.of(context).size.width - 50,
-                                margin: EdgeInsets.only(top: 10, bottom: 10),
-                                padding: EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xffc7b456)),
+                                  // border: Border.all(color: Color(0xffdadada)),
                                   color: Color(0xffffffff),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(5),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0x338a959e),
-                                      offset: Offset(0, 7.6690645218),
-                                      blurRadius: 19.1726608276,
-                                    ),
-                                  ],
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(color: Color(0xffc7b456)),
                                 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Delivery Method',
-                                      style: MyGoogleFontStyle(
-                                        fontFamily: 'Urbanist',
-                                        fontWeight: FontWeight.w700,
-                                        color: Color(0xff232323),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                child: widget.arguments!['address']
+                                                    ['nationality']
+                                                .toString() ==
+                                            "Dubai" &&
+                                        widget.arguments!['address']['state']
+                                                .toString() ==
+                                            "Dubai"
+                                    ? DropdownButtonFormField(
+                                        // value: deliveryMethod,
+                                        decoration: InputDecoration(
+                                            border: InputBorder.none,
+                                            focusedBorder: InputBorder.none,
+                                            enabledBorder: InputBorder.none,
+                                            errorBorder: InputBorder.none,
+                                            disabledBorder: InputBorder.none,
+                                            labelText: 'Select Delivery Method',
+                                            contentPadding: EdgeInsets.all(10)),
+                                        items: timeSlotForDubai
+                                            .map(
+                                              (_deliveryMethod) =>
+                                                  DropdownMenuItem(
+                                                child: Text(
+                                                  _deliveryMethod,
+                                                ),
+                                                value: _deliveryMethod,
+                                              ),
+                                            )
+                                            .toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            print(value.toString);
+                                            deliveryMethod = value.toString();
+
+                                            // _userAddress.nationality = value.toString();
+                                          });
+                                        })
+                                    : DropdownButtonFormField(
+                                        // value: deliveryMethod,
+                                        decoration: InputDecoration(
+                                            border: InputBorder.none,
+                                            focusedBorder: InputBorder.none,
+                                            enabledBorder: InputBorder.none,
+                                            errorBorder: InputBorder.none,
+                                            disabledBorder: InputBorder.none,
+                                            labelText: 'Select Delivery Method',
+                                            contentPadding: EdgeInsets.all(10)),
+                                        items: timeSlotForOther
+                                            .map(
+                                              (_deliveryMethod) =>
+                                                  DropdownMenuItem(
+                                                child: Text(
+                                                  _deliveryMethod,
+                                                ),
+                                                value: _deliveryMethod,
+                                              ),
+                                            )
+                                            .toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            print(value.toString);
+                                            deliveryMethod = value.toString();
+
+                                            // _userAddress.nationality = value.toString();
+                                          });
+                                        }),
                               ),
                               // Send as a gift
                               Row(
@@ -669,6 +727,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 isGift,
                                 userWalletUsed,
                                 widget.arguments['couponId'].toString(),
+                                paymentOption,
+                                deliveryMethod,
                                 widget.arguments['couponValue'].toString(),
                               );
                               if (response == true) {

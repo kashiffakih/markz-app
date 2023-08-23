@@ -16,6 +16,8 @@ class OrderService {
     isGift,
     userWalletUsed,
     couponId,
+    paymentOption,
+    deliveryMethod,
     couponValue,
   ) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
@@ -64,8 +66,9 @@ class OrderService {
         isDinein: 0,
         storePayableAmount: 0,
         comissionAmount: 0,
-        paymentmode: 'cashondelivery',
+        paymentmode: paymentOption.toString(),
         isGift: isGift,
+        deliveryMethod: deliveryMethod.toString(),
         addressId: int.parse(addressId.toString()));
 
     var _orderJson = order.toJson();
@@ -76,6 +79,7 @@ class OrderService {
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
+    print(_responseData);
     return _responseData['success'];
   }
 
