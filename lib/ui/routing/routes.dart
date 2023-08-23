@@ -31,3 +31,4 @@ const String rewardsPage = '/rewardsPage';
 const String contactPage = '/contactPage';
 const String menuWidget = '/menuWidget';
 const String shopsPage = '/shopsPage';
+const String reviewUpdatePage = '/reviewUpdatePage';
