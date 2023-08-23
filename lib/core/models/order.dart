@@ -26,7 +26,7 @@ class Order {
   Null? banktxnid;
   Null? bankname;
   int? couponAmount;
-  Null? couponId;
+  String? couponId;
   num? taxAmount;
   int? packagingAmount;
   num? deliveryAmount;

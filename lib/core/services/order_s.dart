@@ -10,8 +10,18 @@ class OrderService {
   final ConfigModel _configModel = locator<ConfigModel>();
 
   Future<bool> placedOrder(
-      List<AddToCart> cartItems, String cartTotal, addressId, isGift) async {
+    List<AddToCart> cartItems,
+    String cartTotal,
+    addressId,
+    isGift,
+    userWalletUsed,
+    couponId,
+    couponValue,
+  ) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    if (couponId.toString() == 'null' || couponId == null || couponId == '') {
+      couponId = '';
+    }
     var orderDetails = [];
     cartItems.forEach((item) {
       orderDetails.add({
@@ -27,13 +37,13 @@ class OrderService {
     });
 
     Order order = Order(
-        couponAmount: 0,
-        couponId: null,
+        couponAmount: int.parse(couponValue),
+        couponId: couponId,
         deliveryAmount: double.parse(
             _configModel.user.companies![0].deliveryCharges.toString()),
         details: '-',
         isApprovedByHotelier: 0,
-        orderCost: int.parse(cartTotal),
+        orderCost: int.parse(cartTotal.toString()),
         packagingAmount: _configModel.user.companies![0].packagingCharges,
         taxAmount: double.parse(cartTotal) /
             100 *
@@ -47,7 +57,7 @@ class OrderService {
                         _configModel.user.companies![0].taxPercent.toString())))
             .toString()),
         totalCashback: 0,
-        walletAmountUsed: 0,
+        walletAmountUsed: double.parse(userWalletUsed.toString()).toInt(),
         userId: _configModel.user.id,
         isDelivered: 0,
         isDeliveryBoyAccepted: 0,
@@ -66,7 +76,6 @@ class OrderService {
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
-    print(_responseData);
     return _responseData['success'];
   }
 
