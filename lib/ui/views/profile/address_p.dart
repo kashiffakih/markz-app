@@ -149,101 +149,114 @@ class _AddressPageState extends State<AddressPage> {
                                         ),
                                       ),
                                     ),
-                                  Expanded(
-                                      child: InkWell(
-                                          onTap: () {
-                                            Navigator.of(context).push(
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        ShippingUpdatePage(
-                                                            arguments: {
-                                                              'userAddress':
-                                                                  _userAddressModel
-                                                                          .userAddresses![
-                                                                      index]
-                                                            })));
-                                          },
-                                          child: Align(
-                                              alignment: Alignment.centerRight,
-                                              child: Icon(Icons.edit)))),
+                                  // Expanded(
+                                  //     child: InkWell(
+                                  //         onTap: () {
+                                  //           Navigator.of(context).push(
+                                  //               MaterialPageRoute(
+                                  //                   builder: (context) =>
+                                  //                       ShippingUpdatePage(
+                                  //                           arguments: {
+                                  //                             'userAddress':
+                                  //                                 _userAddressModel
+                                  //                                         .userAddresses![
+                                  //                                     index]
+                                  //                           })));
+                                  //         },
+                                  //         child: Align(
+                                  //             alignment: Alignment.centerRight,
+                                  //             child: Icon(Icons.edit)))),
                                 ],
                               ),
-                              Container(
-                                margin: EdgeInsets.only(bottom: 10),
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xffc7b456)),
-                                  color: Color(0xffffffff),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(5),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => ShippingUpdatePage(
+                                              arguments: {
+                                                'userAddress': _userAddressModel
+                                                    .userAddresses![index]
+                                              })));
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.only(bottom: 10),
+                                  padding: EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Color(0xffc7b456)),
+                                    color: Color(0xffffffff),
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(5),
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Color(0x338a959e),
+                                        offset: Offset(0, 7.6690645218),
+                                        blurRadius: 19.1726608276,
+                                      ),
+                                    ],
                                   ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0x338a959e),
-                                      offset: Offset(0, 7.6690645218),
-                                      blurRadius: 19.1726608276,
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      _userAddressModel.userAddresses![index]
-                                                  .label !=
-                                              null
-                                          ? _userAddressModel
-                                              .userAddresses![index].label
-                                              .toString()
-                                          : '',
-                                      style: MyGoogleFontStyle(
-                                        fontFamily: 'Urbanist',
-                                        fontWeight: FontWeight.w700,
-                                        color: Color(0xff232323),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        _userAddressModel.userAddresses![index]
+                                                    .label !=
+                                                null
+                                            ? _userAddressModel
+                                                .userAddresses![index].label
+                                                .toString()
+                                            : '',
+                                        style: MyGoogleFontStyle(
+                                          fontFamily: 'Urbanist',
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xff232323),
+                                        ),
                                       ),
-                                    ),
-                                    Divider(
-                                      thickness: 1,
-                                      color: Colors.grey,
-                                    ),
-                                    Text(
-                                      _userAddressModel
-                                              .userAddresses![index].add1
-                                              .toString() +
-                                          ', ' +
-                                          _userAddressModel
-                                              .userAddresses![index].add2
-                                              .toString() +
-                                          ', ' +
-                                          _userAddressModel
-                                              .userAddresses![index].nationality
-                                              .toString() +
-                                          ', ' +
-                                          _userAddressModel
-                                              .userAddresses![index].state
-                                              .toString() +
-                                          ', ' +
-                                          (_userAddressModel
-                                                      .userAddresses![index]
-                                                      .city !=
-                                                  null
-                                              ? _userAddressModel
-                                                      .userAddresses![index]
-                                                      .city
-                                                      .toString() +
-                                                  ', '
-                                              : '') +
-                                          _userAddressModel
-                                              .userAddresses![index].pincode
-                                              .toString() +
-                                          '.',
-                                      style: MyGoogleFontStyle(
-                                        fontFamily: 'Urbanist',
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xff909090),
+                                      Divider(
+                                        thickness: 1,
+                                        color: Colors.grey,
                                       ),
-                                    ),
-                                  ],
+                                      Text(
+                                        _userAddressModel
+                                                .userAddresses![index].add1
+                                                .toString() +
+                                            ', ' +
+                                            _userAddressModel
+                                                .userAddresses![index].add2
+                                                .toString() +
+                                            ', ' +
+                                            _userAddressModel
+                                                .userAddresses![index]
+                                                .nationality
+                                                .toString() +
+                                            ', ' +
+                                            _userAddressModel
+                                                .userAddresses![index].state
+                                                .toString() +
+                                            ', ' +
+                                            (_userAddressModel
+                                                        .userAddresses![index]
+                                                        .city !=
+                                                    null
+                                                ? _userAddressModel
+                                                        .userAddresses![index]
+                                                        .city
+                                                        .toString() +
+                                                    ', '
+                                                : '') +
+                                            _userAddressModel
+                                                .userAddresses![index].pincode
+                                                .toString() +
+                                            '.',
+                                        style: MyGoogleFontStyle(
+                                          fontFamily: 'Urbanist',
+                                          fontWeight: FontWeight.w400,
+                                          color: Color(0xff909090),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ],
