@@ -32,3 +32,5 @@ const String contactPage = '/contactPage';
 const String menuWidget = '/menuWidget';
 const String shopsPage = '/shopsPage';
 const String reviewUpdatePage = '/reviewUpdatePage';
+const String refundPolicyPage = '/refundPolicyPage';
+const String termAndConditionPage = '/termAndConditionPage';
