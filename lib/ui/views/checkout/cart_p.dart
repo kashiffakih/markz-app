@@ -177,10 +177,11 @@ class _CartPageState extends State<CartPage> {
                                             ),
                                           ),
                                         ),
-                                        Align(
-                                          alignment: Alignment.centerRight,
-                                          child: Expanded(
-                                            flex: 5,
+                                        Expanded(flex: 1, child: Text('')),
+                                        Expanded(
+                                          flex: 5,
+                                          child: Align(
+                                            alignment: Alignment.centerRight,
                                             child: Row(
                                               children: [
                                                 TextButton(
