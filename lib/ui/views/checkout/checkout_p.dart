@@ -419,6 +419,60 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       setState(() {
                                         isGift = value ?? false;
                                       });
+
+                                      if (isGift == true) {
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) =>
+                                              AlertDialog(
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(20)),
+                                            title: Text(
+                                                "Is it the same address as mentioned above?"),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text(
+                                                  'Yes',
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 16),
+                                                ),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).push(
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              AddressPage(
+                                                                  arguments: {
+                                                                    'cartItems':
+                                                                        widget.arguments[
+                                                                            'cartItems'],
+                                                                    'cartTotal':
+                                                                        widget.arguments[
+                                                                            'cartTotal'],
+                                                                    'couponValue':
+                                                                        widget.arguments[
+                                                                            'couponValue'],
+                                                                    'isAddress':
+                                                                        true
+                                                                  })));
+                                                },
+                                                child: Text(
+                                                  'No',
+                                                  style: TextStyle(
+                                                      color: Colors.red,
+                                                      fontSize: 16),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }
                                     },
                                   )
                                 ],

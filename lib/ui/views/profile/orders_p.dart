@@ -122,7 +122,7 @@ class _OrdersPageState extends State<OrdersPage> {
                         ),
                         // Tab Content
                         Container(
-                          height: MediaQuery.of(context).size.height - 124,
+                          height: MediaQuery.of(context).size.height - 200,
                           child: TabBarView(
                             children: [
                               _orderModel.orders.isEmpty

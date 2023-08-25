@@ -69,11 +69,13 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
 
     var cartItems = [];
     var cartTotal = '';
+    var couponValue = 0;
     // print(widget.arguments!['cartItems']);
     // print(widget.arguments!['cartTotal']);
     if (widget.arguments != null) {
       cartItems = widget.arguments!['cartItems'];
       cartTotal = widget.arguments!['cartTotal'];
+      couponValue = widget.arguments!['couponValue'];
     }
     return Scaffold(
       body: SafeArea(
@@ -410,12 +412,13 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                                     .saveUserAddress(userAddress: _userAddress);
                                 if (response == true) {
                                   Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => AddressPage(
-                                              arguments: {
-                                                'cartItems': cartItems,
-                                                'cartTotal': cartTotal,
-                                                'address': []
-                                              })));
+                                      builder: (context) =>
+                                          AddressPage(arguments: {
+                                            'cartItems': cartItems,
+                                            'cartTotal': cartTotal,
+                                            'couponValue': couponValue,
+                                            'address': []
+                                          })));
                                   // Navigator.pushNamed(context, '/addressPage');
                                 }
                                 setState(() {

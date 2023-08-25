@@ -94,7 +94,7 @@ class _AddressPageState extends State<AddressPage> {
                 ),
                 // Body
                 Container(
-                  height: 600,
+                  height: MediaQuery.of(context).size.height - 150,
                   padding: EdgeInsets.all(15),
                   child: _userAddressModel.userAddresses?.length == 0
                       ? SizedBox(
