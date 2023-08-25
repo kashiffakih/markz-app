@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
-import 'package:sales_app/ui/shared/images_sh.dart';
 
 class DrawerWidget extends StatelessWidget {
   final ConfigModel _configModel = locator<ConfigModel>();
@@ -64,11 +63,13 @@ class DrawerWidget extends StatelessWidget {
                                   height: 25,
                                   child: Container(
                                     margin: EdgeInsets.fromLTRB(0, 2, 0, 4.7),
-                                    width: 150,
-                                    height: 70,
+                                    height: 100,
+                                    width: 100,
                                     child: Image.asset(
                                       'assets/images/NewPineWrapsText.jpeg',
-                                      fit: BoxFit.fill,
+                                      height: 100,
+                                      width: 100,
+                                      // fit: BoxFit.fill,
                                     ),
                                   )
                                   // Text(
