@@ -1,15 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sales_app/core/providers/user_wallet_pr.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 
-class RewardsPage extends StatelessWidget {
+class RewardsPage extends StatefulWidget {
   const RewardsPage({Key? key}) : super(key: key);
 
   @override
+  State<RewardsPage> createState() => _RewardsPageState();
+}
+
+class _RewardsPageState extends State<RewardsPage> {
+  @override
+  void initState() {
+    Provider.of<UserWalletModel>(context, listen: false).getMyUserWallets();
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final UserWalletModel _userWaletModel =
+        Provider.of<UserWalletModel>(context);
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
+            margin: EdgeInsets.only(top: 20),
             child: Column(
               children: [
                 // Title
@@ -53,9 +70,11 @@ class RewardsPage extends StatelessWidget {
                 Container(
                   margin: EdgeInsets.all(20),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // Photo and Name
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Container(
                             margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
@@ -72,10 +91,10 @@ class RewardsPage extends StatelessWidget {
                             ),
                           ),
                           Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                'Your Total points',
+                                'Total Earned points',
                                 style: MyGoogleFontStyle(
                                   fontFamily: 'Urbanist',
                                   fontWeight: FontWeight.w700,
@@ -83,7 +102,7 @@ class RewardsPage extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                '500',
+                                _userWaletModel.totalEarnPoint.toString(),
                                 style: MyGoogleFontStyle(
                                   fontFamily: 'Urbanist',
                                   fontSize: 28,
@@ -92,84 +111,167 @@ class RewardsPage extends StatelessWidget {
                                 ),
                               ),
                             ],
-                          )
+                          ),
                         ],
                       ),
                       SizedBox(
-                        height: 20,
+                        height: 40,
                       ),
-                      // Rewards
-                      Container(
-                        margin: EdgeInsets.only(top: 10, bottom: 10),
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xffc7b456)),
-                          color: Color(0xffffffff),
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(5),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0x338a959e),
-                              offset: Offset(0, 7.6690645218),
-                              blurRadius: 19.1726608276,
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Order Rewards',
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xff232323),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    // alreadyhave10orders9Ca (I318:2511;0:1158)
-                                    'Order and earn 20 points',
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xff909090),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Row(
+
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 5,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Image.asset(
-                                  'assets/images/star-9.png',
-                                  width: 7.18,
-                                  height: 12.92,
-                                ),
-                                SizedBox(
-                                  width: 5,
-                                ),
                                 Text(
-                                  '250 Points',
+                                  'Total Used points',
                                   style: MyGoogleFontStyle(
                                     fontFamily: 'Urbanist',
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xff303030),
+                                  ),
+                                ),
+                                Text(
+                                  _userWaletModel.totalUsedPoint.toString(),
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.w700,
                                     color: Color(0xff000000),
                                   ),
                                 ),
                               ],
                             ),
-                          ],
-                        ),
+                          ),
+                          Expanded(
+                            flex: 5,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Remaining points',
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xff303030),
+                                  ),
+                                ),
+                                Text(
+                                  _userWaletModel.totaRemainingPoint.toString(),
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xff000000),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
+                      SizedBox(
+                        height: 20,
+                      ),
+
+                      // Rewards
+                      SizedBox(
+                        height: MediaQuery.sizeOf(context).height - 150,
+                        child: _userWaletModel.userWallets!.length == 0
+                            ? Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: SizedBox(
+                                    height: 50, child: Text('No Rewards')),
+                              )
+                            : ListView.builder(
+                                itemCount: _userWaletModel.userWallets!.length,
+                                scrollDirection: Axis.vertical,
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                    margin:
+                                        EdgeInsets.only(top: 10, bottom: 10),
+                                    padding: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      border:
+                                          Border.all(color: Color(0xffc7b456)),
+                                      color: Color(0xffffffff),
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(5),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Color(0x338a959e),
+                                          offset: Offset(0, 7.6690645218),
+                                          blurRadius: 19.1726608276,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Order Reward ' +
+                                                    _userWaletModel
+                                                        .userWallets![index]
+                                                        .source
+                                                        .toString()
+                                                        .split(' ')
+                                                        .last
+                                                        .toString(),
+                                                style: MyGoogleFontStyle(
+                                                  fontFamily: 'Urbanist',
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xff232323),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text(
+                                                // alreadyhave10orders9Ca (I318:2511;0:1158)
+                                                'Order and ${_userWaletModel.userWallets![index].source}',
+                                                style: MyGoogleFontStyle(
+                                                  fontFamily: 'Urbanist',
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: Color(0xff909090),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Image.asset(
+                                              'assets/images/star-9.png',
+                                              width: 7.18,
+                                              height: 12.92,
+                                            ),
+                                            SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text(
+                                              '${_userWaletModel.userWallets![index].amount} Points',
+                                              style: MyGoogleFontStyle(
+                                                fontFamily: 'Urbanist',
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w600,
+                                                color: Color(0xff000000),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }),
+                      )
                     ],
                   ),
                 )

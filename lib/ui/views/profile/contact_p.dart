@@ -165,6 +165,7 @@ class _ContactPageState extends State<ContactPage> {
                           ),
                         ),
                       ),
+                     
                       // Whatsapp
                       InkWell(
                         onTap: () async {
@@ -173,7 +174,7 @@ class _ContactPageState extends State<ContactPage> {
                           final phone =
                               _configModel.user.companies![0].phone.toString();
                           var whatsappUrl =
-                              "whatsapp://send?phone=${'+91 ' + phone}" +
+                              "whatsapp://send?phone=${phone}" +
                                   "&text=${Uri.encodeComponent(message)}";
                           try {
                             launch(whatsappUrl);
@@ -319,14 +320,5 @@ class _ContactPageState extends State<ContactPage> {
         ],
       ),
     );
-  }
-}
-
-void launchWhatsApp(String message, phone) async {
-  String url = "https://wa.me/${phone}?text=${Uri.parse(message)}";
-  if (await canLaunchUrlString(url)) {
-    await launchUrlString(url);
-  } else {
-    throw 'Could not launch $url';
   }
 }

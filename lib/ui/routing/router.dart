@@ -27,12 +27,15 @@ import 'package:sales_app/ui/views/profile/notifications_p.dart';
 import 'package:sales_app/ui/views/profile/order-details-processing.dart';
 import 'package:sales_app/ui/views/profile/orders_p.dart';
 import 'package:sales_app/ui/views/profile/profile_p.dart';
+import 'package:sales_app/ui/views/profile/refund-policy_p.dart';
+import 'package:sales_app/ui/views/profile/review_id_p.dart';
 import 'package:sales_app/ui/views/profile/reviews_p.dart';
 import 'package:sales_app/ui/views/profile/rewards_p.dart';
 import 'package:sales_app/ui/views/profile/setting_id.dart';
 import 'package:sales_app/ui/views/profile/settings_p.dart';
 import 'package:sales_app/ui/views/profile/shipping_create_p.dart';
 import 'package:sales_app/ui/views/profile/shipping_id_p.dart';
+import 'package:sales_app/ui/views/profile/terms-condition_p.dart';
 import 'package:sales_app/ui/views/profile/wishlist_p.dart';
 import 'package:sales_app/ui/widgets/menu-drawer.dart';
 
@@ -141,6 +144,12 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (BuildContext context) {
         return ReviewsPage();
       });
+    case reviewUpdatePage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return ReviewUpdatePage(
+          arguments: null,
+        );
+      });
     case shippingCreatePage:
       return MaterialPageRoute(builder: (BuildContext context) {
         return ShippingCreatePage();
@@ -176,6 +185,14 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case shopsPage:
       return MaterialPageRoute(builder: (BuildContext context) {
         return ShopsPage();
+      });
+    case refundPolicyPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return RefundPolicyPage();
+      });
+    case termAndConditionPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return TermsAndConditionsPage();
       });
     default:
       return MaterialPageRoute(builder: (BuildContext context) {

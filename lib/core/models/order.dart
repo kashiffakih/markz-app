@@ -26,7 +26,7 @@ class Order {
   Null? banktxnid;
   Null? bankname;
   int? couponAmount;
-  Null? couponId;
+  String? couponId;
   num? taxAmount;
   int? packagingAmount;
   num? deliveryAmount;
@@ -46,6 +46,7 @@ class Order {
   Null? rpyCode;
   Null? rpyMessage;
   bool? isGift;
+  String? deliveryMethod;
   User? user;
   List<OrderDetails>? orderDetails;
   List<OrderStatuses>? orderStatuses;
@@ -98,6 +99,7 @@ class Order {
       this.rpyCode,
       this.rpyMessage,
       this.isGift,
+      this.deliveryMethod,
       this.user,
       this.orderDetails,
       this.orderStatuses,
@@ -150,6 +152,7 @@ class Order {
     rpySignature = json['rpy_signature'];
     rpyCode = json['rpy_code'];
     rpyMessage = json['rpy_message'];
+    deliveryMethod = json['delivery_method'];
     user = json['user'] != null ? new User.fromJson(json['user']) : null;
     if (json['order_details'] != null) {
       orderDetails = <OrderDetails>[];
@@ -217,6 +220,7 @@ class Order {
     data['rpy_code'] = this.rpyCode;
     data['rpy_message'] = this.rpyMessage;
     data['is_gift'] = this.isGift;
+    data['delivery_method'] = this.deliveryMethod;
     if (this.user != null) {
       data['user'] = this.user!.toJson();
     }

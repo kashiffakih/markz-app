@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
-import 'package:sales_app/ui/shared/images_sh.dart';
 
 class DrawerWidget extends StatelessWidget {
   final ConfigModel _configModel = locator<ConfigModel>();
@@ -23,7 +22,7 @@ class DrawerWidget extends StatelessWidget {
                       // pinewrapslogo1MaZ (617:1924)
                       margin: EdgeInsets.fromLTRB(0, 0, 0, 14.7),
                       width: 50,
-                      height: 100,
+                      height: 80,
                       child: Image.asset(
                         'assets/images/pinewrapslogo-1-kg1.png',
                         fit: BoxFit.cover,
@@ -60,19 +59,30 @@ class DrawerWidget extends StatelessWidget {
                             top: 16.6254882812,
                             child: Align(
                               child: SizedBox(
-                                width: 143,
-                                height: 39,
-                                child: Text(
-                                  'PINEWRAPS',
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Righteous',
-                                    fontSize: 25.5776882172,
-                                    fontWeight: FontWeight.w400,
-                                    height: 1.4999999627,
-                                    color: Color(0xff303030),
+                                  width: 120,
+                                  height: 25,
+                                  child: Container(
+                                    margin: EdgeInsets.fromLTRB(0, 2, 0, 4.7),
+                                    height: 100,
+                                    width: 100,
+                                    child: Image.asset(
+                                      'assets/images/NewPineWrapsText.jpeg',
+                                      height: 100,
+                                      width: 100,
+                                      // fit: BoxFit.fill,
+                                    ),
+                                  )
+                                  // Text(
+                                  //   'PINEWRAPS',
+                                  //   style: MyGoogleFontStyle(
+                                  //     fontFamily: 'Righteous',
+                                  //     fontSize: 25.5776882172,
+                                  //     fontWeight: FontWeight.w400,
+                                  //     height: 1.4999999627,
+                                  //     color: Color(0xff303030),
+                                  //   ),
+                                  // ),
                                   ),
-                                ),
-                              ),
                             ),
                           ),
                         ],
@@ -105,7 +115,7 @@ class DrawerWidget extends StatelessWidget {
                       'Home',
                       style: MyGoogleFontStyle(
                         fontFamily: 'Inter',
-                        fontSize: 20.4621505737,
+                        fontSize: 17,
                         fontWeight: FontWeight.w500,
                         height: 1.25,
                         color: Color(0xff232323),
@@ -117,7 +127,6 @@ class DrawerWidget extends StatelessWidget {
             ),
             InkWell(
               onTap: () {
-                Navigator.pop(context);
                 Navigator.pushReplacementNamed(context, '/shopsPage');
               },
               child: Padding(
@@ -139,7 +148,74 @@ class DrawerWidget extends StatelessWidget {
                       'Shop',
                       style: MyGoogleFontStyle(
                         fontFamily: 'Inter',
-                        fontSize: 20.4621505737,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w500,
+                        height: 1.25,
+                        color: Color(0xff232323),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/refundPolicyPage');
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(top: 20, left: 15, bottom: 10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.fromLTRB(0, 0, 23.66, 0.03),
+                      width: 19.18,
+                      height: 21.34,
+                      child: Image.asset(
+                        'assets/images/u-create-dashboard.png',
+                        width: 19.18,
+                        height: 21.34,
+                      ),
+                    ),
+                    Text(
+                      'Refund Policy',
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 17,
+                        fontWeight: FontWeight.w500,
+                        height: 1.25,
+                        color: Color(0xff232323),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.pushReplacementNamed(
+                    context, '/termAndConditionPage');
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(top: 20, left: 15, bottom: 10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.fromLTRB(0, 0, 23.66, 0.03),
+                      width: 19.18,
+                      height: 21.34,
+                      child: Image.asset(
+                        'assets/images/u-create-dashboard.png',
+                        width: 19.18,
+                        height: 21.34,
+                      ),
+                    ),
+                    Text(
+                      'Terms & Conditions',
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 17,
                         fontWeight: FontWeight.w500,
                         height: 1.25,
                         color: Color(0xff232323),
@@ -199,7 +275,7 @@ class DrawerWidget extends StatelessWidget {
                       'Logout',
                       style: MyGoogleFontStyle(
                         fontFamily: 'Inter',
-                        fontSize: 20.4621505737,
+                        fontSize: 17,
                         fontWeight: FontWeight.w500,
                         height: 1.25,
                         color: Color(0xff232323),

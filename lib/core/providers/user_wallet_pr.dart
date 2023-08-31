@@ -1,0 +1,35 @@
+import 'package:flutter/material.dart';
+import 'package:sales_app/core/models/user_wallet.dart';
+import 'package:sales_app/core/services/user_wallet_s.dart';
+import 'package:sales_app/locator.dart';
+
+class UserWalletModel with ChangeNotifier {
+  final UserWalletService _userWalletService = locator<UserWalletService>();
+
+  bool userWalletLoader = true;
+
+  List<UserWallet>? _userWallets;
+
+  set userWallets(List<UserWallet>? newUserWallet) {
+    _userWallets = newUserWallet;
+    userWalletLoader = false;
+    notifyListeners();
+  }
+
+  List<UserWallet>? get userWallets => _userWallets;
+  var totalPoint = 0;
+  var totalEarnPoint = 0;
+  var totalUsedPoint = 0;
+  var totaRemainingPoint = 0;
+
+  getMyUserWallets() async {
+    Map<String, dynamic> _response =
+        await _userWalletService.getMyUserWallets();
+    // print(_response['data']);
+    _userWallets = _response['data'];
+    totalPoint = _response['total_points'];
+    totalEarnPoint = _response['total_earn_points'];
+    totalUsedPoint = _response['total_used_points'];
+    totaRemainingPoint = _response['remaining_points'];
+  }
+}

@@ -11,7 +11,6 @@ import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/products/product_id_p.dart';
 import 'package:sales_app/ui/views/products/products_p.dart';
 import 'package:sales_app/ui/widgets/drawer_w.dart';
-import 'package:sales_app/ui/widgets/menu-drawer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -283,25 +282,42 @@ class _HomePageState extends State<HomePage> {
                                                 top: 11.8349609375 * fem,
                                                 child: Align(
                                                   child: SizedBox(
-                                                    width: 102 * fem,
-                                                    height: 28 * fem,
-                                                    child: Text(
-                                                      'PINEWRAPS',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Righteous',
-                                                        fontSize:
-                                                            18.2076663971 *
-                                                                ffem,
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        height: 1.5000000524 *
-                                                            ffem /
-                                                            fem,
-                                                        color:
-                                                            Color(0xff303030),
+                                                      width: 120 * fem,
+                                                      height: 25 * fem,
+                                                      child: Container(
+                                                        margin:
+                                                            EdgeInsets.fromLTRB(
+                                                                0 * fem,
+                                                                2 * fem,
+                                                                0 * fem,
+                                                                4.7 * fem),
+                                                        width: 100 * fem,
+                                                        height: 70 * fem,
+                                                        child: Image.asset(
+                                                          'assets/images/NewPineWrapsText.jpeg',
+                                                          height: 70,
+                                                          width: 100,
+                                                          // 'assets/images/NewPineWrapsText.jpeg',
+                                                          // fit: BoxFit.fill,
+                                                        ),
+                                                      )
+                                                      // Text(
+                                                      //   'PINEWRAPS',
+                                                      //   style: MyGoogleFontStyle(
+                                                      //     fontFamily: 'PT Serif Regular 400 Italy',
+                                                      //     fontSize:
+                                                      //         18.2076663971 *
+                                                      //             ffem,
+                                                      //     fontWeight:
+                                                      //         FontWeight.w400,
+                                                      //     height: 1.5000000524 *
+                                                      //         ffem /
+                                                      //         fem,
+                                                      //     color:
+                                                      //         Color(0xff303030),
+                                                      //   ),
+                                                      // ),
                                                       ),
-                                                    ),
-                                                  ),
                                                 ),
                                               ),
                                             ],
@@ -313,23 +329,10 @@ class _HomePageState extends State<HomePage> {
                                   Container(
                                     height: double.infinity,
                                     child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
-                                        InkWell(
-                                          onTap: () {},
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            // child: Icon(
-                                            //   Icons.search,
-                                            //   size: 28,
-                                            // ),
-                                            child: Image.asset(
-                                              'assets/images/search.png',
-                                              width: 18.58 * fem,
-                                              height: 18.58 * fem,
-                                            ),
-                                          ),
+                                        SizedBox(
+                                          width: 40,
                                         ),
                                         InkWell(
                                           onTap: () {
@@ -448,7 +451,7 @@ class _HomePageState extends State<HomePage> {
                                                               'mediaURL'] +
                                                           _productModel
                                                               .products![index]
-                                                              .imagepath2
+                                                              .imagepath1
                                                               .toString()),
                                                 ),
                                               ),

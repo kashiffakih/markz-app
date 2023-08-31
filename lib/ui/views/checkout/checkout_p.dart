@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/order_pr.dart';
+import 'package:sales_app/core/providers/user_wallet_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/profile/address_p.dart';
@@ -14,12 +15,30 @@ class CheckoutPage extends StatefulWidget {
   State<CheckoutPage> createState() => _CheckoutPageState();
 }
 
+List<String> timeSlotForDubai = [
+  '11 AM - 1 PM',
+  '2 PM - 5 PM',
+  '4 PM - 7 PM',
+  '7 PM - 9:30 PM'
+];
+List<String> timeSlotForOther = ['4 PM - 7:30 PM', '7 PM - 9:30 PM'];
+List<String> paymentOptions = ['Cash on Delivery', 'Online'];
+
+var paymentOption = '';
+var deliveryMethod = '';
+
 class _CheckoutPageState extends State<CheckoutPage> {
   bool isGift = false;
   @override
   Widget build(BuildContext context) {
     final OrderModel _orderModel = Provider.of<OrderModel>(context);
     final ConfigModel _configModel = locator<ConfigModel>();
+    setState(() {
+      Provider.of<UserWalletModel>(context, listen: false).getMyUserWallets();
+    });
+    final UserWalletModel _userWaletModel =
+        Provider.of<UserWalletModel>(context);
+    // print(_userWaletModel.totalEarnPoint.toString());
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -100,6 +119,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                         .arguments['cartItems'],
                                                     'cartTotal': widget
                                                         .arguments['cartTotal'],
+                                                    'couponValue':
+                                                        widget.arguments[
+                                                            'couponValue'],
                                                     'isAddress': true
                                                   })));
                                     },
@@ -194,6 +216,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                       'cartTotal':
                                                           widget.arguments[
                                                               'cartTotal'],
+                                                      'couponValue':
+                                                          widget.arguments[
+                                                              'couponValue'],
+                                                      'isAddress': true
                                                     })));
                                         // Navigator.pushNamed(
                                         //     context, '/addressPage');
@@ -236,45 +262,52 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       ),
                                     ),
                                   ),
-                                  Image.asset(
-                                    'assets/images/edit-2-mP4.png',
-                                    width: 15.34,
-                                    height: 19.15,
-                                  )
+                                  // Image.asset(
+                                  //   'assets/images/edit-2-mP4.png',
+                                  //   width: 15.34,
+                                  //   height: 19.15,
+                                  // )
                                 ],
                               ),
-                              Container(
-                                width: MediaQuery.of(context).size.width - 50,
-                                margin: EdgeInsets.only(top: 10, bottom: 10),
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xffc7b456)),
-                                  color: Color(0xffffffff),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(5),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0x338a959e),
-                                      offset: Offset(0, 7.6690645218),
-                                      blurRadius: 19.1726608276,
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Cash On Delivery',
-                                      style: MyGoogleFontStyle(
-                                        fontFamily: 'Urbanist',
-                                        fontWeight: FontWeight.w700,
-                                        color: Color(0xff232323),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              SizedBox(
+                                height: 10,
                               ),
+                              Container(
+                                  decoration: BoxDecoration(
+                                    // border: Border.all(color: Color(0xffdadada)),
+                                    color: Color(0xffffffff),
+                                    borderRadius: BorderRadius.circular(5),
+                                    border:
+                                        Border.all(color: Color(0xffc7b456)),
+                                  ),
+                                  child: DropdownButtonFormField(
+                                      // value: paymentOption,
+                                      decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          focusedBorder: InputBorder.none,
+                                          enabledBorder: InputBorder.none,
+                                          errorBorder: InputBorder.none,
+                                          disabledBorder: InputBorder.none,
+                                          labelText: 'Select Payment Method',
+                                          contentPadding: EdgeInsets.all(10)),
+                                      items: paymentOptions
+                                          .map(
+                                            (_payment) => DropdownMenuItem(
+                                              child: Text(
+                                                _payment,
+                                              ),
+                                              value: _payment,
+                                            ),
+                                          )
+                                          .toList(),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          print(value.toString);
+                                          paymentOption = value.toString();
+
+                                          // _userAddress.nationality = value.toString();
+                                        });
+                                      })),
                               // Delivery Method
                               Row(
                                 children: [
@@ -288,44 +321,83 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       ),
                                     ),
                                   ),
-                                  Image.asset(
-                                    'assets/images/edit-2-mP4.png',
-                                    width: 15.34,
-                                    height: 19.15,
-                                  )
                                 ],
                               ),
+                              SizedBox(
+                                height: 10,
+                              ),
                               Container(
-                                width: MediaQuery.of(context).size.width - 50,
-                                margin: EdgeInsets.only(top: 10, bottom: 10),
-                                padding: EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xffc7b456)),
+                                  // border: Border.all(color: Color(0xffdadada)),
                                   color: Color(0xffffffff),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(5),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0x338a959e),
-                                      offset: Offset(0, 7.6690645218),
-                                      blurRadius: 19.1726608276,
-                                    ),
-                                  ],
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(color: Color(0xffc7b456)),
                                 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Delivery Method',
-                                      style: MyGoogleFontStyle(
-                                        fontFamily: 'Urbanist',
-                                        fontWeight: FontWeight.w700,
-                                        color: Color(0xff232323),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                child: widget.arguments!['address']
+                                                    ['nationality']
+                                                .toString() ==
+                                            "Dubai" &&
+                                        widget.arguments!['address']['state']
+                                                .toString() ==
+                                            "Dubai"
+                                    ? DropdownButtonFormField(
+                                        // value: deliveryMethod,
+                                        decoration: InputDecoration(
+                                            border: InputBorder.none,
+                                            focusedBorder: InputBorder.none,
+                                            enabledBorder: InputBorder.none,
+                                            errorBorder: InputBorder.none,
+                                            disabledBorder: InputBorder.none,
+                                            labelText: 'Select Delivery Method',
+                                            contentPadding: EdgeInsets.all(10)),
+                                        items: timeSlotForDubai
+                                            .map(
+                                              (_deliveryMethod) =>
+                                                  DropdownMenuItem(
+                                                child: Text(
+                                                  _deliveryMethod,
+                                                ),
+                                                value: _deliveryMethod,
+                                              ),
+                                            )
+                                            .toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            print(value.toString);
+                                            deliveryMethod = value.toString();
+
+                                            // _userAddress.nationality = value.toString();
+                                          });
+                                        })
+                                    : DropdownButtonFormField(
+                                        // value: deliveryMethod,
+                                        decoration: InputDecoration(
+                                            border: InputBorder.none,
+                                            focusedBorder: InputBorder.none,
+                                            enabledBorder: InputBorder.none,
+                                            errorBorder: InputBorder.none,
+                                            disabledBorder: InputBorder.none,
+                                            labelText: 'Select Delivery Method',
+                                            contentPadding: EdgeInsets.all(10)),
+                                        items: timeSlotForOther
+                                            .map(
+                                              (_deliveryMethod) =>
+                                                  DropdownMenuItem(
+                                                child: Text(
+                                                  _deliveryMethod,
+                                                ),
+                                                value: _deliveryMethod,
+                                              ),
+                                            )
+                                            .toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            print(value.toString);
+                                            deliveryMethod = value.toString();
+
+                                            // _userAddress.nationality = value.toString();
+                                          });
+                                        }),
                               ),
                               // Send as a gift
                               Row(
@@ -347,6 +419,60 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       setState(() {
                                         isGift = value ?? false;
                                       });
+
+                                      if (isGift == true) {
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) =>
+                                              AlertDialog(
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(20)),
+                                            title: Text(
+                                                "Is it the same address as mentioned above?"),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text(
+                                                  'Yes',
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 16),
+                                                ),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).push(
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              AddressPage(
+                                                                  arguments: {
+                                                                    'cartItems':
+                                                                        widget.arguments[
+                                                                            'cartItems'],
+                                                                    'cartTotal':
+                                                                        widget.arguments[
+                                                                            'cartTotal'],
+                                                                    'couponValue':
+                                                                        widget.arguments[
+                                                                            'couponValue'],
+                                                                    'isAddress':
+                                                                        true
+                                                                  })));
+                                                },
+                                                child: Text(
+                                                  'No',
+                                                  style: TextStyle(
+                                                      color: Colors.red,
+                                                      fontSize: 16),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }
                                     },
                                   )
                                 ],
@@ -498,38 +624,67 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    // Row(
-                                    //   children: [
-                                    //     Expanded(
-                                    //       child: Text(
-                                    //         'Packaging',
-                                    //         style: MyGoogleFontStyle(
-                                    //           fontFamily: 'Urbanist',
-                                    //           fontWeight: FontWeight.w500,
-                                    //           color: Color(0xff909090),
-                                    //         ),
-                                    //       ),
-                                    //     ),
-                                    //     Text(
-                                    //       '₹ ' +
-                                    //           (int.parse(_configModel
-                                    //                   .user
-                                    //                   .companies![0]
-                                    //                   .packagingCharges
-                                    //                   .toString()))
-                                    //               .toString(),
-                                    //       textAlign: TextAlign.right,
-                                    //       style: MyGoogleFontStyle(
-                                    //         fontFamily: 'Inter',
-                                    //         fontWeight: FontWeight.w700,
-                                    //         color: Color(0xff303030),
-                                    //       ),
-                                    //     )
-                                    //   ],
-                                    // ),
-                                    // SizedBox(
-                                    //   height: 10,
-                                    // ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            'Coupon (-)',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xff909090),
+                                            ),
+                                          ),
+                                        ),
+                                        Text(
+                                          'د.إ' +
+                                              ' ' +
+                                              widget.arguments['couponValue']
+                                                  .toString(),
+                                          textAlign: TextAlign.right,
+                                          style: MyGoogleFontStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xff303030),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            'Wallet (-)',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xff909090),
+                                            ),
+                                          ),
+                                        ),
+                                        Text(
+                                          'د.إ' +
+                                              ' ' +
+                                              (int.parse(_userWaletModel
+                                                          .totaRemainingPoint
+                                                          .toString()) /
+                                                      3)
+                                                  .toStringAsFixed(0),
+                                          textAlign: TextAlign.right,
+                                          style: MyGoogleFontStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xff303030),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
                                     Row(
                                       children: [
                                         Expanded(
@@ -551,21 +706,21 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                           .companies![0]
                                                           .deliveryCharges
                                                           .toString()) +
-                                                      (int.parse(widget.arguments[
-                                                                  'cartTotal']
-                                                              .toString()) /
+                                                      (int.parse(widget.arguments['cartTotal'].toString()) /
                                                           100 *
                                                           int.parse(_configModel
                                                               .user
                                                               .companies![0]
                                                               .taxPercent
                                                               .toString())) +
-                                                      (int.parse(_configModel
-                                                          .user
-                                                          .companies![0]
-                                                          .packagingCharges
-                                                          .toString())))
-                                                  .toString(),
+                                                      -(int.parse(
+                                                          widget.arguments['couponValue']
+                                                              .toString())) -
+                                                      (int.parse(_userWaletModel
+                                                              .totaRemainingPoint
+                                                              .toString()) /
+                                                          3))
+                                                  .toStringAsFixed(0),
                                           textAlign: TextAlign.right,
                                           style: MyGoogleFontStyle(
                                             fontFamily: 'Inter',
@@ -595,12 +750,41 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           margin: EdgeInsets.fromLTRB(0.89, 0, 0, 0),
                           child: TextButton(
                             onPressed: () async {
+                              var orderCost = (int.parse(widget
+                                          .arguments['cartTotal']
+                                          .toString()) +
+                                      int.parse(_configModel
+                                          .user.companies![0].deliveryCharges
+                                          .toString()) +
+                                      (int.parse(widget.arguments['cartTotal'].toString()) /
+                                          100 *
+                                          int.parse(_configModel
+                                              .user.companies![0].taxPercent
+                                              .toString())) +
+                                      -(int.parse(widget
+                                          .arguments['couponValue']
+                                          .toString())) -
+                                      (int.parse(_userWaletModel.totaRemainingPoint.toString()) /
+                                          3))
+                                  .toStringAsFixed(0);
+
+                              var userWalletUsed = (int.parse(_userWaletModel
+                                          .totaRemainingPoint
+                                          .toString()) /
+                                      3)
+                                  .toStringAsFixed(0);
                               var addressId = widget.arguments['address']['id'];
                               bool response = await _orderModel.placedOrder(
-                                  widget.arguments['cartItems'],
-                                  widget.arguments['cartTotal'].toString(),
-                                  addressId,
-                                  isGift);
+                                widget.arguments['cartItems'],
+                                widget.arguments['cartTotal'].toString(),
+                                addressId,
+                                isGift,
+                                userWalletUsed,
+                                widget.arguments['couponId'].toString(),
+                                paymentOption,
+                                deliveryMethod,
+                                widget.arguments['couponValue'].toString(),
+                              );
                               if (response == true) {
                                 Navigator.pushNamed(context, '/successPage');
                               }

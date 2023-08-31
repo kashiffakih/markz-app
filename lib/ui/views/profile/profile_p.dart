@@ -7,6 +7,7 @@ import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/order_pr.dart';
 import 'package:sales_app/core/providers/review_pr.dart';
 import 'package:sales_app/core/providers/user_address_pr.dart';
+import 'package:sales_app/core/providers/user_wallet_pr.dart';
 import 'package:sales_app/core/providers/wish_list_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
@@ -38,6 +39,7 @@ class _ProfilePageState extends State<ProfilePage> {
     Provider.of<AddToCartModel>(context, listen: false)
         .getAddToCart(productId, '', _CartData);
     Provider.of<UserAddressModel>(context, listen: false).getUserAddresses();
+    Provider.of<UserWalletModel>(context, listen: false).getMyUserWallets();
   }
 
   @override
@@ -49,6 +51,8 @@ class _ProfilePageState extends State<ProfilePage> {
     final ReviewModel _reviewModel = Provider.of<ReviewModel>(context);
     final UserAddressModel _userAddressModel =
         Provider.of<UserAddressModel>(context);
+    final UserWalletModel _userWalletModel =
+        Provider.of<UserWalletModel>(context);
     String initials = getInitials(_configModel.user.firstName.toString());
     return Scaffold(
       body: SafeArea(
@@ -121,15 +125,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                   margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
                                   width: 65,
                                   height: 65,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(40),
-                                    // image: DecorationImage(
-                                    //   fit: BoxFit.cover,
-                                    //   image: AssetImage(
-                                    //     'assets/images/group-8990.png',
-                                    //   ),
-                                    // ),
-                                  ),
                                   child: CircleAvatar(
                                     radius: 50,
                                     backgroundColor: Colors.black,
@@ -341,7 +336,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                     Text(
                                       // alreadyhave10orders9Ca (I318:2511;0:1158)
-                                      'Already have 10 orders',
+                                      'Total earn ${_userWalletModel.totalEarnPoint.toString()} points',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontSize: 11,
@@ -577,6 +572,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               builder: (context) => AddressPage(arguments: {
                                     'cartItems': [],
                                     'cartTotal': '',
+                                    'couponValue': 0,
                                     'isAddress': false
                                   })));
                         },
