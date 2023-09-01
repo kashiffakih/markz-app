@@ -27,6 +27,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    Provider.of<ProductModel>(context, listen: false).getBanners();
     var productId = '';
     Provider.of<WishListModel>(context, listen: false).getWishLists(productId);
   }
@@ -123,6 +124,25 @@ class _HomePageState extends State<HomePage> {
     final ProductModel _productModel = Provider.of<ProductModel>(context);
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
+
+    var images = [
+      _productModel.banners?['banner_path_1'] != null
+          ? _configModel.apiConfig['mediaURL'] +
+              _productModel.banners!['banner_path_1'].toString()
+          : null,
+      _productModel.banners?['banner_path_2'] != null
+          ? _configModel.apiConfig['mediaURL'] +
+              _productModel.banners!['banner_path_2'].toString()
+          : null,
+      _productModel.banners?['banner_path_3'] != null
+          ? _configModel.apiConfig['mediaURL'] +
+              _productModel.banners!['banner_path_3'].toString()
+          : null,
+    ]
+        .where((imageUrl) => imageUrl != null)
+        .map((imageUrl) => imageUrl!)
+        .toList();
+
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
@@ -153,66 +173,21 @@ class _HomePageState extends State<HomePage> {
                           Positioned(
                             left: 0 * fem,
                             top: 67 * fem,
-                            child: Align(
-                              child: SizedBox(
+                            child: SizedBox(
                                 width: 360 * fem,
                                 height: 180 * fem,
-                                child: Image.asset(
-                                  'assets/images/unsplash__HCpwe1-Prc.png',
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            left: 106.1574707031 * fem,
-                            top: 138.9032592773 * fem,
-                            child: Container(
-                              width: 149 * fem,
-                              height: 82.21 * fem,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Center(
-                                    child: Container(
-                                      margin: EdgeInsets.fromLTRB(0 * fem,
-                                          0 * fem, 0 * fem, 12.21 * fem),
-                                      constraints: BoxConstraints(
-                                        maxWidth: 149 * fem,
-                                      ),
-                                      child: Text(
-                                        'There’s a Gift\nfor everyone',
-                                        textAlign: TextAlign.center,
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Philosopher',
-                                          fontSize: 25 * ffem,
-                                          fontWeight: FontWeight.w700,
-                                          height: 1 * ffem / fem,
-                                          color: Color(0xff002140),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Center(
-                                    child: Container(
-                                      margin: EdgeInsets.fromLTRB(0 * fem,
-                                          0 * fem, 0.54 * fem, 0 * fem),
-                                      child: Text(
-                                        'Shop now',
-                                        textAlign: TextAlign.center,
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Poppins',
-                                          fontSize: 13 * ffem,
-                                          fontWeight: FontWeight.w500,
-                                          height: 1.5 * ffem / fem,
-                                          color: Color(0xff303030),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                                child: PageView.builder(
+                                    itemCount: images.length,
+                                    pageSnapping: true,
+                                    itemBuilder: (context, pagePosition) {
+                                      return Container(
+                                          margin: EdgeInsets.all(10),
+                                          child: Image.network(
+                                            images[pagePosition],
+                                            fit: BoxFit.cover,
+                                            alignment: Alignment.center,
+                                          ));
+                                    })),
                           ),
                           SizedBox(
                             height: 210,
