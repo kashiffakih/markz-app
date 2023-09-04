@@ -68,6 +68,7 @@ class _RewardsPageState extends State<RewardsPage> {
                 ),
                 // Body
                 Container(
+                  height: MediaQuery.of(context).size.height - 150,
                   margin: EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -178,7 +179,7 @@ class _RewardsPageState extends State<RewardsPage> {
 
                       // Rewards
                       SizedBox(
-                        height: MediaQuery.sizeOf(context).height - 150,
+                        height: MediaQuery.of(context).size.height - 350,
                         child: _userWaletModel.userWallets!.length == 0
                             ? Padding(
                                 padding: const EdgeInsets.all(20.0),
@@ -190,8 +191,7 @@ class _RewardsPageState extends State<RewardsPage> {
                                 scrollDirection: Axis.vertical,
                                 itemBuilder: (context, index) {
                                   return Container(
-                                    margin:
-                                        EdgeInsets.only(top: 10, bottom: 10),
+                                    margin: EdgeInsets.only(top: 5, bottom: 5),
                                     padding: EdgeInsets.all(10),
                                     decoration: BoxDecoration(
                                       border:
