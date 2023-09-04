@@ -103,8 +103,9 @@ class _CartPageState extends State<CartPage> {
                               child: Center(child: Text('Cart is empty')),
                             )
                           : SizedBox(
-                              height: MediaQuery.of(context).size.width + 130,
+                              height: MediaQuery.of(context).size.height - 335,
                               child: ListView.builder(
+                                scrollDirection: Axis.vertical,
                                 itemCount: _addToCartModel.addToCarts!.length,
                                 itemBuilder: (BuildContext context, index) =>
                                     Column(
@@ -177,7 +178,7 @@ class _CartPageState extends State<CartPage> {
                                             ),
                                           ),
                                         ),
-                                        Expanded(flex: 1, child: Text('')),
+                                        // Expanded(flex: 1, child: Text('')),
                                         Expanded(
                                           flex: 5,
                                           child: Align(
@@ -277,69 +278,94 @@ class _CartPageState extends State<CartPage> {
                 ),
               ),
               if (_addToCartModel.addToCarts!.length != 0)
-                Container(
-                  width: MediaQuery.of(context).size.width - 50,
-                  child: Column(
-                    children: [
-                      Form(
-                        key: _formKey,
-                        child: Row(children: [
-                          Expanded(
-                            flex: 8,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Color(0xffe3e3e3)),
-                                color: Color(0xfffbfbfb),
-                              ),
-                              child: TextFormField(
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  focusedBorder: InputBorder.none,
-                                  enabledBorder: InputBorder.none,
-                                  errorBorder: InputBorder.none,
-                                  disabledBorder: InputBorder.none,
-                                  contentPadding:
-                                      EdgeInsets.fromLTRB(9, 6, 1, 5),
-                                  hintText: 'Enter your promo code',
-                                  hintStyle:
-                                      TextStyle(color: Color(0x3f000000)),
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width - 50,
+                    child: Column(
+                      children: [
+                        Form(
+                          key: _formKey,
+                          child: Row(children: [
+                            Expanded(
+                              flex: 8,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: Color(0xffe3e3e3)),
+                                  color: Color(0xfffbfbfb),
                                 ),
-                                style: MyGoogleFontStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xff000000),
+                                child: TextFormField(
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    errorBorder: InputBorder.none,
+                                    disabledBorder: InputBorder.none,
+                                    contentPadding:
+                                        EdgeInsets.fromLTRB(9, 6, 1, 5),
+                                    hintText: 'Enter your promo code',
+                                    hintStyle:
+                                        TextStyle(color: Color(0x3f000000)),
+                                  ),
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xff000000),
+                                  ),
+                                  onSaved: (value) {
+                                    coupon = value.toString();
+                                  },
                                 ),
-                                onSaved: (value) {
-                                  coupon = value.toString();
-                                },
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Expanded(
-                            flex: 3,
-                            child: InkWell(
-                              onTap: () async {
-                                _formKey.currentState!.save();
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Expanded(
+                              flex: 3,
+                              child: InkWell(
+                                onTap: () async {
+                                  _formKey.currentState!.save();
 
-                                await _couponModel.verifyCoupon(coupon);
-                                // print(_couponModel.coupons![0].minOrderValue);
-                                if (_couponModel.coupons != null &&
-                                    _couponModel.coupons!.isNotEmpty) {
-                                  final firstCoupon = _couponModel.coupons![0];
-                                  final cartTotal = int.parse(
-                                      _addToCartModel.cartTotal.toString());
+                                  await _couponModel.verifyCoupon(coupon);
+                                  // print(_couponModel.coupons![0].minOrderValue);
+                                  if (_couponModel.coupons != null &&
+                                      _couponModel.coupons!.isNotEmpty) {
+                                    final firstCoupon =
+                                        _couponModel.coupons![0];
+                                    final cartTotal = int.parse(
+                                        _addToCartModel.cartTotal.toString());
 
-                                  if (firstCoupon.minOrderValue! < cartTotal) {
-                                    setState(() {
-                                      couponValue = double.parse(
-                                              firstCoupon.value.toString())
-                                          .toInt();
-                                      couponId = firstCoupon.id.toString();
-                                    });
+                                    if (firstCoupon.minOrderValue! <
+                                        cartTotal) {
+                                      setState(() {
+                                        couponValue = double.parse(
+                                                firstCoupon.value.toString())
+                                            .toInt();
+                                        couponId = firstCoupon.id.toString();
+                                      });
+                                    } else {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) =>
+                                            AlertDialog(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20)),
+                                          title: Text(
+                                              "The Product amount should be greater than ${firstCoupon.minOrderValue.toString()}"),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text('Ok'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }
                                   } else {
                                     showDialog(
                                       context: context,
@@ -348,8 +374,7 @@ class _CartPageState extends State<CartPage> {
                                         shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(20)),
-                                        title: Text(
-                                            "The Product amount should be greater than ${firstCoupon.minOrderValue.toString()}"),
+                                        title: Text("Invalid coupon."),
                                         actions: <Widget>[
                                           TextButton(
                                             onPressed: () {
@@ -361,124 +386,17 @@ class _CartPageState extends State<CartPage> {
                                       ),
                                     );
                                   }
-                                } else {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) =>
-                                        AlertDialog(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20)),
-                                      title: Text("Invalid coupon."),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: Text('Ok'),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }
-                              },
-                              child: Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: Color(0xff1e1e1e),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'Apply',
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xffffffff),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          )
-                        ]),
-                      ),
-                      // Promo Code
-
-                      SizedBox(
-                        height: 10,
-                      ),
-                      if (_addToCartModel.addToCarts!.length != 0)
-                        Row(
-                          children: [
-                            Text(
-                              'Total:',
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Urbanist',
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xff808080),
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                _addToCartModel.cartTotal.toString() != null
-                                    ? 'د.إ' +
-                                        ' ' +
-                                        (int.parse(_addToCartModel.cartTotal
-                                                    .toString()) -
-                                                int.parse(
-                                                    couponValue.toString()))
-                                            .toString()
-                                    : 'د.إ' + '0',
-                                textAlign: TextAlign.right,
-                                style: MyGoogleFontStyle(
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xff303030),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      _addToCartModel.addToCarts!.length != 0
-                          ? Container(
-                              margin: EdgeInsets.fromLTRB(0.89, 0, 0, 0),
-                              child: TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          CheckoutPage(arguments: {
-                                            'cartTotal': _addToCartModel
-                                                .cartTotal
-                                                .toString(),
-                                            'cartItems':
-                                                _addToCartModel.addToCarts,
-                                            'address': _orderModel
-                                                    .orders.isNotEmpty
-                                                ? _orderModel.orders[0].address!
-                                                    .toJson()
-                                                : null,
-                                            'couponValue': couponValue,
-                                            'couponId': couponId
-                                          })));
                                 },
-                                style: TextButton.styleFrom(
-                                  padding: EdgeInsets.zero,
-                                ),
                                 child: Container(
-                                  width: 321,
-                                  height: 53,
+                                  width: 50,
+                                  height: 50,
                                   decoration: BoxDecoration(
                                     color: Color(0xff1e1e1e),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Center(
                                     child: Text(
-                                      'Checkout',
+                                      'Apply',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontWeight: FontWeight.w700,
@@ -489,8 +407,98 @@ class _CartPageState extends State<CartPage> {
                                 ),
                               ),
                             )
-                          : Text(''),
-                    ],
+                          ]),
+                        ),
+                        // Promo Code
+
+                        SizedBox(
+                          height: 10,
+                        ),
+                        if (_addToCartModel.addToCarts!.length != 0)
+                          Row(
+                            children: [
+                              Text(
+                                'Total:',
+                                style: MyGoogleFontStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xff808080),
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  _addToCartModel.cartTotal.toString() != null
+                                      ? 'د.إ' +
+                                          ' ' +
+                                          (int.parse(_addToCartModel.cartTotal
+                                                      .toString()) -
+                                                  int.parse(
+                                                      couponValue.toString()))
+                                              .toString()
+                                      : 'د.إ' + '0',
+                                  textAlign: TextAlign.right,
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xff303030),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        _addToCartModel.addToCarts!.length != 0
+                            ? Container(
+                                margin: EdgeInsets.fromLTRB(0.89, 0, 0, 0),
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                CheckoutPage(arguments: {
+                                                  'cartTotal': _addToCartModel
+                                                      .cartTotal
+                                                      .toString(),
+                                                  'cartItems': _addToCartModel
+                                                      .addToCarts,
+                                                  'address': _orderModel
+                                                          .orders.isNotEmpty
+                                                      ? _orderModel
+                                                          .orders[0].address!
+                                                          .toJson()
+                                                      : null,
+                                                  'couponValue': couponValue,
+                                                  'couponId': couponId
+                                                })));
+                                  },
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                  child: Container(
+                                    width: 321,
+                                    height: 53,
+                                    decoration: BoxDecoration(
+                                      color: Color(0xff1e1e1e),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        'Checkout',
+                                        style: MyGoogleFontStyle(
+                                          fontFamily: 'Urbanist',
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xffffffff),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Text(''),
+                      ],
+                    ),
                   ),
                 ),
             ],

@@ -20,7 +20,7 @@ class DrawerWidget extends StatelessWidget {
                   children: <Widget>[
                     Container(
                       // pinewrapslogo1MaZ (617:1924)
-                      margin: EdgeInsets.fromLTRB(0, 0, 0, 14.7),
+                      margin: EdgeInsets.fromLTRB(0, 0, 0, 30),
                       width: 50,
                       height: 80,
                       child: Image.asset(

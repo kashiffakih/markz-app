@@ -85,7 +85,7 @@ class _WishlistPageState extends State<WishlistPage> {
                               child: Center(child: Text('Wishlist is empty')),
                             )
                           : SizedBox(
-                              height: MediaQuery.of(context).size.width + 240,
+                              height: MediaQuery.of(context).size.height - 240,
                               child: ListView.builder(
                                 itemCount: _wishListModel.wishLists!.length,
                                 itemBuilder: (BuildContext context, index) =>
@@ -257,46 +257,49 @@ class _WishlistPageState extends State<WishlistPage> {
                   ],
                 ),
               ),
-              Container(
-                child: Column(
-                  children: [
-                    if (_wishListModel.wishLists!.length != 0)
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Container(
-                          margin: EdgeInsets.fromLTRB(0.89, 0, 0, 0),
-                          child: TextButton(
-                            onPressed: () async {
-                              await _wishListModel.addAllToCart();
-                              setState(() {
-                                _wishListModel.getWishLists('');
-                              });
-                            },
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                            ),
-                            child: Container(
-                              width: 321,
-                              height: 53,
-                              decoration: BoxDecoration(
-                                color: Color(0xff1e1e1e),
-                                borderRadius: BorderRadius.circular(10),
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Container(
+                  child: Column(
+                    children: [
+                      if (_wishListModel.wishLists!.length != 0)
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Container(
+                            margin: EdgeInsets.fromLTRB(0.89, 0, 0, 0),
+                            child: TextButton(
+                              onPressed: () async {
+                                await _wishListModel.addAllToCart();
+                                setState(() {
+                                  _wishListModel.getWishLists('');
+                                });
+                              },
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
                               ),
-                              child: Center(
-                                child: Text(
-                                  'Add all to my cart',
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xffffffff),
+                              child: Container(
+                                width: 321,
+                                height: 53,
+                                decoration: BoxDecoration(
+                                  color: Color(0xff1e1e1e),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'Add all to my cart',
+                                    style: MyGoogleFontStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xffffffff),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],

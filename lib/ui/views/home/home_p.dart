@@ -204,8 +204,8 @@ class _HomePageState extends State<HomePage> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Container(
-                                    margin: EdgeInsets.fromLTRB(
-                                        0 * fem, 0 * fem, 0 * fem, 8.21 * fem),
+                                    // margin: EdgeInsets.fromLTRB(
+                                    //     0 * fem, 0 * fem, 0 * fem, 8.21 * fem),
                                     height: double.infinity,
                                     child: Row(
                                       crossAxisAlignment:
@@ -215,7 +215,7 @@ class _HomePageState extends State<HomePage> {
                                           margin: EdgeInsets.fromLTRB(5 * fem,
                                               2 * fem, 0 * fem, 4.7 * fem),
                                           width: 34.22 * fem,
-                                          height: 58.79 * fem,
+                                          height: 60 * fem,
                                           child: Image.asset(
                                             'assets/images/pinewrapslogo-1-9g4.png',
                                             fit: BoxFit.cover,
