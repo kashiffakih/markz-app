@@ -77,4 +77,19 @@ class ProductService {
 
     return _allProducts;
   }
+
+  Map<String, dynamic>? _banners;
+
+  getBanners() async {
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    http.Response _response = await http.get(
+      Uri.parse('${_apiConfig['baseURL']}/settings/1'),
+      headers: _apiConfig['headers'],
+    );
+    Map<String, dynamic> _responseData = json.decode(_response.body);
+    if (_responseData['success']) {
+      _banners = _responseData['data'];
+    }
+    return _banners;
+  }
 }

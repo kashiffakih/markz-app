@@ -60,4 +60,18 @@ class ProductModel with ChangeNotifier {
   getAllProducts() async {
     allProducts = await _productService.getAllProducts();
   }
+
+// List of products
+  Map<String, dynamic>? _banners;
+
+  set banners(Map<String, dynamic>? newProduct) {
+    _banners = newProduct;
+    productsLoader = false;
+    notifyListeners();
+  }
+
+  Map<String, dynamic>? get banners => _banners;
+  getBanners() async {
+    banners = await _productService.getBanners();
+  }
 }

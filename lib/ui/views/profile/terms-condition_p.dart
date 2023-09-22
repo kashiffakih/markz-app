@@ -63,11 +63,12 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                 ),
                 // Body
                 Container(
+                  height: MediaQuery.of(context).size.height + 1800,
                   margin: EdgeInsets.all(20),
                   child: Column(
                     children: [
                       Container(
-                        height: MediaQuery.of(context).size.height + 1460,
+                        // height: MediaQuery.of(context).size.height + 1600,
                         width: MediaQuery.of(context).size.width,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,

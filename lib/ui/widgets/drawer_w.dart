@@ -20,7 +20,7 @@ class DrawerWidget extends StatelessWidget {
                   children: <Widget>[
                     Container(
                       // pinewrapslogo1MaZ (617:1924)
-                      margin: EdgeInsets.fromLTRB(0, 0, 0, 14.7),
+                      margin: EdgeInsets.fromLTRB(0, 0, 0, 30),
                       width: 50,
                       height: 80,
                       child: Image.asset(
@@ -168,13 +168,13 @@ class DrawerWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
-                      margin: EdgeInsets.fromLTRB(0, 0, 23.66, 0.03),
-                      width: 19.18,
-                      height: 21.34,
+                      margin: EdgeInsets.fromLTRB(0, 0, 19, 0.03),
+                      width: 25,
+                      height: 25,
                       child: Image.asset(
-                        'assets/images/u-create-dashboard.png',
-                        width: 19.18,
-                        height: 21.34,
+                        'assets/images/contract.png',
+                        width: 25,
+                        height: 25,
                       ),
                     ),
                     Text(
@@ -202,13 +202,13 @@ class DrawerWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
-                      margin: EdgeInsets.fromLTRB(0, 0, 23.66, 0.03),
-                      width: 19.18,
-                      height: 21.34,
+                      margin: EdgeInsets.fromLTRB(0, 0, 19, 0.03),
+                      width: 25,
+                      height: 25,
                       child: Image.asset(
-                        'assets/images/u-create-dashboard.png',
-                        width: 19.18,
-                        height: 21.34,
+                        'assets/images/contract.png',
+                        width: 20,
+                        height: 25,
                       ),
                     ),
                     Text(
