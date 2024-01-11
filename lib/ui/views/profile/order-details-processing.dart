@@ -289,7 +289,7 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                                   ),
                                 ),
                                 Text(
-                                  'د.إ' +
+                                  'RS' +
                                       ' ' +
                                       widget.arguments['order']['order_details']
                                               [index]['order_detail_cost']
@@ -351,7 +351,7 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                                     margin: EdgeInsets.fromLTRB(
                                         0 * fem, 1 * fem, 0 * fem, 0 * fem),
                                     child: Text(
-                                      'د.إ' +
+                                      'RS' +
                                           ' ' +
                                           widget.arguments['order']
                                                   ['order_cost']
@@ -397,7 +397,7 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                                     margin: EdgeInsets.fromLTRB(
                                         0 * fem, 1 * fem, 0 * fem, 0 * fem),
                                     child: Text(
-                                      'د.إ' +
+                                      'RS' +
                                           ' ' +
                                           widget.arguments['order']
                                                   ['tax_amount']
@@ -443,7 +443,7 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                                     margin: EdgeInsets.fromLTRB(
                                         0 * fem, 1 * fem, 0 * fem, 0 * fem),
                                     child: Text(
-                                      'د.إ' +
+                                      'RS' +
                                           ' ' +
                                           widget.arguments['order']
                                                   ['delivery_amount']
@@ -489,7 +489,7 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                                     margin: EdgeInsets.fromLTRB(
                                         0 * fem, 1 * fem, 0 * fem, 0 * fem),
                                     child: Text(
-                                      'د.إ' +
+                                      'RS' +
                                           ' ' +
                                           widget.arguments['order']
                                                   ['packaging_amount']
@@ -547,7 +547,7 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                             ),
                           ),
                           Text(
-                            'د.إ' +
+                            'RS' +
                                 ' ' +
                                 widget.arguments['order']['total_amount']
                                     .toString(),
@@ -804,57 +804,57 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        elevation: 10,
-        iconSize: 30,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.black,
-        selectedFontSize: 14,
-        unselectedFontSize: 14,
-        onTap: (value) async {
-          if (value == 0) {
-            Navigator.pushNamed(context, '/homePage');
-          }
-          if (value == 1) {
-            Navigator.pushNamed(context, '/wishlistPage');
-          }
+      // bottomNavigationBar: BottomNavigationBar(
+      //   elevation: 10,
+      //   iconSize: 30,
+      //   type: BottomNavigationBarType.fixed,
+      //   backgroundColor: Colors.white,
+      //   selectedItemColor: Colors.black,
+      //   unselectedItemColor: Colors.black,
+      //   selectedFontSize: 14,
+      //   unselectedFontSize: 14,
+      //   onTap: (value) async {
+      //     if (value == 0) {
+      //       Navigator.pushNamed(context, '/homePage');
+      //     }
+      //     if (value == 1) {
+      //       Navigator.pushNamed(context, '/wishlistPage');
+      //     }
 
-          if (value == 2) {
-            Map<String, dynamic> _CartData = {
-              'kindOfFlower': '',
-              'flavour': '',
-              'writeOnCake': '',
-              'pack': ''
-            };
-            await _addToCartModel.getAddToCart('', '', _CartData);
-            Navigator.pushNamed(context, '/cartPage');
-          }
-          if (value == 3) {
-            Navigator.pushNamed(context, '/profilePage');
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            label: 'Home',
-            icon: Iconoir(Iconoir.home_simple),
-            // icon: Icon(DonIcons.wap_home, size: 23),
-          ),
-          BottomNavigationBarItem(label: 'Saved', icon: Iconoir(Iconoir.heart)),
-          BottomNavigationBarItem(
-            label: 'Cart',
-            icon: Iconoir(Iconoir.shopping_bag),
-          ),
-          BottomNavigationBarItem(
-            label: 'Profile',
-            icon: Icon(
-              DonIcons.user_o,
-              size: 23,
-            ),
-          ),
-        ],
-      ),
+      //     if (value == 2) {
+      //       Map<String, dynamic> _CartData = {
+      //         'kindOfFlower': '',
+      //         'flavour': '',
+      //         'writeOnCake': '',
+      //         'pack': ''
+      //       };
+      //       await _addToCartModel.getAddToCart('', '', _CartData);
+      //       Navigator.pushNamed(context, '/cartPage');
+      //     }
+      //     if (value == 3) {
+      //       Navigator.pushNamed(context, '/profilePage');
+      //     }
+      //   },
+      //   items: const [
+      //     BottomNavigationBarItem(
+      //       label: 'Home',
+      //       icon: Iconoir(Iconoir.home_simple),
+      //       // icon: Icon(DonIcons.wap_home, size: 23),
+      //     ),
+      //     BottomNavigationBarItem(label: 'Saved', icon: Iconoir(Iconoir.heart)),
+      //     BottomNavigationBarItem(
+      //       label: 'Cart',
+      //       icon: Iconoir(Iconoir.shopping_bag),
+      //     ),
+      //     BottomNavigationBarItem(
+      //       label: 'Profile',
+      //       icon: Icon(
+      //         DonIcons.user_o,
+      //         size: 23,
+      //       ),
+      //     ),
+      //   ],
+      // ),
     );
   }
 }

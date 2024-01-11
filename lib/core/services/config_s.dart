@@ -20,7 +20,7 @@ class ConfigService {
       'responseType': 'json',
       'baseURL': url! + '/api',
       // 'mediaURL': url! + '/storage/',
-      'mediaURL': 'https://az1-medias.s3.ap-south-1.amazonaws.com/pinewraps/',
+      'mediaURL': 'https://az2-medias.s3.ap-south-1.amazonaws.com/pinewraps/',
     };
   }
 

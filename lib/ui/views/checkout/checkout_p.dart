@@ -511,7 +511,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           ),
                                         ),
                                         Text(
-                                          'د.إ' +
+                                          'RS' +
                                               ' ' +
                                               widget.arguments['cartTotal']
                                                   .toString(),
@@ -540,7 +540,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           ),
                                         ),
                                         Text(
-                                          'د.إ' +
+                                          'RS' +
                                               ' ' +
                                               _configModel.user.companies![0]
                                                   .deliveryCharges
@@ -570,7 +570,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           ),
                                         ),
                                         Text(
-                                          'د.إ' +
+                                          'RS' +
                                               ' ' +
                                               _configModel
                                                   .user.companies![0].taxPercent
@@ -600,7 +600,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           ),
                                         ),
                                         Text(
-                                          'د.إ' +
+                                          'RS' +
                                               ' ' +
                                               (int.parse(widget.arguments[
                                                               'cartTotal']
@@ -637,7 +637,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           ),
                                         ),
                                         Text(
-                                          'د.إ' +
+                                          'RS' +
                                               ' ' +
                                               widget.arguments['couponValue']
                                                   .toString(),
@@ -666,7 +666,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           ),
                                         ),
                                         Text(
-                                          'د.إ' +
+                                          'RS' +
                                               ' ' +
                                               (int.parse(_userWaletModel
                                                           .totaRemainingPoint
@@ -698,7 +698,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           ),
                                         ),
                                         Text(
-                                          'د.إ' +
+                                          'RS' +
                                               ' ' +
                                               (int.parse(widget.arguments['cartTotal'].toString()) +
                                                       int.parse(_configModel

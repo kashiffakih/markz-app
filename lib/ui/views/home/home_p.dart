@@ -20,10 +20,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // OverlayEntry? sideSheetOverlayEntry;
-  // final sideSheetOverlayLayerLink = LayerLink();
-  // bool isSidebarShown = false;
-
   @override
   void initState() {
     super.initState();
@@ -32,91 +28,6 @@ class _HomePageState extends State<HomePage> {
     Provider.of<WishListModel>(context, listen: false).getWishLists(productId);
   }
 
-  // void showSideSheet() {
-  //   final sideSheetOverlay = Overlay.of(context)!;
-  //   sideSheetOverlayEntry = OverlayEntry(
-  //     builder: (context) => Positioned(
-  //       height: MediaQuery.of(context).size.height,
-  //       child: isSidebarShown
-  //           ? CompositedTransformFollower(
-  //               link: sideSheetOverlayLayerLink,
-  //               child: TweenAnimationBuilder(
-  //                 tween: Tween<double>(begin: 150, end: 300),
-  //                 duration: const Duration(milliseconds: 300),
-  //                 builder: (BuildContext context, double size, Widget? child) {
-  //                   return Material(
-  //                     child: SafeArea(
-  //                       child: Container(
-  //                           width: size,
-  //                           padding: const EdgeInsets.all(10.0),
-  //                           decoration: BoxDecoration(
-  //                             color: Theme.of(context).colorScheme.surface,
-  //                           ),
-  //                           child: Column(
-  //                             children: [
-  //                               Row(
-  //                                 mainAxisAlignment: MainAxisAlignment.end,
-  //                                 children: [
-  //                                   InkWell(
-  //                                     onTap: () {
-  //                                       setState(() {
-  //                                         isSidebarShown = false;
-  //                                         showSideSheet();
-  //                                       });
-  //                                     },
-  //                                     onHover: (value) {},
-  //                                     child: const Icon(
-  //                                       Icons.close,
-  //                                       color: Colors.redAccent,
-  //                                       size: 25.0,
-  //                                     ),
-  //                                   )
-  //                                 ],
-  //                               ),
-  //                               Column(
-  //                                 children: [
-  //                                   Container(
-  //                                     child: Text(
-  //                                       "Custom Side Sheet",
-  //                                       overflow: TextOverflow.ellipsis,
-  //                                       style: const TextStyle(
-  //                                           color: Colors.blueGrey),
-  //                                     ),
-  //                                   ),
-  //                                   const Divider(
-  //                                     height: 5.0,
-  //                                     color: Colors.black,
-  //                                   ),
-  //                                   Container(
-  //                                     child: Row(children: [
-  //                                       Icon(
-  //                                         Icons.dashboard,
-  //                                         size: 25.0,
-  //                                         color: Colors.blueGrey,
-  //                                       ),
-  //                                       Text(
-  //                                         "Home",
-  //                                         overflow: TextOverflow.ellipsis,
-  //                                         style: TextStyle(
-  //                                             color: Colors.blueGrey,
-  //                                             fontSize: 25.0,
-  //                                             fontWeight: FontWeight.w300),
-  //                                       )
-  //                                     ]),
-  //                                   )
-  //                                 ],
-  //                               )
-  //                             ],
-  //                           )),
-  //                     ),
-  //                   );
-  //                 },
-  //               ))
-  //           : SizedBox.shrink(),
-  //     ),
-  //   );
-  //   sideSheetOverlay.insert(sideSheetOverlayEntry!);
-  // }
   final GlobalKey<ScaffoldState> _key = GlobalKey();
   @override
   Widget build(BuildContext context) {
@@ -196,148 +107,228 @@ class _HomePageState extends State<HomePage> {
                             left: 0 * fem,
                             top: 0 * fem,
                             child: Container(
-                              padding: EdgeInsets.fromLTRB(
-                                  5 * fem, 12.6 * fem, 10.64 * fem, 5 * fem),
-                              width: 460 * fem,
-                              height: 71.04 * fem,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    // margin: EdgeInsets.fromLTRB(
-                                    //     0 * fem, 0 * fem, 0 * fem, 8.21 * fem),
-                                    height: double.infinity,
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Container(
-                                          margin: EdgeInsets.fromLTRB(5 * fem,
-                                              2 * fem, 0 * fem, 4.7 * fem),
-                                          width: 34.22 * fem,
-                                          height: 60 * fem,
-                                          child: Image.asset(
-                                            'assets/images/pinewrapslogo-1-9g4.png',
-                                            fit: BoxFit.cover,
-                                          ),
+                                padding: EdgeInsets.fromLTRB(
+                                    5 * fem, 12.6 * fem, 10.64 * fem, 5 * fem),
+                                width: 460 * fem,
+                                height: 71.04 * fem,
+                                child:
+                                    //  Row(
+                                    //   crossAxisAlignment: CrossAxisAlignment.center,
+                                    //   children: [
+                                    //     Container(
+                                    //       // margin: EdgeInsets.fromLTRB(
+                                    //       //     0 * fem, 0 * fem, 0 * fem, 8.21 * fem),
+                                    //       height: double.infinity,
+                                    //       child: Row(
+                                    //         crossAxisAlignment:
+                                    //             CrossAxisAlignment.end,
+                                    //         children: [
+                                    //           Container(
+                                    //             margin: EdgeInsets.fromLTRB(5 * fem,
+                                    //                 2 * fem, 0 * fem, 4.7 * fem),
+                                    //             width: 34.22 * fem,
+                                    //             height: 60 * fem,
+                                    //             child: Image.asset(
+                                    //               'assets/images/pinewrapslogo-1-9g4.png',
+                                    //               fit: BoxFit.cover,
+                                    //             ),
+                                    //           ),
+                                    //           Container(
+                                    //             width: 200 * fem,
+                                    //             height: 39.83 * fem,
+                                    //             child: Stack(
+                                    //               children: [
+                                    //                 Positioned(
+                                    //                   left: 0 * fem,
+                                    //                   top: 0 * fem,
+                                    //                   child: Align(
+                                    //                     child: SizedBox(
+                                    //                       width: 78 * fem,
+                                    //                       height: 27 * fem,
+                                    //                       child: Text(
+                                    //                         'Welcome to',
+                                    //                         style: MyGoogleFontStyle(
+                                    //                           fontFamily: 'Poppins',
+                                    //                           fontSize:
+                                    //                               10.9245996475 *
+                                    //                                   ffem,
+                                    //                           fontWeight:
+                                    //                               FontWeight.w700,
+                                    //                           height: 1.5000000436 *
+                                    //                               ffem /
+                                    //                               fem,
+                                    //                           color:
+                                    //                               Color(0xff303030),
+                                    //                         ),
+                                    //                       ),
+                                    //                     ),
+                                    //                   ),
+                                    //                 ),
+                                    //                 Positioned(
+                                    //                   left: 0 * fem,
+                                    //                   top: 11.8349609375 * fem,
+                                    //                   child: Align(
+                                    //                     child: SizedBox(
+                                    //                         width: 120 * fem,
+                                    //                         height: 25 * fem,
+                                    //                         child: Container(
+                                    //                           margin:
+                                    //                               EdgeInsets.fromLTRB(
+                                    //                                   0 * fem,
+                                    //                                   2 * fem,
+                                    //                                   0 * fem,
+                                    //                                   4.7 * fem),
+                                    //                           width: 100 * fem,
+                                    //                           height: 70 * fem,
+                                    //                           child: Image.asset(
+                                    //                             'assets/images/NewPineWrapsText.jpeg',
+                                    //                             height: 70,
+                                    //                             width: 100,
+                                    //                             // 'assets/images/NewPineWrapsText.jpeg',
+                                    //                             // fit: BoxFit.fill,
+                                    //                           ),
+                                    //                         )
+                                    //                         // Text(
+                                    //                         //   'PINEWRAPS',
+                                    //                         //   style: MyGoogleFontStyle(
+                                    //                         //     fontFamily: 'PT Serif Regular 400 Italy',
+                                    //                         //     fontSize:
+                                    //                         //         18.2076663971 *
+                                    //                         //             ffem,
+                                    //                         //     fontWeight:
+                                    //                         //         FontWeight.w400,
+                                    //                         //     height: 1.5000000524 *
+                                    //                         //         ffem /
+                                    //                         //         fem,
+                                    //                         //     color:
+                                    //                         //         Color(0xff303030),
+                                    //                         //   ),
+                                    //                         // ),
+                                    //                         ),
+                                    //                   ),
+                                    //                 ),
+                                    //               ],
+                                    //             ),
+                                    //           ),
+                                    //         ],
+                                    //       ),
+                                    //     ),
+                                    //     Container(
+                                    //       height: double.infinity,
+                                    //       child: Row(
+                                    //         mainAxisAlignment: MainAxisAlignment.end,
+                                    //         children: [
+                                    //           SizedBox(
+                                    //             width: 40,
+                                    //           ),
+                                    //           InkWell(
+                                    //             onTap: () {
+                                    //               Navigator.pushNamed(
+                                    //                   context, '/notificationPage');
+                                    //             },
+                                    //             child: Padding(
+                                    //               padding: const EdgeInsets.all(10.0),
+                                    //               child: Image.asset(
+                                    //                 'assets/images/vector-afp.png',
+                                    //                 width: 18.58 * fem,
+                                    //                 height: 18.58 * fem,
+                                    //               ),
+                                    //             ),
+                                    //           ),
+                                    //           InkWell(
+                                    //             onTap: () {
+                                    //               _key.currentState!.openDrawer();
+                                    //             },
+                                    //             child: Icon(
+                                    //               Icons.menu_sharp,
+                                    //               size: 30.0,
+                                    //             ),
+                                    //           ),
+                                    //         ],
+                                    //       ),
+                                    //     ),
+                                    //   ],
+                                    // ),
+                                    Row(
+                                  children: [
+                                    const SizedBox(width: 30),
+                                    Container(
+                                      width: 258,
+                                      height: 38,
+                                      padding: const EdgeInsets.only(
+                                        left: 21,
+                                        right: 20.70,
+                                      ),
+                                      clipBehavior: Clip.antiAlias,
+                                      decoration: ShapeDecoration(
+                                        shape: RoundedRectangleBorder(
+                                          side: BorderSide(
+                                              width: 0.50,
+                                              color: Color(0xFFC7B456)),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                         ),
-                                        Container(
-                                          width: 200 * fem,
-                                          height: 39.83 * fem,
-                                          child: Stack(
-                                            children: [
-                                              Positioned(
-                                                left: 0 * fem,
-                                                top: 0 * fem,
-                                                child: Align(
-                                                  child: SizedBox(
-                                                    width: 78 * fem,
-                                                    height: 27 * fem,
-                                                    child: Text(
-                                                      'Welcome to',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Poppins',
-                                                        fontSize:
-                                                            10.9245996475 *
-                                                                ffem,
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                        height: 1.5000000436 *
-                                                            ffem /
-                                                            fem,
-                                                        color:
-                                                            Color(0xff303030),
-                                                      ),
-                                                    ),
-                                                  ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment
+                                            .center, // Center vertically
+                                        children: [
+                                          Expanded(
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 15.0),
+                                              child: TextFormField(
+                                                decoration: InputDecoration(
+                                                  hintText: 'Search',
+                                                  border: InputBorder.none,
+                                                ),
+                                                style: TextStyle(
+                                                  color: Colors.black
+                                                      .withOpacity(0.6),
+                                                  fontSize: 18,
+                                                  fontFamily: 'Urbanist',
+                                                  fontWeight: FontWeight.w600,
+                                                  // letterSpacing: -0.36,
                                                 ),
                                               ),
-                                              Positioned(
-                                                left: 0 * fem,
-                                                top: 11.8349609375 * fem,
-                                                child: Align(
-                                                  child: SizedBox(
-                                                      width: 120 * fem,
-                                                      height: 25 * fem,
-                                                      child: Container(
-                                                        margin:
-                                                            EdgeInsets.fromLTRB(
-                                                                0 * fem,
-                                                                2 * fem,
-                                                                0 * fem,
-                                                                4.7 * fem),
-                                                        width: 100 * fem,
-                                                        height: 70 * fem,
-                                                        child: Image.asset(
-                                                          'assets/images/NewPineWrapsText.jpeg',
-                                                          height: 70,
-                                                          width: 100,
-                                                          // 'assets/images/NewPineWrapsText.jpeg',
-                                                          // fit: BoxFit.fill,
-                                                        ),
-                                                      )
-                                                      // Text(
-                                                      //   'PINEWRAPS',
-                                                      //   style: MyGoogleFontStyle(
-                                                      //     fontFamily: 'PT Serif Regular 400 Italy',
-                                                      //     fontSize:
-                                                      //         18.2076663971 *
-                                                      //             ffem,
-                                                      //     fontWeight:
-                                                      //         FontWeight.w400,
-                                                      //     height: 1.5000000524 *
-                                                      //         ffem /
-                                                      //         fem,
-                                                      //     color:
-                                                      //         Color(0xff303030),
-                                                      //   ),
-                                                      // ),
-                                                      ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    height: double.infinity,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        SizedBox(
-                                          width: 40,
-                                        ),
-                                        InkWell(
-                                          onTap: () {
-                                            Navigator.pushNamed(
-                                                context, '/notificationPage');
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Image.asset(
-                                              'assets/images/vector-afp.png',
-                                              width: 18.58 * fem,
-                                              height: 18.58 * fem,
                                             ),
                                           ),
-                                        ),
-                                        InkWell(
-                                          onTap: () {
-                                            _key.currentState!.openDrawer();
-                                          },
-                                          child: Icon(
-                                            Icons.menu_sharp,
-                                            size: 30.0,
+                                          Container(
+                                            width: 20,
+                                            height: 20,
+                                            child: Image.asset(
+                                              'assets/images/Search-1.png',
+                                              height: 20,
+                                              fit: BoxFit.cover,
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                                    const SizedBox(width: 10),
+                                    Container(
+                                      width: 20,
+                                      height: 20,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment: MainAxisAlignment
+                                            .center, // Center vertically
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Image.asset(
+                                            'assets/images/filter.png',
+                                            height: 20,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                )),
                           ),
                         ],
                       ),
@@ -561,7 +552,7 @@ class _HomePageState extends State<HomePage> {
                                                       .offerPrice
                                                       .toString() +
                                                   ' ' +
-                                                  'د.إ',
+                                                  'RS',
                                               style: MyGoogleFontStyle(
                                                 fontFamily: 'Poppins',
                                                 fontSize: 13 * ffem,
@@ -593,7 +584,7 @@ class _HomePageState extends State<HomePage> {
             ),
             Container(
               width: 345 * fem,
-              height: 435,
+              height: 535,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -810,7 +801,7 @@ class _HomePageState extends State<HomePage> {
             Container(
               // group81Wvi (318:1936)
               width: double.infinity,
-              height: 150 * fem,
+              height: 180 * fem,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5 * fem),
               ),
@@ -1053,56 +1044,106 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        elevation: 10,
-        iconSize: 30,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.black,
-        selectedFontSize: 14,
-        unselectedFontSize: 14,
-        onTap: (value) async {
-          if (value == 0) {
-            Navigator.pushNamed(context, '/homePage');
-          }
-          if (value == 1) {
-            Navigator.pushNamed(context, '/wishlistPage');
-          }
-
-          if (value == 2) {
-            Map<String, dynamic> _CartData = {
-              'kindOfFlower': '',
-              'flavour': '',
-              'writeOnCake': '',
-              'pack': ''
-            };
-            await _addToCartModel.getAddToCart('', '', _CartData);
-            Navigator.pushNamed(context, '/cartPage');
-          }
-          if (value == 3) {
-            Navigator.pushNamed(context, '/profilePage');
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            label: 'Home',
-            icon: Iconoir(Iconoir.home_simple),
-            // icon: Icon(DonIcons.wap_home, size: 23),
-          ),
-          BottomNavigationBarItem(label: 'Saved', icon: Iconoir(Iconoir.heart)),
-          BottomNavigationBarItem(
-            label: 'Cart',
-            icon: Iconoir(Iconoir.shopping_bag),
-          ),
-          BottomNavigationBarItem(
-            label: 'Profile',
-            icon: Icon(
-              DonIcons.user_o,
-              size: 23,
+      bottomNavigationBar: Container(
+        width: 360,
+        height: 70,
+        clipBehavior: Clip.antiAlias,
+        decoration: ShapeDecoration(
+          color: Colors.white,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(width: 2.50, color: Color(0xFFC7B456)),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
             ),
           ),
-        ],
+          shadows: [
+            BoxShadow(
+              color: Color(0x3F000000),
+              blurRadius: 4,
+              offset: Offset(0, 4),
+              spreadRadius: 6,
+            )
+          ],
+        ),
+        child: BottomNavigationBar(
+          elevation: 10,
+          iconSize: 30,
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Color.fromARGB(255, 249, 245, 225),
+          // backgroundColor: Colors.white,
+          selectedItemColor: Colors.black,
+          unselectedItemColor: Colors.black,
+          selectedFontSize: 14,
+          unselectedFontSize: 14,
+          onTap: (value) async {
+            if (value == 0) {
+              Navigator.pushNamed(context, '/homePage');
+            }
+            if (value == 1) {
+              Navigator.pushNamed(context, '/shopsPage');
+            }
+
+            if (value == 2) {
+              Map<String, dynamic> _CartData = {
+                'kindOfFlower': '',
+                'flavour': '',
+                'writeOnCake': '',
+                'pack': ''
+              };
+              await _addToCartModel.getAddToCart('', '', _CartData);
+              Navigator.pushNamed(context, '/cartPage');
+            }
+            if (value == 3) {
+              Navigator.pushNamed(context, '/profilePage');
+            }
+            if (value == 4) {
+              Navigator.pushNamed(context, '/notificationPage');
+            }
+          },
+          items: [
+            BottomNavigationBarItem(
+              label: 'HOME',
+              icon: Image.asset(
+                'assets/images/home-icon.png',
+                width: 23,
+                height: 23,
+              ),
+              // icon: Icon(DonIcons.wap_home, size: 23),
+            ),
+            BottomNavigationBarItem(
+                label: 'CATEGORY',
+                icon: Image.asset(
+                  'assets/images/category-icon.png',
+                  width: 23,
+                  height: 23,
+                )),
+            BottomNavigationBarItem(
+              label: 'CART',
+              icon: Image.asset(
+                'assets/images/cart-icon.png',
+                width: 23,
+                height: 23,
+              ),
+            ),
+            BottomNavigationBarItem(
+              label: 'PROFILE',
+              icon: Image.asset(
+                'assets/images/user-profile-icon.png',
+                width: 23,
+                height: 23,
+              ),
+            ),
+            BottomNavigationBarItem(
+              label: 'NOTIFS',
+              icon: Image.asset(
+                'assets/images/notification-icon.png',
+                width: 23,
+                height: 23,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
