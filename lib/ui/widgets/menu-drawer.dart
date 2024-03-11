@@ -40,7 +40,7 @@ class MenuWidget extends StatelessWidget {
                       width: 39.65 * fem,
                       height: 60.11 * fem,
                       child: Image.asset(
-                        'assets/images/pinewrapslogo-1-kg1.png',
+                        'assets/images/logo-kg1.png',
                         fit: BoxFit.cover,
                       ),
                     ),

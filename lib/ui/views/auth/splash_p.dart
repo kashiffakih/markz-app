@@ -26,7 +26,7 @@ class _SplashPageState extends State<SplashPage> {
                     width: 200,
                     height: 300,
                     child: Image.asset(
-                      'assets/images/pinewrapslogo-1.png',
+                      'assets/images/logo.png',
                     ),
                   ),
                 ),

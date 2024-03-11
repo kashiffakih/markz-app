@@ -21,6 +21,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
+            height: MediaQuery.of(context).size.height * 1.0,
             padding: EdgeInsets.only(top: 20),
             child: Column(
               children: [
@@ -63,12 +64,12 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                 ),
                 // Body
                 Container(
-                  height: MediaQuery.of(context).size.height + 1800,
+                  height: MediaQuery.of(context).size.height,
                   margin: EdgeInsets.all(20),
                   child: Column(
                     children: [
                       Container(
-                        // height: MediaQuery.of(context).size.height + 1600,
+                        height: MediaQuery.of(context).size.height,
                         width: MediaQuery.of(context).size.width,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -78,7 +79,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                               children: [
                                 Text('1. '),
                                 Text(
-                                    '“PINEWRAPS’’ maintains the \nhttps://pinewraps.com/ Website (“Site”).'),
+                                    'AADAB maintains the \nhttps://aadab.com/ Website (“Site”).'),
                               ],
                             ),
                             SizedBox(
@@ -238,7 +239,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                               height: 10,
                             ),
                             Text(
-                                'This privacy policy sets out how https://pinewraps.com/ uses and protects any information that you give https://pinewraps.com/ when you use this website. By using the site, you are accepting the practices described in this privacy policy. These executions may be reshaped, but any alter will be posted and changes will only apply to activities and information on advancement, not retroactive basis. We aggregate the personal information that you provide us, such as when you: Sign up for or register on https://pinewraps.com/, Register to use https://pinewraps.com/ or sign up for newsletter of specials or other promotions on https://pinewraps.com/; Place an order or purchase products or services at our online store or over the phone, Contact us for any reason, such as by replying to inquiries by mail, or through our website’s live chat, by telephone through customer service, or We may automatically collect some information when you visit our website, such as your internet protocol address and operating system, your site browsing and the time and date of your visit and purchases. This information may be collected through the use of “cookies”. PINEWRAPS takes appropriate steps to ensure data privacy and security including through various hardware and software methodologies. However, (https://pinewraps.com/) cannot guarantee the security of any information that is disclosed online. The Website Policies and Terms &amp; Conditions may be changed or updated occasionally to meet the requirements and standards. Therefore, the Customers’ are encouraged to frequently visit these sections to be updated about the changes on the website. Modifications will be effective on the day they are posted.'),
+                                'This privacy policy sets out how https://aadab.com/ uses and protects any information that you give https://aadab.com/ when you use this website. By using the site, you are accepting the practices described in this privacy policy. These executions may be reshaped, but any alter will be posted and changes will only apply to activities and information on advancement, not retroactive basis. We aggregate the personal information that you provide us, such as when you: Sign up for or register on https://aadab.com/, Register to use https://aadab.com/ or sign up for newsletter of specials or other promotions on https://aadab.com/; Place an order or purchase products or services at our online store or over the phone, Contact us for any reason, such as by replying to inquiries by mail, or through our website’s live chat, by telephone through customer service, or We may automatically collect some information when you visit our website, such as your internet protocol address and operating system, your site browsing and the time and date of your visit and purchases. This information may be collected through the use of “cookies”. PINEWRAPS takes appropriate steps to ensure data privacy and security including through various hardware and software methodologies. However, (https://aadab.com/) cannot guarantee the security of any information that is disclosed online. The Website Policies and Terms &amp; Conditions may be changed or updated occasionally to meet the requirements and standards. Therefore, the Customers’ are encouraged to frequently visit these sections to be updated about the changes on the website. Modifications will be effective on the day they are posted.'),
                             SizedBox(
                               height: 15,
                             ),
@@ -264,7 +265,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                               height: 5,
                             ),
                             Text(
-                                'Your personal data will be retain secure. Only authorized employees, and contractors (who have agreed to keep information safe and confidential) have access to this data. All of credit/debit cards details and personally identifiable Data Won’t Be Saved, sold, shared, Leased or Rented to any third parties. https://pinewraps.com/ can also disclose personally identifiable information so as to answer a subpoena, court order or other similar request. https://pinewraps.com/ may also give such personally identifiable information in response to some law enforcement agencies ask or as otherwise required by law. Your personally identifiable information may be offered to a party when https://pinewraps.com/ files for bankruptcy, or there’s a transfer of their possession or assets of https://pinewraps.com/ in connection with proposed or consummated corporate reorganizations, like mergers or acquisitions. https://pinewraps.com/ does not allow to share minor information. https://pinewraps.com/ does not knowingly distribute personal information regarding minors.'),
+                                'Your personal data will be retain secure. Only authorized employees, and contractors (who have agreed to keep information safe and confidential) have access to this data. All of credit/debit cards details and personally identifiable Data Won’t Be Saved, sold, shared, Leased or Rented to any third parties. https://aadab.com/ can also disclose personally identifiable information so as to answer a subpoena, court order or other similar request. https://aadab.com/ may also give such personally identifiable information in response to some law enforcement agencies ask or as otherwise required by law. Your personally identifiable information may be offered to a party when https://aadab.com/ files for bankruptcy, or there’s a transfer of their possession or assets of https://aadab.com/ in connection with proposed or consummated corporate reorganizations, like mergers or acquisitions. https://aadab.com/ does not allow to share minor information. https://aadab.com/ does not knowingly distribute personal information regarding minors.'),
                             SizedBox(
                               height: 15,
                             ),
@@ -277,7 +278,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                               height: 5,
                             ),
                             Text(
-                                'https://pinewraps.com/ isn’t liable for the privacy policies of sites to which it connects. If you supply any information to these third parties’ different rules concerning the collection and use of your personal information could employ. We strongly advise you to review these third party’s privacy policies before providing any information to them.'),
+                                'https://aadab.com/ isn’t liable for the privacy policies of sites to which it connects. If you supply any information to these third parties’ different rules concerning the collection and use of your personal information could employ. We strongly advise you to review these third party’s privacy policies before providing any information to them.'),
                             SizedBox(
                               height: 15,
                             ),
@@ -290,7 +291,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                               height: 5,
                             ),
                             Text(
-                                'If you would like to alter or improvement any information https://pinewraps.com/ has obtained, please contact info@ pinewraps.com'),
+                                'If you would like to alter or improvement any information https://aadab.com/ has obtained, please contact info@ aadab.com'),
                             SizedBox(
                               height: 15,
                             ),

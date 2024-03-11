@@ -10,11 +10,13 @@ class ProductService {
   List<Product> _products = [];
   getProducts() async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+
     http.Response _response = await http.get(
       Uri.parse('${_apiConfig['baseURL']}/products?newArrivals=newArrivals'),
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
+    print(_responseData);
     if (_responseData['success']) {
       _products = [];
       _responseData['data'].forEach((data) {
@@ -61,13 +63,21 @@ class ProductService {
 
   List<Product> _allProducts = [];
 
-  getAllProducts() async {
+  getAllProducts({String? search}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    if (search == null) {
+      search = '';
+    } else {
+      search = search;
+    }
+    print('Api hit for product list with $search');
+    print(search);
     http.Response _response = await http.get(
-      Uri.parse('${_apiConfig['baseURL']}/products'),
+      Uri.parse('${_apiConfig['baseURL']}/products?searchAll=$search'),
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
+    print(_responseData['success']);
     if (_responseData['success']) {
       _allProducts = [];
       _responseData['data'].forEach((data) {

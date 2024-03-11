@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:icon_forest/don_icons.dart';
-import 'package:icon_forest/iconoir.dart';
+// import 'package:icon_forest/don_icons.dart';
+// import 'package:icon_forest/iconoir.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
@@ -10,6 +10,7 @@ import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/products/product_id_p.dart';
 import 'package:sales_app/ui/views/products/products_p.dart';
+import 'package:sales_app/ui/views/products/shops_p.dart';
 import 'package:sales_app/ui/widgets/drawer_w.dart';
 
 class HomePage extends StatefulWidget {
@@ -20,12 +21,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  TextEditingController _controller = TextEditingController();
   @override
   void initState() {
     super.initState();
+    Provider.of<ProductModel>(context, listen: false).getProduct();
     Provider.of<ProductModel>(context, listen: false).getBanners();
     var productId = '';
     Provider.of<WishListModel>(context, listen: false).getWishLists(productId);
+
+    Provider.of<ProductModel>(context, listen: false).getCategories();
   }
 
   final GlobalKey<ScaffoldState> _key = GlobalKey();
@@ -129,7 +134,7 @@ class _HomePageState extends State<HomePage> {
                                     //             width: 34.22 * fem,
                                     //             height: 60 * fem,
                                     //             child: Image.asset(
-                                    //               'assets/images/pinewrapslogo-1-9g4.png',
+                                    //               'assets/images/logo-9g4.png',
                                     //               fit: BoxFit.cover,
                                     //             ),
                                     //           ),
@@ -252,6 +257,30 @@ class _HomePageState extends State<HomePage> {
                                     Row(
                                   children: [
                                     const SizedBox(width: 30),
+                                    // InkWell(
+                                    //   onTap: () {
+                                    //     Scaffold.of(context).openEndDrawer();
+                                    //   },
+                                    //   child: Container(
+                                    //     width: 20,
+                                    //     height: 20,
+                                    //     child: Column(
+                                    //       mainAxisSize: MainAxisSize.min,
+                                    //       mainAxisAlignment: MainAxisAlignment
+                                    //           .center, // Center vertically
+                                    //       crossAxisAlignment:
+                                    //           CrossAxisAlignment.start,
+                                    //       children: [
+                                    //         Image.asset(
+                                    //           'assets/images/category-icon.png',
+                                    //           height: 20,
+                                    //           fit: BoxFit.cover,
+                                    //         ),
+                                    //       ],
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    // const SizedBox(width: 30),
                                     Container(
                                       width: 258,
                                       height: 38,
@@ -281,6 +310,21 @@ class _HomePageState extends State<HomePage> {
                                               padding: const EdgeInsets.only(
                                                   top: 15.0),
                                               child: TextFormField(
+                                                controller: _controller,
+                                                onChanged: (value) {
+                                                  // if (value.length % 3 == 0) {
+                                                  // Call your API here
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ShopsPage(
+                                                              initialText: value
+                                                                  .toString()), // Pass initialText if needed
+                                                    ),
+                                                  );
+                                                  _controller.clear();
+                                                },
                                                 decoration: InputDecoration(
                                                   hintText: 'Search',
                                                   border: InputBorder.none,
@@ -584,7 +628,8 @@ class _HomePageState extends State<HomePage> {
             ),
             Container(
               width: 345 * fem,
-              height: 535,
+              // height: 600,
+              height: MediaQuery.of(context).size.height * 0.7,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -641,7 +686,8 @@ class _HomePageState extends State<HomePage> {
                                           decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(
                                                 10.1176462173 * fem),
-                                            gradient: _category['id'] == 2
+                                            gradient: _category['id'] == 2 ||
+                                                    _category['id'] == 4
                                                 ? LinearGradient(
                                                     begin: Alignment(1, 0.138),
                                                     end: Alignment(-1, 0.128),
@@ -725,7 +771,8 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                     ),
-                                  if (_category['id'] == 2)
+                                  if (_category['id'] == 2 ||
+                                      _category['id'] == 4)
                                     Positioned(
                                       left: 250 * fem,
                                       top: 33.5 * fem,
@@ -1081,7 +1128,14 @@ class _HomePageState extends State<HomePage> {
               Navigator.pushNamed(context, '/homePage');
             }
             if (value == 1) {
-              Navigator.pushNamed(context, '/shopsPage');
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      ShopsPage(initialText: ''), // Pass initialText if needed
+                ),
+              );
+              // Navigator.pushNamed(context, '/shopsPage');
             }
 
             if (value == 2) {

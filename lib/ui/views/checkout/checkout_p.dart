@@ -22,7 +22,7 @@ List<String> timeSlotForDubai = [
   '7 PM - 9:30 PM'
 ];
 List<String> timeSlotForOther = ['4 PM - 7:30 PM', '7 PM - 9:30 PM'];
-List<String> paymentOptions = ['Cash on Delivery', 'Online'];
+List<String> paymentOptions = ['UPI'];
 
 var paymentOption = '';
 var deliveryMethod = '';
@@ -801,7 +801,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               ),
                               child: Center(
                                 child: Text(
-                                  'Submit Order',
+                                  'Paid/Continue',
                                   style: MyGoogleFontStyle(
                                     fontFamily: 'Urbanist',
                                     fontWeight: FontWeight.w700,

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/notification_pr.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/auth/splash_p.dart';
+import 'package:sales_app/ui/views/products/shops_p.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({Key? key}) : super(key: key);
@@ -16,6 +17,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
     super.initState();
     Provider.of<NotificationModel>(context, listen: false).getMyNotifications();
   }
+
+  TextEditingController _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +97,19 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                   child: Padding(
                                     padding: const EdgeInsets.only(top: 15.0),
                                     child: TextFormField(
+                                      controller: _controller,
+                                      onChanged: (value) {
+                                        // Call your API here
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ShopsPage(
+                                                initialText: value
+                                                    .toString()), // Pass initialText if needed
+                                          ),
+                                        );
+                                        _controller.clear();
+                                      },
                                       decoration: InputDecoration(
                                         hintText: 'Search',
                                         border: InputBorder.none,

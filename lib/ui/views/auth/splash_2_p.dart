@@ -24,7 +24,7 @@ class Splash2Page extends StatelessWidget {
                     width: 200,
                     height: 300,
                     child: Image.asset(
-                      'assets/images/pinewrapslogo-1.png',
+                      'assets/images/logo.png',
                     ),
                   ),
                 ),

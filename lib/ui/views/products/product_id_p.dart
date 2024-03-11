@@ -8,6 +8,9 @@ import 'package:sales_app/core/providers/review_pr.dart';
 import 'package:sales_app/core/providers/wish_list_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/products/shops_p.dart';
+
+import '../../../core/models/product.dart';
 
 class ProductIdPage extends StatefulWidget {
   final arguments;
@@ -67,9 +70,10 @@ class _ProductIdPageState extends State<ProductIdPage> {
   // ];
 
   double discountPrice = 0.0;
-
   @override
   Widget build(BuildContext context) {
+    Product product = Product.fromJson(widget.arguments['product']);
+    // print(widget.arguments['product']['review']);
     List<Map<String, dynamic>> _sizes =
         widget.arguments['product']['product_packs'];
     final ConfigModel _configModel = locator<ConfigModel>();
@@ -161,6 +165,18 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                   child: Padding(
                                     padding: const EdgeInsets.only(top: 17.0),
                                     child: TextFormField(
+                                      onChanged: (value) {
+                                        // if (value.length % 3 == 0) {
+                                        // Call your API here
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ShopsPage(
+                                                initialText: value
+                                                    .toString()), // Pass initialText if needed
+                                          ),
+                                        );
+                                      },
                                       decoration: InputDecoration(
                                         hintText: 'Search',
                                         border: InputBorder.none,
@@ -188,21 +204,26 @@ class _ProductIdPageState extends State<ProductIdPage> {
                             ),
                           ),
                           const SizedBox(width: 15),
-                          Container(
-                            width: 20,
-                            height: 20,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment:
-                                  MainAxisAlignment.center, // Center vertically
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Image.asset(
-                                  'assets/images/shopping_cart.png',
-                                  height: 20,
-                                  fit: BoxFit.cover,
-                                ),
-                              ],
+                          InkWell(
+                            onTap: () {
+                              Navigator.pushNamed(context, '/cartPage');
+                            },
+                            child: Container(
+                              width: 20,
+                              height: 20,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment
+                                    .center, // Center vertically
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Image.asset(
+                                    'assets/images/shopping_cart.png',
+                                    height: 20,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -318,12 +339,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                           ),
                                                           Text(
                                                             '( ' +
-                                                                widget
-                                                                    .arguments[
-                                                                        'product']
-                                                                        [
-                                                                        'reviews']
-                                                                    .length
+                                                                (product.reviews ==
+                                                                            null
+                                                                        ? 0
+                                                                        : product
+                                                                            .reviews
+                                                                            ?.length)
                                                                     .toString() +
                                                                 ' Review)',
                                                             style:
@@ -365,11 +386,52 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                     true)
                                                   TextButton(
                                                     onPressed: () async {
-                                                      if (_formKey.currentState!
-                                                          .validate()) {
-                                                        _formKey.currentState!
-                                                            .save();
-                                                        bool type = true;
+                                                      // if (_formKey.currentState!
+                                                      //     .validate()) {
+                                                      _formKey.currentState!
+                                                          .save();
+                                                      bool type = true;
+                                                      print(_CartData[
+                                                          'kindOfFlower']);
+                                                      print(
+                                                          _CartData['flavour']);
+                                                      if (_CartData[
+                                                                  'kindOfFlower'] ==
+                                                              '' ||
+                                                          _CartData[
+                                                                  'flavour'] ==
+                                                              '') {
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                                  context) =>
+                                                              AlertDialog(
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            20)),
+                                                            title: Text(
+                                                                "kindly choose colour and size."),
+                                                            actions: <Widget>[
+                                                              TextButton(
+                                                                onPressed: () {
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                                child: Text(
+                                                                  'Ok',
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontSize:
+                                                                          16),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      } else {
                                                         await _addToCartModel
                                                             .getAddToCart(
                                                                 widget.arguments![
@@ -385,31 +447,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                     child: Container(
                                                       width: 82,
                                                       height: 27.33,
-                                                      // decoration:
-                                                      //     ShapeDecoration(
-                                                      //   color:
-                                                      //       Color(0xffeaeaea),
-
-                                                      //   shape:
-                                                      //       RoundedRectangleBorder(
-
-                                                      //     borderRadius:
-                                                      //         BorderRadius
-                                                      //             .circular(
-                                                      //                 28.51),
-                                                      //   ),
-                                                      //   shadows: [
-                                                      //     BoxShadow(
-                                                      //       color: Color(
-                                                      //           0x3f000000),
-                                                      //       offset: Offset(0,
-                                                      //           2.1298701763),
-                                                      //       blurRadius:
-                                                      //           2.1298701763,
-                                                      //     ),
-                                                      //   ],
-
-                                                      // ),
                                                       decoration: BoxDecoration(
                                                         border: Border.all(
                                                             color: Color(
@@ -591,43 +628,53 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       ['product_prices']![0]
                                                   ['offer_price'] !=
                                               0
-                                          ? Text.rich(
-                                              TextSpan(
-                                                text: 'Total Price',
-                                                style: TextStyle(
-                                                    color: Colors.grey[500]),
-                                                children: [
-                                                  WidgetSpan(
-                                                    child: SizedBox(
-                                                        width:
-                                                            20), // Adjust the width as needed
-                                                  ),
+                                          ? Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 25.0),
+                                              child: Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Text.rich(
                                                   TextSpan(
-                                                    text:
-                                                        'RS. ${widget.arguments['product']['product_prices']![0]['price'].toString()}',
+                                                    text: 'Total Price',
                                                     style: TextStyle(
                                                         color:
-                                                            Color(0xFFC7B456),
-                                                        decoration:
-                                                            TextDecoration
-                                                                .lineThrough,
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.bold),
+                                                            Colors.grey[500]),
+                                                    children: [
+                                                      WidgetSpan(
+                                                        child: SizedBox(
+                                                            width:
+                                                                20), // Adjust the width as needed
+                                                      ),
+                                                      TextSpan(
+                                                        text:
+                                                            'RS. ${widget.arguments['product']['product_prices']![0]['price'].toString()}',
+                                                        style: TextStyle(
+                                                            color: Color(
+                                                                0xFFC7B456),
+                                                            decoration:
+                                                                TextDecoration
+                                                                    .lineThrough,
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      WidgetSpan(
+                                                        child: SizedBox(
+                                                            width:
+                                                                20), // Adjust the width as needed
+                                                      ),
+                                                      TextSpan(
+                                                          text:
+                                                              'RS.${widget.arguments['product']['product_prices']![0]['offer_price'].toString()}',
+                                                          style: TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold)),
+                                                    ],
                                                   ),
-                                                  WidgetSpan(
-                                                    child: SizedBox(
-                                                        width:
-                                                            20), // Adjust the width as needed
-                                                  ),
-                                                  TextSpan(
-                                                      text:
-                                                          'RS.${widget.arguments['product']['product_prices']![0]['offer_price'].toString()}',
-                                                      style: TextStyle(
-                                                          fontSize: 18,
-                                                          fontWeight:
-                                                              FontWeight.bold)),
-                                                ],
+                                                ),
                                               ),
                                             )
                                           : Text(
@@ -710,7 +757,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                             child: Align(
                                               alignment: Alignment.centerLeft,
                                               child: Text(
-                                                ' ( ${widget.arguments['product']['reviews']!.length} ratings )',
+                                                ' ( ${(product.reviews == null ? 0 : product.reviews?.length)} ratings )',
                                                 style: TextStyle(fontSize: 12),
                                               ),
                                             ),
@@ -803,11 +850,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       //             .size
                                                       //             .height -
                                                       //         50,
-                                                      child: widget
-                                                              .arguments![
-                                                                  'product']
-                                                                  ['reviews']!
-                                                              .isEmpty
+                                                      child: product.reviews ==
+                                                              null
                                                           ? Center(
                                                               child: Text(
                                                                   'No reviews'))
@@ -1150,6 +1194,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                               index]
                                                                           [
                                                                           'value']);
+
+                                                                      _CartData[
+                                                                          'kindOfFlower'] = _sizes[index]
+                                                                              [
+                                                                              'value']
+                                                                          .toString();
                                                                     });
                                                                   },
                                                                   style: TextButton
@@ -1373,7 +1423,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                       width: double
                                                                           .infinity,
                                                                       height:
-                                                                          160,
+                                                                          140,
                                                                       child:
                                                                           Stack(
                                                                         children: [
@@ -1432,187 +1482,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                               ),
                                                                             ),
                                                                           ),
-                                                                          if (_addToCartModel
-                                                                              .addToCarts!
-                                                                              .where((cart) => cart.productId == _productModel.categoryWiseproducts![index].id && cart.userId == _configModel.user.id)
-                                                                              .toList()
-                                                                              .isEmpty)
-                                                                            Positioned(
-                                                                              left: 31,
-                                                                              top: 165,
-                                                                              child: TextButton(
-                                                                                onPressed: () async {
-                                                                                  _formKey.currentState!.save();
-                                                                                  bool type = true;
-                                                                                },
-                                                                                style: TextButton.styleFrom(
-                                                                                  padding: EdgeInsets.zero,
-                                                                                ),
-                                                                                child: Container(
-                                                                                  width: 82,
-                                                                                  height: 27.33,
-                                                                                  decoration: BoxDecoration(
-                                                                                    border: Border.all(color: Color(0xffeaeaea)),
-                                                                                    color: Color(0xffffffff),
-                                                                                    borderRadius: BorderRadius.circular(7.0163693428),
-                                                                                    boxShadow: [
-                                                                                      BoxShadow(
-                                                                                        color: Color(0x3f000000),
-                                                                                        offset: Offset(0, 2.1298701763),
-                                                                                        blurRadius: 2.1298701763,
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                  child: Center(
-                                                                                    child: Text(
-                                                                                      'ADD',
-                                                                                      style: MyGoogleFontStyle(
-                                                                                        fontFamily: 'DM Sans',
-                                                                                        fontSize: 12,
-                                                                                        fontWeight: FontWeight.w700,
-                                                                                        height: 1,
-                                                                                        color: Color(0xffc7b456),
-                                                                                      ),
-                                                                                    ),
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          if (_addToCartModel
-                                                                              .addToCarts!
-                                                                              .where((cart) => cart.productId == _productModel.categoryWiseproducts![index].id && cart.userId == _configModel.user.id)
-                                                                              .toList()
-                                                                              .isNotEmpty)
-                                                                            Positioned(
-                                                                              left: 17,
-                                                                              top: 115,
-                                                                              child: Container(
-                                                                                width: 115,
-                                                                                height: 30.33,
-                                                                                decoration: BoxDecoration(
-                                                                                  border: Border.all(color: Color(0xffeaeaea)),
-                                                                                  color: Color(0xffffffff),
-                                                                                  borderRadius: BorderRadius.circular(7.0163693428),
-                                                                                  boxShadow: [
-                                                                                    BoxShadow(
-                                                                                      color: Color(0x3f000000),
-                                                                                      offset: Offset(0, 2.1298701763),
-                                                                                      blurRadius: 2.1298701763,
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                                child: Center(
-                                                                                  child: Row(
-                                                                                    children: [
-                                                                                      SizedBox(
-                                                                                        width: 50,
-                                                                                        child: TextButton(
-                                                                                          onPressed: () async {
-                                                                                            bool minus = false;
-                                                                                            await _addToCartModel.getAddToCart(_productModel.categoryWiseproducts![index].id, minus, _CartData);
-                                                                                          },
-                                                                                          style: TextButton.styleFrom(
-                                                                                            padding: EdgeInsets.zero,
-                                                                                          ),
-                                                                                          child: Container(
-                                                                                            decoration: BoxDecoration(
-                                                                                              border: Border.all(),
-                                                                                              borderRadius: BorderRadius.all(
-                                                                                                Radius.circular(5),
-                                                                                              ),
-                                                                                            ),
-                                                                                            child: Icon(
-                                                                                              Icons.remove,
-                                                                                              color: Colors.black,
-                                                                                              size: 16,
-                                                                                            ),
-                                                                                          ),
-                                                                                        ),
-                                                                                      ),
-                                                                                      Text(
-                                                                                        // '1',
-                                                                                        _addToCartModel.addToCarts!.where((_aTC) => _aTC.productId == _productModel.categoryWiseproducts![index].id).toList()[0].qty.toString(),
-                                                                                        style: MyGoogleFontStyle(
-                                                                                          fontFamily: 'Poppins',
-                                                                                          fontWeight: FontWeight.w500,
-                                                                                          color: Color(0xff1e1e1e),
-                                                                                        ),
-                                                                                      ),
-                                                                                      SizedBox(
-                                                                                        width: 50,
-                                                                                        child: TextButton(
-                                                                                          onPressed: () async {
-                                                                                            bool type = true;
-
-                                                                                            await _addToCartModel.getAddToCart(_productModel.categoryWiseproducts![index].id, type, _CartData);
-                                                                                          },
-                                                                                          style: TextButton.styleFrom(
-                                                                                            padding: EdgeInsets.zero,
-                                                                                          ),
-                                                                                          child: Container(
-                                                                                            decoration: BoxDecoration(
-                                                                                              border: Border.all(),
-                                                                                              borderRadius: BorderRadius.all(
-                                                                                                Radius.circular(5),
-                                                                                              ),
-                                                                                            ),
-                                                                                            child: Icon(
-                                                                                              Icons.add,
-                                                                                              color: Colors.black,
-                                                                                              size: 16,
-                                                                                            ),
-                                                                                          ),
-                                                                                        ),
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            )
-                                                                          else
-                                                                            Positioned(
-                                                                              // frame494xX8 (318:2821)
-                                                                              left: 31,
-                                                                              top: 110,
-                                                                              child: TextButton(
-                                                                                onPressed: () async {
-                                                                                  bool type = true;
-                                                                                  await _addToCartModel.getAddToCart(_productModel.categoryWiseproducts![index].id, type, _CartData);
-                                                                                  // Navigator.pushNamed(context, '/cartPage');
-                                                                                },
-                                                                                style: TextButton.styleFrom(
-                                                                                  padding: EdgeInsets.zero,
-                                                                                ),
-                                                                                child: Container(
-                                                                                  width: 82,
-                                                                                  height: 27.33,
-                                                                                  decoration: BoxDecoration(
-                                                                                    border: Border.all(color: Color(0xffeaeaea)),
-                                                                                    color: Color(0xffffffff),
-                                                                                    borderRadius: BorderRadius.circular(7.0163693428),
-                                                                                    boxShadow: [
-                                                                                      BoxShadow(
-                                                                                        color: Color(0x3f000000),
-                                                                                        offset: Offset(0, 2.1298701763),
-                                                                                        blurRadius: 2.1298701763,
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                  child: Center(
-                                                                                    child: Text(
-                                                                                      'ADD',
-                                                                                      style: MyGoogleFontStyle(
-                                                                                        fontFamily: 'DM Sans',
-                                                                                        fontSize: 12,
-                                                                                        fontWeight: FontWeight.w700,
-                                                                                        height: 1,
-                                                                                        color: Color(0xffc7b456),
-                                                                                      ),
-                                                                                    ),
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            ),
                                                                         ],
                                                                       ),
                                                                     ),
@@ -1770,12 +1639,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   _formKey.currentState!.save();
                                                   bool type = true;
 
-                                                  await _addToCartModel
-                                                      .getAddToCart(
-                                                          widget.arguments![
-                                                              'product']['id'],
-                                                          type,
-                                                          _CartData);
+                                                  // await _addToCartModel
+                                                  //     .getAddToCart(
+                                                  //         widget.arguments![
+                                                  //             'product']['id'],
+                                                  //         type,
+                                                  //         _CartData);
                                                   Navigator.pushNamed(
                                                       context, '/cartPage');
                                                 }
@@ -1806,7 +1675,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                     ),
                                                     Text(
                                                       // addtocartB9Y (318:2187)
-                                                      'Add To Cart',
+                                                      'Go To Cart',
                                                       style: MyGoogleFontStyle(
                                                         fontFamily: 'Urbanist',
                                                         fontWeight:

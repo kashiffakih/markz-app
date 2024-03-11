@@ -432,48 +432,48 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                 ),
-                InkWell(
-                  onTap: () {
-                    Navigator.pushNamed(context, '/registerPage');
-                  },
-                  child: RichText(
-                    textAlign: TextAlign.center,
-                    text: TextSpan(
-                      style: MyGoogleFontStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 13 * ffem,
-                        fontWeight: FontWeight.w600,
-                        height: 1.399999912 * ffem / fem,
-                        letterSpacing: 0.13 * fem,
-                        color: Color(0xff1e232c),
-                      ),
-                      children: [
-                        TextSpan(
-                          text: 'Don’t have an account? ',
-                          style: MyGoogleFontStyle(
-                            fontFamily: 'Urbanist',
-                            fontSize: 13 * ffem,
-                            fontWeight: FontWeight.w500,
-                            height: 1.399999912 * ffem / fem,
-                            letterSpacing: 0.13 * fem,
-                            color: Color(0xff1e232c),
-                          ),
-                        ),
-                        TextSpan(
-                          text: 'Register Now',
-                          style: MyGoogleFontStyle(
-                            fontFamily: 'Urbanist',
-                            fontSize: 13 * ffem,
-                            fontWeight: FontWeight.w700,
-                            height: 1.399999912 * ffem / fem,
-                            letterSpacing: 0.13 * fem,
-                            color: Color(0xffc9b758),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                // InkWell(
+                //   onTap: () {
+                //     Navigator.pushNamed(context, '/registerPage');
+                //   },
+                //   child: RichText(
+                //     textAlign: TextAlign.center,
+                //     text: TextSpan(
+                //       style: MyGoogleFontStyle(
+                //         fontFamily: 'Poppins',
+                //         fontSize: 13 * ffem,
+                //         fontWeight: FontWeight.w600,
+                //         height: 1.399999912 * ffem / fem,
+                //         letterSpacing: 0.13 * fem,
+                //         color: Color(0xff1e232c),
+                //       ),
+                //       children: [
+                //         TextSpan(
+                //           text: 'Don’t have an account? ',
+                //           style: MyGoogleFontStyle(
+                //             fontFamily: 'Urbanist',
+                //             fontSize: 13 * ffem,
+                //             fontWeight: FontWeight.w500,
+                //             height: 1.399999912 * ffem / fem,
+                //             letterSpacing: 0.13 * fem,
+                //             color: Color(0xff1e232c),
+                //           ),
+                //         ),
+                //         TextSpan(
+                //           text: 'Register Now',
+                //           style: MyGoogleFontStyle(
+                //             fontFamily: 'Urbanist',
+                //             fontSize: 13 * ffem,
+                //             fontWeight: FontWeight.w700,
+                //             height: 1.399999912 * ffem / fem,
+                //             letterSpacing: 0.13 * fem,
+                //             color: Color(0xffc9b758),
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
                 //  SizedBox(
                 //   height: 30,
                 // ),

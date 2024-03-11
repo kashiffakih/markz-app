@@ -18,7 +18,7 @@ class Product {
   String? imagepath3;
   String? imagepath4;
   int? subCategoryId;
-  String? position;
+  int? position;
   int? sub2CategoryId;
   int? sub3CategoryId;
   String? vegNonveg;

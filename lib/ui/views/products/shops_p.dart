@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:icon_forest/don_icons.dart';
-import 'package:icon_forest/iconoir.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/models/product.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
@@ -10,10 +8,10 @@ import 'package:sales_app/core/providers/wish_list_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/products/product_id_p.dart';
-import 'package:sales_app/ui/views/products/products_p.dart';
 
 class ShopsPage extends StatefulWidget {
-  const ShopsPage({Key? key}) : super(key: key);
+  final initialText;
+  const ShopsPage({Key? key, this.initialText}) : super(key: key);
 
   @override
   State<ShopsPage> createState() => ShopsPageState();
@@ -30,11 +28,14 @@ class ShopsPageState extends State<ShopsPage> {
   List<Product>? filteredProducts = [];
   int activeIndex = -1;
 
+  // TextEditingController _controller = TextEditingController();
+  var search = '';
   @override
   void initState() {
     super.initState();
+
     Provider.of<ProductModel>(context, listen: false).getCategories();
-    Provider.of<ProductModel>(context, listen: false).getAllProducts();
+    Provider.of<ProductModel>(context, listen: false).getAllProducts(search);
     var productId = '';
     Provider.of<AddToCartModel>(context, listen: false)
         .getAddToCart(productId, '', _CartData);
@@ -43,7 +44,6 @@ class ShopsPageState extends State<ShopsPage> {
 
   @override
   Widget build(BuildContext context) {
-    // print(widget.arguments['category'].toString());
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
@@ -52,9 +52,10 @@ class ShopsPageState extends State<ShopsPage> {
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
 
+    filteredProducts = _productModel.allProducts?.toList();
     setState(() {
-      if (!_isInitialLoad && _productModel.allProducts?.isNotEmpty == true) {
-        filteredProducts = _productModel.allProducts;
+      if (!_isInitialLoad == false && filteredProducts?.isNotEmpty == true) {
+        filteredProducts = filteredProducts;
         _isInitialLoad = true;
         // filteredProducts = [];
       } else {
@@ -65,7 +66,6 @@ class ShopsPageState extends State<ShopsPage> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          margin: EdgeInsets.only(top: 20),
           padding: EdgeInsets.fromLTRB(9 * fem, 16 * fem, 0 * fem, 22 * fem),
           width: double.infinity,
           decoration: BoxDecoration(
@@ -141,6 +141,27 @@ class ShopsPageState extends State<ShopsPage> {
                                 child: Padding(
                                   padding: const EdgeInsets.only(top: 15.0),
                                   child: TextFormField(
+                                    initialValue: widget.initialText.toString(),
+                                    // controller: _controller,
+                                    onChanged: (value) {
+                                      if (value.length % 3 == 0) {
+                                        setState(() {
+                                          filteredProducts =
+                                              Provider.of<ProductModel>(context,
+                                                      listen: false)
+                                                  .getAllProducts(value);
+                                        });
+                                      }
+                                    },
+                                    onFieldSubmitted: (value) {
+                                      setState(() {
+                                        filteredProducts =
+                                            Provider.of<ProductModel>(context,
+                                                    listen: false)
+                                                .getAllProducts(value);
+                                      });
+                                    },
+                                    autofocus: true,
                                     decoration: InputDecoration(
                                       hintText: 'Search',
                                       border: InputBorder.none,
@@ -168,21 +189,26 @@ class ShopsPageState extends State<ShopsPage> {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        Container(
-                          width: 20,
-                          height: 20,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment:
-                                MainAxisAlignment.center, // Center vertically
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Image.asset(
-                                'assets/images/shopping_cart.png',
-                                height: 20,
-                                fit: BoxFit.cover,
-                              ),
-                            ],
+                        InkWell(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/cartPage');
+                          },
+                          child: Container(
+                            width: 20,
+                            height: 20,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment:
+                                  MainAxisAlignment.center, // Center vertically
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Image.asset(
+                                  'assets/images/shopping_cart.png',
+                                  height: 20,
+                                  fit: BoxFit.cover,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -205,13 +231,14 @@ class ShopsPageState extends State<ShopsPage> {
                           setState(() {
                             activeIndex =
                                 -1; // Set activeIndex to -1 for "All" button
-                            filteredProducts = _productModel.allProducts;
+                            filteredProducts =
+                                _productModel.allProducts!.toList();
                           });
                         },
                         style: TextButton.styleFrom(
                           padding: EdgeInsets.zero,
                           backgroundColor: activeIndex == -1
-                              ? Color(0xFFC7B456) // Set the active color here
+                              ? Colors.black // Set the active color here
                               : Colors.white,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(5.0)),
@@ -265,29 +292,13 @@ class ShopsPageState extends State<ShopsPage> {
                                                 _productModel.categories![index]
                                                     ['id'])
                                             .toList();
-                                        // filteredProducts =  Provider.of<ProductModel>(context, listen: false).getCategoryWiseProduct(_productModel.categories![index]['id']);
-
-                                        // Navigator.of(context).push(
-                                        //     MaterialPageRoute(
-                                        //         builder: (context) =>
-                                        //             ProductsPage(arguments: {
-                                        //               'categoryId': _productModel
-                                        //                       .categories![index]
-                                        //                   ['id'],
-                                        //               'subCategory': _productModel
-                                        //                       .categories![index]
-                                        //                   ['sub_categories'],
-                                        //               'category': _productModel
-                                        //                       .categories![index]
-                                        //                   ['name']
-                                        //             })));
                                       });
                                     },
                                     style: TextButton.styleFrom(
                                         padding: EdgeInsets.zero,
                                         backgroundColor: isActive
-                                            ? Color(
-                                                0xFFC7B456) // Set the active color here
+                                            ? Colors
+                                                .black // Set the active color here
                                             : null,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
@@ -339,7 +350,7 @@ class ShopsPageState extends State<ShopsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    filteredProducts!.isNotEmpty
+                    filteredProducts != null
                         ? Container(
                             width: double.infinity,
                             // height: double.infinity,
@@ -354,6 +365,22 @@ class ShopsPageState extends State<ShopsPage> {
                                 ),
                                 itemCount: filteredProducts!.length,
                                 itemBuilder: (BuildContext ctx, index) {
+                                  double discountPrice = (int.parse(
+                                              filteredProducts![index]
+                                                  .productPrices![0]
+                                                  .price
+                                                  .toString()) -
+                                          int.parse(_productModel
+                                              .allProducts![index]
+                                              .productPrices![0]
+                                              .offerPrice
+                                              .toString())) /
+                                      int.parse(_productModel
+                                          .allProducts![index]
+                                          .productPrices![0]
+                                          .price
+                                          .toString()) *
+                                      100;
                                   return Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
@@ -384,9 +411,8 @@ class ShopsPageState extends State<ShopsPage> {
                                                                 builder: (context) =>
                                                                     ProductIdPage(
                                                                         arguments: {
-                                                                          'product': _productModel
-                                                                              .allProducts![index]
-                                                                              .toJson()
+                                                                          'product':
+                                                                              filteredProducts![index].toJson()
                                                                         })));
                                                       },
                                                       child: Container(
@@ -412,8 +438,7 @@ class ShopsPageState extends State<ShopsPage> {
                                                             image: NetworkImage(
                                                               _configModel.apiConfig[
                                                                       'mediaURL'] +
-                                                                  _productModel
-                                                                      .allProducts![
+                                                                  filteredProducts![
                                                                           index]
                                                                       .imagepath1
                                                                       .toString(),
@@ -425,15 +450,16 @@ class ShopsPageState extends State<ShopsPage> {
                                                           onTap: () async {
                                                             await _wishListModel
                                                                 .getWishLists(
-                                                                    _productModel
-                                                                        .products![
+                                                                    filteredProducts![
                                                                             index]
                                                                         .id);
                                                           },
                                                           child: _wishListModel
                                                                       .wishLists!
                                                                       .where((wishList) =>
-                                                                          wishList.productId == _productModel.allProducts![index].id &&
+                                                                          wishList.productId ==
+                                                                              filteredProducts![index]
+                                                                                  .id &&
                                                                           wishList.userId ==
                                                                               _configModel.user.id)
                                                                       .toList()
@@ -489,299 +515,21 @@ class ShopsPageState extends State<ShopsPage> {
                                                       ),
                                                     ),
                                                   ),
-                                                  if (_addToCartModel
-                                                      .addToCarts!
-                                                      .where((cart) =>
-                                                          cart.productId ==
-                                                              _productModel
-                                                                  .allProducts![
-                                                                      index]
-                                                                  .id &&
-                                                          cart.userId ==
-                                                              _configModel
-                                                                  .user.id)
-                                                      .toList()
-                                                      .isEmpty)
-                                                    Positioned(
-                                                      // frame494xX8 (318:2821)
-                                                      left: 31 * fem,
-                                                      top: 165 * fem,
-                                                      child: TextButton(
-                                                        onPressed: () async {
-                                                          bool type = true;
-                                                          await _addToCartModel
-                                                              .getAddToCart(
-                                                                  _productModel
-                                                                      .allProducts![
-                                                                          index]
-                                                                      .id,
-                                                                  type,
-                                                                  _CartData);
-                                                        },
-                                                        style: TextButton
-                                                            .styleFrom(
-                                                          padding:
-                                                              EdgeInsets.zero,
-                                                        ),
-                                                        child: Container(
-                                                          width: 82 * fem,
-                                                          height: 30 * fem,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            border: Border.all(
-                                                                color: Color(
-                                                                    0xffeaeaea)),
-                                                            color: Color(
-                                                                0xffffffff),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        7.0163693428 *
-                                                                            fem),
-                                                            boxShadow: [
-                                                              BoxShadow(
-                                                                color: Color(
-                                                                    0x3f000000),
-                                                                offset: Offset(
-                                                                    0 * fem,
-                                                                    2.1298701763 *
-                                                                        fem),
-                                                                blurRadius:
-                                                                    1 * fem,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          child: Center(
-                                                            child: Text(
-                                                              'ADD',
-                                                              style:
-                                                                  MyGoogleFontStyle(
-                                                                fontFamily:
-                                                                    'DM Sans',
-                                                                fontSize:
-                                                                    12 * ffem,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w700,
-                                                                height: 1 *
-                                                                    ffem /
-                                                                    fem,
-                                                                color: Color(
-                                                                    0xffc7b456),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  if (_addToCartModel
-                                                      .addToCarts!
-                                                      .where((cart) =>
-                                                          cart.productId ==
-                                                              _productModel
-                                                                  .allProducts![
-                                                                      index]
-                                                                  .id &&
-                                                          cart.userId ==
-                                                              _configModel
-                                                                  .user.id)
-                                                      .toList()
-                                                      .isNotEmpty)
-                                                    Positioned(
-                                                      left: 5 * fem,
-                                                      top: 175 * fem,
-                                                      child: Center(
-                                                        child: Container(
-                                                          width: 136 * fem,
-                                                          height: 30 * fem,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            border: Border.all(
-                                                                color: Color(
-                                                                    0xffeaeaea)),
-                                                            color: Color(
-                                                                0xffffffff),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        7.0163693428 *
-                                                                            fem),
-                                                            boxShadow: [
-                                                              BoxShadow(
-                                                                color: Color(
-                                                                    0x3f000000),
-                                                                offset: Offset(
-                                                                    0 * fem,
-                                                                    2.1298701763 *
-                                                                        fem),
-                                                                blurRadius:
-                                                                    2.1298701763 *
-                                                                        fem,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          child: Row(
-                                                            children: [
-                                                              SizedBox(
-                                                                width: 20,
-                                                              ),
-                                                              SizedBox(
-                                                                width: 23,
-                                                                height: 23,
-                                                                child: Center(
-                                                                  child:
-                                                                      TextButton(
-                                                                    onPressed:
-                                                                        () async {
-                                                                      bool
-                                                                          minus =
-                                                                          false;
-                                                                      await _addToCartModel.getAddToCart(
-                                                                          _productModel
-                                                                              .allProducts![index]
-                                                                              .id,
-                                                                          minus,
-                                                                          _CartData);
-                                                                    },
-                                                                    style: TextButton
-                                                                        .styleFrom(
-                                                                      padding:
-                                                                          EdgeInsets
-                                                                              .zero,
-                                                                    ),
-                                                                    child:
-                                                                        Container(
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        border:
-                                                                            Border.all(),
-                                                                        borderRadius:
-                                                                            BorderRadius.all(
-                                                                          Radius.circular(
-                                                                              5),
-                                                                        ),
-                                                                      ),
-                                                                      child:
-                                                                          Center(
-                                                                        child:
-                                                                            Icon(
-                                                                          Icons
-                                                                              .remove,
-                                                                          size:
-                                                                              20,
-                                                                          color:
-                                                                              Colors.black,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                width: 20,
-                                                              ),
-                                                              Text(
-                                                                // '1',
-                                                                _addToCartModel
-                                                                    .addToCarts!
-                                                                    .where((_aTC) =>
-                                                                        _aTC.productId ==
-                                                                        _productModel
-                                                                            .allProducts![index]
-                                                                            .id)
-                                                                    .toList()[0]
-                                                                    .qty
-                                                                    .toString(),
-                                                                style:
-                                                                    MyGoogleFontStyle(
-                                                                  fontFamily:
-                                                                      'Poppins',
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  color: Color(
-                                                                      0xff1e1e1e),
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                width: 20,
-                                                              ),
-                                                              Center(
-                                                                child: SizedBox(
-                                                                  width: 23,
-                                                                  height: 23,
-                                                                  child:
-                                                                      TextButton(
-                                                                    onPressed:
-                                                                        () async {
-                                                                      bool
-                                                                          type =
-                                                                          true;
-                                                                      await _addToCartModel.getAddToCart(
-                                                                          _productModel
-                                                                              .allProducts![index]
-                                                                              .id,
-                                                                          type,
-                                                                          _CartData);
-                                                                    },
-                                                                    style: TextButton
-                                                                        .styleFrom(
-                                                                      padding:
-                                                                          EdgeInsets
-                                                                              .zero,
-                                                                    ),
-                                                                    child:
-                                                                        Container(
-                                                                      width:
-                                                                          30, // Adjust the width as needed
-                                                                      height:
-                                                                          30, // Adjust the height as needed
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        border:
-                                                                            Border.all(),
-                                                                        borderRadius:
-                                                                            BorderRadius.all(
-                                                                          Radius.circular(
-                                                                              5),
-                                                                        ),
-                                                                      ),
-                                                                      child:
-                                                                          Icon(
-                                                                        Icons
-                                                                            .add,
-                                                                        size:
-                                                                            20, // Adjust the size of the Icon as needed
-                                                                        color: Colors
-                                                                            .black,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
                                                 ],
                                               ),
                                             ),
-                                            // SizedBox(
-                                            //   height: 10,
-                                            // ),
                                             InkWell(
                                               onTap: () {
                                                 Navigator.of(context).push(
                                                     MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ProductIdPage(
-                                                                arguments: {
-                                                                  'product': _productModel
-                                                                      .allProducts![
-                                                                          index]
-                                                                      .toJson()
-                                                                })));
+                                                        builder:
+                                                            (context) =>
+                                                                ProductIdPage(
+                                                                    arguments: {
+                                                                      'product':
+                                                                          filteredProducts![index]
+                                                                              .toJson()
+                                                                    })));
                                               },
                                               child: Container(
                                                 // shadechocolatecake3mjU (318:2819)
@@ -794,8 +542,8 @@ class ShopsPageState extends State<ShopsPage> {
                                                   maxWidth: 123 * fem,
                                                 ),
                                                 child: Text(
-                                                  _productModel
-                                                      .allProducts![index].name
+                                                  filteredProducts![index]
+                                                      .name
                                                       .toString(),
                                                   textAlign: TextAlign.center,
                                                   style: MyGoogleFontStyle(
@@ -816,23 +564,78 @@ class ShopsPageState extends State<ShopsPage> {
                                                   0 * fem,
                                                   1 * fem,
                                                   0 * fem),
-                                              child: Text(
-                                                _productModel
-                                                        .allProducts![index]
-                                                        .productPrices![0]
-                                                        .price
-                                                        .toString() +
-                                                    ' ' +
-                                                    'RS',
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Poppins',
-                                                  fontSize: 13 * ffem,
-                                                  fontWeight: FontWeight.w500,
-                                                  height: 1.5 * ffem / fem,
-                                                  letterSpacing:
-                                                      -0.2190869331 * fem,
-                                                  color: Color(0x99000000),
+                                              child: filteredProducts![index]
+                                                          .productPrices![0]
+                                                          .offerPrice !=
+                                                      0
+                                                  ? Text.rich(
+                                                      TextSpan(children: [
+                                                      new TextSpan(
+                                                        text:
+                                                            'RS. ${filteredProducts![index].productPrices![0].price.toString()}',
+                                                        style: new TextStyle(
+                                                          color: Colors.grey,
+                                                          decoration:
+                                                              TextDecoration
+                                                                  .lineThrough,
+                                                        ),
+                                                      ),
+                                                      new TextSpan(
+                                                        text:
+                                                            ' RS.${filteredProducts![index].productPrices![0].offerPrice.toString()}',
+                                                      ),
+                                                    ]))
+                                                  : Text(
+                                                      'RS. ${filteredProducts![index].productPrices![0].price.toString()}',
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: 13,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        height: 1.5,
+                                                        letterSpacing:
+                                                            -0.2190869331,
+                                                        color:
+                                                            Color(0x99000000),
+                                                      ),
+                                                    ),
+                                            ),
+                                            if (discountPrice != 0.0)
+                                              Center(
+                                                child: Text(
+                                                  '( ${discountPrice.round()}% Off)',
+                                                  style: MyGoogleFontStyle(
+                                                    fontFamily: 'Poppins',
+                                                    fontSize: 13 * ffem,
+                                                    fontWeight: FontWeight.w500,
+                                                    height: 1.5 * ffem / fem,
+                                                    letterSpacing:
+                                                        -0.2190869331 * fem,
+                                                    color: Color(0x99000000),
+                                                  ),
                                                 ),
+                                              ),
+                                            SizedBox(
+                                              child: Row(
+                                                children: [
+                                                  Row(
+                                                    children: List.generate(5,
+                                                        (index) {
+                                                      return Icon(
+                                                        index < 5
+                                                            ? Icons.star
+                                                            : Icons.star_border,
+                                                        color: Colors.amber,
+                                                        size: 16,
+                                                      );
+                                                    }),
+                                                  ),
+                                                  Text(
+                                                    ' ( ${filteredProducts?[index].reviews == null ? 0 : filteredProducts?[index].reviews?.length} Review )',
+                                                    style:
+                                                        TextStyle(fontSize: 10),
+                                                  )
+                                                ],
                                               ),
                                             ),
                                           ],

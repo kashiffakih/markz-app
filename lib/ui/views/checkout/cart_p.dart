@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:icon_forest/don_icons.dart';
-import 'package:icon_forest/iconoir.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/coupon_pr.dart';
@@ -10,6 +8,7 @@ import 'package:sales_app/core/providers/user_wallet_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/checkout/checkout_p.dart';
+import 'package:sales_app/ui/views/products/shops_p.dart';
 import 'package:sales_app/ui/views/profile/address_p.dart';
 
 class CartPage extends StatefulWidget {
@@ -42,6 +41,11 @@ class _CartPageState extends State<CartPage> {
     'writeOnCake': '',
     'pack': ''
   };
+  TextEditingController _controller = TextEditingController();
+  List<String> paymentOptions = ['Google Pay', 'PhonePe'];
+
+  var paymentOption = '';
+
   bool isGift = false;
   @override
   Widget build(BuildContext context) {
@@ -51,7 +55,6 @@ class _CartPageState extends State<CartPage> {
     final CouponModel _couponModel = Provider.of<CouponModel>(context);
     final UserWalletModel _userWaletModel =
         Provider.of<UserWalletModel>(context);
-
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -129,6 +132,20 @@ class _CartPageState extends State<CartPage> {
                                         padding:
                                             const EdgeInsets.only(top: 17.0),
                                         child: TextFormField(
+                                          controller: _controller,
+                                          onChanged: (value) {
+                                            // if (value.length % 3 == 0) {
+                                            // Call your API here
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => ShopsPage(
+                                                    initialText: value
+                                                        .toString()), // Pass initialText if needed
+                                              ),
+                                            );
+                                            _controller.clear();
+                                          },
                                           decoration: InputDecoration(
                                             hintText: 'Search',
                                             border: InputBorder.none,
@@ -173,173 +190,295 @@ class _CartPageState extends State<CartPage> {
                           : SizedBox(
                               height: MediaQuery.of(context).size.height - 335,
                               child: ListView.builder(
-                                scrollDirection: Axis.vertical,
-                                itemCount: _addToCartModel.addToCarts!.length,
-                                itemBuilder: (BuildContext context, index) =>
-                                    Column(
-                                  children: [
-                                    Row(
+                                  scrollDirection: Axis.vertical,
+                                  itemCount: _addToCartModel.addToCarts!.length,
+                                  itemBuilder: (BuildContext context, index) {
+                                    double discountPrice = (int.parse(
+                                                _addToCartModel
+                                                    .addToCarts![index]
+                                                    .product!
+                                                    .productPrices![0]
+                                                    .price
+                                                    .toString()) -
+                                            int.parse(_addToCartModel
+                                                .addToCarts![index]
+                                                .product!
+                                                .productPrices![0]
+                                                .offerPrice
+                                                .toString())) /
+                                        int.parse(_addToCartModel
+                                            .addToCarts![index]
+                                            .product!
+                                            .productPrices![0]
+                                            .price
+                                            .toString()) *
+                                        100;
+                                    // print(discountPrice.round());
+                                    return Column(
                                       children: [
-                                        Expanded(
-                                          flex: 3,
-                                          child: Container(
-                                            margin: EdgeInsets.fromLTRB(
-                                                0, 0, 10, 0),
-                                            child: Center(
-                                                child: Image.network(
-                                              _configModel
-                                                      .apiConfig['mediaURL'] +
-                                                  _addToCartModel
-                                                      .addToCarts![index]
-                                                      .product!
-                                                      .imagepath1
-                                                      .toString(),
-                                              // 'assets/images/mask-group-HvE.png',
-                                              width: 80,
-                                              height: 100,
-                                            )),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 4,
-                                          child: Container(
-                                            child: Column(
-                                              children: [
-                                                Align(
-                                                  alignment:
-                                                      Alignment.centerLeft,
-                                                  child: Text(
-                                                    _addToCartModel
-                                                        .addToCarts![index]
-                                                        .product!
-                                                        .name
-                                                        .toString(),
-                                                    style: MyGoogleFontStyle(
-                                                      fontFamily: 'Urbanist',
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Color(0xff909090),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Align(
-                                                  alignment:
-                                                      Alignment.centerLeft,
-                                                  child: Text(
-                                                    'RS' +
-                                                        ' ' +
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              flex: 3,
+                                              child: Container(
+                                                margin: EdgeInsets.fromLTRB(
+                                                    0, 0, 10, 0),
+                                                child: Center(
+                                                    child: Image.network(
+                                                  _configModel.apiConfig[
+                                                          'mediaURL'] +
+                                                      _addToCartModel
+                                                          .addToCarts![index]
+                                                          .product!
+                                                          .imagepath1
+                                                          .toString(),
+                                                  // 'assets/images/mask-group-HvE.png',
+                                                  width: 80,
+                                                  height: 100,
+                                                )),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 4,
+                                              child: Container(
+                                                child: Column(
+                                                  children: [
+                                                    Align(
+                                                      alignment:
+                                                          Alignment.centerLeft,
+                                                      child: Text(
                                                         _addToCartModel
                                                             .addToCarts![index]
                                                             .product!
-                                                            .productPrices![0]
-                                                            .price
+                                                            .name
                                                             .toString(),
-                                                    style: MyGoogleFontStyle(
-                                                      fontFamily: 'Poppins',
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: Color(0xff1e1e1e),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        // Expanded(flex: 1, child: Text('')),
-                                        Expanded(
-                                          flex: 6,
-                                          child: Align(
-                                            alignment: Alignment.centerRight,
-                                            child: Row(
-                                              children: [
-                                                TextButton(
-                                                  onPressed: () async {
-                                                    bool minus = false;
-                                                    await _addToCartModel
-                                                        .getAddToCart(
-                                                            _addToCartModel
-                                                                .addToCarts![
-                                                                    index]
-                                                                .product!
-                                                                .id,
-                                                            minus,
-                                                            _CartData);
-                                                  },
-                                                  style: TextButton.styleFrom(
-                                                    padding: EdgeInsets.zero,
-                                                  ),
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(),
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(5),
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color:
+                                                              Color(0xff909090),
+                                                        ),
                                                       ),
                                                     ),
-                                                    child: Icon(Icons.remove,
-                                                        color: Colors.black),
-                                                  ),
-                                                ),
-                                                Text(
-                                                  _addToCartModel
-                                                      .addToCarts![index].qty
-                                                      .toString(),
-                                                  style: MyGoogleFontStyle(
-                                                    fontFamily: 'Poppins',
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Colors.black,
-                                                  ),
-                                                ),
-                                                TextButton(
-                                                  onPressed: () async {
-                                                    bool type = true;
+                                                    Align(
+                                                        alignment: Alignment
+                                                            .centerLeft,
+                                                        child: _addToCartModel
+                                                                    .addToCarts![
+                                                                        index]
+                                                                    .product!
+                                                                    .productPrices![
+                                                                        0]
+                                                                    .offerPrice !=
+                                                                0
+                                                            ? Text.rich(
+                                                                TextSpan(
+                                                                    children: [
+                                                                    new TextSpan(
+                                                                      text:
+                                                                          'RS. ${_addToCartModel.addToCarts![index].product!.productPrices![0].price.toString()}',
+                                                                      style:
+                                                                          new TextStyle(
+                                                                        color: Colors
+                                                                            .grey,
+                                                                        decoration:
+                                                                            TextDecoration.lineThrough,
+                                                                      ),
+                                                                    ),
+                                                                    new TextSpan(
+                                                                      text:
+                                                                          ' RS.${_addToCartModel.addToCarts![index].product!.productPrices![0].offerPrice.toString()}',
+                                                                    ),
+                                                                  ]))
+                                                            : Text(
+                                                                'RS. ${_addToCartModel.addToCarts![index].product!.productPrices![0].price.toString()}',
+                                                                style:
+                                                                    MyGoogleFontStyle(
+                                                                  fontFamily:
+                                                                      'Poppins',
+                                                                  fontSize: 13,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  height: 1.5,
+                                                                  letterSpacing:
+                                                                      -0.2190869331,
+                                                                  color: Color(
+                                                                      0x99000000),
+                                                                ),
+                                                              )
 
-                                                    await _addToCartModel
-                                                        .getAddToCart(
-                                                            _addToCartModel
-                                                                .addToCarts![
-                                                                    index]
-                                                                .product!
-                                                                .id,
-                                                            type,
-                                                            _CartData);
-                                                  },
-                                                  style: TextButton.styleFrom(
-                                                    padding: EdgeInsets.zero,
-                                                  ),
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(),
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(5),
+                                                        // Text(
+                                                        //   'RS' +
+                                                        //       ' ' +
+                                                        //       _addToCartModel
+                                                        //           .addToCarts![
+                                                        //               index]
+                                                        //           .product!
+                                                        //           .productPrices![
+                                                        //               0]
+                                                        //           .price
+                                                        //           .toString(),
+                                                        //   style:
+                                                        //       MyGoogleFontStyle(
+                                                        //     fontFamily: 'Poppins',
+                                                        //     fontWeight:
+                                                        //         FontWeight.w600,
+                                                        //     color:
+                                                        //         Color(0xff1e1e1e),
+                                                        //   ),
+                                                        // ),
+                                                        ),
+                                                    if (discountPrice != 0.0)
+                                                      Align(
+                                                        alignment: Alignment
+                                                            .centerLeft,
+                                                        child: Text(
+                                                          '( ${discountPrice.round()}% Off)',
+                                                          style:
+                                                              MyGoogleFontStyle(
+                                                            fontFamily:
+                                                                'Poppins',
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    Align(
+                                                      alignment:
+                                                          Alignment.centerLeft,
+                                                      child: Text(
+                                                        'Size:  ${_addToCartModel.addToCarts![index].kindOfFlower}',
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily: 'Poppins',
+                                                        ),
                                                       ),
                                                     ),
-                                                    child: Icon(Icons.add,
-                                                        color: Colors.black),
-                                                  ),
+                                                    Align(
+                                                      alignment:
+                                                          Alignment.centerLeft,
+                                                      child: Text(
+                                                        'Colour:  ${_addToCartModel.addToCarts![index].flavour}',
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily: 'Poppins',
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                              ],
+                                              ),
                                             ),
+                                            // Expanded(flex: 1, child: Text('')),
+                                            Expanded(
+                                              flex: 6,
+                                              child: Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: Row(
+                                                  children: [
+                                                    TextButton(
+                                                      onPressed: () async {
+                                                        bool minus = false;
+                                                        await _addToCartModel
+                                                            .getAddToCart(
+                                                                _addToCartModel
+                                                                    .addToCarts![
+                                                                        index]
+                                                                    .product!
+                                                                    .id,
+                                                                minus,
+                                                                _CartData);
+                                                      },
+                                                      style:
+                                                          TextButton.styleFrom(
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                      ),
+                                                      child: Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          border: Border.all(),
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                            Radius.circular(5),
+                                                          ),
+                                                        ),
+                                                        child: Icon(
+                                                            Icons.remove,
+                                                            color:
+                                                                Colors.black),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      _addToCartModel
+                                                          .addToCarts![index]
+                                                          .qty
+                                                          .toString(),
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () async {
+                                                        bool type = true;
+
+                                                        await _addToCartModel
+                                                            .getAddToCart(
+                                                                _addToCartModel
+                                                                    .addToCarts![
+                                                                        index]
+                                                                    .product!
+                                                                    .id,
+                                                                type,
+                                                                _CartData);
+                                                      },
+                                                      style:
+                                                          TextButton.styleFrom(
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                      ),
+                                                      child: Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          border: Border.all(),
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                            Radius.circular(5),
+                                                          ),
+                                                        ),
+                                                        child: Icon(Icons.add,
+                                                            color:
+                                                                Colors.black),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        // SizedBox(
+                                        //   height: 5,
+                                        // ),
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width -
+                                              50,
+                                          child: Divider(
+                                            thickness: 2,
+                                            color: Colors.black,
                                           ),
                                         ),
                                       ],
-                                    ),
-                                    // SizedBox(
-                                    //   height: 5,
-                                    // ),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width -
-                                          50,
-                                      child: Divider(
-                                        thickness: 2,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                                    );
+                                  }),
                             ),
                     ),
                   ],
@@ -526,19 +665,19 @@ class _CartPageState extends State<CartPage> {
                         //                 MaterialPageRoute(
                         //                     builder: (context) =>
                         //                         CheckoutPage(arguments: {
-                        // 'cartTotal': _addToCartModel
-                        //     .cartTotal
-                        //     .toString(),
-                        // 'cartItems': _addToCartModel
-                        //     .addToCarts,
-                        // 'address': _orderModel
-                        //         .orders.isNotEmpty
-                        //     ? _orderModel
-                        //         .orders[0].address!
-                        //         .toJson()
-                        //     : null,
-                        // 'couponValue': couponValue,
-                        // 'couponId': couponId
+                        //                           'cartTotal': _addToCartModel
+                        //                               .cartTotal
+                        //                               .toString(),
+                        //                           'cartItems': _addToCartModel
+                        //                               .addToCarts,
+                        //                           'address': _orderModel
+                        //                                   .orders.isNotEmpty
+                        //                               ? _orderModel
+                        //                                   .orders[0].address!
+                        //                                   .toJson()
+                        //                               : null,
+                        //                           'couponValue': couponValue,
+                        //                           'couponId': couponId
                         //                         })));
                         //           },
                         //           style: TextButton.styleFrom(
@@ -633,7 +772,7 @@ class _CartPageState extends State<CartPage> {
                                           )
                                         ],
                                       ),
-                                      if (_orderModel.orders[0].address != null)
+                                      if (_orderModel.orders.length > 0)
                                         Container(
                                           width: MediaQuery.of(context)
                                                   .size
@@ -704,7 +843,7 @@ class _CartPageState extends State<CartPage> {
                                             ],
                                           ),
                                         ),
-                                      if (_orderModel.orders[0].address == null)
+                                      if (_orderModel.orders.length == 0)
                                         Center(
                                           child: Container(
                                             width: 150,
@@ -821,7 +960,6 @@ class _CartPageState extends State<CartPage> {
                                                   .toList(),
                                               onChanged: (value) {
                                                 setState(() {
-                                                  print(value.toString);
                                                   paymentOption =
                                                       value.toString();
 
@@ -829,110 +967,110 @@ class _CartPageState extends State<CartPage> {
                                                 });
                                               })),
                                       // Delivery Method
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              'Delivery Method',
-                                              style: MyGoogleFontStyle(
-                                                fontFamily: 'Urbanist',
-                                                fontWeight: FontWeight.w700,
-                                                color: Color(0xff909090),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          // border: Border.all(color: Color(0xffdadada)),
-                                          color: Color(0xffffffff),
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          border: Border.all(
-                                              color: Color(0xffc7b456)),
-                                        ),
-                                        child: _orderModel.orders[0].address!
-                                                        .nationality
-                                                        .toString() ==
-                                                    "Dubai" &&
-                                                _orderModel.orders[0].address!
-                                                        .state
-                                                        .toString() ==
-                                                    "Dubai"
-                                            ? DropdownButtonFormField(
-                                                // value: deliveryMethod,
-                                                decoration: InputDecoration(
-                                                    border: InputBorder.none,
-                                                    focusedBorder:
-                                                        InputBorder.none,
-                                                    enabledBorder:
-                                                        InputBorder.none,
-                                                    errorBorder:
-                                                        InputBorder.none,
-                                                    disabledBorder:
-                                                        InputBorder.none,
-                                                    labelText:
-                                                        'Select Delivery Method',
-                                                    contentPadding:
-                                                        EdgeInsets.all(10)),
-                                                items: timeSlotForDubai
-                                                    .map(
-                                                      (_deliveryMethod) =>
-                                                          DropdownMenuItem(
-                                                        child: Text(
-                                                          _deliveryMethod,
-                                                        ),
-                                                        value: _deliveryMethod,
-                                                      ),
-                                                    )
-                                                    .toList(),
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    print(value.toString);
-                                                    deliveryMethod =
-                                                        value.toString();
+                                      // Row(
+                                      //   children: [
+                                      //     Expanded(
+                                      //       child: Text(
+                                      //         'Delivery Method',
+                                      //         style: MyGoogleFontStyle(
+                                      //           fontFamily: 'Urbanist',
+                                      //           fontWeight: FontWeight.w700,
+                                      //           color: Color(0xff909090),
+                                      //         ),
+                                      //       ),
+                                      //     ),
+                                      //   ],
+                                      // ),
+                                      // SizedBox(
+                                      //   height: 10,
+                                      // ),
+                                      // Container(
+                                      //   decoration: BoxDecoration(
+                                      //     // border: Border.all(color: Color(0xffdadada)),
+                                      //     color: Color(0xffffffff),
+                                      //     borderRadius:
+                                      //         BorderRadius.circular(5),
+                                      //     border: Border.all(
+                                      //         color: Color(0xffc7b456)),
+                                      //   ),
+                                      //   child: _orderModel.orders[0].address!
+                                      //                   .nationality
+                                      //                   .toString() ==
+                                      //               "Dubai" &&
+                                      //           _orderModel.orders[0].address!
+                                      //                   .state
+                                      //                   .toString() ==
+                                      //               "Dubai"
+                                      //       ? DropdownButtonFormField(
+                                      //           // value: deliveryMethod,
+                                      //           decoration: InputDecoration(
+                                      //               border: InputBorder.none,
+                                      //               focusedBorder:
+                                      //                   InputBorder.none,
+                                      //               enabledBorder:
+                                      //                   InputBorder.none,
+                                      //               errorBorder:
+                                      //                   InputBorder.none,
+                                      //               disabledBorder:
+                                      //                   InputBorder.none,
+                                      //               labelText:
+                                      //                   'Select Delivery Method',
+                                      //               contentPadding:
+                                      //                   EdgeInsets.all(10)),
+                                      //           items: timeSlotForDubai
+                                      //               .map(
+                                      //                 (_deliveryMethod) =>
+                                      //                     DropdownMenuItem(
+                                      //                   child: Text(
+                                      //                     _deliveryMethod,
+                                      //                   ),
+                                      //                   value: _deliveryMethod,
+                                      //                 ),
+                                      //               )
+                                      //               .toList(),
+                                      //           onChanged: (value) {
+                                      //             setState(() {
+                                      //               print(value.toString);
+                                      //               deliveryMethod =
+                                      //                   value.toString();
 
-                                                    // _userAddress.nationality = value.toString();
-                                                  });
-                                                })
-                                            : DropdownButtonFormField(
-                                                // value: deliveryMethod,
-                                                decoration: InputDecoration(
-                                                    border: InputBorder.none,
-                                                    focusedBorder:
-                                                        InputBorder.none,
-                                                    enabledBorder:
-                                                        InputBorder.none,
-                                                    errorBorder:
-                                                        InputBorder.none,
-                                                    disabledBorder: InputBorder.none,
-                                                    labelText: 'Select Delivery Method',
-                                                    contentPadding: EdgeInsets.all(10)),
-                                                items: timeSlotForOther
-                                                    .map(
-                                                      (_deliveryMethod) =>
-                                                          DropdownMenuItem(
-                                                        child: Text(
-                                                          _deliveryMethod,
-                                                        ),
-                                                        value: _deliveryMethod,
-                                                      ),
-                                                    )
-                                                    .toList(),
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    print(value.toString);
-                                                    deliveryMethod =
-                                                        value.toString();
+                                      //               // _userAddress.nationality = value.toString();
+                                      //             });
+                                      //           })
+                                      //       : DropdownButtonFormField(
+                                      //           // value: deliveryMethod,
+                                      //           decoration: InputDecoration(
+                                      //               border: InputBorder.none,
+                                      //               focusedBorder:
+                                      //                   InputBorder.none,
+                                      //               enabledBorder:
+                                      //                   InputBorder.none,
+                                      //               errorBorder:
+                                      //                   InputBorder.none,
+                                      //               disabledBorder: InputBorder.none,
+                                      //               labelText: 'Select Delivery Method',
+                                      //               contentPadding: EdgeInsets.all(10)),
+                                      //           items: timeSlotForOther
+                                      //               .map(
+                                      //                 (_deliveryMethod) =>
+                                      //                     DropdownMenuItem(
+                                      //                   child: Text(
+                                      //                     _deliveryMethod,
+                                      //                   ),
+                                      //                   value: _deliveryMethod,
+                                      //                 ),
+                                      //               )
+                                      //               .toList(),
+                                      //           onChanged: (value) {
+                                      //             setState(() {
+                                      //               print(value.toString);
+                                      //               deliveryMethod =
+                                      //                   value.toString();
 
-                                                    // _userAddress.nationality = value.toString();
-                                                  });
-                                                }),
-                                      ),
+                                      //               // _userAddress.nationality = value.toString();
+                                      //             });
+                                      //           }),
+                                      // ),
                                       // Send as a gift
                                       Row(
                                         children: [
@@ -948,7 +1086,9 @@ class _CartPageState extends State<CartPage> {
                                           ),
                                           Checkbox(
                                             value: isGift,
-                                            activeColor: Colors.black,
+                                            activeColor: Color.fromARGB(
+                                                255, 250, 225, 1),
+                                            checkColor: Colors.black,
                                             onChanged: (bool? value) {
                                               setState(() {
                                                 isGift = value ?? false;
@@ -1294,7 +1434,7 @@ class _CartPageState extends State<CartPage> {
                               SizedBox(
                                 height: 20,
                               ),
-                              _orderModel.orders[0].address != null
+                              _orderModel.orders.length > 0
                                   ? Align(
                                       alignment: Alignment.bottomCenter,
                                       child: Container(

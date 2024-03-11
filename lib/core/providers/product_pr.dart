@@ -57,8 +57,8 @@ class ProductModel with ChangeNotifier {
   }
 
   List<Product>? get allProducts => _allProducts;
-  getAllProducts() async {
-    allProducts = await _productService.getAllProducts();
+  getAllProducts(String? search) async {
+    allProducts = await _productService.getAllProducts(search: search);
   }
 
 // List of products
