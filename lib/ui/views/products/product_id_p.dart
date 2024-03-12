@@ -9,6 +9,7 @@ import 'package:sales_app/core/providers/wish_list_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/products/shops_p.dart';
+import 'package:sales_app/ui/widgets/multi_image_w.dart';
 
 import '../../../core/models/product.dart';
 
@@ -791,7 +792,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                 // Description and Reviews
                                 Container(
                                   margin: EdgeInsets.only(top: 10),
-                                  height: 310,
+                                  height: 380,
                                   child: DefaultTabController(
                                     length: 3,
                                     child: Column(
@@ -830,7 +831,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   .size
                                                   .width -
                                               50,
-                                          height: 250,
+                                          height: 330,
                                           child: TabBarView(
                                             children: [
                                               Padding(
@@ -1012,6 +1013,11 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                         ),
                                                       ),
                                                       SizedBox(height: 10),
+                                                      SizedBox(
+                                                          height: 100,
+                                                          // width: 150,
+                                                          child:
+                                                              MultipleImageUploadPage()),
                                                       Container(
                                                         margin:
                                                             EdgeInsets.fromLTRB(
@@ -1629,112 +1635,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                           //     ),
                                           //   ),
                                           // ),
-                                          SizedBox(
-                                            width: 150,
-                                            height: 41,
-                                            child: TextButton(
-                                              onPressed: () async {
-                                                if (_formKey.currentState!
-                                                    .validate()) {
-                                                  _formKey.currentState!.save();
-                                                  bool type = true;
-
-                                                  // await _addToCartModel
-                                                  //     .getAddToCart(
-                                                  //         widget.arguments![
-                                                  //             'product']['id'],
-                                                  //         type,
-                                                  //         _CartData);
-                                                  Navigator.pushNamed(
-                                                      context, '/cartPage');
-                                                }
-                                              },
-                                              style: TextButton.styleFrom(
-                                                padding: EdgeInsets.zero,
-                                              ),
-                                              child: Container(
-                                                padding: EdgeInsets.fromLTRB(
-                                                    20, 10, 10, 10),
-                                                decoration: BoxDecoration(
-                                                  color: Color(0xff1e1e1e),
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                                child: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    Container(
-                                                      padding: EdgeInsets.only(
-                                                          right: 10),
-                                                      child: Image.asset(
-                                                        'assets/images/shopping-bag-03.png',
-                                                        width: 18,
-                                                        height: 17,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      // addtocartB9Y (318:2187)
-                                                      'Go To Cart',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Urbanist',
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                        color:
-                                                            Color(0xffffffff),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-
-                                          SizedBox(
-                                            width: 150,
-                                            height: 41,
-                                            child: TextButton(
-                                              onPressed: () async {},
-                                              style: TextButton.styleFrom(
-                                                padding: EdgeInsets.zero,
-                                              ),
-                                              child: Container(
-                                                padding: EdgeInsets.fromLTRB(
-                                                    30, 10, 10, 10),
-                                                decoration: BoxDecoration(
-                                                  color: Color(0xFFC7B456),
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                                child: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    Container(
-                                                      padding: EdgeInsets.only(
-                                                          right: 10),
-                                                      child: Image.asset(
-                                                        'assets/images/shopping-bag-03.png',
-                                                        width: 18,
-                                                        height: 17,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      // addtocartB9Y (318:2187)
-                                                      'Buy Now',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Urbanist',
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                        color:
-                                                            Color(0xffffffff),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
                                         ],
                                       ),
                                       SizedBox(
@@ -1754,6 +1654,118 @@ class _ProductIdPageState extends State<ProductIdPage> {
                       ),
               ],
             ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: Container(
+        child: Padding(
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+          child: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Expanded(
+                  flex: 6,
+                  child: SizedBox(
+                    width: 150,
+                    height: 41,
+                    child: TextButton(
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          _formKey.currentState!.save();
+                          bool type = true;
+
+                          // await _addToCartModel
+                          //     .getAddToCart(
+                          //         widget.arguments![
+                          //             'product']['id'],
+                          //         type,
+                          //         _CartData);
+                          Navigator.pushNamed(context, '/cartPage');
+                        }
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                      ),
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(20, 10, 10, 10),
+                        decoration: BoxDecoration(
+                          color: Color(0xff1e1e1e),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(right: 10),
+                              child: Image.asset(
+                                'assets/images/shopping-bag-03.png',
+                                width: 18,
+                                height: 17,
+                              ),
+                            ),
+                            Text(
+                              // addtocartB9Y (318:2187)
+                              'Go To Cart',
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xffffffff),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Expanded(
+                  flex: 6,
+                  child: SizedBox(
+                    width: 150,
+                    height: 41,
+                    child: TextButton(
+                      onPressed: () async {},
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                      ),
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(30, 10, 10, 10),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFC7B456),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(right: 10),
+                              child: Image.asset(
+                                'assets/images/shopping-bag-03.png',
+                                width: 18,
+                                height: 17,
+                              ),
+                            ),
+                            Text(
+                              // addtocartB9Y (318:2187)
+                              'Buy Now',
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xffffffff),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

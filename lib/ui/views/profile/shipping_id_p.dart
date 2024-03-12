@@ -400,13 +400,15 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                                     await _userAddressModel.updateUserAddress(
                                         userAddress: _userAddress);
                                 if (response == true) {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => AddressPage(
-                                              arguments: {
-                                                'cartItems': [],
-                                                'cartTotal': '',
-                                                'isAddress': false
-                                              })));
+                                  Navigator.of(context).pop();
+                                  // Navigator.of(context).push(MaterialPageRoute(
+                                  //     builder: (context) =>
+                                  //         AddressPage(arguments: {
+                                  //           'cartItems': [],
+                                  //           'cartTotal': '',
+                                  //           'couponValue': 0,
+                                  //           'isAddress': false,
+                                  //         })));
                                 }
                                 setState(() {
                                   _loading = false;

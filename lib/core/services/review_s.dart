@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:sales_app/core/models/review.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
@@ -13,9 +14,50 @@ class ReviewService {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
     var userId = _configModel.user.id;
 
-    http.Response _response = await http.get(
-      Uri.parse(
-          '${_apiConfig['baseURL']}/review?userId=$userId&productId=$productId&description=$description'),
+    // _configModel.files.forEach((imageFile) async {
+    // if (imageFile.file != null) {
+// Add each image file to the request
+    // for (String filePath in _configModel.files) {
+    //   File file = File(filePath);
+    //   if (await file.exists()) {
+    //     // Add the image file to the request
+    //     request.files.add(
+    //       await http.MultipartFile.fromPath(
+    //         'attachments[]', // Use [] to indicate array in multipart request
+    //         filePath,
+    //       ),
+    //     );
+    //   }
+    // }
+
+    _configModel.files.forEach((element) async {
+      print(element.fileName.toString());
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('${_apiConfig['baseURL']}/review'),
+      )
+        ..fields['userId'] = userId.toString()
+        ..fields['productId'] = productId.toString()
+        ..fields['description'] = description.toString()
+        ..fields['filename'] = element.fileName ?? ''
+        ..files.add(
+          await http.MultipartFile.fromPath(
+            'attachment',
+            element.file.toString(),
+          ),
+        )
+        ..headers.addAll(_apiConfig['headers']);
+      http.StreamedResponse _res = await request.send();
+      http.Response _responseImage = await http.Response.fromStream(_res);
+      // Clear the file reference after uploading
+      element.file = null;
+      print(_responseImage.body);
+    });
+    // }
+    // });
+
+    http.Response _response = await http.post(
+      Uri.parse('${_apiConfig['baseURL']}/review?userId=$userId'),
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
@@ -25,6 +67,7 @@ class ReviewService {
         _reviews.add(Review.fromJson(data));
       });
     }
+
     return _reviews;
   }
 }

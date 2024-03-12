@@ -19,7 +19,7 @@ class DrawerWidget extends StatelessWidget {
                 child: Row(
                   children: <Widget>[
                     // Container(
-                    //   // pinewrapslogo1MaZ (617:1924)
+                    //   // Aadablogo1MaZ (617:1924)
                     //   margin: EdgeInsets.fromLTRB(0, 0, 0, 30),
                     //   width: 50,
                     //   height: 80,
@@ -54,7 +54,7 @@ class DrawerWidget extends StatelessWidget {
                             ),
                           ),
                           Positioned(
-                            // pinewraps59B (617:1925)
+                            // Aadab59B (617:1925)
                             left: 0,
                             top: 16.6254882812,
                             child: Align(

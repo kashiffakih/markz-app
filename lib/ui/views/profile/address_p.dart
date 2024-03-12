@@ -25,7 +25,10 @@ class _AddressPageState extends State<AddressPage> {
   @override
   void initState() {
     super.initState();
-    Provider.of<UserAddressModel>(context, listen: false).getUserAddresses();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Provider.of<UserAddressModel>(context, listen: false)
+          .getUserAddresses();
+    });
   }
 
   @override

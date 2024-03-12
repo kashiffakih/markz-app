@@ -233,8 +233,9 @@ class _CartPageState extends State<CartPage> {
                                                           .imagepath1
                                                           .toString(),
                                                   // 'assets/images/mask-group-HvE.png',
-                                                  width: 80,
-                                                  height: 100,
+                                                  fit: BoxFit.contain,
+                                                  // width: 120,
+                                                  // height: 150,
                                                 )),
                                               ),
                                             ),
@@ -299,7 +300,7 @@ class _CartPageState extends State<CartPage> {
                                                                     MyGoogleFontStyle(
                                                                   fontFamily:
                                                                       'Poppins',
-                                                                  fontSize: 13,
+                                                                  fontSize: 10,
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .w500,
@@ -365,6 +366,23 @@ class _CartPageState extends State<CartPage> {
                                                             MyGoogleFontStyle(
                                                           fontFamily: 'Poppins',
                                                         ),
+                                                      ),
+                                                    ),
+                                                    Align(
+                                                      alignment:
+                                                          Alignment.centerLeft,
+                                                      child: Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons.star,
+                                                            color: Colors.amber,
+                                                          ),
+                                                          Text(
+                                                            ' ( ${(_addToCartModel.addToCarts![index].product!.reviews == null ? 0 : _addToCartModel.addToCarts![index].product!.reviews?.length)} ratings )',
+                                                            style: TextStyle(
+                                                                fontSize: 12),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ),
                                                   ],

@@ -34,3 +34,5 @@ const String shopsPage = '/shopsPage';
 const String reviewUpdatePage = '/reviewUpdatePage';
 const String refundPolicyPage = '/refundPolicyPage';
 const String termAndConditionPage = '/termAndConditionPage';
+
+const String multipleImages = '/multiple-images';
