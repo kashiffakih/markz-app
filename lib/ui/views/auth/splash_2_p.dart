@@ -24,7 +24,7 @@ class Splash2Page extends StatelessWidget {
                     width: 200,
                     height: 300,
                     child: Image.asset(
-                      'assets/images/logo.png',
+                      'assets/images/aadab-logo.png',
                     ),
                   ),
                 ),

@@ -77,8 +77,7 @@ class _ContactPageState extends State<ContactPage> {
                         onTap: () async {
                           String email = Uri.encodeComponent(
                               _configModel.user.companies![0].email.toString());
-                          String subject =
-                              Uri.encodeComponent("Hello PineWraps");
+                          String subject = Uri.encodeComponent("Hello Aadab");
                           String body = Uri.encodeComponent(
                               "Hello! I would like to order a delicious cake.");
                           print(subject); //output: Hello%20Flutter

@@ -38,6 +38,7 @@ import 'package:sales_app/ui/views/profile/shipping_id_p.dart';
 import 'package:sales_app/ui/views/profile/terms-condition_p.dart';
 import 'package:sales_app/ui/views/profile/wishlist_p.dart';
 import 'package:sales_app/ui/widgets/menu-drawer.dart';
+import 'package:sales_app/ui/widgets/multi_image_w.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
@@ -193,6 +194,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case termAndConditionPage:
       return MaterialPageRoute(builder: (BuildContext context) {
         return TermsAndConditionsPage();
+      });
+    case multipleImages:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return MultipleImageUploadPage();
       });
     default:
       return MaterialPageRoute(builder: (BuildContext context) {

@@ -26,7 +26,7 @@ class _SplashPageState extends State<SplashPage> {
                     width: 200,
                     height: 300,
                     child: Image.asset(
-                      'assets/images/logo.png',
+                      'assets/images/aadab-logo.png',
                     ),
                   ),
                 ),

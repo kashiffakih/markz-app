@@ -25,12 +25,14 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    Provider.of<ProductModel>(context, listen: false).getProduct();
-    Provider.of<ProductModel>(context, listen: false).getBanners();
-    var productId = '';
-    Provider.of<WishListModel>(context, listen: false).getWishLists(productId);
-
-    Provider.of<ProductModel>(context, listen: false).getCategories();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Provider.of<ProductModel>(context, listen: false).getProduct();
+      await Provider.of<ProductModel>(context, listen: false).getBanners();
+      var productId = '';
+      await Provider.of<WishListModel>(context, listen: false)
+          .getWishLists(productId);
+      await Provider.of<ProductModel>(context, listen: false).getCategories();
+    });
   }
 
   final GlobalKey<ScaffoldState> _key = GlobalKey();
@@ -40,7 +42,7 @@ class _HomePageState extends State<HomePage> {
     final ProductModel _productModel = Provider.of<ProductModel>(context);
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
-
+    double discountPrice = 0.0;
     var images = [
       _productModel.banners?['banner_path_1'] != null
           ? _configModel.apiConfig['mediaURL'] +
@@ -186,15 +188,15 @@ class _HomePageState extends State<HomePage> {
                                     //                           width: 100 * fem,
                                     //                           height: 70 * fem,
                                     //                           child: Image.asset(
-                                    //                             'assets/images/NewPineWrapsText.jpeg',
+                                    //                             'assets/images/NewAadabText.jpeg',
                                     //                             height: 70,
                                     //                             width: 100,
-                                    //                             // 'assets/images/NewPineWrapsText.jpeg',
+                                    //                             // 'assets/images/NewAadabText.jpeg',
                                     //                             // fit: BoxFit.fill,
                                     //                           ),
                                     //                         )
                                     //                         // Text(
-                                    //                         //   'PINEWRAPS',
+                                    //                         //   'Aadab',
                                     //                         //   style: MyGoogleFontStyle(
                                     //                         //     fontFamily: 'PT Serif Regular 400 Italy',
                                     //                         //     fontSize:
@@ -405,6 +407,18 @@ class _HomePageState extends State<HomePage> {
                             shrinkWrap: true,
                             itemCount: _productModel.products!.length,
                             itemBuilder: (context, index) {
+                              discountPrice = (int.parse(_productModel
+                                          .products![index]
+                                          .productPrices![0]
+                                          .price
+                                          .toString()) -
+                                      int.parse(_productModel.products![index]
+                                          .productPrices![0].offerPrice
+                                          .toString())) /
+                                  int.parse(_productModel
+                                      .products![index].productPrices![0].price
+                                      .toString()) *
+                                  100;
                               return Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
@@ -586,28 +600,89 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                           ),
                                           Container(
-                                            // 5H8 (318:2003)
-                                            margin: EdgeInsets.fromLTRB(0 * fem,
-                                                0 * fem, 1 * fem, 0 * fem),
-                                            child: Text(
-                                              _productModel
-                                                      .products![index]
-                                                      .productPrices![0]
-                                                      .offerPrice
-                                                      .toString() +
-                                                  ' ' +
-                                                  'RS',
-                                              style: MyGoogleFontStyle(
-                                                fontFamily: 'Poppins',
-                                                fontSize: 13 * ffem,
-                                                fontWeight: FontWeight.w500,
-                                                height: 1.5 * ffem / fem,
-                                                letterSpacing:
-                                                    -0.2190869331 * fem,
-                                                color: Color(0x99000000),
+                                              // 5H8 (318:2003)
+                                              margin: EdgeInsets.fromLTRB(
+                                                  0 * fem,
+                                                  0 * fem,
+                                                  1 * fem,
+                                                  0 * fem),
+                                              child: _productModel
+                                                          .products![index]
+                                                          .productPrices![0]
+                                                          .offerPrice !=
+                                                      0
+                                                  ? Text.rich(
+                                                      TextSpan(children: [
+                                                      new TextSpan(
+                                                        text:
+                                                            'RS. ${_productModel.products![index].productPrices![0].price.toString()}',
+                                                        style: new TextStyle(
+                                                          color: Colors.grey,
+                                                          decoration:
+                                                              TextDecoration
+                                                                  .lineThrough,
+                                                        ),
+                                                      ),
+                                                      new TextSpan(
+                                                        text:
+                                                            ' RS.${_productModel.products![index].productPrices![0].offerPrice.toString()}',
+                                                      ),
+                                                    ]))
+                                                  : Text(
+                                                      _productModel
+                                                              .products![index]
+                                                              .productPrices![0]
+                                                              .price
+                                                              .toString() +
+                                                          " " +
+                                                          'RS',
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: 13,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        height: 1.5,
+                                                        letterSpacing:
+                                                            -0.2190869331,
+                                                        color:
+                                                            Color(0x99000000),
+                                                      ),
+                                                    )
+
+                                              // Text(
+                                              //   _productModel
+                                              //           .products![index]
+                                              //           .productPrices![0]
+                                              //           .offerPrice
+                                              //           .toString() +
+                                              //       ' ' +
+                                              //       'RS',
+                                              //   style: MyGoogleFontStyle(
+                                              //     fontFamily: 'Poppins',
+                                              //     fontSize: 13 * ffem,
+                                              //     fontWeight: FontWeight.w500,
+                                              //     height: 1.5 * ffem / fem,
+                                              //     letterSpacing:
+                                              //         -0.2190869331 * fem,
+                                              //     color: Color(0x99000000),
+                                              //   ),
+                                              // ),
+                                              ),
+                                          if (discountPrice != 0.0)
+                                            Center(
+                                              child: Text(
+                                                '( ${discountPrice.round()}% Off)',
+                                                style: MyGoogleFontStyle(
+                                                  fontFamily: 'Poppins',
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  // height: 1.5 * ffem / fem,
+                                                  // letterSpacing:
+                                                  //     -0.2190869331 * fem,
+                                                  color: Color(0x99000000),
+                                                ),
                                               ),
                                             ),
-                                          ),
                                         ],
                                       ),
                                     ),
@@ -686,8 +761,7 @@ class _HomePageState extends State<HomePage> {
                                           decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(
                                                 10.1176462173 * fem),
-                                            gradient: _category['id'] == 2 ||
-                                                    _category['id'] == 4
+                                            gradient: _category['id'] % 2 == 0
                                                 ? LinearGradient(
                                                     begin: Alignment(1, 0.138),
                                                     end: Alignment(-1, 0.128),
@@ -711,7 +785,7 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                     ),
                                   ),
-                                  if (_category['id'] != 2)
+                                  if (_category['id'] % 2 != 0)
                                     Positioned(
                                       left: 22 * fem,
                                       top: 39.5 * fem,
@@ -771,8 +845,7 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                     ),
-                                  if (_category['id'] == 2 ||
-                                      _category['id'] == 4)
+                                  if (_category['id'] % 2 == 0)
                                     Positioned(
                                       left: 250 * fem,
                                       top: 33.5 * fem,

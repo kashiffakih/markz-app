@@ -34,7 +34,7 @@ class MenuWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Container(
-                      // pinewrapslogo1MaZ (617:1924)
+                      // Aadablogo1MaZ (617:1924)
                       margin: EdgeInsets.fromLTRB(
                           0 * fem, 0 * fem, 0 * fem, 14.7 * fem),
                       width: 39.65 * fem,
@@ -70,7 +70,7 @@ class MenuWidget extends StatelessWidget {
                             ),
                           ),
                           Positioned(
-                            // pinewraps59B (617:1925)
+                            // Aadab59B (617:1925)
                             left: 0 * fem,
                             top: 16.6254882812 * fem,
                             child: Align(
@@ -78,7 +78,7 @@ class MenuWidget extends StatelessWidget {
                                 width: 143 * fem,
                                 height: 39 * fem,
                                 child: Text(
-                                  'PINEWRAPS',
+                                  'Aadab',
                                   style: MyGoogleFontStyle(
                                     fontFamily: 'Righteous',
                                     fontSize: 25.5776882172 * ffem,
@@ -224,7 +224,7 @@ class MenuWidget extends StatelessWidget {
               //           width: 20.94 * fem,
               //           height: 21.32 * fem,
               //           child: Image.asset(
-              //             'assets/pinewraps/images/u-setting.png',
+              //             'assets/Aadab/images/u-setting.png',
               //             width: 20.94 * fem,
               //             height: 21.32 * fem,
               //           ),
