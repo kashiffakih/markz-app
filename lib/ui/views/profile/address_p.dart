@@ -38,8 +38,6 @@ class _AddressPageState extends State<AddressPage> {
     var cartItems = [];
     var cartTotal = '';
     int couponValue = 0;
-    // print(widget.arguments!['cartItems']);
-    // print(widget.arguments!['cartTotal']);
     setState(() {
       if (widget.arguments != null) {
         cartItems = widget.arguments!['cartItems'];
