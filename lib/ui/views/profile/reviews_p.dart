@@ -10,6 +10,8 @@ import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/profile/review_id_p.dart';
 
+import '../products/shops_p.dart';
+
 class ReviewsPage extends StatefulWidget {
   const ReviewsPage({Key? key}) : super(key: key);
 
@@ -34,6 +36,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
     final ReviewModel _reviewModel = Provider.of<ReviewModel>(context);
     final ConfigModel _configModel = locator<ConfigModel>();
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
+    TextEditingController _controller = TextEditingController();
 
     return Scaffold(
       body: SafeArea(
@@ -109,6 +112,20 @@ class _ReviewsPageState extends State<ReviewsPage> {
                                   child: Padding(
                                     padding: const EdgeInsets.only(top: 15.0),
                                     child: TextFormField(
+                                      controller: _controller,
+                                      onChanged: (value) {
+                                        // if (value.length % 3 == 0) {
+                                        // Call your API here
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ShopsPage(
+                                                initialText: value
+                                                    .toString()), // Pass initialText if needed
+                                          ),
+                                        );
+                                        _controller.clear();
+                                      },
                                       decoration: InputDecoration(
                                         hintText: 'Search',
                                         border: InputBorder.none,

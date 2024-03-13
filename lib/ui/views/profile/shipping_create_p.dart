@@ -1,6 +1,5 @@
+import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:icon_forest/don_icons.dart';
-import 'package:icon_forest/iconoir.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/models/user_address.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
@@ -23,41 +22,43 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
     add3: "",
     city: null,
     state: null,
-    nationality: 'Dubai',
+    nationality: 'INDIA',
     pincode: '',
   );
-  // String selectedCountry = 'Dubai';
-  // String selectedState = '';
-  // String selectedCity = '';
+  String countryValue = "INDIA";
+  String stateValue = "";
+  String cityValue = "";
+  String address = "";
 
   String selectedChip = '';
+  bool isAltPhone = false;
 
-  List<String> countries = ['USA', 'Canada', 'India', 'Dubai'];
-  Map<String, List<String>> states = {
-    'USA': ['New York', 'California', 'Texas'],
-    'Canada': ['Ontario', 'Quebec', 'Alberta'],
-    'India': ['Delhi', 'Maharashtra', 'Karnataka'],
-    'Dubai': [
-      'Abo Dhabi',
-      'Ajman',
-      'Dubai',
-      'Fujairah',
-      'Ras Al Khaimah',
-      'Sharjah',
-      'Umm Al Quwain'
-    ]
-  };
-  Map<String, List<String>> cities = {
-    'New York': ['New York City', 'Buffalo'],
-    'California': ['Los Angeles', 'San Francisco'],
-    'Texas': ['Houston', 'Dallas'],
-    'Ontario': ['Toronto', 'Ottawa'],
-    'Quebec': ['Montreal', 'Quebec City'],
-    'Alberta': ['Calgary', 'Edmonton'],
-    'Delhi': ['New Delhi', 'Noida'],
-    'Maharashtra': ['Mumbai', 'Pune'],
-    'Karnataka': ['Bangalore', 'Mysore'],
-  };
+  // List<String> countries = ['USA', 'Canada', 'India', 'Dubai'];
+  // Map<String, List<String>> states = {
+  //   'USA': ['New York', 'California', 'Texas'],
+  //   'Canada': ['Ontario', 'Quebec', 'Alberta'],
+  //   'India': ['Delhi', 'Maharashtra', 'Karnataka'],
+  //   'Dubai': [
+  //     'Abo Dhabi',
+  //     'Ajman',
+  //     'Dubai',
+  //     'Fujairah',
+  //     'Ras Al Khaimah',
+  //     'Sharjah',
+  //     'Umm Al Quwain'
+  //   ]
+  // };
+  // Map<String, List<String>> cities = {
+  //   'New York': ['New York City', 'Buffalo'],
+  //   'California': ['Los Angeles', 'San Francisco'],
+  //   'Texas': ['Houston', 'Dallas'],
+  //   'Ontario': ['Toronto', 'Ottawa'],
+  //   'Quebec': ['Montreal', 'Quebec City'],
+  //   'Alberta': ['Calgary', 'Edmonton'],
+  //   'Delhi': ['New Delhi', 'Noida'],
+  //   'Maharashtra': ['Mumbai', 'Pune'],
+  //   'Karnataka': ['Bangalore', 'Mysore'],
+  // };
 
   final _formKey = GlobalKey<FormState>();
   bool _loading = false;
@@ -88,115 +89,45 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                 Container(
                   margin: EdgeInsets.all(20),
                   width: double.infinity,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
+                    // crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       InkWell(
                         onTap: () {
                           Navigator.pop(context);
                         },
-                        child: Center(
-                          child: Text(
-                            'Add Shipping Address',
-                            textAlign: TextAlign.center,
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xff1e232c),
+                        child: Container(
+                          width: 15,
+                          height: 15,
+                          child: Icon(
+                            Icons.arrow_back_ios,
+                            size: 18,
+                            color: Color(0xffEED056),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 50,
+                      ),
+                      Center(
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Center(
+                            child: Text(
+                              'Add Shipping Address',
+                              textAlign: TextAlign.center,
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xff1e232c),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 15),
-                      Row(
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Container(
-                              width: 15,
-                              height: 15,
-                              child: Icon(
-                                Icons.arrow_back_ios,
-                                size: 18,
-                                color: Color(0xffEED056),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 15),
-                          Container(
-                            width: 258,
-                            height: 38,
-                            padding: const EdgeInsets.only(
-                              left: 21,
-                              right: 20.70,
-                            ),
-                            clipBehavior: Clip.antiAlias,
-                            decoration: ShapeDecoration(
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                    width: 0.50, color: Color(0xFFC7B456)),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment
-                                  .center, // Center vertically
-                              children: [
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(top: 15.0),
-                                    child: TextFormField(
-                                      decoration: InputDecoration(
-                                        hintText: 'Search',
-                                        border: InputBorder.none,
-                                      ),
-                                      style: TextStyle(
-                                        color: Colors.black.withOpacity(0.6),
-                                        fontSize: 18,
-                                        fontFamily: 'Urbanist',
-                                        fontWeight: FontWeight.w600,
-                                        // letterSpacing: -0.36,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  child: Image.asset(
-                                    'assets/images/Search-1.png',
-                                    height: 20,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          // const SizedBox(width: 10),
-                          // Container(
-                          //   width: 20,
-                          //   height: 20,
-                          //   child: Column(
-                          //     mainAxisSize: MainAxisSize.min,
-                          //     mainAxisAlignment:
-                          //         MainAxisAlignment.center, // Center vertically
-                          //     crossAxisAlignment: CrossAxisAlignment.start,
-                          //     children: [
-                          //       Image.asset(
-                          //         'assets/images/filter.png',
-                          //         height: 20,
-                          //         fit: BoxFit.cover,
-                          //       ),
-                          //     ],
-                          //   ),
-                          // ),
-                        ],
-                      )
                     ],
                   ),
                 ),
@@ -215,7 +146,7 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                             color: Color(0xfffbfbfb),
                           ),
                           child: TextFormField(
-                            initialValue: _userAddress.add1,
+                            initialValue: _userAddress.fullName,
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               focusedBorder: InputBorder.none,
@@ -223,7 +154,7 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                               errorBorder: InputBorder.none,
                               disabledBorder: InputBorder.none,
                               contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-                              hintText: 'Address 1',
+                              hintText: 'Full Name',
                               hintStyle: TextStyle(color: Color(0x3f000000)),
                             ),
                             style: MyGoogleFontStyle(
@@ -233,19 +164,19 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                             ),
                             validator: (value) {
                               if (value!.isEmpty) {
-                                return "Address 1 Cannot be empty.";
+                                return "Full Name Cannot be empty.";
                               }
                               return null;
                             },
                             onSaved: (value) {
-                              _userAddress.add1 = value;
+                              _userAddress.fullName = value;
                             },
                           ),
                         ),
                         SizedBox(
                           height: 20,
                         ),
-                        // Address
+                        // Phone
                         Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
@@ -253,7 +184,8 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                             color: Color(0xfffbfbfb),
                           ),
                           child: TextFormField(
-                            initialValue: _userAddress.add2,
+                            initialValue: _userAddress.phone,
+                            keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               focusedBorder: InputBorder.none,
@@ -261,7 +193,7 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                               errorBorder: InputBorder.none,
                               disabledBorder: InputBorder.none,
                               contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-                              hintText: 'Address 2',
+                              hintText: 'Phone',
                               hintStyle: TextStyle(color: Color(0x3f000000)),
                             ),
                             style: MyGoogleFontStyle(
@@ -271,131 +203,196 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                             ),
                             validator: (value) {
                               if (value!.isEmpty) {
-                                return "Address 2 Cannot be empty.";
+                                return "Phone Cannot be empty.";
                               }
                               return null;
                             },
                             onSaved: (value) {
-                              _userAddress.add2 = value;
+                              _userAddress.phone = value;
                             },
                           ),
                         ),
                         SizedBox(
                           height: 20,
                         ),
-
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Color(0xffdadada)),
-                            color: Color(0xffffffff),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: DropdownButtonFormField(
-                              value: _userAddress.nationality,
-                              decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  focusedBorder: InputBorder.none,
-                                  enabledBorder: InputBorder.none,
-                                  errorBorder: InputBorder.none,
-                                  disabledBorder: InputBorder.none,
-                                  labelText: 'Select Country',
-                                  contentPadding: EdgeInsets.all(10)),
-                              items: countries
-                                  .map(
-                                    (_country) => DropdownMenuItem(
-                                      child: Text(
-                                        _country,
-                                      ),
-                                      value: _country,
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  // selectedCountry = value.toString();
-                                  _userAddress.state = null;
-                                  _userAddress.city = null;
-                                  _userAddress.nationality = value.toString();
-                                });
-                                print(_userAddress.state);
-                              }),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Color(0xffdadada)),
-                            color: Color(0xffffffff),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: DropdownButtonFormField<String>(
-                            // value: _userAddress.state,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              labelText: _userAddress.nationality == 'Dubai'
-                                  ? 'Selecte Emirate'
-                                  : 'Select State',
-                              contentPadding: EdgeInsets.all(10),
-                            ),
-                            value: _userAddress.state,
-                            items:
-                                states[_userAddress.nationality]?.map((state) {
-                                      return DropdownMenuItem<String>(
-                                        value: state,
-                                        child: Text(state),
-                                      );
-                                    }).toList() ??
-                                    [],
-                            onChanged: (value) {
+                        if (isAltPhone == false)
+                          InkWell(
+                            onTap: () {
                               setState(() {
-                                _userAddress.city = null;
-                                _userAddress.state = value.toString();
+                                isAltPhone = true;
                               });
                             },
+                            child: Row(
+                              children: [
+                                Icon(Icons.add),
+                                Text('Add Alternate Phone Number'),
+                              ],
+                            ),
                           ),
-                        ),
+                        if (isAltPhone == true)
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Color(0xffe3e3e3)),
+                              color: Color(0xfffbfbfb),
+                            ),
+                            child: TextFormField(
+                              initialValue: _userAddress.altPhone,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                errorBorder: InputBorder.none,
+                                disabledBorder: InputBorder.none,
+                                contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
+                                hintText: 'Alternate Phone Number',
+                                hintStyle: TextStyle(color: Color(0x3f000000)),
+                              ),
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xff000000),
+                              ),
+                              onSaved: (value) {
+                                _userAddress.altPhone = value;
+                              },
+                            ),
+                          ),
                         SizedBox(
                           height: 20,
                         ),
-                        if (_userAddress.nationality != 'Dubai')
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Color(0xffdadada)),
-                              color: Color(0xffffffff),
-                              borderRadius: BorderRadius.circular(5),
+                        if (isAltPhone == true)
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                isAltPhone = false;
+                                _userAddress.altPhone = '';
+                              });
+                            },
+                            child: Row(
+                              children: [
+                                Icon(Icons.remove),
+                                Text('Remove Alternate Phone Number'),
+                              ],
                             ),
-                            child: DropdownButtonFormField<String>(
-                                // value: _userAddress.city,
-                                decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    focusedBorder: InputBorder.none,
-                                    enabledBorder: InputBorder.none,
-                                    errorBorder: InputBorder.none,
-                                    disabledBorder: InputBorder.none,
-                                    labelText: 'Select City',
-                                    contentPadding: EdgeInsets.all(10)),
-                                items: cities[_userAddress.state]?.map((city) {
-                                      return DropdownMenuItem<String>(
-                                        value: city,
-                                        child: Text(city),
-                                      );
-                                    }).toList() ??
-                                    [],
-                                onChanged: (value) {
-                                  setState(() {
-                                    _userAddress.city = value.toString();
-                                  });
-                                }),
                           ),
-                        if (_userAddress.nationality != 'Dubai')
+                        if (isAltPhone == true)
                           SizedBox(
                             height: 20,
                           ),
+
+                        Container(
+                            // padding: EdgeInsets.symmetric(horizontal: 20),
+                            // height: 600,
+                            child: Column(
+                          children: [
+                            ///Adding CSC Picker Widget in app
+                            CSCPicker(
+                              layout: Layout.vertical,
+
+                              ///Enable disable state dropdown [OPTIONAL PARAMETER]
+                              showStates: true,
+
+                              /// Enable disable city drop down [OPTIONAL PARAMETER]
+                              showCities: true,
+
+                              ///Enable (get flag with country name) / Disable (Disable flag) / ShowInDropdownOnly (display flag in dropdown only) [OPTIONAL PARAMETER]
+                              flagState: CountryFlag.DISABLE,
+
+                              ///Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER] (USE with disabledDropdownDecoration)
+                              dropdownDecoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                  color: Colors.white,
+                                  border: Border.all(
+                                      color: Colors.grey.shade300, width: 1)),
+
+                              ///Disabled Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER]  (USE with disabled dropdownDecoration)
+                              disabledDropdownDecoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                  color: Colors.grey.shade300,
+                                  border: Border.all(
+                                      color: Colors.grey.shade300, width: 1)),
+
+                              ///placeholders for dropdown search field
+                              countrySearchPlaceholder: "Country",
+                              stateSearchPlaceholder: "State",
+                              citySearchPlaceholder: "City",
+
+                              ///labels for dropdown
+                              countryDropdownLabel: "Country",
+                              stateDropdownLabel: "State",
+                              cityDropdownLabel: "City",
+
+                              ///Default Country
+                              defaultCountry: CscCountry.India,
+
+                              //Country Filter [OPTIONAL PARAMETER]
+                              // countryFilter: [CscCountry.India],
+
+                              ///Disable country dropdown (Note: use it with default country)
+                              disableCountry: true,
+
+                              ///selected item style [OPTIONAL PARAMETER]
+                              selectedItemStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                              ),
+
+                              ///DropdownDialog Heading style [OPTIONAL PARAMETER]
+                              dropdownHeadingStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold),
+
+                              ///DropdownDialog Item style [OPTIONAL PARAMETER]
+                              dropdownItemStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                              ),
+
+                              ///Dialog box radius [OPTIONAL PARAMETER]
+                              dropdownDialogRadius: 10.0,
+
+                              ///Search bar radius [OPTIONAL PARAMETER]
+                              searchBarRadius: 10.0,
+
+                              ///triggers once country selected in dropdown
+                              onCountryChanged: (value) {
+                                setState(() {
+                                  ///store value in country variable
+                                  countryValue = value;
+                                });
+                              },
+
+                              ///triggers once state selected in dropdown
+                              onStateChanged: (value) {
+                                setState(() {
+                                  ///store value in state variable
+                                  stateValue = value.toString();
+                                  _userAddress.state = stateValue;
+                                });
+                              },
+
+                              ///triggers once city selected in dropdown
+                              onCityChanged: (value) {
+                                setState(() {
+                                  ///store value in city variable
+                                  cityValue = value.toString();
+                                  _userAddress.city = cityValue;
+                                });
+                              },
+
+                              ///Show only specific countries using country filter
+                              // countryFilter: ["United States", "Canada", "Mexico"],
+                            ),
+                          ],
+                        )),
+                        SizedBox(
+                          height: 20,
+                        ),
 
                         Container(
                           decoration: BoxDecoration(
@@ -405,6 +402,7 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                           ),
                           child: TextFormField(
                             initialValue: _userAddress.pincode,
+                            keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               focusedBorder: InputBorder.none,
@@ -434,6 +432,120 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                         SizedBox(
                           height: 20,
                         ),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Color(0xffe3e3e3)),
+                            color: Color(0xfffbfbfb),
+                          ),
+                          child: TextFormField(
+                            initialValue: _userAddress.add1,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
+                              hintText: 'House No, Building no',
+                              hintStyle: TextStyle(color: Color(0x3f000000)),
+                            ),
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff000000),
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "House No, Building no Cannot be empty.";
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _userAddress.add1 = value;
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        // Address
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Color(0xffe3e3e3)),
+                            color: Color(0xfffbfbfb),
+                          ),
+                          child: TextFormField(
+                            initialValue: _userAddress.add2,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
+                              hintText: 'Road, Colony, Area',
+                              hintStyle: TextStyle(color: Color(0x3f000000)),
+                            ),
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff000000),
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "Road, Colony, Area Cannot be empty.";
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _userAddress.add2 = value;
+                            },
+                          ),
+                        ),
+
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Color(0xffe3e3e3)),
+                            color: Color(0xfffbfbfb),
+                          ),
+                          child: TextFormField(
+                            initialValue: _userAddress.add3,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
+                              hintText: 'Landmark',
+                              hintStyle: TextStyle(color: Color(0x3f000000)),
+                            ),
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff000000),
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "Landmark Cannot be empty.";
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _userAddress.add3 = value;
+                            },
+                          ),
+                        ),
+
+                        SizedBox(
+                          height: 20,
+                        ),
                         Wrap(
                           spacing: 8.0,
                           children: [
@@ -446,7 +558,18 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                                 });
                               },
                               selectedColor: Colors.green,
-                              label: Text('Home'),
+                              label: SizedBox(
+                                width: 80,
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.home),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text('Home'),
+                                  ],
+                                ),
+                              ),
                             ),
                             ChoiceChip(
                               selected: selectedChip == 'Work',
@@ -457,19 +580,30 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                                 });
                               },
                               selectedColor: Colors.blue,
-                              label: Text('Work'),
+                              label: SizedBox(
+                                width: 80,
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.work),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text('Work'),
+                                  ],
+                                ),
+                              ),
                             ),
-                            ChoiceChip(
-                              selected: selectedChip == 'Other',
-                              onSelected: (bool selected) {
-                                setState(() {
-                                  selectedChip = selected ? 'Other' : '';
-                                  _userAddress.label = selectedChip;
-                                });
-                              },
-                              selectedColor: Colors.orange,
-                              label: Text('Other'),
-                            ),
+                            // ChoiceChip(
+                            //   selected: selectedChip == 'Other',
+                            //   onSelected: (bool selected) {
+                            //     setState(() {
+                            //       selectedChip = selected ? 'Other' : '';
+                            //       _userAddress.label = selectedChip;
+                            //     });
+                            //   },
+                            //   selectedColor: Colors.orange,
+                            //   label: Text('Other'),
+                            // ),
                             // Add more ChoiceChip widgets here as needed
                           ],
                         ),

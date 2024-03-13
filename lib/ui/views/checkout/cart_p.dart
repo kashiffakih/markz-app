@@ -42,7 +42,11 @@ class _CartPageState extends State<CartPage> {
     'pack': ''
   };
   TextEditingController _controller = TextEditingController();
-  List<String> paymentOptions = ['Google Pay', 'PhonePe'];
+  List<String> paymentOptions = [
+    'CoD (Not available)',
+    'Google Pay',
+    'PhonePe'
+  ];
 
   var paymentOption = '';
 
