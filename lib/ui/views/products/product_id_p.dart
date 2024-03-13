@@ -10,8 +10,10 @@ import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/products/shops_p.dart';
 import 'package:sales_app/ui/widgets/multi_image_w.dart';
+import 'package:share/share.dart';
 
 import '../../../core/models/product.dart';
+import 'package:badges/badges.dart' as badges;
 
 class ProductIdPage extends StatefulWidget {
   final arguments;
@@ -71,6 +73,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
   // ];
 
   double discountPrice = 0.0;
+
   @override
   Widget build(BuildContext context) {
     Product product = Product.fromJson(widget.arguments['product']);
@@ -91,6 +94,14 @@ class _ProductIdPageState extends State<ProductIdPage> {
         int.parse(widget.arguments['product']['product_prices']![0]['price']
             .toString()) *
         100;
+
+    var cartCount = 0;
+    setState(() {
+      cartCount = _addToCartModel.addToCarts!.length;
+    });
+    double baseWidth = 360;
+    double fem = MediaQuery.of(context).size.width / baseWidth;
+    double ffem = fem * 0.97;
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -209,21 +220,27 @@ class _ProductIdPageState extends State<ProductIdPage> {
                             onTap: () {
                               Navigator.pushNamed(context, '/cartPage');
                             },
-                            child: Container(
-                              width: 20,
-                              height: 20,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment
-                                    .center, // Center vertically
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Image.asset(
-                                    'assets/images/shopping_cart.png',
-                                    height: 20,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ],
+                            child: badges.Badge(
+                              badgeContent: Text(
+                                cartCount.toString(),
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              child: Container(
+                                width: 20,
+                                height: 20,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment
+                                      .center, // Center vertically
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/shopping_cart.png',
+                                      height: 20,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -241,16 +258,109 @@ class _ProductIdPageState extends State<ProductIdPage> {
                               children: [
                                 // Featured Image
                                 Stack(children: [
-                                  SizedBox(
-                                    width: MediaQuery.of(context).size.width,
-                                    height: 350,
-                                    child: Image.network(
-                                      _configModel.apiConfig['mediaURL'] +
-                                          widget.arguments['product']
-                                                  ['imagepath1']
-                                              .toString(),
-                                      fit: BoxFit.cover,
-                                    ),
+                                  Stack(
+                                    children: [
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        height: 350,
+                                        child: Image.network(
+                                          _configModel.apiConfig['mediaURL'] +
+                                              widget.arguments['product']
+                                                      ['imagepath1']
+                                                  .toString(),
+                                          fit: BoxFit.fill,
+                                          // fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 5,
+                                        right: 10,
+                                        child: Row(
+                                          children: [
+                                            InkWell(
+                                              onTap: () async {
+                                                await _wishListModel
+                                                    .getWishLists(
+                                                        widget.arguments[
+                                                            'product']['id']);
+                                              },
+                                              child: _wishListModel
+                                                      .wishListLoader
+                                                  ? Align(
+                                                      // vectorRZx (318:2001)
+                                                      alignment:
+                                                          Alignment.topRight,
+                                                      child: SizedBox(
+                                                        width: 25 * fem,
+                                                        height: 22.4 * fem,
+                                                        child: Image.asset(
+                                                          'assets/images/vector-wXc.png',
+                                                          width: 25 * fem,
+                                                          height: 22.4 * fem,
+                                                        ),
+                                                      ),
+                                                    )
+                                                  : _wishListModel.wishLists!
+                                                              .where((wishList) =>
+                                                                  wishList.productId ==
+                                                                      widget.arguments[
+                                                                              'product']
+                                                                          [
+                                                                          'id'] &&
+                                                                  wishList.userId ==
+                                                                      _configModel
+                                                                          .user
+                                                                          .id)
+                                                              .toList()
+                                                              .length ==
+                                                          0
+                                                      ? Align(
+                                                          // vectorRZx (318:2001)
+                                                          alignment: Alignment
+                                                              .topRight,
+                                                          child: SizedBox(
+                                                            width: 25 * fem,
+                                                            height: 22.4 * fem,
+                                                            child: Image.asset(
+                                                              'assets/images/vector-yse.png',
+                                                              width: 25 * fem,
+                                                              height:
+                                                                  22.4 * fem,
+                                                            ),
+                                                          ),
+                                                        )
+                                                      : Align(
+                                                          // vectorRZx (318:2001)
+                                                          alignment: Alignment
+                                                              .topRight,
+                                                          child: SizedBox(
+                                                            width: 25 * fem,
+                                                            height: 22.4 * fem,
+                                                            child: Image.asset(
+                                                              'assets/images/vector-wXc.png',
+                                                              width: 25 * fem,
+                                                              height:
+                                                                  22.4 * fem,
+                                                            ),
+                                                          ),
+                                                        ),
+                                            ),
+                                            SizedBox(width: 5),
+                                            IconButton(
+                                              onPressed: () {
+                                                Share.share(
+                                                  'Check out this product:`${widget.arguments['product']['name']}`\n\nDescription: `${widget.arguments['product']['description']}`\n\nLink: `${_configModel.apiConfig['mediaURL'] + widget.arguments['product']['imagepath1'].toString()}`',
+                                                );
+                                              },
+                                              icon: Icon(Icons.share),
+                                              color: Colors.white,
+                                              iconSize: 30,
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
                                   ),
                                   // Rounded Section
                                   Positioned(
@@ -412,8 +522,23 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                     BorderRadius
                                                                         .circular(
                                                                             20)),
-                                                            title: Text(
-                                                                "kindly choose colour and size."),
+                                                            title: _CartData[
+                                                                            'kindOfFlower'] ==
+                                                                        '' &&
+                                                                    _CartData[
+                                                                            'flavour'] !=
+                                                                        ''
+                                                                ? Text(
+                                                                    "kindly choose size.")
+                                                                : _CartData['flavour'] ==
+                                                                            '' &&
+                                                                        _CartData[
+                                                                                'kindOfFlower'] !=
+                                                                            ''
+                                                                    ? Text(
+                                                                        "kindly choose colour.")
+                                                                    : Text(
+                                                                        "kindly choose colour and size."),
                                                             actions: <Widget>[
                                                               TextButton(
                                                                 onPressed: () {
@@ -673,6 +798,21 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold)),
+                                                      if (discountPrice != 0.0)
+                                                        WidgetSpan(
+                                                          child: SizedBox(
+                                                              width:
+                                                                  10), // Adjust the width as needed
+                                                        ),
+                                                      if (discountPrice != 0.0)
+                                                        TextSpan(
+                                                            text:
+                                                                '( ${discountPrice.round()}% Off)',
+                                                            style: TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold))
                                                     ],
                                                   ),
                                                 ),
@@ -689,21 +829,21 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 color: Color(0x99000000),
                                               ),
                                             ),
-                                      if (discountPrice != 0.0)
-                                        Center(
-                                          child: Text(
-                                            '( ${discountPrice.round()}% Off)',
-                                            style: MyGoogleFontStyle(
-                                              fontFamily: 'Poppins',
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                              // height: 1.5 * ffem / fem,
-                                              // letterSpacing:
-                                              //     -0.2190869331 * fem,
-                                              color: Color(0x99000000),
-                                            ),
-                                          ),
-                                        ),
+                                      // if (discountPrice != 0.0)
+                                      //   Center(
+                                      //     child: Text(
+                                      //       '( ${discountPrice.round()}% Off)',
+                                      //       style: MyGoogleFontStyle(
+                                      //         fontFamily: 'Poppins',
+                                      //         fontSize: 12,
+                                      //         fontWeight: FontWeight.bold,
+                                      //         // height: 1.5 * ffem / fem,
+                                      //         // letterSpacing:
+                                      //         //     -0.2190869331 * fem,
+                                      //         color: Color(0x99000000),
+                                      //       ),
+                                      //     ),
+                                      //   ),
                                       Padding(
                                         padding: const EdgeInsets.only(
                                             left: 20.0, top: 10),
@@ -1728,7 +1868,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                     width: 150,
                     height: 41,
                     child: TextButton(
-                      onPressed: () async {},
+                      onPressed: () async {
+                        Navigator.pushNamed(context, '/cartPage');
+                      },
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,
                       ),

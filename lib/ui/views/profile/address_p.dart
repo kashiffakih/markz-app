@@ -298,36 +298,51 @@ class _AddressPageState extends State<AddressPage> {
                                         color: Colors.grey,
                                       ),
                                       Text(
-                                        _userAddressModel
-                                                .userAddresses![index].add1
-                                                .toString() +
-                                            ', ' +
-                                            _userAddressModel
-                                                .userAddresses![index].add2
-                                                .toString() +
-                                            ', ' +
-                                            _userAddressModel
-                                                .userAddresses![index]
-                                                .nationality
-                                                .toString() +
-                                            ', ' +
-                                            _userAddressModel
-                                                .userAddresses![index].state
-                                                .toString() +
-                                            ', ' +
-                                            (_userAddressModel
-                                                        .userAddresses![index]
-                                                        .city !=
-                                                    null
+                                        (_userAddressModel.userAddresses![index].fullName != null
                                                 ? _userAddressModel
-                                                        .userAddresses![index]
-                                                        .city
-                                                        .toString() +
-                                                    ', '
+                                                    .userAddresses![index]
+                                                    .fullName
+                                                    .toString()
                                                 : '') +
-                                            _userAddressModel
-                                                .userAddresses![index].pincode
-                                                .toString() +
+                                            ', ' +
+                                            (_userAddressModel.userAddresses![index].phone != null
+                                                ? _userAddressModel
+                                                    .userAddresses![index].phone
+                                                    .toString()
+                                                : '') +
+                                            ', ' +
+                                            (_userAddressModel.userAddresses![index].altPhone != null
+                                                ? _userAddressModel
+                                                    .userAddresses![index]
+                                                    .altPhone
+                                                    .toString()
+                                                : '') +
+                                            ', ' +
+                                            (_userAddressModel.userAddresses![index].state != null
+                                                ? _userAddressModel
+                                                    .userAddresses![index].state
+                                                    .toString()
+                                                : '') +
+                                            ', ' +
+                                            ', ' +
+                                            (_userAddressModel.userAddresses![index].city != null
+                                                ? _userAddressModel.userAddresses![index].city
+                                                    .toString()
+                                                : '') +
+                                            ', ' +
+                                            (_userAddressModel.userAddresses![index].pincode != null
+                                                ? _userAddressModel
+                                                    .userAddresses![index]
+                                                    .pincode
+                                                    .toString()
+                                                : '') +
+                                            (_userAddressModel.userAddresses![index].add1 != null
+                                                ? _userAddressModel.userAddresses![index].add1.toString()
+                                                : '') +
+                                            ', ' +
+                                            (_userAddressModel.userAddresses![index].add2 != null ? _userAddressModel.userAddresses![index].add2.toString() : '') +
+                                            ', ' +
+                                            (_userAddressModel.userAddresses![index].add3 != null ? _userAddressModel.userAddresses![index].add3.toString() : '') +
                                             '.',
                                         style: MyGoogleFontStyle(
                                           fontFamily: 'Urbanist',

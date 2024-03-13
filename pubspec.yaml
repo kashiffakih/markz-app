@@ -40,7 +40,10 @@ dependencies:
   image_picker: ^0.8.4+4
   file_picker: ^5.2.11
   icon_forest: ^1.1.8
-  multiple_images_picker: ^1.0.1
+  csc_picker: ^0.2.7
+  share: ^2.0.4
+  badges: ^3.1.1
+  # multiple_images_picker: ^1.0.1
 
 dev_dependencies:
   flutter_test:
