@@ -7,6 +7,7 @@ import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/user_address_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/checkout/cart_p.dart';
 import 'package:sales_app/ui/views/checkout/checkout_p.dart';
 import 'package:sales_app/ui/views/profile/shipping_create_p.dart';
 import 'package:sales_app/ui/views/profile/shipping_id_p.dart';
@@ -198,20 +199,19 @@ class _AddressPageState extends State<AddressPage> {
                                             Navigator.of(context).push(
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                        CheckoutPage(
-                                                            arguments: {
-                                                              'cartItems':
-                                                                  cartItems,
-                                                              'cartTotal':
-                                                                  cartTotal,
-                                                              'couponValue':
-                                                                  couponValue,
-                                                              'address':
-                                                                  _userAddressModel
-                                                                      .userAddresses![
-                                                                          index]
-                                                                      .toJson(),
-                                                            })));
+                                                        CartPage(arguments: {
+                                                          // 'cartItems':
+                                                          //     cartItems,
+                                                          // 'cartTotal':
+                                                          //     cartTotal,
+                                                          // 'couponValue':
+                                                          //     couponValue,
+                                                          'address':
+                                                              _userAddressModel
+                                                                  .userAddresses![
+                                                                      index]
+                                                                  .toJson(),
+                                                        })));
                                           }
                                         });
                                       },

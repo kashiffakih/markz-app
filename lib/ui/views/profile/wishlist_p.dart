@@ -20,8 +20,11 @@ class _WishlistPageState extends State<WishlistPage> {
   @override
   void initState() {
     super.initState();
-    var productId = '';
-    Provider.of<WishListModel>(context, listen: false).getWishLists(productId);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      var productId = '';
+      await Provider.of<WishListModel>(context, listen: false)
+          .getWishLists(productId);
+    });
   }
 
   double discountPrice = 0.0;
@@ -33,7 +36,9 @@ class _WishlistPageState extends State<WishlistPage> {
     TextEditingController _controller = TextEditingController();
     var cartCount = 0;
     setState(() {
-      cartCount = _addToCartModel.addToCarts!.length;
+      cartCount = _addToCartModel.addToCarts == null
+          ? 0
+          : _addToCartModel.addToCarts!.length;
     });
     return Scaffold(
       body: SafeArea(

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:icon_forest/don_icons.dart';
-import 'package:icon_forest/iconoir.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
@@ -62,16 +60,19 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 // Title
                 Container(
-                  margin: EdgeInsets.only(top: 40, left: 20, bottom: 20),
+                  margin:
+                      EdgeInsets.only(top: 10, left: 30, bottom: 20, right: 30),
                   width: double.infinity,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       InkWell(
                         onTap: () {
                           Navigator.pop(context);
                         },
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Container(
                               child: Image.asset(
