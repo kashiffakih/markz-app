@@ -24,6 +24,8 @@ class ProductIdPage extends StatefulWidget {
 }
 
 class _ProductIdPageState extends State<ProductIdPage> {
+  var displayImage = '';
+  var seconsdImage = '';
   void initState() {
     super.initState();
     var productId = '';
@@ -61,21 +63,14 @@ class _ProductIdPageState extends State<ProductIdPage> {
       'name': 'Red',
     },
   ];
-  // List<Map<String, dynamic>> flowers = [
-  //   {
-  //     'id': 1,
-  //     'name': 'Lily',
-  //   },
-  //   {
-  //     'id': 2,
-  //     'name': 'Rose',
-  //   },
-  // ];
 
   double discountPrice = 0.0;
 
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      displayImage = widget.arguments['product']['imagepath1'].toString();
+    });
     Product product = Product.fromJson(widget.arguments['product']);
     // print(widget.arguments['product']['review']);
     List<Map<String, dynamic>> _sizes =
@@ -97,11 +92,29 @@ class _ProductIdPageState extends State<ProductIdPage> {
 
     var cartCount = 0;
     setState(() {
-      cartCount = _addToCartModel.addToCarts!.length;
+      cartCount = _addToCartModel.addToCarts == null
+          ? 0
+          : _addToCartModel.addToCarts!.length;
     });
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
+
+    var images = [
+      widget.arguments['product']['imagepath1'] != null
+          ? widget.arguments['product']['imagepath1'].toString()
+          : '',
+      widget.arguments['product']['imagepath2'] != null
+          ? widget.arguments['product']['imagepath2'].toString()
+          : '',
+      widget.arguments['product']['imagepath3'] != null
+          ? widget.arguments['product']['imagepath3'].toString()
+          : '',
+      widget.arguments['product']['imagepath4'] != null
+          ? widget.arguments['product']['imagepath4'].toString()
+          : '',
+    ];
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -112,7 +125,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
             child: Column(
               children: [
                 Container(
-                  margin: EdgeInsets.only(top: 30, left: 20, bottom: 10),
+                  margin: EdgeInsets.only(top: 5, bottom: 10),
                   width: double.infinity,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,6 +149,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                       ),
                       const SizedBox(height: 15),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           InkWell(
                             onTap: () {
@@ -256,7 +270,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                             key: _formKey,
                             child: Column(
                               children: [
-                                // Featured Image
                                 Stack(children: [
                                   Stack(
                                     children: [
@@ -264,14 +277,21 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                         width:
                                             MediaQuery.of(context).size.width,
                                         height: 350,
-                                        child: Image.network(
-                                          _configModel.apiConfig['mediaURL'] +
-                                              widget.arguments['product']
-                                                      ['imagepath1']
-                                                  .toString(),
-                                          fit: BoxFit.fill,
-                                          // fit: BoxFit.cover,
-                                        ),
+                                        child: seconsdImage == ''
+                                            ? Image.network(
+                                                _configModel
+                                                        .apiConfig['mediaURL'] +
+                                                    displayImage,
+                                                fit: BoxFit.fill,
+                                                // fit: BoxFit.cover,
+                                              )
+                                            : Image.network(
+                                                _configModel
+                                                        .apiConfig['mediaURL'] +
+                                                    seconsdImage,
+                                                fit: BoxFit.fill,
+                                                // fit: BoxFit.cover,
+                                              ),
                                       ),
                                       Positioned(
                                         top: 5,
@@ -389,6 +409,36 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                   child: Column(
                                     children: [
                                       Container(
+                                        child: Row(
+                                          children: images
+                                              .map(
+                                                (image) => InkWell(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      seconsdImage = image;
+                                                    });
+                                                  },
+                                                  child: Container(
+                                                    margin: EdgeInsets.only(
+                                                        right: 8),
+                                                    width: 60,
+                                                    height: 80,
+                                                    child: image != ''
+                                                        ? Image.network(
+                                                            _configModel.apiConfig[
+                                                                    'mediaURL'] +
+                                                                image,
+                                                            fit: BoxFit.fill,
+                                                            // fit: BoxFit.cover,
+                                                          )
+                                                        : Text(''),
+                                                  ),
+                                                ),
+                                              )
+                                              .toList(),
+                                        ),
+                                      ),
+                                      Container(
                                         decoration: BoxDecoration(
                                           // color: Colors.red,
                                           color: Color(0xffffffff),
@@ -502,10 +552,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       _formKey.currentState!
                                                           .save();
                                                       bool type = true;
-                                                      print(_CartData[
-                                                          'kindOfFlower']);
-                                                      print(
-                                                          _CartData['flavour']);
+
                                                       if (_CartData[
                                                                   'kindOfFlower'] ==
                                                               '' ||
@@ -829,21 +876,218 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 color: Color(0x99000000),
                                               ),
                                             ),
-                                      // if (discountPrice != 0.0)
-                                      //   Center(
-                                      //     child: Text(
-                                      //       '( ${discountPrice.round()}% Off)',
-                                      //       style: MyGoogleFontStyle(
-                                      //         fontFamily: 'Poppins',
-                                      //         fontSize: 12,
-                                      //         fontWeight: FontWeight.bold,
-                                      //         // height: 1.5 * ffem / fem,
-                                      //         // letterSpacing:
-                                      //         //     -0.2190869331 * fem,
-                                      //         color: Color(0x99000000),
-                                      //       ),
-                                      //     ),
-                                      //   ),
+                                      // Size
+                                      Container(
+                                        margin:
+                                            EdgeInsets.only(top: 15, bottom: 5),
+                                        width:
+                                            MediaQuery.of(context).size.width -
+                                                50,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Size',
+                                              style: MyGoogleFontStyle(
+                                                fontFamily: 'Urbanist',
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xff000000),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  flex: 9,
+                                                  child: SingleChildScrollView(
+                                                    scrollDirection:
+                                                        Axis.horizontal,
+                                                    child: Container(
+                                                      margin:
+                                                          EdgeInsets.fromLTRB(
+                                                              0, 0, 0, 8),
+                                                      width: 381,
+                                                      height: 60,
+                                                      child: Row(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          SizedBox(
+                                                            width: 295,
+                                                            child: ListView
+                                                                .builder(
+                                                              scrollDirection:
+                                                                  Axis.horizontal,
+                                                              itemCount:
+                                                                  _sizes.length,
+                                                              itemBuilder:
+                                                                  (BuildContext
+                                                                          context,
+                                                                      index) {
+                                                                final isActive =
+                                                                    index ==
+                                                                        activeIndex;
+                                                                return Row(
+                                                                  children: [
+                                                                    SizedBox(
+                                                                      width: 52,
+                                                                      height:
+                                                                          52,
+                                                                      child:
+                                                                          TextButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                          setState(
+                                                                              () {
+                                                                            activeIndex =
+                                                                                index;
+                                                                            print('tab');
+                                                                            print(_sizes[index]['value']);
+
+                                                                            _CartData['kindOfFlower'] =
+                                                                                _sizes[index]['value'].toString();
+                                                                          });
+                                                                        },
+                                                                        style: TextButton
+                                                                            .styleFrom(
+                                                                          padding:
+                                                                              EdgeInsets.zero,
+                                                                          backgroundColor: isActive
+                                                                              ? Colors.black // Set the active color here
+                                                                              : null,
+                                                                          shape:
+                                                                              RoundedRectangleBorder(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(30.0), // Adjust the border radius
+                                                                          ),
+                                                                        ),
+                                                                        child:
+                                                                            Container(
+                                                                          width:
+                                                                              50,
+                                                                          height:
+                                                                              50,
+                                                                          decoration:
+                                                                              ShapeDecoration(
+                                                                            shape:
+                                                                                OvalBorder(
+                                                                              side: BorderSide(width: 0.95, color: Color(0xFFDDDDDD)),
+                                                                            ),
+                                                                          ),
+                                                                          child:
+                                                                              Center(
+                                                                            child:
+                                                                                Text(
+                                                                              _sizes[index]['value'].toString(),
+                                                                              style: MyGoogleFontStyle(
+                                                                                fontFamily: 'Urbanist',
+                                                                                fontSize: 15,
+                                                                                fontWeight: FontWeight.w600,
+                                                                                height: 1.2,
+                                                                                letterSpacing: -0.36,
+                                                                                color: isActive ? Colors.white : Color(0x99000000),
+                                                                                // Set the text color based on active state
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    SizedBox(
+                                                                        width:
+                                                                            10),
+                                                                  ],
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  flex: 3,
+                                                  child: TextButton(
+                                                    onPressed: () {},
+                                                    child: Column(
+                                                      children: [
+                                                        Container(
+                                                          child: Image.asset(
+                                                            'assets/images/size-chart-icon.png',
+                                                            width: 40,
+                                                            height: 40,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          'Size Chart',
+                                                          style: TextStyle(
+                                                              fontSize: 11,
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Container(
+                                              margin: EdgeInsets.only(top: 10),
+                                              width: 318.36,
+                                              height: 70,
+                                              decoration: ShapeDecoration(
+                                                color: Colors.white,
+                                                shape: RoundedRectangleBorder(
+                                                  side: BorderSide(
+                                                      width: 0.95,
+                                                      color: Color(0xFFDADADA)),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          19.01),
+                                                ),
+                                              ),
+                                              child: DropdownButtonFormField(
+                                                  decoration: InputDecoration(
+                                                      border: InputBorder.none,
+                                                      focusedBorder:
+                                                          InputBorder.none,
+                                                      enabledBorder:
+                                                          InputBorder.none,
+                                                      errorBorder:
+                                                          InputBorder.none,
+                                                      disabledBorder:
+                                                          InputBorder.none,
+                                                      labelText: 'Select Color',
+                                                      contentPadding:
+                                                          EdgeInsets.all(10)),
+                                                  items: flavors
+                                                      .map(
+                                                        (_flavor) =>
+                                                            DropdownMenuItem(
+                                                          child: Text(
+                                                            _flavor['name'],
+                                                          ),
+                                                          value:
+                                                              _flavor['name'],
+                                                        ),
+                                                      )
+                                                      .toList(),
+                                                  onChanged: (value) {
+                                                    _CartData['flavour'] =
+                                                        value.toString();
+                                                  }),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                       Padding(
                                         padding: const EdgeInsets.only(
                                             left: 20.0, top: 10),
@@ -1274,222 +1518,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                   ),
                                 ),
 
-                                // Size
-                                Container(
-                                  width: MediaQuery.of(context).size.width - 50,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Size',
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xff000000),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            flex: 9,
-                                            child: SingleChildScrollView(
-                                              scrollDirection: Axis.horizontal,
-                                              child: Container(
-                                                margin: EdgeInsets.fromLTRB(
-                                                    0, 0, 0, 8),
-                                                width: 381,
-                                                height: 60,
-                                                child: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    SizedBox(
-                                                      width: 295,
-                                                      child: ListView.builder(
-                                                        scrollDirection:
-                                                            Axis.horizontal,
-                                                        itemCount:
-                                                            _sizes.length,
-                                                        itemBuilder:
-                                                            (BuildContext
-                                                                    context,
-                                                                index) {
-                                                          final isActive =
-                                                              index ==
-                                                                  activeIndex;
-                                                          return Row(
-                                                            children: [
-                                                              SizedBox(
-                                                                width: 52,
-                                                                height: 52,
-                                                                child:
-                                                                    TextButton(
-                                                                  onPressed:
-                                                                      () {
-                                                                    setState(
-                                                                        () {
-                                                                      activeIndex =
-                                                                          index;
-                                                                      print(
-                                                                          'tab');
-                                                                      print(_sizes[
-                                                                              index]
-                                                                          [
-                                                                          'value']);
-
-                                                                      _CartData[
-                                                                          'kindOfFlower'] = _sizes[index]
-                                                                              [
-                                                                              'value']
-                                                                          .toString();
-                                                                    });
-                                                                  },
-                                                                  style: TextButton
-                                                                      .styleFrom(
-                                                                    padding:
-                                                                        EdgeInsets
-                                                                            .zero,
-                                                                    backgroundColor:
-                                                                        isActive
-                                                                            ? Colors.black // Set the active color here
-                                                                            : null,
-                                                                    shape:
-                                                                        RoundedRectangleBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              30.0), // Adjust the border radius
-                                                                    ),
-                                                                  ),
-                                                                  child:
-                                                                      Container(
-                                                                    width: 50,
-                                                                    height: 50,
-                                                                    decoration:
-                                                                        ShapeDecoration(
-                                                                      shape:
-                                                                          OvalBorder(
-                                                                        side: BorderSide(
-                                                                            width:
-                                                                                0.95,
-                                                                            color:
-                                                                                Color(0xFFDDDDDD)),
-                                                                      ),
-                                                                    ),
-                                                                    child:
-                                                                        Center(
-                                                                      child:
-                                                                          Text(
-                                                                        _sizes[index]['value']
-                                                                            .toString(),
-                                                                        style:
-                                                                            MyGoogleFontStyle(
-                                                                          fontFamily:
-                                                                              'Urbanist',
-                                                                          fontSize:
-                                                                              15,
-                                                                          fontWeight:
-                                                                              FontWeight.w600,
-                                                                          height:
-                                                                              1.2,
-                                                                          letterSpacing:
-                                                                              -0.36,
-                                                                          color: isActive
-                                                                              ? Colors.white
-                                                                              : Color(0x99000000),
-                                                                          // Set the text color based on active state
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                  width: 10),
-                                                            ],
-                                                          );
-                                                        },
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            flex: 3,
-                                            child: TextButton(
-                                              onPressed: () {},
-                                              child: Column(
-                                                children: [
-                                                  Container(
-                                                    child: Image.asset(
-                                                      'assets/images/size-chart-icon.png',
-                                                      width: 40,
-                                                      height: 40,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    'Size Chart',
-                                                    style: TextStyle(
-                                                        fontSize: 11,
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.only(top: 10),
-                                        width: 318.36,
-                                        height: 70,
-                                        decoration: ShapeDecoration(
-                                          color: Colors.white,
-                                          shape: RoundedRectangleBorder(
-                                            side: BorderSide(
-                                                width: 0.95,
-                                                color: Color(0xFFDADADA)),
-                                            borderRadius:
-                                                BorderRadius.circular(19.01),
-                                          ),
-                                        ),
-                                        child: DropdownButtonFormField(
-                                            decoration: InputDecoration(
-                                                border: InputBorder.none,
-                                                focusedBorder: InputBorder.none,
-                                                enabledBorder: InputBorder.none,
-                                                errorBorder: InputBorder.none,
-                                                disabledBorder:
-                                                    InputBorder.none,
-                                                labelText: 'Select Color',
-                                                contentPadding:
-                                                    EdgeInsets.all(10)),
-                                            items: flavors
-                                                .map(
-                                                  (_flavor) => DropdownMenuItem(
-                                                    child: Text(
-                                                      _flavor['name'],
-                                                    ),
-                                                    value: _flavor['name'],
-                                                  ),
-                                                )
-                                                .toList(),
-                                            onChanged: (value) {
-                                              _CartData['flavour'] =
-                                                  value.toString();
-                                            }),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
                                 // Add More Items
                                 Container(
                                   child: Padding(
@@ -1802,10 +1830,10 @@ class _ProductIdPageState extends State<ProductIdPage> {
           padding: const EdgeInsets.only(left: 8.0, right: 8.0),
           child: Row(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Expanded(
-                  flex: 6,
+              Expanded(
+                flex: 6,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
                   child: SizedBox(
                     width: 150,
                     height: 41,
@@ -1860,10 +1888,10 @@ class _ProductIdPageState extends State<ProductIdPage> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Expanded(
-                  flex: 6,
+              Expanded(
+                flex: 6,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
                   child: SizedBox(
                     width: 150,
                     height: 41,

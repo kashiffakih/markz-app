@@ -12,6 +12,7 @@ import 'package:sales_app/ui/views/products/product_id_p.dart';
 import 'package:sales_app/ui/views/products/products_p.dart';
 import 'package:sales_app/ui/views/products/shops_p.dart';
 import 'package:sales_app/ui/widgets/drawer_w.dart';
+import 'package:badges/badges.dart' as badges;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -22,9 +23,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   TextEditingController _controller = TextEditingController();
+  Map<String, dynamic> _CartData = {
+    'kindOfFlower': '',
+    'flavour': '',
+    'writeOnCake': '',
+    'pack': ''
+  };
   @override
   void initState() {
     super.initState();
+    var productId = '';
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await Provider.of<ProductModel>(context, listen: false).getProduct();
       await Provider.of<ProductModel>(context, listen: false).getBanners();
@@ -32,6 +40,8 @@ class _HomePageState extends State<HomePage> {
       await Provider.of<WishListModel>(context, listen: false)
           .getWishLists(productId);
       await Provider.of<ProductModel>(context, listen: false).getCategories();
+      Provider.of<AddToCartModel>(context, listen: false)
+          .getAddToCart(productId, '', _CartData);
     });
   }
 
@@ -64,6 +74,12 @@ class _HomePageState extends State<HomePage> {
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
+    var cartCount = 0;
+    setState(() {
+      cartCount = _addToCartModel.addToCarts == null
+          ? 0
+          : _addToCartModel.addToCarts!.length;
+    });
     return Scaffold(
       key: _key,
       drawer: DrawerWidget(),
@@ -301,7 +317,7 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                       child: Row(
-                                        mainAxisSize: MainAxisSize.min,
+                                        // mainAxisSize: MainAxisSize.min,
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         crossAxisAlignment: CrossAxisAlignment
@@ -310,7 +326,7 @@ class _HomePageState extends State<HomePage> {
                                           Expanded(
                                             child: Padding(
                                               padding: const EdgeInsets.only(
-                                                  top: 15.0),
+                                                  top: 5.0),
                                               child: TextFormField(
                                                 controller: _controller,
                                                 onChanged: (value) {
@@ -354,7 +370,7 @@ class _HomePageState extends State<HomePage> {
                                         ],
                                       ),
                                     ),
-                                    const SizedBox(width: 10),
+                                    const SizedBox(width: 20),
                                     Container(
                                       width: 20,
                                       height: 20,
@@ -1247,10 +1263,16 @@ class _HomePageState extends State<HomePage> {
                 )),
             BottomNavigationBarItem(
               label: 'CART',
-              icon: Image.asset(
-                'assets/images/cart-icon.png',
-                width: 23,
-                height: 23,
+              icon: badges.Badge(
+                badgeContent: Text(
+                  cartCount.toString(),
+                  style: TextStyle(color: Colors.white),
+                ),
+                child: Image.asset(
+                  'assets/images/cart-icon.png',
+                  width: 23,
+                  height: 23,
+                ),
               ),
             ),
             BottomNavigationBarItem(
