@@ -1013,7 +1013,1275 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 Expanded(
                                                   flex: 3,
                                                   child: TextButton(
-                                                    onPressed: () {},
+                                                    onPressed: () {
+                                                      showModalBottomSheet(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return widget.arguments[
+                                                                          'product']
+                                                                      [
+                                                                      'category_id'] ==
+                                                                  4
+                                                              ? Container(
+                                                                  margin: EdgeInsets
+                                                                      .only(
+                                                                          top:
+                                                                              30),
+                                                                  height: 200,
+                                                                  child: Table(
+                                                                    columnWidths: {
+                                                                      0: FlexColumnWidth(
+                                                                          7), // Set width of column 0 to 2 times of default width
+                                                                      1: FlexColumnWidth(
+                                                                          3), // Set width of column 0 to 2 times of default width
+                                                                      2: FlexColumnWidth(
+                                                                          3), // Set width of column 0 to 2 times of default width
+                                                                      3: FlexColumnWidth(
+                                                                          3), // Set width of column 0 to 2 times of default width
+                                                                      4: FlexColumnWidth(
+                                                                          3), // Set width of column 0 to 2 times of default width
+                                                                      5: FlexColumnWidth(
+                                                                          3), // Set width of column 0 to 2 times of default width
+                                                                    },
+                                                                    border: TableBorder
+                                                                        .all(), // Add border decoration
+                                                                    children: [
+                                                                      TableRow(
+                                                                        children: [
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'XS',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'S',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'M',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'L',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'XL',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      TableRow(
+                                                                        children: [
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'Chest',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '34',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '36',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '38',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '40',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '42',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      TableRow(
+                                                                        children: [
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'Waist',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '32',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '33',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '36',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '38',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '40',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      TableRow(
+                                                                        children: [
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'Hip',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '37',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '39',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '42',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '44',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '47',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      TableRow(
+                                                                        children: [
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'Shoulder',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '12.5',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '13',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '13.5',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '14',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '14.5',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      TableRow(
+                                                                        children: [
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'Sleev Length',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '16',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '16.5',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '17',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '17.5',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '17.5',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      TableRow(
+                                                                        children: [
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'Length',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '46',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '46',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '46',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '46',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '46',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                )
+                                                              : Container(
+                                                                  margin: EdgeInsets
+                                                                      .only(
+                                                                          top:
+                                                                              30),
+                                                                  height: 200,
+                                                                  child: Table(
+                                                                    columnWidths: {
+                                                                      0: FlexColumnWidth(
+                                                                          7), // Set width of column 0 to 2 times of default width
+                                                                      1: FlexColumnWidth(
+                                                                          3), // Set width of column 0 to 2 times of default width
+                                                                      2: FlexColumnWidth(
+                                                                          3), // Set width of column 0 to 2 times of default width
+                                                                      3: FlexColumnWidth(
+                                                                          3), // Set width of column 0 to 2 times of default width
+                                                                      4: FlexColumnWidth(
+                                                                          3), // Set width of column 0 to 2 times of default width
+                                                                      5: FlexColumnWidth(
+                                                                          3), // Set width of column 0 to 2 times of default width
+                                                                    },
+                                                                    border: TableBorder
+                                                                        .all(), // Add border decoration
+                                                                    children: [
+                                                                      TableRow(
+                                                                        children: [
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'Label Size',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'XS',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'S',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'M',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'L',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'XL',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      TableRow(
+                                                                        children: [
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'Standard Size',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '36',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '38',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '40',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '42',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '44',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      TableRow(
+                                                                        children: [
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'Chest',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '41',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '43',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '45',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '47',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '49',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      TableRow(
+                                                                        children: [
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'Shoulder',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '16',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '17',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '18',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '19',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '20',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      TableRow(
+                                                                        children: [
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'Waist',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '40',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '42',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '44',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '46',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '48',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      TableRow(
+                                                                        children: [
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'Length',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '41',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '41',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '42',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '44',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '45',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      TableRow(
+                                                                        children: [
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'Sleev Length',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '23 1/2',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '24',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '24 1/2',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '25',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '25 1/2',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      TableRow(
+                                                                        children: [
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              'Neck',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '17',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '17 1/2',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '18',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '18 1/2',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                          TableCell(
+                                                                            child: Center(
+                                                                                child: Text(
+                                                                              '19',
+                                                                              style: TextStyle(fontSize: 15),
+                                                                            )),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                );
+                                                        },
+                                                      );
+                                                      // showDialog(
+                                                      //   context: context,
+                                                      //   builder: (BuildContext
+                                                      //           context) =>
+                                                      //       AlertDialog(
+                                                      //     shape: RoundedRectangleBorder(
+                                                      //         borderRadius:
+                                                      //             BorderRadius
+                                                      //                 .circular(
+                                                      //                     20)),
+                                                      //     content: Table(
+                                                      //       columnWidths: {
+                                                      //         0: FlexColumnWidth(
+                                                      //             7), // Set width of column 0 to 2 times of default width
+                                                      //         1: FlexColumnWidth(
+                                                      //             3), // Set width of column 0 to 2 times of default width
+                                                      //         2: FlexColumnWidth(
+                                                      //             3), // Set width of column 0 to 2 times of default width
+                                                      //         3: FlexColumnWidth(
+                                                      //             3), // Set width of column 0 to 2 times of default width
+                                                      //         4: FlexColumnWidth(
+                                                      //             3), // Set width of column 0 to 2 times of default width
+                                                      //         5: FlexColumnWidth(
+                                                      //             3), // Set width of column 0 to 2 times of default width
+                                                      //       },
+                                                      //       border: TableBorder
+                                                      //           .all(), // Add border decoration
+                                                      //       children: [
+                                                      //         TableRow(
+                                                      //           children: [
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 'Label Size',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 'XS',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 'S',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 'M',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 'L',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 'XL',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //           ],
+                                                      //         ),
+                                                      //         TableRow(
+                                                      //           children: [
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 'Standard Size',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '36',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '38',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '40',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '42',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '44',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //           ],
+                                                      //         ),
+                                                      //         TableRow(
+                                                      //           children: [
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 'Chest',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '41',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '43',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '45',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '47',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '49',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //           ],
+                                                      //         ),
+                                                      //         TableRow(
+                                                      //           children: [
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 'Shoulder',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '16',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '17',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '18',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '19',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '20',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //           ],
+                                                      //         ),
+                                                      //         TableRow(
+                                                      //           children: [
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 'Waist',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '40',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '42',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '44',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '46',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '48',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //           ],
+                                                      //         ),
+                                                      //         TableRow(
+                                                      //           children: [
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 'Length',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '41',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '41',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '42',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '44',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '45',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //           ],
+                                                      //         ),
+                                                      //         TableRow(
+                                                      //           children: [
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 'Sleev Length',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '23 1/2',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '24',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '24 1/2',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '25',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '25 1/2',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //           ],
+                                                      //         ),
+                                                      //         TableRow(
+                                                      //           children: [
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 'Neck',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '17',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '17 1/2',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '18',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '18 1/2',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //             TableCell(
+                                                      //               child: Center(
+                                                      //                   child: Text(
+                                                      //                 '19',
+                                                      //                 style: TextStyle(
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               )),
+                                                      //             ),
+                                                      //           ],
+                                                      //         ),
+                                                      //       ],
+                                                      //     ),
+                                                      //     actions: <Widget>[
+                                                      //       TextButton(
+                                                      //         onPressed: () {
+                                                      //           Navigator.pop(
+                                                      //               context);
+                                                      //         },
+                                                      //         child: Text(
+                                                      //           'Ok',
+                                                      //           style: TextStyle(
+                                                      //               color: Colors
+                                                      //                   .black,
+                                                      //               fontSize:
+                                                      //                   16),
+                                                      //         ),
+                                                      //       ),
+                                                      //     ],
+                                                      //   ),
+                                                      // );
+                                                    },
                                                     child: Column(
                                                       children: [
                                                         Container(
