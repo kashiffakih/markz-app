@@ -1,7 +1,5 @@
 import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:icon_forest/don_icons.dart';
-import 'package:icon_forest/iconoir.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/models/user_address.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
@@ -45,13 +43,11 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
     });
     UserAddressModel _userAddressModel =
         Provider.of<UserAddressModel>(context, listen: false);
-    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
 
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
-            padding: EdgeInsets.only(top: 20),
             child: Column(
               children: [
                 // Title

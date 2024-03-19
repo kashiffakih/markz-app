@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:icon_forest/don_icons.dart';
-import 'package:icon_forest/iconoir.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/review_pr.dart';
 import 'package:sales_app/locator.dart';
@@ -35,14 +32,12 @@ class _ReviewsPageState extends State<ReviewsPage> {
   Widget build(BuildContext context) {
     final ReviewModel _reviewModel = Provider.of<ReviewModel>(context);
     final ConfigModel _configModel = locator<ConfigModel>();
-    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     TextEditingController _controller = TextEditingController();
 
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
-            padding: EdgeInsets.only(top: 20),
             child: Column(
               children: [
                 // Title

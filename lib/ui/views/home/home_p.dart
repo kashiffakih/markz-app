@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'package:icon_forest/don_icons.dart';
-// import 'package:icon_forest/iconoir.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
@@ -65,6 +63,30 @@ class _HomePageState extends State<HomePage> {
       _productModel.banners?['banner_path_3'] != null
           ? _configModel.apiConfig['mediaURL'] +
               _productModel.banners!['banner_path_3'].toString()
+          : null,
+      _productModel.banners?['banner_path_4'] != null
+          ? _configModel.apiConfig['mediaURL'] +
+              _productModel.banners!['banner_path_4'].toString()
+          : null,
+      _productModel.banners?['banner_path_5'] != null
+          ? _configModel.apiConfig['mediaURL'] +
+              _productModel.banners!['banner_path_5'].toString()
+          : null,
+      _productModel.banners?['banner_path_6'] != null
+          ? _configModel.apiConfig['mediaURL'] +
+              _productModel.banners!['banner_path_6'].toString()
+          : null,
+      _productModel.banners?['banner_path_11'] != null
+          ? _configModel.apiConfig['mediaURL'] +
+              _productModel.banners!['banner_path_11'].toString()
+          : null,
+      _productModel.banners?['banner_path_12'] != null
+          ? _configModel.apiConfig['mediaURL'] +
+              _productModel.banners!['banner_path_12'].toString()
+          : null,
+      _productModel.banners?['banner_path_13'] != null
+          ? _configModel.apiConfig['mediaURL'] +
+              _productModel.banners!['banner_path_13'].toString()
           : null,
     ]
         .where((imageUrl) => imageUrl != null)
@@ -134,171 +156,9 @@ class _HomePageState extends State<HomePage> {
                                     5 * fem, 12.6 * fem, 10.64 * fem, 5 * fem),
                                 width: 460 * fem,
                                 height: 71.04 * fem,
-                                child:
-                                    //  Row(
-                                    //   crossAxisAlignment: CrossAxisAlignment.center,
-                                    //   children: [
-                                    //     Container(
-                                    //       // margin: EdgeInsets.fromLTRB(
-                                    //       //     0 * fem, 0 * fem, 0 * fem, 8.21 * fem),
-                                    //       height: double.infinity,
-                                    //       child: Row(
-                                    //         crossAxisAlignment:
-                                    //             CrossAxisAlignment.end,
-                                    //         children: [
-                                    //           Container(
-                                    //             margin: EdgeInsets.fromLTRB(5 * fem,
-                                    //                 2 * fem, 0 * fem, 4.7 * fem),
-                                    //             width: 34.22 * fem,
-                                    //             height: 60 * fem,
-                                    //             child: Image.asset(
-                                    //               'assets/images/logo-9g4.png',
-                                    //               fit: BoxFit.cover,
-                                    //             ),
-                                    //           ),
-                                    //           Container(
-                                    //             width: 200 * fem,
-                                    //             height: 39.83 * fem,
-                                    //             child: Stack(
-                                    //               children: [
-                                    //                 Positioned(
-                                    //                   left: 0 * fem,
-                                    //                   top: 0 * fem,
-                                    //                   child: Align(
-                                    //                     child: SizedBox(
-                                    //                       width: 78 * fem,
-                                    //                       height: 27 * fem,
-                                    //                       child: Text(
-                                    //                         'Welcome to',
-                                    //                         style: MyGoogleFontStyle(
-                                    //                           fontFamily: 'Poppins',
-                                    //                           fontSize:
-                                    //                               10.9245996475 *
-                                    //                                   ffem,
-                                    //                           fontWeight:
-                                    //                               FontWeight.w700,
-                                    //                           height: 1.5000000436 *
-                                    //                               ffem /
-                                    //                               fem,
-                                    //                           color:
-                                    //                               Color(0xff303030),
-                                    //                         ),
-                                    //                       ),
-                                    //                     ),
-                                    //                   ),
-                                    //                 ),
-                                    //                 Positioned(
-                                    //                   left: 0 * fem,
-                                    //                   top: 11.8349609375 * fem,
-                                    //                   child: Align(
-                                    //                     child: SizedBox(
-                                    //                         width: 120 * fem,
-                                    //                         height: 25 * fem,
-                                    //                         child: Container(
-                                    //                           margin:
-                                    //                               EdgeInsets.fromLTRB(
-                                    //                                   0 * fem,
-                                    //                                   2 * fem,
-                                    //                                   0 * fem,
-                                    //                                   4.7 * fem),
-                                    //                           width: 100 * fem,
-                                    //                           height: 70 * fem,
-                                    //                           child: Image.asset(
-                                    //                             'assets/images/NewAadabText.jpeg',
-                                    //                             height: 70,
-                                    //                             width: 100,
-                                    //                             // 'assets/images/NewAadabText.jpeg',
-                                    //                             // fit: BoxFit.fill,
-                                    //                           ),
-                                    //                         )
-                                    //                         // Text(
-                                    //                         //   'Aadab',
-                                    //                         //   style: MyGoogleFontStyle(
-                                    //                         //     fontFamily: 'PT Serif Regular 400 Italy',
-                                    //                         //     fontSize:
-                                    //                         //         18.2076663971 *
-                                    //                         //             ffem,
-                                    //                         //     fontWeight:
-                                    //                         //         FontWeight.w400,
-                                    //                         //     height: 1.5000000524 *
-                                    //                         //         ffem /
-                                    //                         //         fem,
-                                    //                         //     color:
-                                    //                         //         Color(0xff303030),
-                                    //                         //   ),
-                                    //                         // ),
-                                    //                         ),
-                                    //                   ),
-                                    //                 ),
-                                    //               ],
-                                    //             ),
-                                    //           ),
-                                    //         ],
-                                    //       ),
-                                    //     ),
-                                    //     Container(
-                                    //       height: double.infinity,
-                                    //       child: Row(
-                                    //         mainAxisAlignment: MainAxisAlignment.end,
-                                    //         children: [
-                                    //           SizedBox(
-                                    //             width: 40,
-                                    //           ),
-                                    //           InkWell(
-                                    //             onTap: () {
-                                    //               Navigator.pushNamed(
-                                    //                   context, '/notificationPage');
-                                    //             },
-                                    //             child: Padding(
-                                    //               padding: const EdgeInsets.all(10.0),
-                                    //               child: Image.asset(
-                                    //                 'assets/images/vector-afp.png',
-                                    //                 width: 18.58 * fem,
-                                    //                 height: 18.58 * fem,
-                                    //               ),
-                                    //             ),
-                                    //           ),
-                                    //           InkWell(
-                                    //             onTap: () {
-                                    //               _key.currentState!.openDrawer();
-                                    //             },
-                                    //             child: Icon(
-                                    //               Icons.menu_sharp,
-                                    //               size: 30.0,
-                                    //             ),
-                                    //           ),
-                                    //         ],
-                                    //       ),
-                                    //     ),
-                                    //   ],
-                                    // ),
-                                    Row(
+                                child: Row(
                                   children: [
                                     const SizedBox(width: 30),
-                                    // InkWell(
-                                    //   onTap: () {
-                                    //     Scaffold.of(context).openEndDrawer();
-                                    //   },
-                                    //   child: Container(
-                                    //     width: 20,
-                                    //     height: 20,
-                                    //     child: Column(
-                                    //       mainAxisSize: MainAxisSize.min,
-                                    //       mainAxisAlignment: MainAxisAlignment
-                                    //           .center, // Center vertically
-                                    //       crossAxisAlignment:
-                                    //           CrossAxisAlignment.start,
-                                    //       children: [
-                                    //         Image.asset(
-                                    //           'assets/images/category-icon.png',
-                                    //           height: 20,
-                                    //           fit: BoxFit.cover,
-                                    //         ),
-                                    //       ],
-                                    //     ),
-                                    //   ),
-                                    // ),
-                                    // const SizedBox(width: 30),
                                     Container(
                                       width: 258,
                                       height: 38,
@@ -411,7 +271,7 @@ class _HomePageState extends State<HomePage> {
             _productModel.productsLoader
                 ? LinearProgressIndicator()
                 : SizedBox(
-                    height: 320,
+                    height: 290,
                     child: _productModel.productsLoader
                         ? SizedBox(
                             // height: 20,

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:icon_forest/don_icons.dart';
-import 'package:icon_forest/iconoir.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
@@ -8,7 +6,6 @@ import 'package:sales_app/core/providers/user_address_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/checkout/cart_p.dart';
-import 'package:sales_app/ui/views/checkout/checkout_p.dart';
 import 'package:sales_app/ui/views/profile/shipping_create_p.dart';
 import 'package:sales_app/ui/views/profile/shipping_id_p.dart';
 
@@ -36,8 +33,6 @@ class _AddressPageState extends State<AddressPage> {
   Widget build(BuildContext context) {
     final UserAddressModel _userAddressModel =
         Provider.of<UserAddressModel>(context);
-    final ConfigModel _configModel = locator<ConfigModel>();
-    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
 
     var cartItems = [];
     var cartTotal = '';
@@ -54,12 +49,11 @@ class _AddressPageState extends State<AddressPage> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
-            padding: EdgeInsets.only(top: 20),
             child: Column(
               children: [
                 // Title
                 Container(
-                  margin: EdgeInsets.all(20),
+                  margin: EdgeInsets.all(10),
                   width: double.infinity,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,6 +77,7 @@ class _AddressPageState extends State<AddressPage> {
                       ),
                       const SizedBox(height: 15),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           InkWell(
                             onTap: () {
@@ -376,9 +371,9 @@ class _AddressPageState extends State<AddressPage> {
         },
         child: Icon(
           Icons.add,
-          color: Colors.black,
+          color: Colors.white,
         ),
-        backgroundColor: Color(0xffffffff),
+        backgroundColor: Colors.black,
       ),
       // bottomNavigationBar: BottomNavigationBar(
       //   elevation: 10,

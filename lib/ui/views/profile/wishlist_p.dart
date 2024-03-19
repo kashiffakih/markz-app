@@ -46,7 +46,6 @@ class _WishlistPageState extends State<WishlistPage> {
           child: Column(
             children: [
               Container(
-                padding: EdgeInsets.only(top: 20),
                 child: Column(
                   children: [
                     // Title

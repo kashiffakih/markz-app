@@ -1,8 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:icon_forest/don_icons.dart';
-import 'package:icon_forest/iconoir.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/models/user.dart';
@@ -42,7 +40,6 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
-            padding: EdgeInsets.only(top: 20),
             child: Column(
               children: [
                 // Title
@@ -57,6 +54,7 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                           Navigator.pop(context);
                         },
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
                               child: Image.asset(

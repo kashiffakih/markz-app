@@ -1068,15 +1068,16 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       labelText: 'Select Color',
                                                       contentPadding:
                                                           EdgeInsets.all(10)),
-                                                  items: flavors
+                                                  items: _sizes
                                                       .map(
-                                                        (_flavor) =>
+                                                        (_color) =>
                                                             DropdownMenuItem(
                                                           child: Text(
-                                                            _flavor['name'],
+                                                            _color['unit']
+                                                                ['name'],
                                                           ),
-                                                          value:
-                                                              _flavor['name'],
+                                                          value: _color['unit']
+                                                              ['name'],
                                                         ),
                                                       )
                                                       .toList(),
