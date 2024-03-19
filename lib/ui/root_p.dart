@@ -18,7 +18,7 @@ class _RootPageState extends State<RootPage> {
   authenticateUser(_, AuthModel authModel, ConfigModel configModel) async {
     // configModel.getApiConfig(domain: 'http://192.168.0.189:8080');
     // configModel.getApiConfig(domain: 'http://172.20.10.3:8080');
-    // configModel.getApiConfig(domain: 'http://192.168.0.102:8080');
+    // configModel.getApiConfig(domain: 'http://192.168.0.104:8080');
     configModel.getApiConfig(domain: 'http://api.aadab.aaibuzz.com');
     // configModel.getApiConfig(domain: 'http://api.pw.aaibuzz.com');
     await configModel.fetchLoginData();

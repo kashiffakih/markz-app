@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:icon_forest/don_icons.dart';
-import 'package:icon_forest/iconoir.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
@@ -26,7 +24,6 @@ class _OrdersPageState extends State<OrdersPage> {
 
   @override
   Widget build(BuildContext context) {
-    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     final OrderModel _orderModel = Provider.of<OrderModel>(context);
     return Scaffold(
       body: SafeArea(
@@ -37,7 +34,7 @@ class _OrdersPageState extends State<OrdersPage> {
               children: [
                 // Title
                 Container(
-                  margin: EdgeInsets.all(20),
+                  // margin: EdgeInsets.all(20),
                   width: double.infinity,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

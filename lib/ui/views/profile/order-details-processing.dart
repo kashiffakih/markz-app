@@ -557,9 +557,10 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                 child: Container(
                   // width: 200 * fem,
                   // height: 44 * fem,
-                  child: Row(
+                  child: Column(
                     children: [
                       Align(
+                        alignment: Alignment.centerLeft,
                         child: SizedBox(
                           width: 47 * fem,
                           height: 24 * fem,
@@ -576,6 +577,7 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                         ),
                       ),
                       Align(
+                        alignment: Alignment.centerLeft,
                         child: SizedBox(
                           // width: 100 * fem,
                           // height: 24 * fem,
@@ -595,14 +597,18 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                   ),
                 ),
               ),
+              SizedBox(
+                height: 20,
+              ),
               Padding(
                 padding: const EdgeInsets.only(left: 20.0),
                 child: Container(
                   // width: 141 * fem,
                   // height: 44 * fem,
-                  child: Row(
+                  child: Column(
                     children: [
                       Align(
+                        alignment: Alignment.centerLeft,
                         child: SizedBox(
                           width: 26 * fem,
                           height: 24 * fem,
@@ -619,6 +625,7 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                         ),
                       ),
                       Align(
+                        alignment: Alignment.centerLeft,
                         child: SizedBox(
                           width: 141 * fem,
                           height: 24 * fem,
@@ -638,18 +645,69 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                   ),
                 ),
               ),
+              SizedBox(
+                height: 20,
+              ),
               Padding(
                 padding: const EdgeInsets.only(left: 20.0),
                 child: Container(
                   // width: 80 * fem,
                   // height: 44 * fem,
-                  child: Row(
+                  child: Column(
                     children: [
                       SizedBox(
-                        width: 77 * fem,
-                        height: 24 * fem,
+                        // width: 77 * fem,
+                        // height: 24 * fem,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Phone number: ',
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 12 * ffem,
+                              fontWeight: FontWeight.w400,
+                              height: 2 * ffem / fem,
+                              color: Color(0xff1e1e1e),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        // width: 80 * fem,
+                        // height: 24 * fem,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            widget.arguments['order']['user']['phone']
+                                .toString(),
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 13 * ffem,
+                              fontWeight: FontWeight.w600,
+                              height: 1.8461538462 * ffem / fem,
+                              color: Color(0xff1e1e1e),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0),
+                child: Container(
+                  // width: 285 * fem,
+                  // height: 60 * fem,
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
                         child: Text(
-                          'Phone number: ',
+                          'Deliver to: ',
                           style: MyGoogleFontStyle(
                             fontFamily: 'Urbanist',
                             fontSize: 12 * ffem,
@@ -659,43 +717,8 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                           ),
                         ),
                       ),
-                      SizedBox(
-                        width: 80 * fem,
-                        height: 24 * fem,
-                        child: Text(
-                          widget.arguments['order']['user']['phone'].toString(),
-                          style: MyGoogleFontStyle(
-                            fontFamily: 'Urbanist',
-                            fontSize: 13 * ffem,
-                            fontWeight: FontWeight.w600,
-                            height: 1.8461538462 * ffem / fem,
-                            color: Color(0xff1e1e1e),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 20.0),
-                child: Container(
-                  // width: 285 * fem,
-                  // height: 60 * fem,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Deliver to: ',
-                        style: MyGoogleFontStyle(
-                          fontFamily: 'Urbanist',
-                          fontSize: 12 * ffem,
-                          fontWeight: FontWeight.w400,
-                          height: 2 * ffem / fem,
-                          color: Color(0xff1e1e1e),
-                        ),
-                      ),
-                      Expanded(
+                      Align(
+                        alignment: Alignment.centerLeft,
                         child: Text(
                           widget.arguments['order']['address']['add_1']
                                   .toString() +

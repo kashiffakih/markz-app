@@ -36,3 +36,4 @@ const String refundPolicyPage = '/refundPolicyPage';
 const String termAndConditionPage = '/termAndConditionPage';
 
 const String multipleImages = '/multiple-images';
+const String promocodes = '/promocodes';

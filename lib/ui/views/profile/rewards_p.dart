@@ -26,7 +26,6 @@ class _RewardsPageState extends State<RewardsPage> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
-            margin: EdgeInsets.only(top: 20),
             child: Column(
               children: [
                 // Title

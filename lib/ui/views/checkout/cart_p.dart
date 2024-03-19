@@ -11,6 +11,7 @@ import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/checkout/checkout_p.dart';
 import 'package:sales_app/ui/views/products/shops_p.dart';
 import 'package:sales_app/ui/views/profile/address_p.dart';
+import 'package:sales_app/ui/views/promocodes/promocodes_p.dart';
 
 class CartPage extends StatefulWidget {
   final arguments;
@@ -210,9 +211,49 @@ class _CartPageState extends State<CartPage> {
                         width: MediaQuery.of(context).size.width - 50,
                         // height: MediaQuery.of(context).size.height - 250,
                         child: _addToCartModel.addToCarts!.isEmpty
-                            ? SizedBox(
-                                height: 60,
-                                child: Center(child: Text('Cart is empty')),
+                            ? Column(
+                                children: [
+                                  SizedBox(
+                                    height: 60,
+                                    child: Center(child: Text('Cart is empty')),
+                                  ),
+                                  SizedBox(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.6,
+                                  ),
+                                  SizedBox(
+                                    height: 60,
+                                    child: Center(
+                                        child: TextButton(
+                                            style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStateProperty.all<
+                                                      Color>(Colors.black),
+                                              foregroundColor:
+                                                  MaterialStateProperty.all<
+                                                      Color>(Colors.white),
+                                              shape: MaterialStateProperty.all<
+                                                  OutlinedBorder>(
+                                                RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0), // Adjust the radius as needed
+                                                ),
+                                              ),
+                                            ),
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => ShopsPage(
+                                                      initialText:
+                                                          ''), // Pass initialText if needed
+                                                ),
+                                              );
+                                            },
+                                            child: Text('Add Products'))),
+                                  ),
+                                ],
                               )
                             : SizedBox(
                                 height: MediaQuery.of(context).size.height *
@@ -531,6 +572,7 @@ class _CartPageState extends State<CartPage> {
                       width: MediaQuery.of(context).size.width - 50,
                       child: Column(
                         children: [
+                          // if (couponValue == '')
                           Form(
                             key: _formKey,
                             child: Row(children: [
@@ -552,7 +594,7 @@ class _CartPageState extends State<CartPage> {
                                       disabledBorder: InputBorder.none,
                                       contentPadding:
                                           EdgeInsets.fromLTRB(9, 6, 1, 5),
-                                      hintText: 'Enter your promo code',
+                                      hintText: 'Enter your promocode',
                                       hintStyle:
                                           TextStyle(color: Color(0x3f000000)),
                                     ),
@@ -657,8 +699,57 @@ class _CartPageState extends State<CartPage> {
                               )
                             ]),
                           ),
-                          // Promo Code
 
+                          // Promo Code
+                          InkWell(
+                            onTap: () async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => PromocodesPage()),
+                              );
+                              // setState(() {
+                              await _couponModel.verifyCoupon(result);
+                              final firstCoupon = _couponModel.coupons![0];
+                              final cartTotal = int.parse(
+                                  _addToCartModel.cartTotal.toString());
+
+                              if (firstCoupon.minOrderValue! < cartTotal) {
+                                setState(() {
+                                  couponValue =
+                                      double.parse(firstCoupon.value.toString())
+                                          .toInt();
+                                  couponId = firstCoupon.id.toString();
+                                });
+                              } else {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    title: Text(
+                                        "The Product amount should be greater than ${firstCoupon.minOrderValue.toString()}"),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text('Ok'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                              // });
+                              // print(result);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('View all promocodes'),
+                            ),
+                          ),
                           // SizedBox(
                           //   height: 10,
                           // ),
@@ -754,7 +845,9 @@ class _CartPageState extends State<CartPage> {
 
                                 // Body
                                 Container(
-                                  height: 550,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.65,
+                                  // height: 480,
                                   child: Container(
                                     width:
                                         MediaQuery.of(context).size.width - 50,
@@ -1302,14 +1395,48 @@ class _CartPageState extends State<CartPage> {
                                                       ),
                                                     ),
                                                   ),
+                                                  if (_userWaletModel
+                                                          .totaRemainingPoint !=
+                                                      0)
+                                                    InkWell(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          _userWaletModel
+                                                              .totaRemainingPoint = 0;
+                                                        });
+                                                      },
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                right: 8.0),
+                                                        child: Text('(Remove)'),
+                                                      ),
+                                                    ),
+                                                  if (_userWaletModel
+                                                          .totaRemainingPoint ==
+                                                      0)
+                                                    InkWell(
+                                                      onTap: () async {
+                                                        await _userWaletModel
+                                                            .getMyUserWallets();
+                                                        setState(() {
+                                                          // _userWaletModel
+                                                          //         .totaRemainingPoint =
+                                                          //     _userWaletModel
+                                                          //         .totaRemainingPoint; // Not sure what this line is doing
+                                                        });
+                                                      },
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                right: 8.0),
+                                                        child: Text('(Add)'),
+                                                      ),
+                                                    ),
                                                   Text(
-                                                    'RS' +
-                                                        ' ' +
-                                                        (int.parse(_userWaletModel
-                                                                    .totaRemainingPoint
-                                                                    .toString()) /
-                                                                3)
-                                                            .toStringAsFixed(0),
+                                                    'RS ${(_userWaletModel.totaRemainingPoint ~/ 3)}', // Division by 3 directly
                                                     textAlign: TextAlign.right,
                                                     style: MyGoogleFontStyle(
                                                       fontFamily: 'Inter',
@@ -1379,9 +1506,40 @@ class _CartPageState extends State<CartPage> {
                                     ),
                                   ),
                                 ),
-                                // SizedBox(
-                                //   height: 20,
-                                // ),
+                                SizedBox(
+                                  height: 60,
+                                  child: Center(
+                                      child: TextButton(
+                                          style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty.all<
+                                                    Color>(Colors.black),
+                                            foregroundColor:
+                                                MaterialStateProperty.all<
+                                                    Color>(Colors.white),
+                                            shape: MaterialStateProperty.all<
+                                                OutlinedBorder>(
+                                              RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(
+                                                    10.0), // Adjust the radius as needed
+                                              ),
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => ShopsPage(
+                                                    initialText:
+                                                        ''), // Pass initialText if needed
+                                              ),
+                                            );
+                                          },
+                                          child: Text('Add More Products'))),
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
                                 _orderModel.orders.length > 0
                                     ? Align(
                                         alignment: Alignment.bottomCenter,
@@ -1418,8 +1576,7 @@ class _CartPageState extends State<CartPage> {
                                                               .toString()) /
                                                       3)
                                                   .toStringAsFixed(0);
-                                              var addressId = _orderModel
-                                                  .orders[0].address!.id;
+                                              var addressId = address.id;
                                               bool response =
                                                   await _orderModel.placedOrder(
                                                 _addToCartModel.addToCarts!

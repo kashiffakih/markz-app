@@ -8,6 +8,7 @@ import 'package:sales_app/core/providers/wish_list_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/products/product_id_p.dart';
+import 'package:badges/badges.dart' as badges;
 
 class ShopsPage extends StatefulWidget {
   final initialText;
@@ -62,7 +63,12 @@ class ShopsPageState extends State<ShopsPage> {
         _isInitialLoad = false;
       }
     });
-
+    var cartCount = 0;
+    setState(() {
+      cartCount = _addToCartModel.addToCarts == null
+          ? 0
+          : _addToCartModel.addToCarts!.length;
+    });
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -100,6 +106,7 @@ class ShopsPageState extends State<ShopsPage> {
                     ),
                     const SizedBox(height: 15),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         InkWell(
                           onTap: () {
@@ -196,18 +203,16 @@ class ShopsPageState extends State<ShopsPage> {
                           child: Container(
                             width: 20,
                             height: 20,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment:
-                                  MainAxisAlignment.center, // Center vertically
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Image.asset(
-                                  'assets/images/shopping_cart.png',
-                                  height: 20,
-                                  fit: BoxFit.cover,
-                                ),
-                              ],
+                            child: badges.Badge(
+                              badgeContent: Text(
+                                cartCount.toString(),
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              child: Image.asset(
+                                'assets/images/cart-icon.png',
+                                width: 23,
+                                height: 23,
+                              ),
                             ),
                           ),
                         ),
