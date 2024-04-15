@@ -1,20 +1,72 @@
 import 'package:flutter/material.dart';
+// import 'package:get_ip_address/get_ip_address.dart';
 // import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/auth_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
 
+// import 'package:firebase_auth/firebase_auth.dart';
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  final argument;
+  const LoginPage({Key? key, this.argument}) : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
+  // String _platformVersion = 'Unknown';
+
+  @override
+  void initState() {
+    super.initState();
+    // initPlatformState();
+    fetchLoginData();
+  }
+
+  // // Platform messages are asynchronous, so we initialize in an async method.
+  // Future<void> initPlatformState() async {
+  //   // try {
+  //   //   /// Initialize Ip Address
+  //   //   var ipAddress = IpAddress(type: RequestType.json);
+
+  //   //   /// Get the IpAddress based on requestType.
+  //   //   dynamic data = await ipAddress.getIp();
+  //   //   print(data.toString());
+  //   // } on IpAddressException catch (exception) {
+  //   //   /// Handle the exception.
+  //   //   print(exception.message);
+  //   // }
+  //   try {
+  //     if (Platform.isAndroid) {
+  //       _deviceData = _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
+  //     } else if (Platform.isIOS) {
+  //       _deviceData = _readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
+  //     } else if (Platform.isLinux) {
+  //       _deviceData = _readLinuxDeviceInfo(await deviceInfoPlugin.linuxInfo);
+  //     } else if (Platform.isMacOS) {
+  //       _deviceData = _readMacOsDeviceInfo(await deviceInfoPlugin.macOsInfo);
+  //     } else if (Platform.isWindows) {
+  //       _deviceData =
+  //           _readWindowsDeviceInfo(await deviceInfoPlugin.windowsInfo);
+  //     }
+  //   } on PlatformException {
+  //     _deviceData = <String, dynamic>{
+  //       'Error:': 'Failed to get platform version.'
+  //     };
+  //   }
+
+  //   String? identifier =
+  //       _deviceData['manufacturer'] + ' ' + _deviceData['model'];
+
+  //   loginData = Map.of(loginData);
+  //   loginData['imei_no'] = identifier;
+
+  //   print(loginData);
+  // }
+
   // GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
 
   // Future<void> _handleSignIn() async {
@@ -50,12 +102,11 @@ class _LoginPageState extends State<LoginPage> {
   };
   bool _isLoading = false;
 
-  @override
-  void initState() {
-    fetchLoginData();
+  // @override
+  // void initState() {
 
-    super.initState();
-  }
+  //   super.initState();
+  // }
 
   fetchLoginData() async {
     await _configModel.fetchLoginData();
@@ -65,6 +116,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    // print(widget.argument['role']);
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
@@ -432,48 +484,50 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                 ),
-                // InkWell(
-                //   onTap: () {
-                //     Navigator.pushNamed(context, '/registerPage');
-                //   },
-                //   child: RichText(
-                //     textAlign: TextAlign.center,
-                //     text: TextSpan(
-                //       style: MyGoogleFontStyle(
-                //         fontFamily: 'Poppins',
-                //         fontSize: 13 * ffem,
-                //         fontWeight: FontWeight.w600,
-                //         height: 1.399999912 * ffem / fem,
-                //         letterSpacing: 0.13 * fem,
-                //         color: Color(0xff1e232c),
-                //       ),
-                //       children: [
-                //         TextSpan(
-                //           text: 'Don’t have an account? ',
-                //           style: MyGoogleFontStyle(
-                //             fontFamily: 'Urbanist',
-                //             fontSize: 13 * ffem,
-                //             fontWeight: FontWeight.w500,
-                //             height: 1.399999912 * ffem / fem,
-                //             letterSpacing: 0.13 * fem,
-                //             color: Color(0xff1e232c),
-                //           ),
-                //         ),
-                //         TextSpan(
-                //           text: 'Register Now',
-                //           style: MyGoogleFontStyle(
-                //             fontFamily: 'Urbanist',
-                //             fontSize: 13 * ffem,
-                //             fontWeight: FontWeight.w700,
-                //             height: 1.399999912 * ffem / fem,
-                //             letterSpacing: 0.13 * fem,
-                //             color: Color(0xffc9b758),
-                //           ),
-                //         ),
-                //       ],
-                //     ),
-                //   ),
-                // ),
+                // Text(_platformVersion),
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/registerPage',
+                        arguments: {'role': widget.argument['role']});
+                  },
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 13 * ffem,
+                        fontWeight: FontWeight.w600,
+                        height: 1.399999912 * ffem / fem,
+                        letterSpacing: 0.13 * fem,
+                        color: Color(0xff1e232c),
+                      ),
+                      children: [
+                        TextSpan(
+                          text: 'Don’t have an account? ',
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 13 * ffem,
+                            fontWeight: FontWeight.w500,
+                            height: 1.399999912 * ffem / fem,
+                            letterSpacing: 0.13 * fem,
+                            color: Color(0xff1e232c),
+                          ),
+                        ),
+                        TextSpan(
+                          text: 'Register Now',
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 13 * ffem,
+                            fontWeight: FontWeight.w700,
+                            height: 1.399999912 * ffem / fem,
+                            letterSpacing: 0.13 * fem,
+                            color: Color(0xffc9b758),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 //  SizedBox(
                 //   height: 30,
                 // ),

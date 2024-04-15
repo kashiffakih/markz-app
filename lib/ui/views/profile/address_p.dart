@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sales_app/core/providers/add_to_cart_pr.dart';
-import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/user_address_pr.dart';
-import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/checkout/cart_p.dart';
 import 'package:sales_app/ui/views/profile/shipping_create_p.dart';

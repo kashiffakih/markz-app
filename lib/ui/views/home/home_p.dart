@@ -102,6 +102,7 @@ class _HomePageState extends State<HomePage> {
           ? 0
           : _addToCartModel.addToCarts!.length;
     });
+    // print(_configModel.user.roles![0].name);
     return Scaffold(
       key: _key,
       drawer: DrawerWidget(),
@@ -283,18 +284,37 @@ class _HomePageState extends State<HomePage> {
                             shrinkWrap: true,
                             itemCount: _productModel.products!.length,
                             itemBuilder: (context, index) {
-                              discountPrice = (int.parse(_productModel
-                                          .products![index]
-                                          .productPrices![0]
-                                          .price
-                                          .toString()) -
-                                      int.parse(_productModel.products![index]
-                                          .productPrices![0].offerPrice
-                                          .toString())) /
-                                  int.parse(_productModel
-                                      .products![index].productPrices![0].price
-                                      .toString()) *
-                                  100;
+                              if (_configModel.user.roles![0].name ==
+                                  'Distributor') {
+                                discountPrice = (int.parse(_productModel
+                                            .products![index]
+                                            .productPrices![0]
+                                            .distributorPrice
+                                            .toString()) -
+                                        int.parse(_productModel
+                                            .products![index]
+                                            .productPrices![0]
+                                            .distributorOfferPrice
+                                            .toString())) /
+                                    int.parse(_productModel.products![index]
+                                        .productPrices![0].distributorPrice
+                                        .toString()) *
+                                    100;
+                              } else {
+                                discountPrice = (int.parse(_productModel
+                                            .products![index]
+                                            .productPrices![0]
+                                            .price
+                                            .toString()) -
+                                        int.parse(_productModel.products![index]
+                                            .productPrices![0].offerPrice
+                                            .toString())) /
+                                    int.parse(_productModel.products![index]
+                                        .productPrices![0].price
+                                        .toString()) *
+                                    100;
+                              }
+
                               return Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
@@ -320,11 +340,15 @@ class _HomePageState extends State<HomePage> {
                                                       builder: (context) =>
                                                           ProductIdPage(
                                                               arguments: {
-                                                                'product':
+                                                                'product': _productModel
+                                                                    .products![
+                                                                        index]
+                                                                    .toJson(),
+                                                                'product_images':
                                                                     _productModel
                                                                         .products![
                                                                             index]
-                                                                        .toJson()
+                                                                        .productImages
                                                               })));
                                             },
                                             child: Container(
@@ -446,7 +470,7 @@ class _HomePageState extends State<HomePage> {
                                                                         index]
                                                                     .category!
                                                                     .name
-                                                                    .toString()
+                                                                    .toString(),
                                                               })));
                                             },
                                             child: Container(

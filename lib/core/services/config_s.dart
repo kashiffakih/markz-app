@@ -44,6 +44,8 @@ class ConfigService {
     String _loginData = _prefs.get('loginData').toString();
     Map<String, dynamic> _loginMap = json.decode(_loginData);
     _loginMap['password'] = '';
+    _loginMap['email'] = '';
+    _loginMap['phone'] = '';
     _prefs.setString('loginData', json.encode(_loginMap));
   }
 }

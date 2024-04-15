@@ -43,6 +43,8 @@ dependencies:
   csc_picker: ^0.2.7
   share: ^2.0.4
   badges: ^3.1.1
+  get_ip_address: ^0.0.5
+  device_info_plus: ^9.1.2
   # multiple_images_picker: ^1.0.1
 
 dev_dependencies:

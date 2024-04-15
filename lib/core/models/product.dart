@@ -27,6 +27,7 @@ class Product {
   SubCategory? subCategory;
   List<ProductPrices>? productPrices;
   List<ProductPack>? productPacks;
+  List<ProductImages>? productImages;
   List<Tags>? tags;
   Company? company;
   List<Review>? reviews;
@@ -58,6 +59,7 @@ class Product {
       this.subCategory,
       this.productPrices,
       this.productPacks,
+      this.productImages,
       this.tags,
       this.company,
       this.reviews});
@@ -101,6 +103,12 @@ class Product {
       productPacks = <ProductPack>[];
       json['product_packs'].forEach((v) {
         productPacks!.add(new ProductPack.fromJson(v));
+      });
+    }
+    if (json['product_images'] != null) {
+      productImages = <ProductImages>[];
+      json['product_images'].forEach((v) {
+        productImages!.add(new ProductImages.fromJson(v));
       });
     }
     if (json['tags'] != null) {
@@ -624,6 +632,69 @@ class Company {
     data['short_category'] = this.shortCategory;
     data['is_available'] = this.isAvailable;
     data['imagepath'] = this.imagepath;
+    return data;
+  }
+}
+
+class ProductImages {
+  int? id;
+  int? productId;
+  String? imagepath;
+  Null? description;
+  int? isAvatar;
+  String? createdAt;
+  String? updatedAt;
+  String? imagepath2;
+  String? imagepath3;
+  String? imagepath4;
+  int? unitId;
+  Unit? unit;
+
+  ProductImages(
+      {this.id,
+      this.productId,
+      this.imagepath,
+      this.description,
+      this.isAvatar,
+      this.createdAt,
+      this.updatedAt,
+      this.imagepath2,
+      this.imagepath3,
+      this.imagepath4,
+      this.unitId,
+      this.unit});
+
+  ProductImages.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    productId = json['product_id'];
+    imagepath = json['imagepath'];
+    description = json['description'];
+    isAvatar = json['is_avatar'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
+    imagepath2 = json['imagepath2'];
+    imagepath3 = json['imagepath3'];
+    imagepath4 = json['imagepath4'];
+    unitId = json['unit_id'];
+    unit = json['unit'] != null ? new Unit.fromJson(json['unit']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['product_id'] = this.productId;
+    data['imagepath'] = this.imagepath;
+    data['description'] = this.description;
+    data['is_avatar'] = this.isAvatar;
+    data['created_at'] = this.createdAt;
+    data['updated_at'] = this.updatedAt;
+    data['imagepath2'] = this.imagepath2;
+    data['imagepath3'] = this.imagepath3;
+    data['imagepath4'] = this.imagepath4;
+    data['unit_id'] = this.unitId;
+    if (this.unit != null) {
+      data['unit'] = this.unit!.toJson();
+    }
     return data;
   }
 }

@@ -38,9 +38,12 @@ class AuthService {
     );
 
     Map<String, dynamic> _responseData = json.decode(_response.body);
+    // print(_responseData);
     if (_responseData['success']) {
+      var roleId;
+      roleId = registerData!['role'] == 'Distributor' ? 3 : 6;
       var userRole = {
-        'role_id': 6,
+        'role_id': roleId,
         'user_id': _responseData['data']['id'],
       };
       http.Response _responseUserRole = await http.post(
