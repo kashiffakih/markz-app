@@ -1,17 +1,26 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+// import 'package:get_ip_address/get_ip_address.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/models/user_address.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/coupon_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/order_pr.dart';
+import 'package:sales_app/core/providers/product_pr.dart';
 import 'package:sales_app/core/providers/user_wallet_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
-import 'package:sales_app/ui/views/checkout/checkout_p.dart';
+import 'package:sales_app/ui/views/auth/login_p.dart';
 import 'package:sales_app/ui/views/products/shops_p.dart';
 import 'package:sales_app/ui/views/profile/address_p.dart';
 import 'package:sales_app/ui/views/promocodes/promocodes_p.dart';
+
+import '../../../core/providers/wish_list_pr.dart';
+import '../products/product_id_p.dart';
 
 class CartPage extends StatefulWidget {
   final arguments;
@@ -30,23 +39,90 @@ class _CartPageState extends State<CartPage> {
   String couponId = '';
   int couponValue = 0;
   UserAddress address = UserAddress();
-
-  // bool type = true;
-  @override
-  void initState() {
-    Provider.of<AddToCartModel>(context, listen: false)
-        .getAddToCart('', '', '');
-    Provider.of<OrderModel>(context, listen: false).getOrder();
-    super.initState();
-    Provider.of<UserWalletModel>(context, listen: false).getMyUserWallets();
-  }
-
   Map<String, dynamic> _CartData = {
     'kindOfFlower': '',
     'flavour': '',
     'writeOnCake': '',
     'pack': ''
   };
+  // bool type = true;
+  @override
+  void initState() {
+    var productId = '';
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Provider.of<AddToCartModel>(context, listen: false)
+          .getAddToCart('', '', _CartData);
+      await Provider.of<ProductModel>(context, listen: false)
+          .getCategoryWiseProduct(widget.arguments!['product']['category_id']);
+      await Provider.of<OrderModel>(context, listen: false).getOrder();
+      super.initState();
+      await Provider.of<UserWalletModel>(context, listen: false)
+          .getMyUserWallets();
+
+      await Provider.of<WishListModel>(context, listen: false)
+          .getWishLists(productId);
+    });
+    initPlatformState();
+  }
+
+  static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+  Map<String, dynamic> _deviceData = <String, dynamic>{};
+  String? identifier = '';
+
+  Future<void> initPlatformState() async {
+    try {
+      if (Platform.isAndroid) {
+        _deviceData = _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
+      }
+    } on PlatformException {
+      _deviceData = <String, dynamic>{
+        'Error:': 'Failed to get platform version.'
+      };
+    }
+
+    identifier = _deviceData['id'] + '@' + _deviceData['model'] + 'gmail.com';
+  }
+
+  Map<String, dynamic> _readAndroidBuildData(AndroidDeviceInfo build) {
+    return <String, dynamic>{
+      'version.securityPatch': build.version.securityPatch,
+      'version.sdkInt': build.version.sdkInt,
+      'version.release': build.version.release,
+      'version.previewSdkInt': build.version.previewSdkInt,
+      'version.incremental': build.version.incremental,
+      'version.codename': build.version.codename,
+      'version.baseOS': build.version.baseOS,
+      'board': build.board,
+      'bootloader': build.bootloader,
+      'brand': build.brand,
+      'device': build.device,
+      'display': build.display,
+      'fingerprint': build.fingerprint,
+      'hardware': build.hardware,
+      'host': build.host,
+      'id': build.id,
+      'manufacturer': build.manufacturer,
+      'model': build.model,
+      'product': build.product,
+      'supported32BitAbis': build.supported32BitAbis,
+      'supported64BitAbis': build.supported64BitAbis,
+      'supportedAbis': build.supportedAbis,
+      'tags': build.tags,
+      'type': build.type,
+      'isPhysicalDevice': build.isPhysicalDevice,
+      'systemFeatures': build.systemFeatures,
+      'displaySizeInches':
+          ((build.displayMetrics.sizeInches * 10).roundToDouble() / 10),
+      'displayWidthPixels': build.displayMetrics.widthPx,
+      'displayWidthInches': build.displayMetrics.widthInches,
+      'displayHeightPixels': build.displayMetrics.heightPx,
+      'displayHeightInches': build.displayMetrics.heightInches,
+      'displayXDpi': build.displayMetrics.xDpi,
+      'displayYDpi': build.displayMetrics.yDpi,
+      'serialNumber': build.serialNumber,
+    };
+  }
+
   TextEditingController _controller = TextEditingController();
   List<String> paymentOptions = [
     'CoD (Not available)',
@@ -65,6 +141,8 @@ class _CartPageState extends State<CartPage> {
     final CouponModel _couponModel = Provider.of<CouponModel>(context);
     final UserWalletModel _userWaletModel =
         Provider.of<UserWalletModel>(context);
+    final ProductModel _productModel = Provider.of<ProductModel>(context);
+    final WishListModel _wishListModel = Provider.of<WishListModel>(context);
 
     setState(() {
       if (_orderModel.orders.length > 0) {
@@ -907,7 +985,7 @@ class _CartPageState extends State<CartPage> {
                                             )
                                           ],
                                         ),
-                                        if (_orderModel.orders.length > 0)
+                                        if (address.id != null)
                                           Container(
                                             width: MediaQuery.of(context)
                                                     .size
@@ -970,7 +1048,7 @@ class _CartPageState extends State<CartPage> {
                                               ],
                                             ),
                                           ),
-                                        if (_orderModel.orders.length == 0)
+                                        if (address.id == null)
                                           Center(
                                             child: Container(
                                               width: 150,
@@ -1506,41 +1584,40 @@ class _CartPageState extends State<CartPage> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(
-                                  height: 60,
-                                  child: Center(
-                                      child: TextButton(
-                                          style: ButtonStyle(
-                                            backgroundColor:
-                                                MaterialStateProperty.all<
-                                                    Color>(Colors.black),
-                                            foregroundColor:
-                                                MaterialStateProperty.all<
-                                                    Color>(Colors.white),
-                                            shape: MaterialStateProperty.all<
-                                                OutlinedBorder>(
-                                              RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(
-                                                    10.0), // Adjust the radius as needed
-                                              ),
-                                            ),
-                                          ),
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => ShopsPage(
-                                                    initialText:
-                                                        ''), // Pass initialText if needed
-                                              ),
-                                            );
-                                          },
-                                          child: Text('Add More Products'))),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                _orderModel.orders.length > 0
+
+                                // SizedBox(
+                                //   height: 60,
+                                //   child: Center(
+                                //       child: TextButton(
+                                //           style: ButtonStyle(
+                                //             backgroundColor:
+                                //                 MaterialStateProperty.all<
+                                //                     Color>(Colors.black),
+                                //             foregroundColor:
+                                //                 MaterialStateProperty.all<
+                                //                     Color>(Colors.white),
+                                //             shape: MaterialStateProperty.all<
+                                //                 OutlinedBorder>(
+                                //               RoundedRectangleBorder(
+                                //                 borderRadius: BorderRadius.circular(
+                                //                     10.0), // Adjust the radius as needed
+                                //               ),
+                                //             ),
+                                //           ),
+                                //           onPressed: () {
+                                //             Navigator.push(
+                                //               context,
+                                //               MaterialPageRoute(
+                                //                 builder: (context) => ShopsPage(
+                                //                     initialText:
+                                //                         ''), // Pass initialText if needed
+                                //               ),
+                                //             );
+                                //           },
+                                //           child: Text('Add More Products'))),
+                                // ),
+
+                                address.id != null
                                     ? Align(
                                         alignment: Alignment.bottomCenter,
                                         child: Container(
@@ -1548,53 +1625,72 @@ class _CartPageState extends State<CartPage> {
                                               0.89, 0, 0, 0),
                                           child: TextButton(
                                             onPressed: () async {
-                                              var orderCost = (int.parse(
-                                                          _addToCartModel
-                                                              .cartTotal
-                                                              .toString()) +
-                                                      int.parse(_configModel
-                                                          .user
-                                                          .companies![0]
-                                                          .deliveryCharges
-                                                          .toString()) +
-                                                      (int.parse(_addToCartModel
-                                                              .cartTotal
-                                                              .toString()) /
-                                                          100 *
-                                                          int.parse(_configModel
-                                                              .user
-                                                              .companies![0]
-                                                              .taxPercent
-                                                              .toString())) +
-                                                      -(int.parse(couponValue.toString())) -
-                                                      (int.parse(_userWaletModel.totaRemainingPoint.toString()) / 3))
-                                                  .toStringAsFixed(0);
+                                              print(_configModel.user.firstName
+                                                  .toString());
+                                              print(_configModel.user.email
+                                                  .toString());
 
-                                              var userWalletUsed = (int.parse(
-                                                          _userWaletModel
-                                                              .totaRemainingPoint
-                                                              .toString()) /
-                                                      3)
-                                                  .toStringAsFixed(0);
-                                              var addressId = address.id;
-                                              bool response =
-                                                  await _orderModel.placedOrder(
-                                                _addToCartModel.addToCarts!
-                                                    .toList(),
-                                                _addToCartModel.cartTotal
-                                                    .toString(),
-                                                addressId,
-                                                isGift,
-                                                userWalletUsed,
-                                                couponId.toString(),
-                                                paymentOption,
-                                                deliveryMethod,
-                                                couponValue.toString(),
-                                              );
-                                              if (response == true) {
-                                                Navigator.pushNamed(
-                                                    context, '/successPage');
+                                              if (_configModel.user.firstName ==
+                                                      'Guest' &&
+                                                  _configModel.user.email ==
+                                                      identifier) {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        LoginPage(), // Pass initialText if needed
+                                                  ),
+                                                );
+                                              } else {
+                                                print('faled');
                                               }
+                                              // var orderCost = (int.parse(
+                                              //             _addToCartModel
+                                              //                 .cartTotal
+                                              //                 .toString()) +
+                                              //         int.parse(_configModel
+                                              //             .user
+                                              //             .companies![0]
+                                              //             .deliveryCharges
+                                              //             .toString()) +
+                                              //         (int.parse(_addToCartModel
+                                              //                 .cartTotal
+                                              //                 .toString()) /
+                                              //             100 *
+                                              //             int.parse(_configModel
+                                              //                 .user
+                                              //                 .companies![0]
+                                              //                 .taxPercent
+                                              //                 .toString())) +
+                                              //         -(int.parse(couponValue.toString())) -
+                                              //         (int.parse(_userWaletModel.totaRemainingPoint.toString()) / 3))
+                                              //     .toStringAsFixed(0);
+
+                                              // var userWalletUsed = (int.parse(
+                                              //             _userWaletModel
+                                              //                 .totaRemainingPoint
+                                              //                 .toString()) /
+                                              //         3)
+                                              //     .toStringAsFixed(0);
+                                              // var addressId = address.id;
+                                              // bool response =
+                                              //     await _orderModel.placedOrder(
+                                              //   _addToCartModel.addToCarts!
+                                              //       .toList(),
+                                              //   _addToCartModel.cartTotal
+                                              //       .toString(),
+                                              //   addressId,
+                                              //   isGift,
+                                              //   userWalletUsed,
+                                              //   couponId.toString(),
+                                              //   paymentOption,
+                                              //   deliveryMethod,
+                                              //   couponValue.toString(),
+                                              // );
+                                              // if (response == true) {
+                                              //   Navigator.pushNamed(
+                                              //       context, '/successPage');
+                                              // }
                                             },
                                             style: TextButton.styleFrom(
                                               padding: EdgeInsets.zero,
@@ -1609,7 +1705,7 @@ class _CartPageState extends State<CartPage> {
                                               ),
                                               child: Center(
                                                 child: Text(
-                                                  'Paid/Continue',
+                                                  'Pay/Continue',
                                                   style: MyGoogleFontStyle(
                                                     fontFamily: 'Urbanist',
                                                     fontWeight: FontWeight.w700,
@@ -1627,7 +1723,232 @@ class _CartPageState extends State<CartPage> {
                                           style: TextStyle(
                                               fontSize: 16, color: Colors.red),
                                         ),
-                                      )
+                                      ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Add More Items',
+                                        style: MyGoogleFontStyle(
+                                          fontFamily: 'Urbanist',
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xff000000),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        height: 190,
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: _productModel
+                                                      .categoryWiseproductsLoader
+                                                  ? Center(
+                                                      child:
+                                                          LinearProgressIndicator())
+                                                  : ListView.builder(
+                                                      itemCount: _productModel
+                                                          .categoryWiseproducts!
+                                                          .length,
+                                                      scrollDirection:
+                                                          Axis.horizontal,
+                                                      itemBuilder:
+                                                          (BuildContext context,
+                                                                  index) =>
+                                                              InkWell(
+                                                        onTap: () {
+                                                          Navigator.of(context).push(
+                                                              MaterialPageRoute(
+                                                                  builder: (context) =>
+                                                                      ProductIdPage(
+                                                                          arguments: {
+                                                                            'product':
+                                                                                _productModel.categoryWiseproducts![index].toJson()
+                                                                          })));
+                                                        },
+                                                        child: Row(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Container(
+                                                              // margin: EdgeInsets.fromLTRB(
+                                                              //     0, 0, 0, 0),
+                                                              width: 170,
+                                                              height: 320,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            15),
+                                                              ),
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  Container(
+                                                                    width: double
+                                                                        .infinity,
+                                                                    height: 140,
+                                                                    child:
+                                                                        Stack(
+                                                                      children: [
+                                                                        Positioned(
+                                                                          // frame9SvA (318:2815)
+                                                                          left:
+                                                                              0,
+                                                                          top:
+                                                                              0,
+                                                                          child:
+                                                                              Container(
+                                                                            padding: EdgeInsets.fromLTRB(
+                                                                                106,
+                                                                                13,
+                                                                                14,
+                                                                                13),
+                                                                            width:
+                                                                                145,
+                                                                            height:
+                                                                                133,
+                                                                            decoration:
+                                                                                BoxDecoration(
+                                                                              borderRadius: BorderRadius.circular(15),
+                                                                              color: Color(0x0c000000),
+                                                                              image: DecorationImage(
+                                                                                fit: BoxFit.cover,
+                                                                                image: NetworkImage(_configModel.apiConfig['mediaURL'] + _productModel.categoryWiseproducts![index].imagepath1.toString()
+                                                                                    // 'assets/images/shades-chocolate-cake-3-1-2-1-bg.png',
+                                                                                    ),
+                                                                              ),
+                                                                            ),
+                                                                            child:
+                                                                                InkWell(
+                                                                              onTap: () async {
+                                                                                await _wishListModel.getWishLists(_productModel.categoryWiseproducts![index].id);
+                                                                              },
+                                                                              child: _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.categoryWiseproducts![index].id && wishList.userId == _configModel.user.id).toList().length == 0
+                                                                                  ? Align(
+                                                                                      // vectorRZx (318:2001)
+                                                                                      alignment: Alignment.topRight,
+                                                                                      child: SizedBox(
+                                                                                        width: 25,
+                                                                                        height: 22.4,
+                                                                                        child: Image.asset(
+                                                                                          'assets/images/vector-yse.png',
+                                                                                          width: 25,
+                                                                                          height: 22.4,
+                                                                                        ),
+                                                                                      ),
+                                                                                    )
+                                                                                  : Align(
+                                                                                      // vectorRZx (318:2001)
+                                                                                      alignment: Alignment.topRight,
+                                                                                      child: SizedBox(
+                                                                                        width: 25,
+                                                                                        height: 22.4,
+                                                                                        child: Image.asset(
+                                                                                          'assets/images/vector-wXc.png',
+                                                                                          width: 25,
+                                                                                          height: 22.4,
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                  Container(
+                                                                    child: Text(
+                                                                      _productModel
+                                                                          .categoryWiseproducts![
+                                                                              index]
+                                                                          .name
+                                                                          .toString(),
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      style:
+                                                                          MyGoogleFontStyle(
+                                                                        fontFamily:
+                                                                            'Urbanist',
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight.w700,
+                                                                        height:
+                                                                            1.2,
+                                                                        letterSpacing:
+                                                                            -0.3,
+                                                                        color: Color(
+                                                                            0xff000000),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  InkWell(
+                                                                    onTap: () {
+                                                                      Navigator.of(context).push(MaterialPageRoute(
+                                                                          builder: (context) =>
+                                                                              ProductIdPage(arguments: {
+                                                                                'product': _productModel.categoryWiseproducts![index].toJson()
+                                                                              })));
+                                                                    },
+                                                                    child:
+                                                                        Container(
+                                                                      child: _productModel.categoryWiseproducts![index].productPrices![0].offerPrice !=
+                                                                              0
+                                                                          ? Text.rich(
+                                                                              TextSpan(children: [
+                                                                              new TextSpan(
+                                                                                text: 'RS. ${_productModel.categoryWiseproducts![index].productPrices![0].price.toString()}',
+                                                                                style: new TextStyle(
+                                                                                  color: Colors.grey,
+                                                                                  decoration: TextDecoration.lineThrough,
+                                                                                ),
+                                                                              ),
+                                                                              new TextSpan(
+                                                                                text: ' RS.${_productModel.categoryWiseproducts![index].productPrices![0].offerPrice.toString()}',
+                                                                              ),
+                                                                            ]))
+                                                                          : Text(
+                                                                              _productModel.categoryWiseproducts![index].productPrices![0].price.toString() + " " + 'RS',
+                                                                              style: MyGoogleFontStyle(
+                                                                                fontFamily: 'Poppins',
+                                                                                fontSize: 13,
+                                                                                fontWeight: FontWeight.w500,
+                                                                                height: 1.5,
+                                                                                letterSpacing: -0.2190869331,
+                                                                                color: Color(0x99000000),
+                                                                              ),
+                                                                            ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                           )

@@ -65,11 +65,15 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       });
     case loginPage:
       return MaterialPageRoute(builder: (BuildContext context) {
-        return LoginPage();
+        return LoginPage(
+          argument: settings.arguments,
+        );
       });
     case registerPage:
       return MaterialPageRoute(builder: (BuildContext context) {
-        return RegisterPage();
+        return RegisterPage(
+          argument: settings.arguments,
+        );
       });
     case forgotPasswordPage:
       return MaterialPageRoute(builder: (BuildContext context) {

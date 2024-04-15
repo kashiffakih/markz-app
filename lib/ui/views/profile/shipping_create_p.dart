@@ -630,9 +630,10 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                                             'cartItems': cartItems,
                                             'cartTotal': cartTotal,
                                             'couponValue': couponValue,
-                                            'address': []
+                                            'address': [],
+                                            'isAddress': true
                                           })));
-                                  // Navigator.pushNamed(context, '/addressPage');
+                                  // Navigator.pop(context);
                                 }
                                 setState(() {
                                   _loading = false;

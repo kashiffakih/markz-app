@@ -24,8 +24,8 @@ class ProductIdPage extends StatefulWidget {
 }
 
 class _ProductIdPageState extends State<ProductIdPage> {
-  var displayImage = '';
-  var seconsdImage = '';
+  // var displayImage = '';
+  // var seconsdImage = '';
   void initState() {
     super.initState();
     var productId = '';
@@ -53,33 +53,40 @@ class _ProductIdPageState extends State<ProductIdPage> {
   };
 
   bool? check1 = false;
-  List<Map<String, dynamic>> flavors = [
-    {
-      'id': 1,
-      'name': 'Brown',
-    },
-    {
-      'id': 2,
-      'name': 'Red',
-    },
-  ];
 
   double discountPrice = 0.0;
 
+  var unitName = '';
+  List<dynamic> productDisplayImages = [];
+  List<dynamic> updateProductDisplayImages = [];
+
+  var cartCount = 0;
+
   @override
   Widget build(BuildContext context) {
-    setState(() {
-      displayImage = widget.arguments['product']['imagepath1'].toString();
-    });
-    Product product = Product.fromJson(widget.arguments['product']);
-    // print(widget.arguments['product']['review']);
-    List<Map<String, dynamic>> _sizes =
-        widget.arguments['product']['product_packs'];
     final ConfigModel _configModel = locator<ConfigModel>();
     final ProductModel _productModel = Provider.of<ProductModel>(context);
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
     final ReviewModel _reviewModel = Provider.of<ReviewModel>(context);
+
+    // productDisplayImages = widget.arguments['product_images']
+    //     // .where((image) => image.unit.name == unitName)
+    //     .toList();
+
+    setState(() {
+      cartCount = _addToCartModel.addToCarts == null
+          ? 0
+          : _addToCartModel.addToCarts!.length;
+
+      productDisplayImages = widget.arguments['product_images']
+          // .where((image) => image.unit.name == unitName)
+          .toList();
+    });
+    Product product = Product.fromJson(widget.arguments['product']);
+    List<Map<String, dynamic>> _sizes =
+        widget.arguments['product']['product_packs'];
+
     discountPrice = (int.parse(widget.arguments['product']['product_prices']![0]
                     ['price']
                 .toString()) -
@@ -90,29 +97,18 @@ class _ProductIdPageState extends State<ProductIdPage> {
             .toString()) *
         100;
 
-    var cartCount = 0;
-    setState(() {
-      cartCount = _addToCartModel.addToCarts == null
-          ? 0
-          : _addToCartModel.addToCarts!.length;
-    });
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
-
-    var images = [
-      widget.arguments['product']['imagepath1'] != null
-          ? widget.arguments['product']['imagepath1'].toString()
-          : '',
-      widget.arguments['product']['imagepath2'] != null
-          ? widget.arguments['product']['imagepath2'].toString()
-          : '',
-      widget.arguments['product']['imagepath3'] != null
-          ? widget.arguments['product']['imagepath3'].toString()
-          : '',
-      widget.arguments['product']['imagepath4'] != null
-          ? widget.arguments['product']['imagepath4'].toString()
-          : '',
+    var disImages = updateProductDisplayImages.isNotEmpty
+        ? updateProductDisplayImages
+        : productDisplayImages;
+    List<dynamic> imageProduct = [];
+    imageProduct = [
+      disImages[0].imagepath != null ? disImages[0].imagepath.toString() : '',
+      disImages[0].imagepath2 != null ? disImages[0].imagepath2.toString() : '',
+      disImages[0].imagepath3 != null ? disImages[0].imagepath3.toString() : '',
+      disImages[0].imagepath4 != null ? disImages[0].imagepath4.toString() : '',
     ];
 
     return Scaffold(
@@ -277,21 +273,24 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                         width:
                                             MediaQuery.of(context).size.width,
                                         height: 350,
-                                        child: seconsdImage == ''
-                                            ? Image.network(
+                                        child: PageView.builder(
+                                            itemCount: imageProduct.length,
+                                            pageSnapping: true,
+                                            itemBuilder:
+                                                (context, pagePosition) {
+                                              // pagePosition == 0
+                                              //     ? ''
+                                              //     : pagePosition;
+                                              return Image.network(
                                                 _configModel
                                                         .apiConfig['mediaURL'] +
-                                                    displayImage,
+                                                    imageProduct[pagePosition],
                                                 fit: BoxFit.fill,
                                                 // fit: BoxFit.cover,
-                                              )
-                                            : Image.network(
-                                                _configModel
-                                                        .apiConfig['mediaURL'] +
-                                                    seconsdImage,
-                                                fit: BoxFit.fill,
-                                                // fit: BoxFit.cover,
-                                              ),
+                                              );
+                                            }),
+
+                                      
                                       ),
                                       Positioned(
                                         top: 5,
@@ -308,7 +307,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                               child: _wishListModel
                                                       .wishListLoader
                                                   ? Align(
-                                                      // vectorRZx (318:2001)
                                                       alignment:
                                                           Alignment.topRight,
                                                       child: SizedBox(
@@ -409,13 +407,24 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                   child: Column(
                                     children: [
                                       Container(
-                                        child: Row(
-                                          children: images
+                                        child: 
+                                        Row(
+                                          children: productDisplayImages
                                               .map(
                                                 (image) => InkWell(
                                                   onTap: () {
                                                     setState(() {
-                                                      seconsdImage = image;
+                                                      unitName = image.unit.name
+                                                          .toString();
+                                                      updateProductDisplayImages =
+                                                          widget
+                                                              .arguments[
+                                                                  'product_images']
+                                                              .where((image) =>
+                                                                  image.unit
+                                                                      .name ==
+                                                                  unitName)
+                                                              .toList();
                                                     });
                                                   },
                                                   child: Container(
@@ -427,7 +436,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                         ? Image.network(
                                                             _configModel.apiConfig[
                                                                     'mediaURL'] +
-                                                                image,
+                                                                image.imagepath
+                                                                    .toString(),
                                                             fit: BoxFit.fill,
                                                             // fit: BoxFit.cover,
                                                           )
@@ -1840,6 +1850,22 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   onChanged: (value) {
                                                     _CartData['flavour'] =
                                                         value.toString();
+
+                                                    unitName = value
+                                                        .toString()
+                                                        .toString();
+                                                    print(unitName);
+                                                    setState(() {
+                                                      updateProductDisplayImages =
+                                                          widget
+                                                              .arguments[
+                                                                  'product_images']
+                                                              .where((image) =>
+                                                                  image.unit
+                                                                      .name ==
+                                                                  unitName)
+                                                              .toList();
+                                                    });
                                                   }),
                                             ),
                                           ],
