@@ -1,5 +1,6 @@
 import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/models/user_address.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
@@ -186,6 +187,10 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                           child: TextFormField(
                             initialValue: _userAddress.phone,
                             keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(10),
+                            ],
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               focusedBorder: InputBorder.none,
@@ -239,6 +244,10 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                             child: TextFormField(
                               initialValue: _userAddress.altPhone,
                               keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(10),
+                              ],
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 focusedBorder: InputBorder.none,
@@ -401,44 +410,6 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                             color: Color(0xfffbfbfb),
                           ),
                           child: TextFormField(
-                            initialValue: _userAddress.pincode,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-                              hintText: 'Pincode',
-                              hintStyle: TextStyle(color: Color(0x3f000000)),
-                            ),
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff000000),
-                            ),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return "Pincode Cannot be empty.";
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _userAddress.pincode = value;
-                            },
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Color(0xffe3e3e3)),
-                            color: Color(0xfffbfbfb),
-                          ),
-                          child: TextFormField(
                             initialValue: _userAddress.add1,
                             decoration: InputDecoration(
                               border: InputBorder.none,
@@ -523,6 +494,44 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                               errorBorder: InputBorder.none,
                               disabledBorder: InputBorder.none,
                               contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
+                              hintText: 'District',
+                              hintStyle: TextStyle(color: Color(0x3f000000)),
+                            ),
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff000000),
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "District Cannot be empty.";
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              // _userAddress.add3 = value;
+                            },
+                          ),
+                        ),
+
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Color(0xffe3e3e3)),
+                            color: Color(0xfffbfbfb),
+                          ),
+                          child: TextFormField(
+                            initialValue: _userAddress.add3,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
                               hintText: 'Landmark',
                               hintStyle: TextStyle(color: Color(0x3f000000)),
                             ),
@@ -539,6 +548,46 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                             },
                             onSaved: (value) {
                               _userAddress.add3 = value;
+                            },
+                          ),
+                        ),
+
+                        SizedBox(
+                          height: 20,
+                        ),
+
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Color(0xffe3e3e3)),
+                            color: Color(0xfffbfbfb),
+                          ),
+                          child: TextFormField(
+                            initialValue: _userAddress.pincode,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
+                              hintText: 'Pincode',
+                              hintStyle: TextStyle(color: Color(0x3f000000)),
+                            ),
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff000000),
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "Pincode Cannot be empty.";
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _userAddress.pincode = value;
                             },
                           ),
                         ),

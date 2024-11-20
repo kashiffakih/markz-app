@@ -1,5 +1,6 @@
 import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/models/user_address.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
@@ -23,7 +24,8 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
   @override
   void initState() {
     super.initState();
-    _userAddress = widget.arguments['userAddress'];
+    _userAddress =
+        UserAddress.fromJson(widget.arguments['userAddress'].toJson());
   }
 
   String selectedChip = '';
@@ -38,8 +40,10 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
   @override
   Widget build(BuildContext context) {
     setState(() {
-      stateValue = _userAddress.state.toString();
-      cityValue = _userAddress.city.toString();
+      if (stateValue == "" && cityValue == "") {
+        stateValue = widget.arguments['userAddress'].state.toString();
+        cityValue = widget.arguments['userAddress'].city.toString();
+      }
     });
     UserAddressModel _userAddressModel =
         Provider.of<UserAddressModel>(context, listen: false);
@@ -143,6 +147,10 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                           child: TextFormField(
                             initialValue: _userAddress.phone,
                             keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(10),
+                            ],
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               focusedBorder: InputBorder.none,
@@ -196,6 +204,10 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                             child: TextFormField(
                               initialValue: _userAddress.altPhone,
                               keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(10),
+                              ],
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 focusedBorder: InputBorder.none,
@@ -238,112 +250,88 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                           SizedBox(
                             height: 20,
                           ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text('Country: India'),
+                            ),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text('State: ' +
+                                  widget.arguments['userAddress'].state),
+                            ),
+                            Text('City: ' +
+                                widget.arguments['userAddress'].city),
+                          ],
+                        ),
+
+                        SizedBox(
+                          height: 20,
+                        ),
 
                         Container(
                             // padding: EdgeInsets.symmetric(horizontal: 20),
                             // height: 600,
                             child: Column(
                           children: [
-                            ///Adding CSC Picker Widget in app
                             CSCPicker(
                               layout: Layout.vertical,
-
-                              ///Enable disable state dropdown [OPTIONAL PARAMETER]
                               showStates: true,
-
-                              /// Enable disable city drop down [OPTIONAL PARAMETER]
                               showCities: true,
-
-                              ///Enable (get flag with country name) / Disable (Disable flag) / ShowInDropdownOnly (display flag in dropdown only) [OPTIONAL PARAMETER]
                               flagState: CountryFlag.DISABLE,
-
-                              ///Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER] (USE with disabledDropdownDecoration)
                               dropdownDecoration: BoxDecoration(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(10)),
                                   color: Colors.white,
                                   border: Border.all(
                                       color: Colors.grey.shade300, width: 1)),
-
-                              ///Disabled Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER]  (USE with disabled dropdownDecoration)
                               disabledDropdownDecoration: BoxDecoration(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(10)),
                                   color: Colors.grey.shade300,
                                   border: Border.all(
                                       color: Colors.grey.shade300, width: 1)),
-
-                              ///placeholders for dropdown search field
                               countrySearchPlaceholder: "Country",
                               stateSearchPlaceholder: "State",
                               citySearchPlaceholder: "City",
-
-                              ///labels for dropdown
                               countryDropdownLabel: "Country",
                               stateDropdownLabel: "State",
                               cityDropdownLabel: "City",
-
-                              ///Default Country
                               defaultCountry: CscCountry.India,
-
-                              //Country Filter [OPTIONAL PARAMETER]
-                              // countryFilter: [CscCountry.India],
-
-                              ///Disable country dropdown (Note: use it with default country)
                               disableCountry: true,
-
-                              ///selected item style [OPTIONAL PARAMETER]
                               selectedItemStyle: TextStyle(
                                 color: Colors.black,
                                 fontSize: 14,
                               ),
-
-                              ///DropdownDialog Heading style [OPTIONAL PARAMETER]
                               dropdownHeadingStyle: TextStyle(
                                   color: Colors.black,
                                   fontSize: 17,
                                   fontWeight: FontWeight.bold),
-
-                              ///DropdownDialog Item style [OPTIONAL PARAMETER]
                               dropdownItemStyle: TextStyle(
                                 color: Colors.black,
                                 fontSize: 14,
                               ),
-
-                              ///Dialog box radius [OPTIONAL PARAMETER]
                               dropdownDialogRadius: 10.0,
-
-                              ///Search bar radius [OPTIONAL PARAMETER]
                               searchBarRadius: 10.0,
-
-                              ///triggers once country selected in dropdown
                               onCountryChanged: (value) {
                                 setState(() {
-                                  ///store value in country variable
                                   countryValue = value;
                                 });
                               },
-
-                              ///triggers once state selected in dropdown
                               onStateChanged: (value) {
                                 setState(() {
-                                  ///store value in state variable
                                   stateValue = value.toString();
                                   _userAddress.state = stateValue;
                                 });
                               },
-
-                              ///triggers once city selected in dropdown
                               onCityChanged: (value) {
                                 setState(() {
-                                  ///store value in city variable
                                   cityValue = value.toString();
                                   _userAddress.city = cityValue;
                                 });
                               },
-
-                              ///Show only specific countries using country filter
-                              // countryFilter: ["United States", "Canada", "Mexico"],
                             ),
                           ],
                         )),
@@ -351,44 +339,6 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                           height: 20,
                         ),
 
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Color(0xffe3e3e3)),
-                            color: Color(0xfffbfbfb),
-                          ),
-                          child: TextFormField(
-                            initialValue: _userAddress.pincode,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-                              hintText: 'Pincode',
-                              hintStyle: TextStyle(color: Color(0x3f000000)),
-                            ),
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff000000),
-                            ),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return "Pincode Cannot be empty.";
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _userAddress.pincode = value;
-                            },
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
                         Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
@@ -496,6 +446,46 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                             },
                             onSaved: (value) {
                               _userAddress.add3 = value;
+                            },
+                          ),
+                        ),
+
+                        SizedBox(
+                          height: 20,
+                        ),
+
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Color(0xffe3e3e3)),
+                            color: Color(0xfffbfbfb),
+                          ),
+                          child: TextFormField(
+                            initialValue: _userAddress.pincode,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
+                              hintText: 'Pincode',
+                              hintStyle: TextStyle(color: Color(0x3f000000)),
+                            ),
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff000000),
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "Pincode Cannot be empty.";
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _userAddress.pincode = value;
                             },
                           ),
                         ),

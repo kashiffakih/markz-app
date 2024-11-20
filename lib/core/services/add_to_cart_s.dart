@@ -15,6 +15,8 @@ class AddToCartService {
     var writeOnCake = cartData!['writeOnCake'].toString();
     var pack = cartData!['pack'].toString();
 
+    print(cartData);
+
     http.Response _response = await http.get(
       Uri.parse(
           '${_apiConfig['baseURL']}/add_to_cart?userId=$userId&productId=$productId&type=$type&kind_of_flower=$kindOfFlower&flavour=$flavour&write_on_cake=$writeOnCake&pack=$pack'),

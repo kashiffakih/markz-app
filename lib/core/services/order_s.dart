@@ -80,6 +80,7 @@ class OrderService {
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
     print(_responseData);
+    print(_responseData['success']);
     return _responseData['success'];
   }
 
@@ -97,8 +98,10 @@ class OrderService {
       _orders = [];
       _responseData['data'].forEach((data) {
         _orders.add(Order.fromJson(data));
+        print(1);
       });
     }
+    print(_orders);
     return _orders;
   }
 }

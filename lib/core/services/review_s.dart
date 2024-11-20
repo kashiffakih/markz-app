@@ -31,7 +31,6 @@ class ReviewService {
     // }
 
     _configModel.files.forEach((element) async {
-      print(element.fileName.toString());
       var request = http.MultipartRequest(
         'POST',
         Uri.parse('${_apiConfig['baseURL']}/review'),
@@ -51,6 +50,7 @@ class ReviewService {
       http.Response _responseImage = await http.Response.fromStream(_res);
       // Clear the file reference after uploading
       element.file = null;
+      print('Image');
       print(_responseImage.body);
     });
     // }

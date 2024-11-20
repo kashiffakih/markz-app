@@ -20,7 +20,8 @@ class ConfigService {
       'responseType': 'json',
       'baseURL': url! + '/api',
       // 'mediaURL': url! + '/storage/',
-      'mediaURL': 'https://az2-medias.s3.ap-south-1.amazonaws.com/Aadab/',
+      'mediaURL':
+          'https://az-do-bucket-1.blr1.cdn.digitaloceanspaces.com/Aadab/',
     };
   }
 

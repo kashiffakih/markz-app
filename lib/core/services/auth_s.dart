@@ -11,7 +11,7 @@ class AuthService {
   Future<void> getLoggedInUser(
       {@required Map<String, dynamic>? loginData}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-
+    print('Login Data');
     print(loginData);
     http.Response _response = await http.post(
       Uri.parse('${_apiConfig['baseURL']}/login'),
@@ -21,6 +21,7 @@ class AuthService {
 
     Map<String, dynamic> _responseData = json.decode(_response.body);
     print(_responseData);
+
     if (_responseData['success'] == null) {
     } else if (_responseData['success']) {
       await _configModel.saveLoginData(newLoginData: loginData);
@@ -31,6 +32,10 @@ class AuthService {
   Future<bool> registerUser(
       {@required Map<String, dynamic>? registerData}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+
+    print('Register Data');
+    print(registerData);
+
     http.Response _response = await http.post(
       Uri.parse('${_apiConfig['baseURL']}/register-user'),
       body: json.encode(registerData),
@@ -38,7 +43,7 @@ class AuthService {
     );
 
     Map<String, dynamic> _responseData = json.decode(_response.body);
-    // print(_responseData);
+    print(_response.body);
     if (_responseData['success']) {
       var roleId;
       roleId = registerData!['role'] == 'Distributor' ? 3 : 6;
@@ -49,6 +54,15 @@ class AuthService {
       http.Response _responseUserRole = await http.post(
         Uri.parse('${_apiConfig['baseURL']}/role_user'),
         body: json.encode(userRole),
+        headers: _apiConfig['headers'],
+      );
+      var userCompany = {
+        'company_id': 1,
+        'user_id': _responseData['data']['id'],
+      };
+      await http.post(
+        Uri.parse('${_apiConfig['baseURL']}/company_user'),
+        body: json.encode(userCompany),
         headers: _apiConfig['headers'],
       );
 

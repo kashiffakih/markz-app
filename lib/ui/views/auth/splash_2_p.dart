@@ -61,7 +61,9 @@ class _Splash2PageState extends State<Splash2Page> {
       };
     }
 
-    identifier = _deviceData['id'] + '@' + _deviceData['model'] + 'gmail.com';
+    // identifier = _deviceData['id'] + '@' + _deviceData['model'] + 'gmail.com';
+    identifier = _deviceData['id'] + '@gmail.com';
+    // identifier = 'RP1A.200720.011@gmail.com';
 
     // print(identifier);
   }
@@ -94,14 +96,14 @@ class _Splash2PageState extends State<Splash2Page> {
       'type': build.type,
       'isPhysicalDevice': build.isPhysicalDevice,
       'systemFeatures': build.systemFeatures,
-      'displaySizeInches':
-          ((build.displayMetrics.sizeInches * 10).roundToDouble() / 10),
-      'displayWidthPixels': build.displayMetrics.widthPx,
-      'displayWidthInches': build.displayMetrics.widthInches,
-      'displayHeightPixels': build.displayMetrics.heightPx,
-      'displayHeightInches': build.displayMetrics.heightInches,
-      'displayXDpi': build.displayMetrics.xDpi,
-      'displayYDpi': build.displayMetrics.yDpi,
+      // 'displaySizeInches':
+      //     ((build.displayMetrics.sizeInches * 10).roundToDouble() / 10),
+      // 'displayWidthPixels': build.displayMetrics.widthPx,
+      // 'displayWidthInches': build.displayMetrics.widthInches,
+      // 'displayHeightPixels': build.displayMetrics.heightPx,
+      // 'displayHeightInches': build.displayMetrics.heightInches,
+      // 'displayXDpi': build.displayMetrics.xDpi,
+      // 'displayYDpi': build.displayMetrics.yDpi,
       'serialNumber': build.serialNumber,
     };
   }

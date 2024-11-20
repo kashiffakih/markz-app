@@ -12,10 +12,11 @@ class ProductService {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
     http.Response _response = await http.get(
-      Uri.parse('${_apiConfig['baseURL']}/products?newArrivals=newArrivals'),
+      Uri.parse('${_apiConfig['baseURL']}/products?newArrivals=true'),
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
+    print('New Arrivals');
     print(_responseData);
     if (_responseData['success']) {
       _products = [];

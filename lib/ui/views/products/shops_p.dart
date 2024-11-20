@@ -53,12 +53,10 @@ class ShopsPageState extends State<ShopsPage> {
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
 
-    filteredProducts = _productModel.allProducts?.toList();
     setState(() {
-      if (!_isInitialLoad == false && filteredProducts?.isNotEmpty == true) {
-        filteredProducts = filteredProducts;
+      if (!_isInitialLoad && _productModel.allProducts!.length > 0) {
+        filteredProducts = _productModel.allProducts?.toList();
         _isInitialLoad = true;
-        // filteredProducts = [];
       } else {
         _isInitialLoad = false;
       }
@@ -297,6 +295,8 @@ class ShopsPageState extends State<ShopsPage> {
                                                 _productModel.categories![index]
                                                     ['id'])
                                             .toList();
+
+                                        print(filteredProducts);
                                       });
                                     },
                                     style: TextButton.styleFrom(
@@ -411,13 +411,18 @@ class ShopsPageState extends State<ShopsPage> {
                                                     top: 0 * fem,
                                                     child: InkWell(
                                                       onTap: () {
+                                                        print(filteredProducts![
+                                                                index]
+                                                            .productImages);
                                                         Navigator.of(context).push(
                                                             MaterialPageRoute(
                                                                 builder: (context) =>
                                                                     ProductIdPage(
                                                                         arguments: {
                                                                           'product':
-                                                                              filteredProducts![index].toJson()
+                                                                              filteredProducts![index].toJson(),
+                                                                          'product_images':
+                                                                              filteredProducts![index].productImages
                                                                         })));
                                                       },
                                                       child: Container(
@@ -533,7 +538,10 @@ class ShopsPageState extends State<ShopsPage> {
                                                                     arguments: {
                                                                       'product':
                                                                           filteredProducts![index]
-                                                                              .toJson()
+                                                                              .toJson(),
+                                                                      'product_images':
+                                                                          filteredProducts![index]
+                                                                              .productImages
                                                                     })));
                                               },
                                               child: Container(

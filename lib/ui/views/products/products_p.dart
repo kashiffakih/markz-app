@@ -36,6 +36,7 @@ class _ProductsPageState extends State<ProductsPage> {
   void initState() {
     super.initState();
     var productId = '';
+    print(widget.arguments['categoryId']);
     Provider.of<AddToCartModel>(context, listen: false)
         .getAddToCart(productId, '', _CartData);
     Provider.of<ProductModel>(context, listen: false)
@@ -60,7 +61,7 @@ class _ProductsPageState extends State<ProductsPage> {
         filteredProducts = _productModel.categoryWiseproducts;
         _isInitialLoad = true;
       } else {
-        _isInitialLoad = false;
+        // _isInitialLoad = false;
       }
     });
     var cartCount = 0;
@@ -81,6 +82,7 @@ class _ProductsPageState extends State<ProductsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Top Section
               Container(
                 margin:
                     EdgeInsets.only(left: 20, top: 30, bottom: 20, right: 30),
@@ -88,6 +90,7 @@ class _ProductsPageState extends State<ProductsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Header
                     InkWell(
                       onTap: () {
                         Navigator.pop(context);
@@ -105,7 +108,9 @@ class _ProductsPageState extends State<ProductsPage> {
                         ),
                       ),
                     ),
+                    // End Header
                     const SizedBox(height: 15),
+                    // Categories
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -123,66 +128,67 @@ class _ProductsPageState extends State<ProductsPage> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 15),
-                        Container(
-                          width: 238,
-                          height: 38,
-                          padding: const EdgeInsets.only(
-                            left: 21,
-                            right: 20.70,
-                          ),
-                          clipBehavior: Clip.antiAlias,
-                          decoration: ShapeDecoration(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                  width: 0.50, color: Color(0xFFC7B456)),
-                              borderRadius: BorderRadius.circular(10),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Container(
+                            height: 38,
+                            padding: const EdgeInsets.only(
+                              left: 21,
+                              right: 20.70,
                             ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment:
-                                CrossAxisAlignment.center, // Center vertically
-                            children: [
-                              Expanded(
-                                child: TextFormField(
-                                  onChanged: (value) {
-                                    // if (value.length % 3 == 0) {
-                                    // Call your API here
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ShopsPage(
-                                            initialText: value
-                                                .toString()), // Pass initialText if needed
-                                      ),
-                                    );
-                                    _controller.clear();
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: 'Search',
-                                    border: InputBorder.none,
-                                  ),
-                                  style: TextStyle(
-                                    color: Colors.black.withOpacity(0.6),
-                                    fontSize: 18,
-                                    fontFamily: 'Urbanist',
-                                    fontWeight: FontWeight.w600,
-                                    // letterSpacing: -0.36,
+                            clipBehavior: Clip.antiAlias,
+                            decoration: ShapeDecoration(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                    width: 0.50, color: Color(0xFFC7B456)),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment
+                                  .center, // Center vertically
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                    onChanged: (value) {
+                                      // if (value.length % 3 == 0) {
+                                      // Call your API here
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ShopsPage(
+                                              initialText: value
+                                                  .toString()), // Pass initialText if needed
+                                        ),
+                                      );
+                                      _controller.clear();
+                                    },
+                                    decoration: InputDecoration(
+                                      hintText: 'Search',
+                                      border: InputBorder.none,
+                                    ),
+                                    style: TextStyle(
+                                      color: Colors.black.withOpacity(0.6),
+                                      fontSize: 18,
+                                      fontFamily: 'Urbanist',
+                                      fontWeight: FontWeight.w600,
+                                      // letterSpacing: -0.36,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Container(
-                                width: 20,
-                                height: 20,
-                                child: Image.asset(
-                                  'assets/images/Search-1.png',
+                                Container(
+                                  width: 20,
                                   height: 20,
-                                  fit: BoxFit.cover,
+                                  child: Image.asset(
+                                    'assets/images/Search-1.png',
+                                    height: 20,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -208,139 +214,145 @@ class _ProductsPageState extends State<ProductsPage> {
                         ),
                       ],
                     )
+                    // End Categories
                   ],
                 ),
               ),
+              // End Top Section
               SizedBox(
                 height: 2 * fem,
               ),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Container(
-                  margin:
-                      EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 8 * fem),
-                  width: 381 * fem,
-                  height: 35 * fem,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            activeIndex =
-                                -1; // Set activeIndex to -1 for "All" button
-                            filteredProducts = _productModel
-                                .categoryWiseproducts!
-                                .where((element) =>
-                                    element.categoryId ==
-                                    widget.arguments['categoryId'])
-                                .toList();
-                          });
-                        },
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          backgroundColor: activeIndex == -1
-                              ? Colors.black // Set the active color here
-                              : Colors.white,
+
+              // Categories
+              Container(
+                margin: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 8 * fem),
+                height: 35 * fem,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          activeIndex =
+                              -1; // Set activeIndex to -1 for "All" button
+                          filteredProducts = _productModel.categoryWiseproducts!
+                              .where((element) =>
+                                  element.categoryId ==
+                                  widget.arguments['categoryId'])
+                              .toList();
+                        });
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        backgroundColor: activeIndex == -1
+                            ? Colors.black // Set the active color here
+                            : Colors.white,
+                      ),
+                      child: Container(
+                        width: 55 * fem,
+                        height: double.infinity,
+                        decoration: BoxDecoration(
+                          border: activeIndex == -1
+                              ? null
+                              : Border.all(color: Color(0xffc7b456)),
+                          borderRadius: BorderRadius.circular(5 * fem),
                         ),
-                        child: Container(
-                          width: 55 * fem,
-                          height: double.infinity,
-                          decoration: BoxDecoration(
-                            border: activeIndex == -1
-                                ? null
-                                : Border.all(color: Color(0xffc7b456)),
-                            borderRadius: BorderRadius.circular(5 * fem),
-                          ),
-                          child: Center(
-                            child: Text(
-                              'All',
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Urbanist',
-                                fontSize: 15 * ffem,
-                                fontWeight: FontWeight.w700,
-                                height: 1.2 * ffem / fem,
-                                letterSpacing: -0.36 * fem,
-                                color: activeIndex == -1
-                                    ? Colors.white // Set the active color here
-                                    : Colors.black,
-                              ),
+                        child: Center(
+                          child: Text(
+                            'All',
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 15 * ffem,
+                              fontWeight: FontWeight.w700,
+                              height: 1.2 * ffem / fem,
+                              letterSpacing: -0.36 * fem,
+                              color: activeIndex == -1
+                                  ? Colors.white // Set the active color here
+                                  : Colors.black,
                             ),
                           ),
                         ),
                       ),
-                      SizedBox(
-                        width: 2 * fem,
-                      ),
-                      SizedBox(
-                        width: 295,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: widget.arguments['subCategory'].length,
-                          itemBuilder: (BuildContext context, index) {
-                            final isActive = index == activeIndex;
-                            return Row(
-                              children: [
-                                TextButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      activeIndex = index;
-                                      filteredProducts = [];
-                                      filteredProducts = _productModel
-                                          .categoryWiseproducts!
-                                          .where((cat) =>
-                                              cat.subCategoryId ==
-                                              widget.arguments['subCategory']
-                                                  [index]['id'])
-                                          .toList();
-                                    });
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                    backgroundColor: isActive
-                                        ? Colors
-                                            .black // Set the active color here
-                                        : null,
+                    ),
+                    SizedBox(
+                      width: 5 * fem,
+                    ),
+                    SizedBox(
+                      width: 295,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: widget.arguments['subCategory'].length,
+                        itemBuilder: (BuildContext context, index) {
+                          final isActive = index == activeIndex;
+                          return Row(
+                            children: [
+                              TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    activeIndex = index;
+                                    print(activeIndex);
+                                    print(index);
+                                    print(widget.arguments['subCategory']);
+                                    print(_productModel.categoryWiseproducts!);
+                                    filteredProducts = [];
+                                    filteredProducts = _productModel
+                                        .categoryWiseproducts!
+                                        .where((cat) =>
+                                            cat.subCategoryId ==
+                                            widget.arguments['subCategory']
+                                                [index]['id'])
+                                        .toList();
+                                    print(filteredProducts![0].toJson());
+                                  });
+                                },
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                  backgroundColor:
+                                      isActive ? Colors.black : null,
+                                ),
+                                child: Container(
+                                  width: 79 * fem,
+                                  height: double.infinity,
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Color(0xffc7b456)),
+                                    borderRadius:
+                                        BorderRadius.circular(5 * fem),
                                   ),
-                                  child: Container(
-                                    width: 79 * fem,
-                                    height: double.infinity,
-                                    decoration: BoxDecoration(
-                                      border:
-                                          Border.all(color: Color(0xffc7b456)),
-                                      borderRadius:
-                                          BorderRadius.circular(5 * fem),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        widget.arguments['subCategory'][index]
-                                                ['name']
-                                            .toString(),
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontSize: 15 * ffem,
-                                          fontWeight: FontWeight.w600,
-                                          height: 1.2 * ffem / fem,
-                                          letterSpacing: -0.36 * fem,
-                                          color: isActive
-                                              ? Colors.white
-                                              : Color(0x99000000),
-                                          // Set the text color based on active state
-                                        ),
+                                  child: Center(
+                                    child: Text(
+                                      widget.arguments['subCategory'][index]
+                                              ['name']
+                                          .toString(),
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 15 * ffem,
+                                        fontWeight: FontWeight.w600,
+                                        height: 1.2 * ffem / fem,
+                                        letterSpacing: -0.36 * fem,
+                                        color: isActive
+                                            ? Colors.white
+                                            : Color(0x99000000),
+                                        // Set the text color based on active state
                                       ),
                                     ),
                                   ),
                                 ),
-                                SizedBox(width: 6 * fem),
-                              ],
-                            );
-                          },
-                        ),
+                              ),
+                              SizedBox(width: 6 * fem),
+                            ],
+                          );
+                        },
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
+              // End Categories
+
+              // Text(filteredProducts![0].toJson().toString()),
+
+              // Product List
               Container(
                 margin:
                     EdgeInsets.fromLTRB(12 * fem, 0 * fem, 22 * fem, 0 * fem),
@@ -352,30 +364,24 @@ class _ProductsPageState extends State<ProductsPage> {
                         ? Container(
                             width: double.infinity,
                             height: MediaQuery.of(context).size.height - 200,
-                            // height: 582 * fem,
                             child: GridView.builder(
                                 gridDelegate:
                                     const SliverGridDelegateWithMaxCrossAxisExtent(
                                   childAspectRatio: 1 / 2,
                                   maxCrossAxisExtent: 200,
-                                  // mainAxisSpacing: 20,
-                                  // crossAxisSpacing: 0,
                                 ),
                                 itemCount: filteredProducts!.length,
                                 itemBuilder: (BuildContext ctx, index) {
                                   double discountPrice = (int.parse(
-                                              _productModel
-                                                  .categoryWiseproducts![index]
+                                              filteredProducts![index]
                                                   .productPrices![0]
                                                   .price
                                                   .toString()) -
-                                          int.parse(_productModel
-                                              .categoryWiseproducts![index]
+                                          int.parse(filteredProducts![index]
                                               .productPrices![0]
                                               .offerPrice
                                               .toString())) /
-                                      int.parse(_productModel
-                                          .categoryWiseproducts![index]
+                                      int.parse(filteredProducts![index]
                                           .productPrices![0]
                                           .price
                                           .toString()) *
@@ -384,6 +390,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
+                                      // Single Product
                                       Container(
                                         width: 145 * fem,
                                         height: double.infinity,
@@ -400,7 +407,6 @@ class _ProductsPageState extends State<ProductsPage> {
                                               child: Stack(
                                                 children: [
                                                   Positioned(
-                                                    // frame9SvA (318:2815)
                                                     left: 0 * fem,
                                                     top: 0 * fem,
                                                     child: InkWell(
@@ -410,9 +416,10 @@ class _ProductsPageState extends State<ProductsPage> {
                                                                 builder: (context) =>
                                                                     ProductIdPage(
                                                                         arguments: {
-                                                                          'product': _productModel
-                                                                              .categoryWiseproducts![index]
-                                                                              .toJson()
+                                                                          'product':
+                                                                              filteredProducts![index].toJson(),
+                                                                          'product_images':
+                                                                              filteredProducts![index].productImages
                                                                         })));
                                                       },
                                                       child: Container(
@@ -438,8 +445,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                                             image: NetworkImage(
                                                               _configModel.apiConfig[
                                                                       'mediaURL'] +
-                                                                  _productModel
-                                                                      .categoryWiseproducts![
+                                                                  filteredProducts![
                                                                           index]
                                                                       .imagepath1
                                                                       .toString(),
@@ -451,15 +457,16 @@ class _ProductsPageState extends State<ProductsPage> {
                                                           onTap: () async {
                                                             await _wishListModel
                                                                 .getWishLists(
-                                                                    _productModel
-                                                                        .categoryWiseproducts![
+                                                                    filteredProducts![
                                                                             index]
                                                                         .id);
                                                           },
                                                           child: _wishListModel
                                                                       .wishLists!
                                                                       .where((wishList) =>
-                                                                          wishList.productId == _productModel.categoryWiseproducts![index].id &&
+                                                                          wishList.productId ==
+                                                                              filteredProducts![index]
+                                                                                  .id &&
                                                                           wishList.userId ==
                                                                               _configModel.user.id)
                                                                       .toList()
@@ -522,14 +529,17 @@ class _ProductsPageState extends State<ProductsPage> {
                                               onTap: () {
                                                 Navigator.of(context).push(
                                                     MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ProductIdPage(
-                                                                arguments: {
-                                                                  'product': _productModel
-                                                                      .categoryWiseproducts![
-                                                                          index]
-                                                                      .toJson()
-                                                                })));
+                                                        builder:
+                                                            (context) =>
+                                                                ProductIdPage(
+                                                                    arguments: {
+                                                                      'product':
+                                                                          filteredProducts![index]
+                                                                              .toJson(),
+                                                                      'product_images':
+                                                                          filteredProducts![index]
+                                                                              .productImages
+                                                                    })));
                                               },
                                               child: Container(
                                                 margin: EdgeInsets.fromLTRB(
@@ -541,9 +551,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                                   maxWidth: 123 * fem,
                                                 ),
                                                 child: Text(
-                                                  _productModel
-                                                      .categoryWiseproducts![
-                                                          index]
+                                                  filteredProducts![index]
                                                       .name
                                                       .toString(),
                                                   textAlign: TextAlign.center,
@@ -565,9 +573,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                                     0 * fem,
                                                     1 * fem,
                                                     0 * fem),
-                                                child: _productModel
-                                                            .categoryWiseproducts![
-                                                                index]
+                                                child: filteredProducts![index]
                                                             .productPrices![0]
                                                             .offerPrice !=
                                                         0
@@ -575,7 +581,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                                         TextSpan(children: [
                                                         new TextSpan(
                                                           text:
-                                                              'RS. ${_productModel.categoryWiseproducts![index].productPrices![0].price.toString()}',
+                                                              'RS. ${filteredProducts![index].productPrices![0].price.toString()}',
                                                           style: new TextStyle(
                                                             color: Colors.grey,
                                                             decoration:
@@ -585,11 +591,11 @@ class _ProductsPageState extends State<ProductsPage> {
                                                         ),
                                                         new TextSpan(
                                                           text:
-                                                              ' RS.${_productModel.categoryWiseproducts![index].productPrices![0].offerPrice.toString()}',
+                                                              ' RS.${filteredProducts![index].productPrices![0].offerPrice.toString()}',
                                                         ),
                                                       ]))
                                                     : Text(
-                                                        'RS. ${_productModel.categoryWiseproducts![index].productPrices![0].price.toString()}',
+                                                        'RS. ${filteredProducts![index].productPrices![0].price.toString()}',
                                                         style:
                                                             MyGoogleFontStyle(
                                                           fontFamily: 'Poppins',
@@ -634,7 +640,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                                     }),
                                                   ),
                                                   Text(
-                                                    ' ( ${_productModel.categoryWiseproducts![index].reviews!.length} Review )',
+                                                    ' ( ${filteredProducts![index].reviews!.length} Review )',
                                                     style:
                                                         TextStyle(fontSize: 10),
                                                   )
@@ -644,6 +650,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                           ],
                                         ),
                                       ),
+                                      // End Single Product
                                     ],
                                   );
                                 }),
@@ -654,61 +661,11 @@ class _ProductsPageState extends State<ProductsPage> {
                   ],
                 ),
               ),
+              // End Product List
             ],
           ),
         ),
       ),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   elevation: 10,
-      //   iconSize: 30,
-      //   type: BottomNavigationBarType.fixed,
-      //   backgroundColor: Colors.white,
-      //   selectedItemColor: Colors.black,
-      //   unselectedItemColor: Colors.black,
-      //   selectedFontSize: 14,
-      //   unselectedFontSize: 14,
-      //   onTap: (value) async {
-      //     if (value == 0) {
-      //       Navigator.pushNamed(context, '/homePage');
-      //     }
-      //     if (value == 1) {
-      //       Navigator.pushNamed(context, '/wishlistPage');
-      //     }
-
-      //     if (value == 2) {
-      //       Map<String, dynamic> _CartData = {
-      //         'kindOfFlower': '',
-      //         'flavour': '',
-      //         'writeOnCake': '',
-      //         'pack': ''
-      //       };
-      //       await _addToCartModel.getAddToCart('', '', _CartData);
-      //       Navigator.pushNamed(context, '/cartPage');
-      //     }
-      //     if (value == 3) {
-      //       Navigator.pushNamed(context, '/profilePage');
-      //     }
-      //   },
-      //   items: const [
-      //     BottomNavigationBarItem(
-      //       label: 'Home',
-      //       icon: Iconoir(Iconoir.home_simple),
-      //       // icon: Icon(DonIcons.wap_home, size: 23),
-      //     ),
-      //     BottomNavigationBarItem(label: 'Saved', icon: Iconoir(Iconoir.heart)),
-      //     BottomNavigationBarItem(
-      //       label: 'Cart',
-      //       icon: Iconoir(Iconoir.shopping_bag),
-      //     ),
-      //     BottomNavigationBarItem(
-      //       label: 'Profile',
-      //       icon: Icon(
-      //         DonIcons.user_o,
-      //         size: 23,
-      //       ),
-      //     ),
-      //   ],
-      // ),
     );
   }
 }

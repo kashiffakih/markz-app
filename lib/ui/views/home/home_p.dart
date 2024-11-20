@@ -11,6 +11,7 @@ import 'package:sales_app/ui/views/products/products_p.dart';
 import 'package:sales_app/ui/views/products/shops_p.dart';
 import 'package:sales_app/ui/widgets/drawer_w.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -50,6 +51,8 @@ class _HomePageState extends State<HomePage> {
     final ProductModel _productModel = Provider.of<ProductModel>(context);
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
+    final PageController _sliderController = PageController();
+
     double discountPrice = 0.0;
     var images = [
       _productModel.banners?['banner_path_1'] != null
@@ -102,17 +105,17 @@ class _HomePageState extends State<HomePage> {
           ? 0
           : _addToCartModel.addToCarts!.length;
     });
-    // print(_configModel.user.roles![0].name);
+
     return Scaffold(
       key: _key,
       drawer: DrawerWidget(),
       body: SingleChildScrollView(
         child: Column(
           children: [
+            // Banner
             Container(
               width: double.infinity,
               child: Container(
-                // homedashboardLCW (318:1931)
                 padding:
                     EdgeInsets.fromLTRB(0 * fem, 30 * fem, 0 * fem, 8 * fem),
                 width: double.infinity,
@@ -135,16 +138,29 @@ class _HomePageState extends State<HomePage> {
                                 height: 180 * fem,
                                 child: PageView.builder(
                                     itemCount: images.length,
+                                    controller: _sliderController,
                                     pageSnapping: true,
                                     itemBuilder: (context, pagePosition) {
                                       return Container(
-                                          margin: EdgeInsets.all(10),
-                                          child: Image.network(
-                                            images[pagePosition],
-                                            fit: BoxFit.cover,
-                                            alignment: Alignment.center,
-                                          ));
+                                        margin: EdgeInsets.all(10),
+                                        child: Image.network(
+                                          images[pagePosition],
+                                          fit: BoxFit.cover,
+                                          alignment: Alignment.center,
+                                        ),
+                                      );
                                     })),
+                          ),
+                          const SizedBox(height: 16),
+                          SmoothPageIndicator(
+                            controller: _sliderController,
+                            count: images.length,
+                            effect: ExpandingDotsEffect(
+                              dotHeight: 8,
+                              dotWidth: 8,
+                              activeDotColor: Colors.blue,
+                              dotColor: Colors.grey,
+                            ),
                           ),
                           SizedBox(
                             height: 210,
@@ -153,105 +169,103 @@ class _HomePageState extends State<HomePage> {
                             left: 0 * fem,
                             top: 0 * fem,
                             child: Container(
-                                padding: EdgeInsets.fromLTRB(
-                                    5 * fem, 12.6 * fem, 10.64 * fem, 5 * fem),
-                                width: 460 * fem,
-                                height: 71.04 * fem,
-                                child: Row(
-                                  children: [
-                                    const SizedBox(width: 30),
-                                    Container(
-                                      width: 258,
-                                      height: 38,
-                                      padding: const EdgeInsets.only(
-                                        left: 21,
-                                        right: 20.70,
+                              padding: EdgeInsets.fromLTRB(
+                                  5 * fem, 12.6 * fem, 10.64 * fem, 5 * fem),
+                              width: 460 * fem,
+                              height: 71.04 * fem,
+                              child: Row(
+                                children: [
+                                  const SizedBox(width: 20),
+                                  Container(
+                                    width: 320,
+                                    height: 38,
+                                    padding: const EdgeInsets.only(
+                                      left: 21,
+                                      right: 20.70,
+                                    ),
+                                    clipBehavior: Clip.antiAlias,
+                                    decoration: ShapeDecoration(
+                                      shape: RoundedRectangleBorder(
+                                        side: BorderSide(
+                                            width: 0.50,
+                                            color: Color(0xFFC7B456)),
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
-                                      clipBehavior: Clip.antiAlias,
-                                      decoration: ShapeDecoration(
-                                        shape: RoundedRectangleBorder(
-                                          side: BorderSide(
-                                              width: 0.50,
-                                              color: Color(0xFFC7B456)),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                      child: Row(
-                                        // mainAxisSize: MainAxisSize.min,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment
-                                            .center, // Center vertically
-                                        children: [
-                                          Expanded(
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 5.0),
-                                              child: TextFormField(
-                                                controller: _controller,
-                                                onChanged: (value) {
-                                                  // if (value.length % 3 == 0) {
-                                                  // Call your API here
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ShopsPage(
-                                                              initialText: value
-                                                                  .toString()), // Pass initialText if needed
-                                                    ),
-                                                  );
-                                                  _controller.clear();
-                                                },
-                                                decoration: InputDecoration(
-                                                  hintText: 'Search',
-                                                  border: InputBorder.none,
-                                                ),
-                                                style: TextStyle(
-                                                  color: Colors.black
-                                                      .withOpacity(0.6),
-                                                  fontSize: 18,
-                                                  fontFamily: 'Urbanist',
-                                                  fontWeight: FontWeight.w600,
-                                                  // letterSpacing: -0.36,
-                                                ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment
+                                          .center, // Center vertically
+                                      children: [
+                                        Expanded(
+                                          child: Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 5.0),
+                                            child: TextFormField(
+                                              controller: _controller,
+                                              onChanged: (value) {
+                                                // if (value.length % 3 == 0) {
+                                                // Call your API here
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => ShopsPage(
+                                                        initialText: value
+                                                            .toString()), // Pass initialText if needed
+                                                  ),
+                                                );
+                                                _controller.clear();
+                                              },
+                                              decoration: InputDecoration(
+                                                hintText: 'Search',
+                                                border: InputBorder.none,
+                                              ),
+                                              style: TextStyle(
+                                                color: Colors.black
+                                                    .withOpacity(0.6),
+                                                fontSize: 18,
+                                                fontFamily: 'Urbanist',
+                                                fontWeight: FontWeight.w600,
+                                                // letterSpacing: -0.36,
                                               ),
                                             ),
                                           ),
-                                          Container(
-                                            width: 20,
-                                            height: 20,
-                                            child: Image.asset(
-                                              'assets/images/Search-1.png',
-                                              height: 20,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 20),
-                                    Container(
-                                      width: 20,
-                                      height: 20,
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        mainAxisAlignment: MainAxisAlignment
-                                            .center, // Center vertically
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Image.asset(
-                                            'assets/images/filter.png',
+                                        ),
+                                        Container(
+                                          width: 20,
+                                          height: 20,
+                                          child: Image.asset(
+                                            'assets/images/Search-1.png',
                                             height: 20,
                                             fit: BoxFit.cover,
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                )),
+                                  ),
+                                  const SizedBox(width: 20),
+                                  Container(
+                                    width: 20,
+                                    height: 20,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment: MainAxisAlignment
+                                          .center, // Center vertically
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Image.asset(
+                                          'assets/images/filter.png',
+                                          height: 20,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -260,6 +274,9 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+            // End Banner
+
+            // New Arrivals
             Container(
               child: Center(
                 child: Image.asset(
@@ -272,10 +289,9 @@ class _HomePageState extends State<HomePage> {
             _productModel.productsLoader
                 ? LinearProgressIndicator()
                 : SizedBox(
-                    height: 290,
+                    height: 320,
                     child: _productModel.productsLoader
                         ? SizedBox(
-                            // height: 20,
                             child: Center(child: Text('No new arrivals')),
                           )
                         : ListView.builder(
@@ -284,37 +300,6 @@ class _HomePageState extends State<HomePage> {
                             shrinkWrap: true,
                             itemCount: _productModel.products!.length,
                             itemBuilder: (context, index) {
-                              if (_configModel.user.roles![0].name ==
-                                  'Distributor') {
-                                discountPrice = (int.parse(_productModel
-                                            .products![index]
-                                            .productPrices![0]
-                                            .distributorPrice
-                                            .toString()) -
-                                        int.parse(_productModel
-                                            .products![index]
-                                            .productPrices![0]
-                                            .distributorOfferPrice
-                                            .toString())) /
-                                    int.parse(_productModel.products![index]
-                                        .productPrices![0].distributorPrice
-                                        .toString()) *
-                                    100;
-                              } else {
-                                discountPrice = (int.parse(_productModel
-                                            .products![index]
-                                            .productPrices![0]
-                                            .price
-                                            .toString()) -
-                                        int.parse(_productModel.products![index]
-                                            .productPrices![0].offerPrice
-                                            .toString())) /
-                                    int.parse(_productModel.products![index]
-                                        .productPrices![0].price
-                                        .toString()) *
-                                    100;
-                              }
-
                               return Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
@@ -322,7 +307,6 @@ class _HomePageState extends State<HomePage> {
                                     padding: const EdgeInsets.only(
                                         left: 5, right: 8),
                                     child: Container(
-                                      // group8949Yce (318:1997)
                                       width: 145 * fem,
                                       height: double.infinity,
                                       decoration: BoxDecoration(
@@ -336,20 +320,19 @@ class _HomePageState extends State<HomePage> {
                                           InkWell(
                                             onTap: () {
                                               Navigator.of(context).push(
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ProductIdPage(
-                                                              arguments: {
-                                                                'product': _productModel
-                                                                    .products![
-                                                                        index]
-                                                                    .toJson(),
-                                                                'product_images':
-                                                                    _productModel
-                                                                        .products![
-                                                                            index]
-                                                                        .productImages
-                                                              })));
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ProductIdPage(arguments: {
+                                                    'product': _productModel
+                                                        .products![index]
+                                                        .toJson(),
+                                                    'product_images':
+                                                        _productModel
+                                                            .products![index]
+                                                            .productImages
+                                                  }),
+                                                ),
+                                              );
                                             },
                                             child: Container(
                                               margin: EdgeInsets.fromLTRB(
@@ -474,7 +457,6 @@ class _HomePageState extends State<HomePage> {
                                                               })));
                                             },
                                             child: Container(
-                                              // shadechocolatecake3pc6 (318:2002)
                                               margin: EdgeInsets.fromLTRB(
                                                   0 * fem,
                                                   6 * fem,
@@ -500,74 +482,49 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                           ),
                                           Container(
-                                              // 5H8 (318:2003)
-                                              margin: EdgeInsets.fromLTRB(
-                                                  0 * fem,
-                                                  0 * fem,
-                                                  1 * fem,
-                                                  0 * fem),
-                                              child: _productModel
-                                                          .products![index]
-                                                          .productPrices![0]
-                                                          .offerPrice !=
-                                                      0
-                                                  ? Text.rich(
-                                                      TextSpan(children: [
-                                                      new TextSpan(
-                                                        text:
-                                                            'RS. ${_productModel.products![index].productPrices![0].price.toString()}',
-                                                        style: new TextStyle(
-                                                          color: Colors.grey,
-                                                          decoration:
-                                                              TextDecoration
-                                                                  .lineThrough,
-                                                        ),
+                                            margin: EdgeInsets.fromLTRB(0 * fem,
+                                                0 * fem, 1 * fem, 0 * fem),
+                                            child: _productModel
+                                                        .products![index]
+                                                        .productPrices![0]
+                                                        .offerPrice !=
+                                                    0
+                                                ? Text.rich(TextSpan(children: [
+                                                    new TextSpan(
+                                                      text:
+                                                          'RS. ${_productModel.products![index].productPrices![0].price.toString()}',
+                                                      style: new TextStyle(
+                                                        color: Colors.grey,
+                                                        decoration:
+                                                            TextDecoration
+                                                                .lineThrough,
                                                       ),
-                                                      new TextSpan(
-                                                        text:
-                                                            ' RS.${_productModel.products![index].productPrices![0].offerPrice.toString()}',
-                                                      ),
-                                                    ]))
-                                                  : Text(
-                                                      _productModel
-                                                              .products![index]
-                                                              .productPrices![0]
-                                                              .price
-                                                              .toString() +
-                                                          " " +
-                                                          'RS',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Poppins',
-                                                        fontSize: 13,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        height: 1.5,
-                                                        letterSpacing:
-                                                            -0.2190869331,
-                                                        color:
-                                                            Color(0x99000000),
-                                                      ),
-                                                    )
-
-                                              // Text(
-                                              //   _productModel
-                                              //           .products![index]
-                                              //           .productPrices![0]
-                                              //           .offerPrice
-                                              //           .toString() +
-                                              //       ' ' +
-                                              //       'RS',
-                                              //   style: MyGoogleFontStyle(
-                                              //     fontFamily: 'Poppins',
-                                              //     fontSize: 13 * ffem,
-                                              //     fontWeight: FontWeight.w500,
-                                              //     height: 1.5 * ffem / fem,
-                                              //     letterSpacing:
-                                              //         -0.2190869331 * fem,
-                                              //     color: Color(0x99000000),
-                                              //   ),
-                                              // ),
-                                              ),
+                                                    ),
+                                                    new TextSpan(
+                                                      text:
+                                                          ' RS.${_productModel.products![index].productPrices![0].offerPrice.toString()}',
+                                                    ),
+                                                  ]))
+                                                : Text(
+                                                    _productModel
+                                                            .products![index]
+                                                            .productPrices![0]
+                                                            .price
+                                                            .toString() +
+                                                        " " +
+                                                        'RS',
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Poppins',
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      height: 1.5,
+                                                      letterSpacing:
+                                                          -0.2190869331,
+                                                      color: Color(0x99000000),
+                                                    ),
+                                                  ),
+                                          ),
                                           if (discountPrice != 0.0)
                                             Center(
                                               child: Text(
@@ -576,9 +533,6 @@ class _HomePageState extends State<HomePage> {
                                                   fontFamily: 'Poppins',
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.bold,
-                                                  // height: 1.5 * ffem / fem,
-                                                  // letterSpacing:
-                                                  //     -0.2190869331 * fem,
                                                   color: Color(0x99000000),
                                                 ),
                                               ),
@@ -591,6 +545,9 @@ class _HomePageState extends State<HomePage> {
                               );
                             }),
                   ),
+            // End New Arrivals
+
+            // Category
             Container(
               height: 20,
               child: Center(
@@ -603,8 +560,6 @@ class _HomePageState extends State<HomePage> {
             ),
             Container(
               width: 345 * fem,
-              // height: 600,
-              height: MediaQuery.of(context).size.height * 0.7,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -815,11 +770,13 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
+            // End Category
+
+            // Last Banner
             SizedBox(
-              height: 10,
+              height: 20,
             ),
             Container(
-              // group81Wvi (318:1936)
               width: double.infinity,
               height: 180 * fem,
               decoration: BoxDecoration(
@@ -828,7 +785,6 @@ class _HomePageState extends State<HomePage> {
               child: Stack(
                 children: [
                   Positioned(
-                    // rectangle45ELv (318:1937)
                     left: 0 * fem,
                     top: 0 * fem,
                     child: Align(
@@ -1061,6 +1017,7 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
+            // End Last Banner
           ],
         ),
       ),

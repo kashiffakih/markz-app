@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +12,8 @@ import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/products/shops_p.dart';
 import 'package:sales_app/ui/widgets/multi_image_w.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../../core/models/product.dart';
 import 'package:badges/badges.dart' as badges;
@@ -24,8 +27,8 @@ class ProductIdPage extends StatefulWidget {
 }
 
 class _ProductIdPageState extends State<ProductIdPage> {
-  // var displayImage = '';
-  // var seconsdImage = '';
+  List<Map<String, dynamic>> _sizes = [];
+
   void initState() {
     super.initState();
     var productId = '';
@@ -35,6 +38,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
         .getCategoryWiseProduct(widget.arguments!['product']['category_id']);
     Provider.of<WishListModel>(context, listen: false).getWishLists(productId);
     _format = DateFormat('yyyy-MM-dd');
+    // _sizes = widget.arguments['product']['product_packs'];
   }
 
   int activeIndex = -1;
@@ -44,10 +48,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
   final _reviewFormKey = GlobalKey<FormState>();
   var _reviewDescription = '';
   DateFormat? _format;
-  // ignore: non_constant_identifier_names
   Map<String, dynamic> _CartData = {
     'kindOfFlower': '',
-    'flavour': '',
+    'flavour': '', // Unit Name
     'writeOnCake': '',
     'pack': ''
   };
@@ -70,10 +73,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
     final ReviewModel _reviewModel = Provider.of<ReviewModel>(context);
 
-    // productDisplayImages = widget.arguments['product_images']
-    //     // .where((image) => image.unit.name == unitName)
-    //     .toList();
-
     setState(() {
       cartCount = _addToCartModel.addToCarts == null
           ? 0
@@ -82,10 +81,25 @@ class _ProductIdPageState extends State<ProductIdPage> {
       productDisplayImages = widget.arguments['product_images']
           // .where((image) => image.unit.name == unitName)
           .toList();
+
+      if (unitName == '') {
+        unitName = productDisplayImages[0].unit.name;
+        _CartData['flavour'] = unitName;
+      }
+      if (_sizes.isEmpty)
+        _sizes = widget.arguments['product']['product_packs']
+            .where((_pack) =>
+                _pack['unit']['name'] == productDisplayImages[0].unit.name)
+            .toList();
     });
     Product product = Product.fromJson(widget.arguments['product']);
-    List<Map<String, dynamic>> _sizes =
-        widget.arguments['product']['product_packs'];
+
+    Set<dynamic> seen = {};
+    List<Map<String, dynamic>> _s =
+        _sizes.where((item) => seen.add(item['unit']['name'])).toList();
+
+    print('Sizes');
+    print(_sizes);
 
     discountPrice = (int.parse(widget.arguments['product']['product_prices']![0]
                     ['price']
@@ -99,7 +113,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
 
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
-    double ffem = fem * 0.97;
     var disImages = updateProductDisplayImages.isNotEmpty
         ? updateProductDisplayImages
         : productDisplayImages;
@@ -110,6 +123,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
       disImages[0].imagepath3 != null ? disImages[0].imagepath3.toString() : '',
       disImages[0].imagepath4 != null ? disImages[0].imagepath4.toString() : '',
     ];
+
+    final PageController _sliderController = PageController();
 
     return Scaffold(
       body: SafeArea(
@@ -126,6 +141,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Top Nav
                       InkWell(
                         onTap: () {
                           Navigator.pop(context);
@@ -143,10 +159,14 @@ class _ProductIdPageState extends State<ProductIdPage> {
                           ),
                         ),
                       ),
+                      // End Top Nav
+
                       const SizedBox(height: 15),
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          // Back
                           InkWell(
                             onTap: () {
                               Navigator.pop(context);
@@ -161,9 +181,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                               ),
                             ),
                           ),
+                          // End Back
                           const SizedBox(width: 15),
+
+                          // Search
                           Container(
-                            width: 238,
+                            width: 270,
                             height: 38,
                             padding: const EdgeInsets.only(
                               left: 21,
@@ -185,7 +208,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                               children: [
                                 Expanded(
                                   child: Padding(
-                                    padding: const EdgeInsets.only(top: 17.0),
+                                    padding: const EdgeInsets.only(top: 1.0),
                                     child: TextFormField(
                                       onChanged: (value) {
                                         // if (value.length % 3 == 0) {
@@ -225,7 +248,11 @@ class _ProductIdPageState extends State<ProductIdPage> {
                               ],
                             ),
                           ),
+                          // End Search
+
                           const SizedBox(width: 15),
+
+                          // Cart
                           InkWell(
                             onTap: () {
                               Navigator.pushNamed(context, '/cartPage');
@@ -254,11 +281,13 @@ class _ProductIdPageState extends State<ProductIdPage> {
                               ),
                             ),
                           ),
+                          // End Cart
                         ],
                       )
                     ],
                   ),
                 ),
+
                 widget.arguments['product'] != null
                     ? SingleChildScrollView(
                         child: Container(
@@ -267,6 +296,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                             child: Column(
                               children: [
                                 Stack(children: [
+                                  // Images
                                   Stack(
                                     children: [
                                       SizedBox(
@@ -275,22 +305,18 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                         height: 350,
                                         child: PageView.builder(
                                             itemCount: imageProduct.length,
+                                            controller: _sliderController,
                                             pageSnapping: true,
                                             itemBuilder:
                                                 (context, pagePosition) {
-                                              // pagePosition == 0
-                                              //     ? ''
-                                              //     : pagePosition;
                                               return Image.network(
                                                 _configModel
                                                         .apiConfig['mediaURL'] +
                                                     imageProduct[pagePosition],
-                                                fit: BoxFit.fill,
+                                                fit: BoxFit.contain,
                                                 // fit: BoxFit.cover,
                                               );
                                             }),
-
-                                      
                                       ),
                                       Positioned(
                                         top: 5,
@@ -380,7 +406,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                       )
                                     ],
                                   ),
-                                  // Rounded Section
+                                  // End Images
+
                                   Positioned(
                                     top: 325,
                                     child: Align(
@@ -401,56 +428,112 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                     ),
                                   ),
                                 ]),
+                                SmoothPageIndicator(
+                                  controller: _sliderController,
+                                  count: imageProduct.length,
+                                  effect: ExpandingDotsEffect(
+                                    dotHeight: 8,
+                                    dotWidth: 8,
+                                    activeDotColor: Colors.blue,
+                                    dotColor: Colors.grey,
+                                  ),
+                                ),
+
+                                SizedBox(
+                                  height: 15,
+                                ),
 
                                 Container(
                                   width: MediaQuery.of(context).size.width - 50,
                                   child: Column(
                                     children: [
+                                      // Display Images
                                       Container(
-                                        child: 
-                                        Row(
-                                          children: productDisplayImages
-                                              .map(
-                                                (image) => InkWell(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      unitName = image.unit.name
-                                                          .toString();
-                                                      updateProductDisplayImages =
-                                                          widget
-                                                              .arguments[
-                                                                  'product_images']
-                                                              .where((image) =>
-                                                                  image.unit
-                                                                      .name ==
-                                                                  unitName)
-                                                              .toList();
-                                                    });
-                                                  },
-                                                  child: Container(
-                                                    margin: EdgeInsets.only(
-                                                        right: 8),
-                                                    width: 60,
-                                                    height: 80,
-                                                    child: image != ''
-                                                        ? Image.network(
-                                                            _configModel.apiConfig[
-                                                                    'mediaURL'] +
-                                                                image.imagepath
-                                                                    .toString(),
-                                                            fit: BoxFit.fill,
-                                                            // fit: BoxFit.cover,
-                                                          )
-                                                        : Text(''),
+                                        height: 100,
+                                        child: ListView.builder(
+                                            padding: const EdgeInsets.only(
+                                                left: 5, right: 8),
+                                            scrollDirection: Axis.horizontal,
+                                            shrinkWrap: true,
+                                            itemCount:
+                                                productDisplayImages.length,
+                                            itemBuilder: (context, index) {
+                                              return InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    unitName =
+                                                        productDisplayImages[
+                                                                index]
+                                                            .unit
+                                                            .name
+                                                            .toString();
+
+                                                    _CartData['flavour'] =
+                                                        unitName;
+
+                                                    updateProductDisplayImages =
+                                                        widget.arguments[
+                                                                'product_images']
+                                                            .where((image) =>
+                                                                image.unit
+                                                                    .name ==
+                                                                unitName)
+                                                            .toList();
+
+                                                    _sizes = widget
+                                                        .arguments['product']
+                                                            ['product_packs']
+                                                        .where((_pack) =>
+                                                            _pack['unit']
+                                                                ['name'] ==
+                                                            productDisplayImages[
+                                                                    index]
+                                                                .unit
+                                                                .name)
+                                                        .toList();
+
+                                                    print(_sizes);
+                                                  });
+                                                },
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    border: unitName ==
+                                                            productDisplayImages[
+                                                                    index]
+                                                                .unit
+                                                                .name
+                                                        ? Border.all()
+                                                        : Border.all(
+                                                            color:
+                                                                Colors.white),
                                                   ),
+                                                  margin:
+                                                      EdgeInsets.only(right: 8),
+                                                  width: 60,
+                                                  height: 80,
+                                                  child: productDisplayImages[
+                                                              index] !=
+                                                          ''
+                                                      ? Image.network(
+                                                          _configModel.apiConfig[
+                                                                  'mediaURL'] +
+                                                              productDisplayImages[
+                                                                      index]
+                                                                  .imagepath
+                                                                  .toString(),
+                                                          fit: BoxFit.fill,
+                                                          // fit: BoxFit.cover,
+                                                        )
+                                                      : Text(''),
                                                 ),
-                                              )
-                                              .toList(),
-                                        ),
+                                              );
+                                            }),
                                       ),
+                                      // Display Images
+
+                                      // Product Name to Available in Stock
                                       Container(
                                         decoration: BoxDecoration(
-                                          // color: Colors.red,
                                           color: Color(0xffffffff),
                                           borderRadius: BorderRadius.only(
                                             topLeft: Radius.circular(30),
@@ -549,9 +632,11 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 if (_addToCartModel.addToCarts
                                                         ?.where((cart) =>
                                                             cart.productId ==
-                                                            widget.arguments[
-                                                                    'product']
-                                                                ['id'])
+                                                                widget.arguments[
+                                                                        'product']
+                                                                    ['id'] &&
+                                                            cart.flavour ==
+                                                                unitName)
                                                         ?.toList()
                                                         ?.isEmpty ??
                                                     true)
@@ -671,9 +756,11 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 if (_addToCartModel.addToCarts
                                                         ?.where((cart) =>
                                                             cart.productId ==
-                                                            widget.arguments[
-                                                                    'product']
-                                                                ['id'])
+                                                                widget.arguments[
+                                                                        'product']
+                                                                    ['id'] &&
+                                                            cart.flavour ==
+                                                                unitName)
                                                         ?.toList()
                                                         ?.isNotEmpty ==
                                                     true)
@@ -798,15 +885,16 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                           ],
                                         ),
                                       ),
+                                      // End Product Name to Available in Stock
                                     ],
                                   ),
                                 ),
 
-                                // Price
                                 Container(
                                   margin: EdgeInsets.only(top: 10),
                                   child: Column(
                                     children: [
+                                      // Price
                                       widget.arguments['product']
                                                       ['product_prices']![0]
                                                   ['offer_price'] !=
@@ -1805,69 +1893,69 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 ),
                                               ],
                                             ),
-                                            Container(
-                                              margin: EdgeInsets.only(top: 10),
-                                              width: 318.36,
-                                              height: 70,
-                                              decoration: ShapeDecoration(
-                                                color: Colors.white,
-                                                shape: RoundedRectangleBorder(
-                                                  side: BorderSide(
-                                                      width: 0.95,
-                                                      color: Color(0xFFDADADA)),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          19.01),
-                                                ),
-                                              ),
-                                              child: DropdownButtonFormField(
-                                                  decoration: InputDecoration(
-                                                      border: InputBorder.none,
-                                                      focusedBorder:
-                                                          InputBorder.none,
-                                                      enabledBorder:
-                                                          InputBorder.none,
-                                                      errorBorder:
-                                                          InputBorder.none,
-                                                      disabledBorder:
-                                                          InputBorder.none,
-                                                      labelText: 'Select Color',
-                                                      contentPadding:
-                                                          EdgeInsets.all(10)),
-                                                  items: _sizes
-                                                      .map(
-                                                        (_color) =>
-                                                            DropdownMenuItem(
-                                                          child: Text(
-                                                            _color['unit']
-                                                                ['name'],
-                                                          ),
-                                                          value: _color['unit']
-                                                              ['name'],
-                                                        ),
-                                                      )
-                                                      .toList(),
-                                                  onChanged: (value) {
-                                                    _CartData['flavour'] =
-                                                        value.toString();
+                                            // Container(
+                                            //   margin: EdgeInsets.only(top: 10),
+                                            //   width: 318.36,
+                                            //   height: 70,
+                                            //   decoration: ShapeDecoration(
+                                            //     color: Colors.white,
+                                            //     shape: RoundedRectangleBorder(
+                                            //       side: BorderSide(
+                                            //           width: 0.95,
+                                            //           color: Color(0xFFDADADA)),
+                                            //       borderRadius:
+                                            //           BorderRadius.circular(
+                                            //               19.01),
+                                            //     ),
+                                            //   ),
+                                            //   child: DropdownButtonFormField(
+                                            //       decoration: InputDecoration(
+                                            //           border: InputBorder.none,
+                                            //           focusedBorder:
+                                            //               InputBorder.none,
+                                            //           enabledBorder:
+                                            //               InputBorder.none,
+                                            //           errorBorder:
+                                            //               InputBorder.none,
+                                            //           disabledBorder:
+                                            //               InputBorder.none,
+                                            //           labelText: 'Select Color',
+                                            //           contentPadding:
+                                            //               EdgeInsets.all(10)),
+                                            //       items: _s
+                                            //           .map(
+                                            //             (_color) =>
+                                            //                 DropdownMenuItem(
+                                            //               child: Text(
+                                            //                 _color['unit']
+                                            //                     ['name'],
+                                            //               ),
+                                            //               value: _color['unit']
+                                            //                   ['name'],
+                                            //             ),
+                                            //           )
+                                            //           .toList(),
+                                            //       onChanged: (value) {
+                                            //         _CartData['flavour'] =
+                                            //             value.toString();
 
-                                                    unitName = value
-                                                        .toString()
-                                                        .toString();
-                                                    print(unitName);
-                                                    setState(() {
-                                                      updateProductDisplayImages =
-                                                          widget
-                                                              .arguments[
-                                                                  'product_images']
-                                                              .where((image) =>
-                                                                  image.unit
-                                                                      .name ==
-                                                                  unitName)
-                                                              .toList();
-                                                    });
-                                                  }),
-                                            ),
+                                            //         unitName = value
+                                            //             .toString()
+                                            //             .toString();
+                                            //         print(unitName);
+                                            //         setState(() {
+                                            //           updateProductDisplayImages =
+                                            //               widget
+                                            //                   .arguments[
+                                            //                       'product_images']
+                                            //                   .where((image) =>
+                                            //                       image.unit
+                                            //                           .name ==
+                                            //                       unitName)
+                                            //                   .toList();
+                                            //         });
+                                            //       }),
+                                            // ),
                                           ],
                                         ),
                                       ),
@@ -1998,7 +2086,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   .size
                                                   .width -
                                               50,
-                                          height: 330,
+                                          height: 350,
                                           child: TabBarView(
                                             children: [
                                               Padding(
@@ -2011,6 +2099,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                               ),
                                               Container(
                                                 child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     Container(
                                                       // height:
@@ -2027,7 +2117,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                               child: Padding(
                                                                 padding:
                                                                     const EdgeInsets
-                                                                            .only(
+                                                                        .only(
                                                                         top:
                                                                             8.0),
                                                                 child: SizedBox(
@@ -2074,6 +2164,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                       ),
                                                                       child:
                                                                           Column(
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.start,
                                                                         children: [
                                                                           Row(
                                                                             children: [
@@ -2200,40 +2292,65 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                         .currentState!
                                                                         .save();
 
-                                                                    setState(
-                                                                        () {
-                                                                      _loading =
-                                                                          true;
-                                                                    });
+                                                                    if (_configModel
+                                                                            .files
+                                                                            .length ==
+                                                                        0)
+                                                                      showDialog(
+                                                                        context:
+                                                                            context,
+                                                                        builder:
+                                                                            (BuildContext context) =>
+                                                                                AlertDialog(
+                                                                          title:
+                                                                              Text('Please upload an image'),
+                                                                          actions: [
+                                                                            TextButton(
+                                                                              onPressed: () {
+                                                                                Navigator.pop(context);
+                                                                              },
+                                                                              child: Text('Ok'),
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                      );
+                                                                    else {
+                                                                      setState(
+                                                                          () {
+                                                                        _loading =
+                                                                            true;
+                                                                      });
 
-                                                                    await _reviewModel
-                                                                        .getMyReviews(
-                                                                      widget.arguments[
-                                                                              'product']
-                                                                          [
-                                                                          'id'],
-                                                                      _reviewDescription,
-                                                                    );
+                                                                      await _reviewModel
+                                                                          .getMyReviews(
+                                                                        widget.arguments['product']
+                                                                            [
+                                                                            'id'],
+                                                                        _reviewDescription,
+                                                                      );
 
-                                                                    setState(
-                                                                        () {
-                                                                      _loading =
-                                                                          false;
-                                                                    });
+                                                                      setState(
+                                                                          () {
+                                                                        _loading =
+                                                                            false;
+                                                                      });
 
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .push(
-                                                                            MaterialPageRoute(
-                                                                      builder:
-                                                                          (context) =>
-                                                                              ProductIdPage(
-                                                                        arguments: {
-                                                                          'product':
-                                                                              widget.arguments!['product']
-                                                                        },
-                                                                      ),
-                                                                    ));
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .push(
+                                                                              MaterialPageRoute(
+                                                                        builder:
+                                                                            (context) =>
+                                                                                ProductIdPage(
+                                                                          arguments: {
+                                                                            'product':
+                                                                                widget.arguments!['product'],
+                                                                            'product_images':
+                                                                                widget.arguments['product_images']
+                                                                          },
+                                                                        ),
+                                                                      ));
+                                                                    }
                                                                   }
                                                                 },
                                                           style: TextButton
@@ -2347,12 +2464,22 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                           onTap: () {
                                                             Navigator.of(
                                                                     context)
-                                                                .push(MaterialPageRoute(
-                                                                    builder: (context) =>
-                                                                        ProductIdPage(
-                                                                            arguments: {
-                                                                              'product': _productModel.categoryWiseproducts![index].toJson()
-                                                                            })));
+                                                                .push(
+                                                              MaterialPageRoute(
+                                                                builder: (context) =>
+                                                                    ProductIdPage(
+                                                                        arguments: {
+                                                                      'product': _productModel
+                                                                          .categoryWiseproducts![
+                                                                              index]
+                                                                          .toJson(),
+                                                                      'product_images': _productModel
+                                                                          .categoryWiseproducts![
+                                                                              index]
+                                                                          .productImages
+                                                                    }),
+                                                              ),
+                                                            );
                                                           },
                                                           child: Row(
                                                             crossAxisAlignment:
@@ -2472,9 +2599,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                       onTap:
                                                                           () {
                                                                         Navigator.of(context).push(MaterialPageRoute(
-                                                                            builder: (context) =>
-                                                                                ProductIdPage(arguments: {
-                                                                                  'product': _productModel.categoryWiseproducts![index].toJson()
+                                                                            builder: (context) => ProductIdPage(arguments: {
+                                                                                  'product': _productModel.categoryWiseproducts![index].toJson(),
+                                                                                  'product_images': _productModel.categoryWiseproducts![index].productImages
                                                                                 })));
                                                                       },
                                                                       child:
@@ -2603,6 +2730,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                         height: 650,
                         child: Center(child: CircularProgressIndicator()),
                       ),
+                // End Images
               ],
             ),
           ),
@@ -2645,6 +2773,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Container(
@@ -2680,7 +2809,45 @@ class _ProductIdPageState extends State<ProductIdPage> {
                     height: 41,
                     child: TextButton(
                       onPressed: () async {
+                        _formKey.currentState!.save();
+                        bool type = true;
                         Navigator.pushNamed(context, '/cartPage');
+
+                        // if (_CartData['kindOfFlower'] == '' ||
+                        //     _CartData['flavour'] == '') {
+                        //   showDialog(
+                        //     context: context,
+                        //     builder: (BuildContext context) => AlertDialog(
+                        //       shape: RoundedRectangleBorder(
+                        //           borderRadius: BorderRadius.circular(20)),
+                        //       title: _CartData['kindOfFlower'] == '' &&
+                        //               _CartData['flavour'] != ''
+                        //           ? Text("kindly choose size.")
+                        //           : _CartData['flavour'] == '' &&
+                        //                   _CartData['kindOfFlower'] != ''
+                        //               ? Text("kindly choose colour.")
+                        //               : Text("kindly choose colour and size."),
+                        //       actions: <Widget>[
+                        //         TextButton(
+                        //           onPressed: () {
+                        //             Navigator.pop(context);
+                        //           },
+                        //           child: Text(
+                        //             'Ok',
+                        //             style: TextStyle(
+                        //                 color: Colors.black, fontSize: 16),
+                        //           ),
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   );
+                        // } else {
+                        //   await _addToCartModel.getAddToCart(
+                        //       widget.arguments!['product']['id'],
+                        //       type,
+                        //       _CartData);
+                        //   Navigator.pushNamed(context, '/cartPage');
+                        // }
                       },
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,
