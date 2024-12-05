@@ -139,270 +139,6 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                     key: _formKey,
                     child: Column(
                       children: [
-                        // Full Name
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Color(0xffe3e3e3)),
-                            color: Color(0xfffbfbfb),
-                          ),
-                          child: TextFormField(
-                            initialValue: _userAddress.fullName,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-                              hintText: 'Full Name',
-                              hintStyle: TextStyle(color: Color(0x3f000000)),
-                            ),
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff000000),
-                            ),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return "Full Name Cannot be empty.";
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _userAddress.fullName = value;
-                            },
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        // Phone
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Color(0xffe3e3e3)),
-                            color: Color(0xfffbfbfb),
-                          ),
-                          child: TextFormField(
-                            initialValue: _userAddress.phone,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                              LengthLimitingTextInputFormatter(10),
-                            ],
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-                              hintText: 'Phone',
-                              hintStyle: TextStyle(color: Color(0x3f000000)),
-                            ),
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff000000),
-                            ),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return "Phone Cannot be empty.";
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _userAddress.phone = value;
-                            },
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        if (isAltPhone == false)
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                isAltPhone = true;
-                              });
-                            },
-                            child: Row(
-                              children: [
-                                Icon(Icons.add),
-                                Text('Add Alternate Phone Number'),
-                              ],
-                            ),
-                          ),
-                        if (isAltPhone == true)
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Color(0xffe3e3e3)),
-                              color: Color(0xfffbfbfb),
-                            ),
-                            child: TextFormField(
-                              initialValue: _userAddress.altPhone,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                                LengthLimitingTextInputFormatter(10),
-                              ],
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                enabledBorder: InputBorder.none,
-                                errorBorder: InputBorder.none,
-                                disabledBorder: InputBorder.none,
-                                contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-                                hintText: 'Alternate Phone Number',
-                                hintStyle: TextStyle(color: Color(0x3f000000)),
-                              ),
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Urbanist',
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xff000000),
-                              ),
-                              onSaved: (value) {
-                                _userAddress.altPhone = value;
-                              },
-                            ),
-                          ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        if (isAltPhone == true)
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                isAltPhone = false;
-                                _userAddress.altPhone = '';
-                              });
-                            },
-                            child: Row(
-                              children: [
-                                Icon(Icons.remove),
-                                Text('Remove Alternate Phone Number'),
-                              ],
-                            ),
-                          ),
-                        if (isAltPhone == true)
-                          SizedBox(
-                            height: 20,
-                          ),
-
-                        Container(
-                            // padding: EdgeInsets.symmetric(horizontal: 20),
-                            // height: 600,
-                            child: Column(
-                          children: [
-                            ///Adding CSC Picker Widget in app
-                            CSCPicker(
-                              layout: Layout.vertical,
-
-                              ///Enable disable state dropdown [OPTIONAL PARAMETER]
-                              showStates: true,
-
-                              /// Enable disable city drop down [OPTIONAL PARAMETER]
-                              showCities: true,
-
-                              ///Enable (get flag with country name) / Disable (Disable flag) / ShowInDropdownOnly (display flag in dropdown only) [OPTIONAL PARAMETER]
-                              flagState: CountryFlag.DISABLE,
-
-                              ///Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER] (USE with disabledDropdownDecoration)
-                              dropdownDecoration: BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                  color: Colors.white,
-                                  border: Border.all(
-                                      color: Colors.grey.shade300, width: 1)),
-
-                              ///Disabled Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER]  (USE with disabled dropdownDecoration)
-                              disabledDropdownDecoration: BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                  color: Colors.grey.shade300,
-                                  border: Border.all(
-                                      color: Colors.grey.shade300, width: 1)),
-
-                              ///placeholders for dropdown search field
-                              countrySearchPlaceholder: "Country",
-                              stateSearchPlaceholder: "State",
-                              citySearchPlaceholder: "City",
-
-                              ///labels for dropdown
-                              countryDropdownLabel: "Country",
-                              stateDropdownLabel: "State",
-                              cityDropdownLabel: "City",
-
-                              ///Default Country
-                              defaultCountry: CscCountry.India,
-
-                              //Country Filter [OPTIONAL PARAMETER]
-                              // countryFilter: [CscCountry.India],
-
-                              ///Disable country dropdown (Note: use it with default country)
-                              disableCountry: true,
-
-                              ///selected item style [OPTIONAL PARAMETER]
-                              selectedItemStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                              ),
-
-                              ///DropdownDialog Heading style [OPTIONAL PARAMETER]
-                              dropdownHeadingStyle: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold),
-
-                              ///DropdownDialog Item style [OPTIONAL PARAMETER]
-                              dropdownItemStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                              ),
-
-                              ///Dialog box radius [OPTIONAL PARAMETER]
-                              dropdownDialogRadius: 10.0,
-
-                              ///Search bar radius [OPTIONAL PARAMETER]
-                              searchBarRadius: 10.0,
-
-                              ///triggers once country selected in dropdown
-                              onCountryChanged: (value) {
-                                setState(() {
-                                  ///store value in country variable
-                                  countryValue = value;
-                                });
-                              },
-
-                              ///triggers once state selected in dropdown
-                              onStateChanged: (value) {
-                                setState(() {
-                                  ///store value in state variable
-                                  stateValue = value.toString();
-                                  _userAddress.state = stateValue;
-                                });
-                              },
-
-                              ///triggers once city selected in dropdown
-                              onCityChanged: (value) {
-                                setState(() {
-                                  ///store value in city variable
-                                  cityValue = value.toString();
-                                  _userAddress.city = cityValue;
-                                });
-                              },
-
-                              ///Show only specific countries using country filter
-                              // countryFilter: ["United States", "Canada", "Mexico"],
-                            ),
-                          ],
-                        )),
-                        SizedBox(
-                          height: 20,
-                        ),
-
                         Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
@@ -557,6 +293,118 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                         ),
 
                         Container(
+                            // padding: EdgeInsets.symmetric(horizontal: 20),
+                            // height: 600,
+                            child: Column(
+                          children: [
+                            ///Adding CSC Picker Widget in app
+                            CSCPicker(
+                              layout: Layout.vertical,
+
+                              ///Enable disable state dropdown [OPTIONAL PARAMETER]
+                              showStates: true,
+
+                              /// Enable disable city drop down [OPTIONAL PARAMETER]
+                              showCities: true,
+
+                              ///Enable (get flag with country name) / Disable (Disable flag) / ShowInDropdownOnly (display flag in dropdown only) [OPTIONAL PARAMETER]
+                              flagState: CountryFlag.DISABLE,
+
+                              ///Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER] (USE with disabledDropdownDecoration)
+                              dropdownDecoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                  color: Colors.white,
+                                  border: Border.all(
+                                      color: Colors.grey.shade300, width: 1)),
+
+                              ///Disabled Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER]  (USE with disabled dropdownDecoration)
+                              disabledDropdownDecoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                  color: Colors.grey.shade300,
+                                  border: Border.all(
+                                      color: Colors.grey.shade300, width: 1)),
+
+                              ///placeholders for dropdown search field
+                              countrySearchPlaceholder: "Country",
+                              stateSearchPlaceholder: "State",
+                              citySearchPlaceholder: "City",
+
+                              ///labels for dropdown
+                              countryDropdownLabel: "Country",
+                              stateDropdownLabel: "State",
+                              cityDropdownLabel: "City",
+
+                              ///Default Country
+                              defaultCountry: CscCountry.India,
+
+                              //Country Filter [OPTIONAL PARAMETER]
+                              // countryFilter: [CscCountry.India],
+
+                              ///Disable country dropdown (Note: use it with default country)
+                              disableCountry: true,
+
+                              ///selected item style [OPTIONAL PARAMETER]
+                              selectedItemStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                              ),
+
+                              ///DropdownDialog Heading style [OPTIONAL PARAMETER]
+                              dropdownHeadingStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold),
+
+                              ///DropdownDialog Item style [OPTIONAL PARAMETER]
+                              dropdownItemStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                              ),
+
+                              ///Dialog box radius [OPTIONAL PARAMETER]
+                              dropdownDialogRadius: 10.0,
+
+                              ///Search bar radius [OPTIONAL PARAMETER]
+                              searchBarRadius: 10.0,
+
+                              ///triggers once country selected in dropdown
+                              onCountryChanged: (value) {
+                                setState(() {
+                                  ///store value in country variable
+                                  countryValue = value;
+                                });
+                              },
+
+                              ///triggers once state selected in dropdown
+                              onStateChanged: (value) {
+                                setState(() {
+                                  ///store value in state variable
+                                  stateValue = value.toString();
+                                  _userAddress.state = stateValue;
+                                });
+                              },
+
+                              ///triggers once city selected in dropdown
+                              onCityChanged: (value) {
+                                setState(() {
+                                  ///store value in city variable
+                                  cityValue = value.toString();
+                                  _userAddress.city = cityValue;
+                                });
+                              },
+
+                              ///Show only specific countries using country filter
+                              // countryFilter: ["United States", "Canada", "Mexico"],
+                            ),
+                          ],
+                        )),
+                        SizedBox(
+                          height: 20,
+                        ),
+
+                        Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(color: Color(0xffe3e3e3)),
@@ -595,6 +443,157 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                         SizedBox(
                           height: 20,
                         ),
+                        // Full Name
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Color(0xffe3e3e3)),
+                            color: Color(0xfffbfbfb),
+                          ),
+                          child: TextFormField(
+                            initialValue: _userAddress.fullName,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
+                              hintText: 'Full Name',
+                              hintStyle: TextStyle(color: Color(0x3f000000)),
+                            ),
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff000000),
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "Full Name Cannot be empty.";
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _userAddress.fullName = value;
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        // Phone
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Color(0xffe3e3e3)),
+                            color: Color(0xfffbfbfb),
+                          ),
+                          child: TextFormField(
+                            initialValue: _userAddress.phone,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(10),
+                            ],
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
+                              hintText: 'Phone',
+                              hintStyle: TextStyle(color: Color(0x3f000000)),
+                            ),
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff000000),
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "Phone Cannot be empty.";
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _userAddress.phone = value;
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        if (isAltPhone == false)
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                isAltPhone = true;
+                              });
+                            },
+                            child: Row(
+                              children: [
+                                Icon(Icons.add),
+                                Text('Add Alternate Phone Number'),
+                              ],
+                            ),
+                          ),
+                        if (isAltPhone == true)
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Color(0xffe3e3e3)),
+                              color: Color(0xfffbfbfb),
+                            ),
+                            child: TextFormField(
+                              initialValue: _userAddress.altPhone,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(10),
+                              ],
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                errorBorder: InputBorder.none,
+                                disabledBorder: InputBorder.none,
+                                contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
+                                hintText: 'Alternate Phone Number',
+                                hintStyle: TextStyle(color: Color(0x3f000000)),
+                              ),
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xff000000),
+                              ),
+                              onSaved: (value) {
+                                _userAddress.altPhone = value;
+                              },
+                            ),
+                          ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        if (isAltPhone == true)
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                isAltPhone = false;
+                                _userAddress.altPhone = '';
+                              });
+                            },
+                            child: Row(
+                              children: [
+                                Icon(Icons.remove),
+                                Text('Remove Alternate Phone Number'),
+                              ],
+                            ),
+                          ),
+                        if (isAltPhone == true)
+                          SizedBox(
+                            height: 20,
+                          ),
                         Wrap(
                           spacing: 8.0,
                           children: [
@@ -666,27 +665,48 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                             onPressed: () async {
                               if (_formKey.currentState!.validate()) {
                                 _formKey.currentState!.save();
-
-                                setState(() {
-                                  _loading = true;
-                                });
-                                bool response = await _userAddressModel
-                                    .saveUserAddress(userAddress: _userAddress);
-                                if (response == true) {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          AddressPage(arguments: {
-                                            'cartItems': cartItems,
-                                            'cartTotal': cartTotal,
-                                            'couponValue': couponValue,
-                                            'address': [],
-                                            'isAddress': true
-                                          })));
-                                  // Navigator.pop(context);
+                                if (_userAddress.label == null ||
+                                    _userAddress.label == '') {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) =>
+                                        AlertDialog(
+                                      title:
+                                          Text('Please select address type.'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text('Ok'),
+                                        )
+                                      ],
+                                    ),
+                                  );
+                                } else {
+                                  setState(() {
+                                    _loading = true;
+                                  });
+                                  bool response =
+                                      await _userAddressModel.saveUserAddress(
+                                          userAddress: _userAddress);
+                                  if (response == true) {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AddressPage(arguments: {
+                                                  'cartItems': cartItems,
+                                                  'cartTotal': cartTotal,
+                                                  'couponValue': couponValue,
+                                                  'address': [],
+                                                  'isAddress': false
+                                                })));
+                                    // Navigator.pop(context);
+                                  }
+                                  setState(() {
+                                    _loading = false;
+                                  });
                                 }
-                                setState(() {
-                                  _loading = false;
-                                });
                               }
                             },
                             style: TextButton.styleFrom(

@@ -6,100 +6,106 @@ class SuccessPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'SUCCESS!',
-                  textAlign: TextAlign.center,
-                  style: MyGoogleFontStyle(
-                    fontFamily: 'Urbanist',
-                    fontSize: 32,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xff303030),
-                  ),
-                ),
-                Image.asset(
-                  'assets/images/graphics.png',
-                  width: 268.98,
-                  height: 248.44,
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  'Your order will be delivered soon.\nThank you for choosing Aadab!',
-                  textAlign: TextAlign.center,
-                  style: MyGoogleFontStyle(
-                    fontFamily: 'Urbanist',
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xff909090),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.fromLTRB(0.89, 20, 0, 0),
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/ordersPage');
-                    },
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushReplacementNamed(context, '/homePage');
+        return false;
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'SUCCESS!',
+                    textAlign: TextAlign.center,
+                    style: MyGoogleFontStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 32,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xff303030),
                     ),
-                    child: Container(
-                      width: 321,
-                      height: 53,
-                      decoration: BoxDecoration(
-                        color: Color(0xff1e1e1e),
-                        borderRadius: BorderRadius.circular(10),
+                  ),
+                  Image.asset(
+                    'assets/images/graphics.png',
+                    width: 268.98,
+                    height: 248.44,
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Your order will be delivered soon.\nThank you for choosing Aadab!',
+                    textAlign: TextAlign.center,
+                    style: MyGoogleFontStyle(
+                      fontFamily: 'Urbanist',
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xff909090),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.fromLTRB(0.89, 20, 0, 0),
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/ordersPage');
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
                       ),
-                      child: Center(
-                        child: Text(
-                          'Track You Order',
-                          style: MyGoogleFontStyle(
-                            fontFamily: 'Urbanist',
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xffffffff),
+                      child: Container(
+                        width: 321,
+                        height: 53,
+                        decoration: BoxDecoration(
+                          color: Color(0xff1e1e1e),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Track You Order',
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xffffffff),
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                Container(
-                  margin: EdgeInsets.fromLTRB(0.89, 10, 0, 0),
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/homePage');
-                    },
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                    ),
-                    child: Container(
-                      width: 321,
-                      height: 53,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Color(0xff000000)),
-                        borderRadius: BorderRadius.circular(10),
+                  Container(
+                    margin: EdgeInsets.fromLTRB(0.89, 10, 0, 0),
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, '/');
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
                       ),
-                      child: Center(
-                        child: Text(
-                          'Back to home',
-                          style: MyGoogleFontStyle(
-                            fontFamily: 'Urbanist',
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xff1e1e1e),
+                      child: Container(
+                        width: 321,
+                        height: 53,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Color(0xff000000)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Back to home',
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xff1e1e1e),
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

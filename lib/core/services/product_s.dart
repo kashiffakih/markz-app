@@ -78,7 +78,7 @@ class ProductService {
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
-    print(_responseData['success']);
+    print(_responseData);
     if (_responseData['success']) {
       _allProducts = [];
       _responseData['data'].forEach((data) {

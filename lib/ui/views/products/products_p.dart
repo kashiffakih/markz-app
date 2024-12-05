@@ -225,7 +225,7 @@ class _ProductsPageState extends State<ProductsPage> {
 
               // Categories
               Container(
-                margin: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 8 * fem),
+                // margin: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 5 * fem),
                 height: 35 * fem,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -255,7 +255,7 @@ class _ProductsPageState extends State<ProductsPage> {
                           border: activeIndex == -1
                               ? null
                               : Border.all(color: Color(0xffc7b456)),
-                          borderRadius: BorderRadius.circular(5 * fem),
+                          borderRadius: BorderRadius.circular(15 * fem),
                         ),
                         child: Center(
                           child: Text(
@@ -278,7 +278,7 @@ class _ProductsPageState extends State<ProductsPage> {
                       width: 5 * fem,
                     ),
                     SizedBox(
-                      width: 295,
+                      width: MediaQuery.of(context).size.width,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: widget.arguments['subCategory'].length,
@@ -311,13 +311,13 @@ class _ProductsPageState extends State<ProductsPage> {
                                       isActive ? Colors.black : null,
                                 ),
                                 child: Container(
-                                  width: 79 * fem,
+                                  padding: EdgeInsets.symmetric(horizontal: 10),
                                   height: double.infinity,
                                   decoration: BoxDecoration(
                                     border:
                                         Border.all(color: Color(0xffc7b456)),
                                     borderRadius:
-                                        BorderRadius.circular(5 * fem),
+                                        BorderRadius.circular(15 * fem),
                                   ),
                                   child: Center(
                                     child: Text(

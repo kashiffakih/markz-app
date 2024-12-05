@@ -406,7 +406,7 @@ class Product {
     imagepath3 = json['imagepath3'];
     imagepath4 = json['imagepath4'];
     subCategoryId = json['sub_category_id'];
-    position = json['position'];
+    position = json['position'].toString();
     sub2CategoryId = json['sub_2_category_id'];
     sub3CategoryId = json['sub_3_category_id'];
     vegNonveg = json['veg_nonveg'];

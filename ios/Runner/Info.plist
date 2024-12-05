@@ -71,5 +71,9 @@
 	<false/>
 	<key>kTCCServiceMediaLibrary</key>
 	<string>media</string>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
 </dict>
 </plist>

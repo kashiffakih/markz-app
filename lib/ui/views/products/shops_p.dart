@@ -57,9 +57,10 @@ class ShopsPageState extends State<ShopsPage> {
       if (!_isInitialLoad && _productModel.allProducts!.length > 0) {
         filteredProducts = _productModel.allProducts?.toList();
         _isInitialLoad = true;
-      } else {
-        _isInitialLoad = false;
       }
+      // else {
+      //   _isInitialLoad = false;
+      // }
     });
     var cartCount = 0;
     setState(() {
@@ -122,6 +123,8 @@ class ShopsPageState extends State<ShopsPage> {
                         ),
                         const SizedBox(width: 15),
                         Container(
+                          // width: 320,
+                          // height: 38,
                           width: 248,
                           height: 38,
                           padding: const EdgeInsets.only(
@@ -137,36 +140,43 @@ class ShopsPageState extends State<ShopsPage> {
                             ),
                           ),
                           child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment:
                                 CrossAxisAlignment.center, // Center vertically
                             children: [
                               Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.only(top: 15.0),
+                                  padding: const EdgeInsets.only(top: 5.0),
                                   child: TextFormField(
-                                    initialValue: widget.initialText.toString(),
                                     // controller: _controller,
                                     onChanged: (value) {
-                                      if (value.length % 3 == 0) {
+                                      if (value.length % 2 == 0) {
                                         setState(() {
+                                          // filteredProducts =
+                                          // Provider.of<ProductModel>(context,
+                                          //         listen: false)
+                                          //     .getAllProducts(value);
+                                          if (value.length == 0) {
+                                            _productModel.getAllProducts('');
+                                            filteredProducts =
+                                                _productModel.allProducts ?? [];
+                                          }
+
+                                          _productModel.getAllProducts(value);
                                           filteredProducts =
-                                              Provider.of<ProductModel>(context,
-                                                      listen: false)
-                                                  .getAllProducts(value);
+                                              _productModel.allProducts ?? [];
+                                          // print(filteredProducts);
                                         });
                                       }
                                     },
                                     onFieldSubmitted: (value) {
                                       setState(() {
+                                        _productModel.getAllProducts(value);
                                         filteredProducts =
-                                            Provider.of<ProductModel>(context,
-                                                    listen: false)
-                                                .getAllProducts(value);
+                                            _productModel.allProducts ?? [];
+                                        print(filteredProducts);
                                       });
                                     },
-                                    autofocus: true,
                                     decoration: InputDecoration(
                                       hintText: 'Search',
                                       border: InputBorder.none,
@@ -287,7 +297,10 @@ class ShopsPageState extends State<ShopsPage> {
                                   TextButton(
                                     onPressed: () async {
                                       setState(() {
+                                        filteredProducts = [];
                                         activeIndex = index;
+                                        print(_productModel.categories![index]
+                                            ['id']);
                                         filteredProducts = _productModel
                                             .allProducts!
                                             .where((element) =>
@@ -355,7 +368,7 @@ class ShopsPageState extends State<ShopsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    filteredProducts != null
+                    filteredProducts!.isNotEmpty
                         ? Container(
                             width: double.infinity,
                             // height: double.infinity,
@@ -421,8 +434,9 @@ class ShopsPageState extends State<ShopsPage> {
                                                                         arguments: {
                                                                           'product':
                                                                               filteredProducts![index].toJson(),
-                                                                          'product_images':
-                                                                              filteredProducts![index].productImages
+                                                                          'product_images': filteredProducts!
+                                                                              .first
+                                                                              .productImages
                                                                         })));
                                                       },
                                                       child: Container(
@@ -539,9 +553,9 @@ class ShopsPageState extends State<ShopsPage> {
                                                                       'product':
                                                                           filteredProducts![index]
                                                                               .toJson(),
-                                                                      'product_images':
-                                                                          filteredProducts![index]
-                                                                              .productImages
+                                                                      'product_images': filteredProducts!
+                                                                          .first
+                                                                          .productImages
                                                                     })));
                                               },
                                               child: Container(
@@ -668,57 +682,6 @@ class ShopsPageState extends State<ShopsPage> {
           ),
         ),
       ),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   elevation: 10,
-      //   iconSize: 30,
-      //   type: BottomNavigationBarType.fixed,
-      //   backgroundColor: Colors.white,
-      //   selectedItemColor: Colors.black,
-      //   unselectedItemColor: Colors.black,
-      //   selectedFontSize: 14,
-      //   unselectedFontSize: 14,
-      //   onTap: (value) async {
-      //     if (value == 0) {
-      //       Navigator.pushNamed(context, '/homePage');
-      //     }
-      //     if (value == 1) {
-      //       Navigator.pushNamed(context, '/wishlistPage');
-      //     }
-
-      //     if (value == 2) {
-      //       Map<String, dynamic> _CartData = {
-      //         'kindOfFlower': '',
-      //         'flavour': '',
-      //         'writeOnCake': '',
-      //         'pack': ''
-      //       };
-      //       await _addToCartModel.getAddToCart('', '', _CartData);
-      //       Navigator.pushNamed(context, '/cartPage');
-      //     }
-      //     if (value == 3) {
-      //       Navigator.pushNamed(context, '/profilePage');
-      //     }
-      //   },
-      //   items: const [
-      //     BottomNavigationBarItem(
-      //       label: 'Home',
-      //       icon: Iconoir(Iconoir.home_simple),
-      //       // icon: Icon(DonIcons.wap_home, size: 23),
-      //     ),
-      //     BottomNavigationBarItem(label: 'Saved', icon: Iconoir(Iconoir.heart)),
-      //     BottomNavigationBarItem(
-      //       label: 'Cart',
-      //       icon: Iconoir(Iconoir.shopping_bag),
-      //     ),
-      //     BottomNavigationBarItem(
-      //       label: 'Profile',
-      //       icon: Icon(
-      //         DonIcons.user_o,
-      //         size: 23,
-      //       ),
-      //     ),
-      //   ],
-      // ),
     );
   }
 }

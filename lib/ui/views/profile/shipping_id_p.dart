@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/models/user_address.dart';
-import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/user_address_pr.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/profile/address_p.dart';
 
 class ShippingUpdatePage extends StatefulWidget {
   final arguments;
@@ -98,7 +98,247 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                     key: _formKey,
                     child: Column(
                       children: [
-                        // Full Name
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Color(0xffe3e3e3)),
+                            color: Color(0xfffbfbfb),
+                          ),
+                          child: TextFormField(
+                            initialValue: _userAddress.add1,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
+                              hintText: 'House No, Building no',
+                              hintStyle: TextStyle(color: Color(0x3f000000)),
+                            ),
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff000000),
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "House No, Building no Cannot be empty.";
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _userAddress.add1 = value;
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        // Address
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Color(0xffe3e3e3)),
+                            color: Color(0xfffbfbfb),
+                          ),
+                          child: TextFormField(
+                            initialValue: _userAddress.add2,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
+                              hintText: 'Road, Colony, Area',
+                              hintStyle: TextStyle(color: Color(0x3f000000)),
+                            ),
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff000000),
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "Road, Colony, Area Cannot be empty.";
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _userAddress.add2 = value;
+                            },
+                          ),
+                        ),
+
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Color(0xffe3e3e3)),
+                            color: Color(0xfffbfbfb),
+                          ),
+                          child: TextFormField(
+                            initialValue: _userAddress.add3,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
+                              hintText: 'Landmark',
+                              hintStyle: TextStyle(color: Color(0x3f000000)),
+                            ),
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff000000),
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "Landmark Cannot be empty.";
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _userAddress.add3 = value;
+                            },
+                          ),
+                        ),
+
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text('Country: India'),
+                            ),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text('State: ' +
+                                  widget.arguments['userAddress'].state),
+                            ),
+                            Text('City: ' +
+                                widget.arguments['userAddress'].city),
+                          ],
+                        ),
+
+                        SizedBox(
+                          height: 20,
+                        ),
+
+                        Container(
+                            // padding: EdgeInsets.symmetric(horizontal: 20),
+                            // height: 600,
+                            child: Column(
+                          children: [
+                            CSCPicker(
+                              layout: Layout.vertical,
+                              showStates: true,
+                              showCities: true,
+                              flagState: CountryFlag.DISABLE,
+                              dropdownDecoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                  color: Colors.white,
+                                  border: Border.all(
+                                      color: Colors.grey.shade300, width: 1)),
+                              disabledDropdownDecoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                  color: Colors.grey.shade300,
+                                  border: Border.all(
+                                      color: Colors.grey.shade300, width: 1)),
+                              countrySearchPlaceholder: "Country",
+                              stateSearchPlaceholder: "State",
+                              citySearchPlaceholder: "City",
+                              countryDropdownLabel: "Country",
+                              stateDropdownLabel: "State",
+                              cityDropdownLabel: "City",
+                              defaultCountry: CscCountry.India,
+                              disableCountry: true,
+                              selectedItemStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                              ),
+                              dropdownHeadingStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold),
+                              dropdownItemStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                              ),
+                              dropdownDialogRadius: 10.0,
+                              searchBarRadius: 10.0,
+                              onCountryChanged: (value) {
+                                setState(() {
+                                  countryValue = value;
+                                });
+                              },
+                              onStateChanged: (value) {
+                                setState(() {
+                                  stateValue = value.toString();
+                                  _userAddress.state = stateValue;
+                                });
+                              },
+                              onCityChanged: (value) {
+                                setState(() {
+                                  cityValue = value.toString();
+                                  _userAddress.city = cityValue;
+                                });
+                              },
+                            ),
+                          ],
+                        )),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Color(0xffe3e3e3)),
+                            color: Color(0xfffbfbfb),
+                          ),
+                          child: TextFormField(
+                            initialValue: _userAddress.pincode,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
+                              hintText: 'Pincode',
+                              hintStyle: TextStyle(color: Color(0x3f000000)),
+                            ),
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff000000),
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "Pincode Cannot be empty.";
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _userAddress.pincode = value;
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+
                         // Full Name
                         Container(
                           decoration: BoxDecoration(
@@ -134,6 +374,7 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                             },
                           ),
                         ),
+
                         SizedBox(
                           height: 20,
                         ),
@@ -250,249 +491,7 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                           SizedBox(
                             height: 20,
                           ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text('Country: India'),
-                            ),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text('State: ' +
-                                  widget.arguments['userAddress'].state),
-                            ),
-                            Text('City: ' +
-                                widget.arguments['userAddress'].city),
-                          ],
-                        ),
 
-                        SizedBox(
-                          height: 20,
-                        ),
-
-                        Container(
-                            // padding: EdgeInsets.symmetric(horizontal: 20),
-                            // height: 600,
-                            child: Column(
-                          children: [
-                            CSCPicker(
-                              layout: Layout.vertical,
-                              showStates: true,
-                              showCities: true,
-                              flagState: CountryFlag.DISABLE,
-                              dropdownDecoration: BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                  color: Colors.white,
-                                  border: Border.all(
-                                      color: Colors.grey.shade300, width: 1)),
-                              disabledDropdownDecoration: BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                  color: Colors.grey.shade300,
-                                  border: Border.all(
-                                      color: Colors.grey.shade300, width: 1)),
-                              countrySearchPlaceholder: "Country",
-                              stateSearchPlaceholder: "State",
-                              citySearchPlaceholder: "City",
-                              countryDropdownLabel: "Country",
-                              stateDropdownLabel: "State",
-                              cityDropdownLabel: "City",
-                              defaultCountry: CscCountry.India,
-                              disableCountry: true,
-                              selectedItemStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                              ),
-                              dropdownHeadingStyle: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold),
-                              dropdownItemStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                              ),
-                              dropdownDialogRadius: 10.0,
-                              searchBarRadius: 10.0,
-                              onCountryChanged: (value) {
-                                setState(() {
-                                  countryValue = value;
-                                });
-                              },
-                              onStateChanged: (value) {
-                                setState(() {
-                                  stateValue = value.toString();
-                                  _userAddress.state = stateValue;
-                                });
-                              },
-                              onCityChanged: (value) {
-                                setState(() {
-                                  cityValue = value.toString();
-                                  _userAddress.city = cityValue;
-                                });
-                              },
-                            ),
-                          ],
-                        )),
-                        SizedBox(
-                          height: 20,
-                        ),
-
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Color(0xffe3e3e3)),
-                            color: Color(0xfffbfbfb),
-                          ),
-                          child: TextFormField(
-                            initialValue: _userAddress.add1,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-                              hintText: 'House No, Building no',
-                              hintStyle: TextStyle(color: Color(0x3f000000)),
-                            ),
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff000000),
-                            ),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return "House No, Building no Cannot be empty.";
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _userAddress.add1 = value;
-                            },
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        // Address
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Color(0xffe3e3e3)),
-                            color: Color(0xfffbfbfb),
-                          ),
-                          child: TextFormField(
-                            initialValue: _userAddress.add2,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-                              hintText: 'Road, Colony, Area',
-                              hintStyle: TextStyle(color: Color(0x3f000000)),
-                            ),
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff000000),
-                            ),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return "Road, Colony, Area Cannot be empty.";
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _userAddress.add2 = value;
-                            },
-                          ),
-                        ),
-
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Color(0xffe3e3e3)),
-                            color: Color(0xfffbfbfb),
-                          ),
-                          child: TextFormField(
-                            initialValue: _userAddress.add3,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-                              hintText: 'Landmark',
-                              hintStyle: TextStyle(color: Color(0x3f000000)),
-                            ),
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff000000),
-                            ),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return "Landmark Cannot be empty.";
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _userAddress.add3 = value;
-                            },
-                          ),
-                        ),
-
-                        SizedBox(
-                          height: 20,
-                        ),
-
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Color(0xffe3e3e3)),
-                            color: Color(0xfffbfbfb),
-                          ),
-                          child: TextFormField(
-                            initialValue: _userAddress.pincode,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-                              hintText: 'Pincode',
-                              hintStyle: TextStyle(color: Color(0x3f000000)),
-                            ),
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff000000),
-                            ),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return "Pincode Cannot be empty.";
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _userAddress.pincode = value;
-                            },
-                          ),
-                        ),
-
-                        SizedBox(
-                          height: 20,
-                        ),
                         Wrap(
                           spacing: 8.0,
                           children: [
@@ -567,26 +566,60 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                               if (_formKey.currentState!.validate()) {
                                 _formKey.currentState!.save();
 
-                                setState(() {
-                                  _loading = true;
-                                });
-                                bool response =
-                                    await _userAddressModel.updateUserAddress(
-                                        userAddress: _userAddress);
-                                if (response == true) {
-                                  Navigator.of(context).pop();
-                                  // Navigator.of(context).push(MaterialPageRoute(
-                                  //     builder: (context) =>
-                                  //         AddressPage(arguments: {
-                                  //           'cartItems': [],
-                                  //           'cartTotal': '',
-                                  //           'couponValue': 0,
-                                  //           'isAddress': false,
-                                  //         })));
+                                if (_userAddress.label == null ||
+                                    _userAddress.label == '') {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) =>
+                                        AlertDialog(
+                                      title:
+                                          Text('Please select address type.'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text('Ok'),
+                                        )
+                                      ],
+                                    ),
+                                  );
+                                } else {
+                                  setState(() {
+                                    _loading = true;
+                                  });
+                                  print('city : ${_userAddress.city}');
+                                  print('state : ${_userAddress.state}');
+
+                                  _userAddress.city = _userAddress.city != null
+                                      ? _userAddress.city.toString()
+                                      : widget.arguments['userAddress'].city
+                                          .toString();
+                                  _userAddress.state = _userAddress.state !=
+                                          null
+                                      ? _userAddress.state.toString()
+                                      : widget.arguments['userAddress'].state
+                                          .toString();
+                                  print(_userAddress.city);
+                                  bool response =
+                                      await _userAddressModel.updateUserAddress(
+                                          userAddress: _userAddress);
+                                  if (response == true) {
+                                    // Navigator.of(context).pop();
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AddressPage(arguments: {
+                                                  'cartItems': [],
+                                                  'cartTotal': '',
+                                                  'couponValue': 0,
+                                                  'isAddress': false,
+                                                })));
+                                  }
+                                  setState(() {
+                                    _loading = false;
+                                  });
                                 }
-                                setState(() {
-                                  _loading = false;
-                                });
                               }
                             },
                             style: TextButton.styleFrom(
