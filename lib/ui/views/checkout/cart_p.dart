@@ -166,6 +166,12 @@ class _CartPageState extends State<CartPage> {
       print(address.add1.toString());
     });
 
+    double discountPrice = 0.0;
+
+    double baseWidth = 360;
+    double fem = MediaQuery.of(context).size.width / baseWidth;
+    double ffem = fem * 0.97;
+
     return Scaffold(
       body: WillPopScope(
         onWillPop: () async {
@@ -305,41 +311,250 @@ class _CartPageState extends State<CartPage> {
                                     height: 60,
                                     child: Center(child: Text('Cart is empty')),
                                   ),
-                                  SizedBox(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.6,
-                                  ),
-                                  SizedBox(
-                                    height: 60,
-                                    child: Center(
-                                        child: TextButton(
-                                            style: ButtonStyle(
-                                              backgroundColor:
-                                                  MaterialStateProperty.all<
-                                                      Color>(Colors.black),
-                                              foregroundColor:
-                                                  MaterialStateProperty.all<
-                                                      Color>(Colors.white),
-                                              shape: MaterialStateProperty.all<
-                                                  OutlinedBorder>(
-                                                RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0), // Adjust the radius as needed
-                                                ),
-                                              ),
+                                  Container(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          SizedBox(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height -
+                                                530,
+                                          ),
+                                          Text(
+                                            'Add More Items',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontWeight: FontWeight.w700,
+                                              color: Color(0xff000000),
                                             ),
-                                            onPressed: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) => ShopsPage(
-                                                      initialText:
-                                                          ''), // Pass initialText if needed
-                                                ),
-                                              );
-                                            },
-                                            child: Text('Add Products'))),
+                                          ),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.4,
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: _productModel
+                                                          .productsLoader
+                                                      ? Center(
+                                                          child:
+                                                              LinearProgressIndicator())
+                                                      : ListView.builder(
+                                                          // padding:
+                                                          //     const EdgeInsets.only(left: 5, right: 8),
+                                                          scrollDirection:
+                                                              Axis.horizontal,
+                                                          shrinkWrap: true,
+                                                          itemCount:
+                                                              _productModel
+                                                                  .products!
+                                                                  .length,
+                                                          itemBuilder:
+                                                              (context, index) {
+                                                            return Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          10),
+                                                              child: Container(
+                                                                width: MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .width *
+                                                                    0.4,
+                                                                height: MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .height *
+                                                                    0.45,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              15),
+                                                                ),
+                                                                child: Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    InkWell(
+                                                                      onTap:
+                                                                          () {
+                                                                        Navigator.of(context)
+                                                                            .push(
+                                                                          MaterialPageRoute(
+                                                                            builder: (context) =>
+                                                                                ProductIdPage(arguments: {
+                                                                              'product': _productModel.products![index].toJson(),
+                                                                              'product_images': _productModel.products![index].productImages
+                                                                            }),
+                                                                          ),
+                                                                        );
+                                                                      },
+                                                                      child:
+                                                                          Container(
+                                                                        margin: EdgeInsets.fromLTRB(
+                                                                            0 * fem,
+                                                                            0 * fem,
+                                                                            0 * fem,
+                                                                            5 * fem),
+                                                                        padding: EdgeInsets.fromLTRB(
+                                                                            106 *
+                                                                                fem,
+                                                                            13 *
+                                                                                fem,
+                                                                            14 *
+                                                                                fem,
+                                                                            15 *
+                                                                                fem),
+                                                                        width: MediaQuery.of(context).size.width *
+                                                                            0.4,
+                                                                        height: MediaQuery.of(context).size.height *
+                                                                            0.26,
+                                                                        decoration:
+                                                                            BoxDecoration(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(15),
+                                                                          image:
+                                                                              DecorationImage(
+                                                                            fit:
+                                                                                BoxFit.contain,
+                                                                            image:
+                                                                                NetworkImage(_configModel.apiConfig['mediaURL'] + _productModel.products![index].productImages?.first.imagepath.toString()),
+                                                                          ),
+                                                                        ),
+                                                                        child:
+                                                                            InkWell(
+                                                                          onTap:
+                                                                              () async {
+                                                                            await _wishListModel.getWishLists(_productModel.products![index].id);
+                                                                          },
+                                                                          child: _wishListModel.wishListLoader
+                                                                              ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
+                                                                              : _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.products![index].id && wishList.userId == _configModel.user.id).toList().length == 0
+                                                                                  ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
+                                                                                  : Align(
+                                                                                      alignment: Alignment.topRight,
+                                                                                      child: Icon(
+                                                                                        Icons.favorite_outlined,
+                                                                                        color: Colors.red,
+                                                                                      )),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    SizedBox(
+                                                                      height:
+                                                                          10,
+                                                                    ),
+                                                                    InkWell(
+                                                                      onTap:
+                                                                          () {
+                                                                        Navigator.of(context).push(MaterialPageRoute(
+                                                                            builder: (context) => ProductIdPage(arguments: {
+                                                                                  'product': _productModel.products![index].toJson(),
+                                                                                  'category': _productModel.products![index].category!.name.toString(),
+                                                                                })));
+                                                                      },
+                                                                      child:
+                                                                          Container(
+                                                                        child:
+                                                                            Text(
+                                                                          _productModel
+                                                                              .products![index]
+                                                                              .name
+                                                                              .toString(),
+                                                                          textAlign:
+                                                                              TextAlign.center,
+                                                                          style:
+                                                                              MyGoogleFontStyle(
+                                                                            fontFamily:
+                                                                                'Urbanist',
+                                                                            fontSize:
+                                                                                15,
+                                                                            fontWeight:
+                                                                                FontWeight.w700,
+                                                                            color:
+                                                                                Color(0xff000000),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    Container(
+                                                                      child: _productModel.products![index].productPrices![0].offerPrice !=
+                                                                              0
+                                                                          ? Text.rich(
+                                                                              TextSpan(children: [
+                                                                              new TextSpan(
+                                                                                text: 'RS. ${_productModel.products![index].productPrices![0].price.toString()}',
+                                                                                style: new TextStyle(
+                                                                                  color: Colors.grey,
+                                                                                  decoration: TextDecoration.lineThrough,
+                                                                                ),
+                                                                              ),
+                                                                              new TextSpan(
+                                                                                text: ' RS.${_productModel.products![index].productPrices![0].offerPrice.toString()}',
+                                                                              ),
+                                                                            ]))
+                                                                          : Text(
+                                                                              _productModel.products![index].productPrices![0].price.toString() + " " + 'RS',
+                                                                              style: MyGoogleFontStyle(
+                                                                                fontFamily: 'Poppins',
+                                                                                fontSize: 13,
+                                                                                fontWeight: FontWeight.w500,
+                                                                                height: 1.5,
+                                                                                letterSpacing: -0.2190869331,
+                                                                                color: Color(0x99000000),
+                                                                              ),
+                                                                            ),
+                                                                    ),
+                                                                    if (discountPrice !=
+                                                                        0.0)
+                                                                      Center(
+                                                                        child:
+                                                                            Text(
+                                                                          '( ${discountPrice.round()}% Off)',
+                                                                          style:
+                                                                              MyGoogleFontStyle(
+                                                                            fontFamily:
+                                                                                'Poppins',
+                                                                            fontSize:
+                                                                                12,
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                            color:
+                                                                                Color(0x99000000),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            );
+                                                          },
+                                                        ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ],
                               )
@@ -350,387 +565,377 @@ class _CartPageState extends State<CartPage> {
                                             ? _addToCartModel.addToCarts!.length
                                             : 2)),
                                 child: ListView.builder(
-                                    scrollDirection: Axis.vertical,
-                                    itemCount:
-                                        _addToCartModel.addToCarts!.length,
-                                    itemBuilder: (BuildContext context, index) {
-                                      // print(
-                                      //     'cart Count: ${_addToCartModel.addToCarts!.first.userId}');
-                                      double discountPrice = (int.parse(
-                                                  _addToCartModel
-                                                      .addToCarts![index]
-                                                      .product!
-                                                      .productPrices![0]
-                                                      .price
-                                                      .toString()) -
-                                              int.parse(_addToCartModel
-                                                  .addToCarts![index]
-                                                  .product!
-                                                  .productPrices![0]
-                                                  .offerPrice
-                                                  .toString())) /
-                                          int.parse(_addToCartModel
-                                              .addToCarts![index]
-                                              .product!
-                                              .productPrices![0]
-                                              .price
-                                              .toString()) *
-                                          100;
-                                      // print(_addToCartModel
-                                      //     .addToCarts![index].product
-                                      //     .where((image) =>
-                                      //         image.unit!.name ==
-                                      //         _addToCartModel
-                                      //             .addToCarts![index].flavour)
-                                      //     .toList()
-                                      //     .first
-                                      //     .imagepath);
-                                      Map<String, dynamic> _cartData =
-                                          _addToCartModel.addToCarts![index]
-                                              .toJson();
-                                      return Column(
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                flex: 4,
-                                                child: InkWell(
-                                                  onTap: () {
-                                                    Navigator.of(context).push(
-                                                        MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                ProductIdPage(
-                                                                    arguments: {
-                                                                      'product': _addToCartModel
-                                                                          .addToCarts![
-                                                                              index]
-                                                                          .product!
-                                                                          .toJson(),
-                                                                      'product_images': _addToCartModel
-                                                                          .addToCarts![
-                                                                              index]
-                                                                          .product!
-                                                                          .productImages
-                                                                    })));
-                                                  },
-                                                  child: Container(
-                                                    margin: EdgeInsets.fromLTRB(
-                                                        0, 0, 10, 0),
-                                                    child: Center(
-                                                      child: Image.network(
-                                                        _configModel.apiConfig[
-                                                                'mediaURL'] +
-                                                            _addToCartModel
-                                                                .addToCarts![
-                                                                    index]
-                                                                .product!
-                                                                .productImages!
-                                                                .where((image) =>
-                                                                    image.unit!
-                                                                        .name ==
-                                                                    _addToCartModel
+                                  scrollDirection: Axis.vertical,
+                                  itemCount: _addToCartModel.addToCarts!.length,
+                                  itemBuilder: (BuildContext context, index) {
+                                    // print(
+                                    //     'cart Count: ${_addToCartModel.addToCarts!.first.userId}');
+                                    double discountPrice = (int.parse(
+                                                _addToCartModel
+                                                    .addToCarts![index]
+                                                    .product!
+                                                    .productPrices![0]
+                                                    .price
+                                                    .toString()) -
+                                            int.parse(_addToCartModel
+                                                .addToCarts![index]
+                                                .product!
+                                                .productPrices![0]
+                                                .offerPrice
+                                                .toString())) /
+                                        int.parse(_addToCartModel
+                                            .addToCarts![index]
+                                            .product!
+                                            .productPrices![0]
+                                            .price
+                                            .toString()) *
+                                        100;
+                                    // print(_addToCartModel
+                                    //     .addToCarts![index].product
+                                    //     .where((image) =>
+                                    //         image.unit!.name ==
+                                    //         _addToCartModel
+                                    //             .addToCarts![index].flavour)
+                                    //     .toList()
+                                    //     .first
+                                    //     .imagepath);
+                                    Map<String, dynamic> _cartData =
+                                        _addToCartModel.addToCarts![index]
+                                            .toJson();
+                                    return Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              flex: 4,
+                                              child: InkWell(
+                                                onTap: () {
+                                                  Navigator.of(context).push(
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              ProductIdPage(
+                                                                  arguments: {
+                                                                    'product': _addToCartModel
                                                                         .addToCarts![
                                                                             index]
-                                                                        .flavour)
-                                                                .toList()[0]
-                                                                .imagepath
-                                                                .toString(),
-                                                        // 'assets/images/mask-group-HvE.png',
-                                                        fit: BoxFit.contain,
-                                                        // width: 120,
-                                                        // height: 150,
-                                                      ),
+                                                                        .product!
+                                                                        .toJson(),
+                                                                    'product_images': _addToCartModel
+                                                                        .addToCarts![
+                                                                            index]
+                                                                        .product!
+                                                                        .productImages
+                                                                  })));
+                                                },
+                                                child: Container(
+                                                  margin: EdgeInsets.fromLTRB(
+                                                      0, 0, 10, 0),
+                                                  child: Center(
+                                                    child: Image.network(
+                                                      _configModel.apiConfig[
+                                                              'mediaURL'] +
+                                                          _addToCartModel
+                                                              .addToCarts![
+                                                                  index]
+                                                              .product!
+                                                              .productImages!
+                                                              .where((image) =>
+                                                                  image.unit!
+                                                                      .name ==
+                                                                  _addToCartModel
+                                                                      .addToCarts![
+                                                                          index]
+                                                                      .flavour)
+                                                              .toList()[0]
+                                                              .imagepath
+                                                              .toString(),
+                                                      // 'assets/images/mask-group-HvE.png',
+                                                      fit: BoxFit.contain,
+                                                      // width: 120,
+                                                      // height: 150,
                                                     ),
                                                   ),
                                                 ),
                                               ),
-                                              Expanded(
-                                                flex: 8,
-                                                child: Column(
-                                                  children: [
-                                                    Align(
-                                                      alignment:
-                                                          Alignment.centerLeft,
-                                                      child: Text(
-                                                        _addToCartModel
-                                                            .addToCarts![index]
-                                                            .product!
-                                                            .name
-                                                            .toString(),
-                                                        style:
-                                                            MyGoogleFontStyle(
-                                                          fontFamily:
-                                                              'Urbanist',
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color:
-                                                              Color(0xff909090),
-                                                        ),
+                                            ),
+                                            Expanded(
+                                              flex: 8,
+                                              child: Column(
+                                                children: [
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    child: Text(
+                                                      _addToCartModel
+                                                          .addToCarts![index]
+                                                          .product!
+                                                          .name
+                                                          .toString(),
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Urbanist',
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color:
+                                                            Color(0xff909090),
                                                       ),
                                                     ),
-                                                    Align(
+                                                  ),
+                                                  Align(
+                                                      alignment:
+                                                          Alignment.centerLeft,
+                                                      child: _addToCartModel
+                                                                  .addToCarts![
+                                                                      index]
+                                                                  .product!
+                                                                  .productPrices![
+                                                                      0]
+                                                                  .offerPrice !=
+                                                              0
+                                                          ? Row(
+                                                              children: [
+                                                                Text.rich(
+                                                                  TextSpan(
+                                                                      children: [
+                                                                        new TextSpan(
+                                                                          text:
+                                                                              'RS. ${_addToCartModel.addToCarts![index].product!.productPrices![0].price.toString()}',
+                                                                          style:
+                                                                              new TextStyle(
+                                                                            color:
+                                                                                Colors.grey,
+                                                                            decoration:
+                                                                                TextDecoration.lineThrough,
+                                                                          ),
+                                                                        ),
+                                                                        new TextSpan(
+                                                                          text:
+                                                                              ' RS.${_addToCartModel.addToCarts![index].product!.productPrices![0].offerPrice.toString()}',
+                                                                        ),
+                                                                      ]),
+                                                                ),
+                                                                SizedBox(
+                                                                  width: 5,
+                                                                ),
+                                                                if (discountPrice !=
+                                                                    0.0)
+                                                                  Align(
+                                                                    alignment:
+                                                                        Alignment
+                                                                            .centerLeft,
+                                                                    child: Text(
+                                                                      '( ${discountPrice.round()}% Off)',
+                                                                      style:
+                                                                          MyGoogleFontStyle(
+                                                                        fontFamily:
+                                                                            'Poppins',
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                              ],
+                                                            )
+                                                          : Row(
+                                                              children: [
+                                                                Text(
+                                                                  'RS. ${_addToCartModel.addToCarts![index].product!.productPrices![0].price.toString()}',
+                                                                  style:
+                                                                      MyGoogleFontStyle(
+                                                                    fontFamily:
+                                                                        'Poppins',
+                                                                    fontSize:
+                                                                        10,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    height: 1.5,
+                                                                    letterSpacing:
+                                                                        -0.2190869331,
+                                                                    color: Color(
+                                                                        0x99000000),
+                                                                  ),
+                                                                ),
+                                                                if (discountPrice !=
+                                                                    0.0)
+                                                                  Align(
+                                                                    alignment:
+                                                                        Alignment
+                                                                            .centerLeft,
+                                                                    child: Text(
+                                                                      '( ${discountPrice.round()}% Off)',
+                                                                      style:
+                                                                          MyGoogleFontStyle(
+                                                                        fontFamily:
+                                                                            'Poppins',
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                              ],
+                                                            )),
+                                                  Row(
+                                                    children: [
+                                                      Align(
                                                         alignment: Alignment
                                                             .centerLeft,
-                                                        child: _addToCartModel
-                                                                    .addToCarts![
-                                                                        index]
-                                                                    .product!
-                                                                    .productPrices![
-                                                                        0]
-                                                                    .offerPrice !=
-                                                                0
-                                                            ? Row(
-                                                                children: [
-                                                                  Text.rich(
-                                                                    TextSpan(
-                                                                        children: [
-                                                                          new TextSpan(
-                                                                            text:
-                                                                                'RS. ${_addToCartModel.addToCarts![index].product!.productPrices![0].price.toString()}',
-                                                                            style:
-                                                                                new TextStyle(
-                                                                              color: Colors.grey,
-                                                                              decoration: TextDecoration.lineThrough,
-                                                                            ),
-                                                                          ),
-                                                                          new TextSpan(
-                                                                            text:
-                                                                                ' RS.${_addToCartModel.addToCarts![index].product!.productPrices![0].offerPrice.toString()}',
-                                                                          ),
-                                                                        ]),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    width: 5,
-                                                                  ),
-                                                                  if (discountPrice !=
-                                                                      0.0)
-                                                                    Align(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .centerLeft,
-                                                                      child:
-                                                                          Text(
-                                                                        '( ${discountPrice.round()}% Off)',
-                                                                        style:
-                                                                            MyGoogleFontStyle(
-                                                                          fontFamily:
-                                                                              'Poppins',
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                ],
-                                                              )
-                                                            : Row(
-                                                                children: [
-                                                                  Text(
-                                                                    'RS. ${_addToCartModel.addToCarts![index].product!.productPrices![0].price.toString()}',
-                                                                    style:
-                                                                        MyGoogleFontStyle(
-                                                                      fontFamily:
-                                                                          'Poppins',
-                                                                      fontSize:
-                                                                          10,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500,
-                                                                      height:
-                                                                          1.5,
-                                                                      letterSpacing:
-                                                                          -0.2190869331,
-                                                                      color: Color(
-                                                                          0x99000000),
-                                                                    ),
-                                                                  ),
-                                                                  if (discountPrice !=
-                                                                      0.0)
-                                                                    Align(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .centerLeft,
-                                                                      child:
-                                                                          Text(
-                                                                        '( ${discountPrice.round()}% Off)',
-                                                                        style:
-                                                                            MyGoogleFontStyle(
-                                                                          fontFamily:
-                                                                              'Poppins',
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                ],
-                                                              )),
-                                                    Row(
-                                                      children: [
-                                                        Align(
-                                                          alignment: Alignment
-                                                              .centerLeft,
-                                                          child: Text(
-                                                            'Size: ${_addToCartModel.addToCarts![index].kindOfFlower}',
-                                                            style:
-                                                                MyGoogleFontStyle(
-                                                              fontFamily:
-                                                                  'Poppins',
-                                                            ),
+                                                        child: Text(
+                                                          'Size: ${_addToCartModel.addToCarts![index].kindOfFlower}',
+                                                          style:
+                                                              MyGoogleFontStyle(
+                                                            fontFamily:
+                                                                'Poppins',
                                                           ),
                                                         ),
-                                                        SizedBox(
-                                                          width: 10,
+                                                      ),
+                                                      SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      Align(
+                                                        alignment: Alignment
+                                                            .centerLeft,
+                                                        child: Text(
+                                                          'Colour: ${_addToCartModel.addToCarts![index].flavour}',
+                                                          style:
+                                                              MyGoogleFontStyle(
+                                                            fontFamily:
+                                                                'Poppins',
+                                                          ),
                                                         ),
-                                                        Align(
-                                                          alignment: Alignment
-                                                              .centerLeft,
-                                                          child: Text(
-                                                            'Colour: ${_addToCartModel.addToCarts![index].flavour}',
-                                                            style:
-                                                                MyGoogleFontStyle(
-                                                              fontFamily:
-                                                                  'Poppins',
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(
+                                                          Icons.star,
+                                                          color: Colors.amber,
+                                                        ),
+                                                        Text(
+                                                          ' ( ${(_addToCartModel.addToCarts![index].product!.reviews == null ? 0 : _addToCartModel.addToCarts![index].product!.reviews?.length)} ratings )',
+                                                          style: TextStyle(
+                                                              fontSize: 12),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    child: Row(
+                                                      children: [
+                                                        TextButton(
+                                                          onPressed: () async {
+                                                            bool minus = false;
+                                                            await _addToCartModel
+                                                                .getAddToCart(
+                                                                    _addToCartModel
+                                                                        .addToCarts![
+                                                                            index]
+                                                                        .product!
+                                                                        .id,
+                                                                    minus,
+                                                                    _cartData);
+                                                          },
+                                                          style: TextButton
+                                                              .styleFrom(
+                                                            padding:
+                                                                EdgeInsets.zero,
+                                                          ),
+                                                          child: Container(
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              border:
+                                                                  Border.all(),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .all(
+                                                                Radius.circular(
+                                                                    5),
+                                                              ),
                                                             ),
+                                                            child: Icon(
+                                                                Icons.remove,
+                                                                color: Colors
+                                                                    .black),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          _addToCartModel
+                                                              .addToCarts![
+                                                                  index]
+                                                              .qty
+                                                              .toString(),
+                                                          style:
+                                                              MyGoogleFontStyle(
+                                                            fontFamily:
+                                                                'Poppins',
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () async {
+                                                            bool type = true;
+
+                                                            await _addToCartModel
+                                                                .getAddToCart(
+                                                                    _addToCartModel
+                                                                        .addToCarts![
+                                                                            index]
+                                                                        .product!
+                                                                        .id,
+                                                                    type,
+                                                                    _cartData);
+                                                          },
+                                                          style: TextButton
+                                                              .styleFrom(
+                                                            padding:
+                                                                EdgeInsets.zero,
+                                                          ),
+                                                          child: Container(
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              border:
+                                                                  Border.all(),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .all(
+                                                                Radius.circular(
+                                                                    5),
+                                                              ),
+                                                            ),
+                                                            child: Icon(
+                                                                Icons.add,
+                                                                color: Colors
+                                                                    .black),
                                                           ),
                                                         ),
                                                       ],
                                                     ),
-                                                    Align(
-                                                      alignment:
-                                                          Alignment.centerLeft,
-                                                      child: Row(
-                                                        children: [
-                                                          Icon(
-                                                            Icons.star,
-                                                            color: Colors.amber,
-                                                          ),
-                                                          Text(
-                                                            ' ( ${(_addToCartModel.addToCarts![index].product!.reviews == null ? 0 : _addToCartModel.addToCarts![index].product!.reviews?.length)} ratings )',
-                                                            style: TextStyle(
-                                                                fontSize: 12),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Align(
-                                                      alignment:
-                                                          Alignment.centerLeft,
-                                                      child: Row(
-                                                        children: [
-                                                          TextButton(
-                                                            onPressed:
-                                                                () async {
-                                                              bool minus =
-                                                                  false;
-                                                              await _addToCartModel.getAddToCart(
-                                                                  _addToCartModel
-                                                                      .addToCarts![
-                                                                          index]
-                                                                      .product!
-                                                                      .id,
-                                                                  minus,
-                                                                  _cartData);
-                                                            },
-                                                            style: TextButton
-                                                                .styleFrom(
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .zero,
-                                                            ),
-                                                            child: Container(
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                border: Border
-                                                                    .all(),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .all(
-                                                                  Radius
-                                                                      .circular(
-                                                                          5),
-                                                                ),
-                                                              ),
-                                                              child: Icon(
-                                                                  Icons.remove,
-                                                                  color: Colors
-                                                                      .black),
-                                                            ),
-                                                          ),
-                                                          Text(
-                                                            _addToCartModel
-                                                                .addToCarts![
-                                                                    index]
-                                                                .qty
-                                                                .toString(),
-                                                            style:
-                                                                MyGoogleFontStyle(
-                                                              fontFamily:
-                                                                  'Poppins',
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              color:
-                                                                  Colors.black,
-                                                            ),
-                                                          ),
-                                                          TextButton(
-                                                            onPressed:
-                                                                () async {
-                                                              bool type = true;
-
-                                                              await _addToCartModel.getAddToCart(
-                                                                  _addToCartModel
-                                                                      .addToCarts![
-                                                                          index]
-                                                                      .product!
-                                                                      .id,
-                                                                  type,
-                                                                  _cartData);
-                                                            },
-                                                            style: TextButton
-                                                                .styleFrom(
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .zero,
-                                                            ),
-                                                            child: Container(
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                border: Border
-                                                                    .all(),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .all(
-                                                                  Radius
-                                                                      .circular(
-                                                                          5),
-                                                                ),
-                                                              ),
-                                                              child: Icon(
-                                                                  Icons.add,
-                                                                  color: Colors
-                                                                      .black),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
+                                                  )
+                                                ],
                                               ),
-                                            ],
-                                          ),
-                                          // SizedBox(
-                                          //   height: 5,
-                                          // ),
-                                          Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width -
-                                                50,
-                                            child: Divider(
-                                              thickness: 2,
-                                              color: Colors.black,
                                             ),
+                                          ],
+                                        ),
+                                        // SizedBox(
+                                        //   height: 5,
+                                        // ),
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width -
+                                              50,
+                                          child: Divider(
+                                            thickness: 2,
+                                            color: Colors.black,
                                           ),
-                                        ],
-                                      );
-                                    }),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
                               ),
                       ),
                     ],
@@ -1967,32 +2172,13 @@ class _CartPageState extends State<CartPage> {
                                                                                 await _wishListModel.getWishLists(_productModel.categoryWiseproducts![index].id);
                                                                               },
                                                                               child: _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.categoryWiseproducts![index].id && wishList.userId == _configModel.user.id).toList().length == 0
-                                                                                  ? Align(
-                                                                                      // vectorRZx (318:2001)
-                                                                                      alignment: Alignment.topRight,
-                                                                                      child: SizedBox(
-                                                                                        width: 25,
-                                                                                        height: 22.4,
-                                                                                        child: Image.asset(
-                                                                                          'assets/images/vector-yse.png',
-                                                                                          width: 25,
-                                                                                          height: 22.4,
-                                                                                        ),
-                                                                                      ),
-                                                                                    )
+                                                                                  ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
                                                                                   : Align(
-                                                                                      // vectorRZx (318:2001)
                                                                                       alignment: Alignment.topRight,
-                                                                                      child: SizedBox(
-                                                                                        width: 25,
-                                                                                        height: 22.4,
-                                                                                        child: Image.asset(
-                                                                                          'assets/images/vector-wXc.png',
-                                                                                          width: 25,
-                                                                                          height: 22.4,
-                                                                                        ),
-                                                                                      ),
-                                                                                    ),
+                                                                                      child: Icon(
+                                                                                        Icons.favorite_outlined,
+                                                                                        color: Colors.red,
+                                                                                      )),
                                                                             ),
                                                                           ),
                                                                         ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:pinch_zoom/pinch_zoom.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
@@ -307,12 +308,16 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                             pageSnapping: true,
                                             itemBuilder:
                                                 (context, pagePosition) {
-                                              return Image.network(
-                                                _configModel
-                                                        .apiConfig['mediaURL'] +
-                                                    imageProduct[pagePosition],
-                                                fit: BoxFit.contain,
-                                                // fit: BoxFit.cover,
+                                              return PinchZoom(
+                                                maxScale: 3.0,
+                                                child: Image.network(
+                                                  _configModel.apiConfig[
+                                                          'mediaURL'] +
+                                                      imageProduct[
+                                                          pagePosition],
+                                                  fit: BoxFit.contain,
+                                                  // fit: BoxFit.cover,
+                                                ),
                                               );
                                             }),
                                       ),
@@ -333,22 +338,17 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   ? Align(
                                                       alignment:
                                                           Alignment.topRight,
-                                                      child: SizedBox(
-                                                        width: 25 * fem,
-                                                        height: 22.4 * fem,
-                                                        child: Image.asset(
-                                                          'assets/images/vector-wXc.png',
-                                                          width: 25 * fem,
-                                                          height: 22.4 * fem,
-                                                        ),
-                                                      ),
+                                                      child: Align(
+                                                          alignment: Alignment
+                                                              .topRight,
+                                                          child: Icon(Icons
+                                                              .favorite_border_outlined)),
                                                     )
                                                   : _wishListModel.wishLists!
                                                               .where((wishList) =>
                                                                   wishList.productId ==
                                                                       widget.arguments[
-                                                                              'product']
-                                                                          [
+                                                                              'product'][
                                                                           'id'] &&
                                                                   wishList.userId ==
                                                                       _configModel
@@ -361,32 +361,21 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                           // vectorRZx (318:2001)
                                                           alignment: Alignment
                                                               .topRight,
-                                                          child: SizedBox(
-                                                            width: 25 * fem,
-                                                            height: 22.4 * fem,
-                                                            child: Image.asset(
-                                                              'assets/images/vector-yse.png',
-                                                              width: 25 * fem,
-                                                              height:
-                                                                  22.4 * fem,
-                                                            ),
-                                                          ),
+                                                          child: Align(
+                                                              alignment:
+                                                                  Alignment
+                                                                      .topRight,
+                                                              child: Icon(Icons
+                                                                  .favorite_border_outlined)),
                                                         )
                                                       : Align(
-                                                          // vectorRZx (318:2001)
                                                           alignment: Alignment
                                                               .topRight,
-                                                          child: SizedBox(
-                                                            width: 25 * fem,
-                                                            height: 22.4 * fem,
-                                                            child: Image.asset(
-                                                              'assets/images/vector-wXc.png',
-                                                              width: 25 * fem,
-                                                              height:
-                                                                  22.4 * fem,
-                                                            ),
-                                                          ),
-                                                        ),
+                                                          child: Icon(
+                                                            Icons
+                                                                .favorite_outlined,
+                                                            color: Colors.red,
+                                                          )),
                                             ),
                                             SizedBox(width: 5),
                                             IconButton(
@@ -397,7 +386,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                               },
                                               icon: Icon(Icons.share),
                                               color: Colors.black,
-                                              iconSize: 30,
                                             ),
                                           ],
                                         ),
@@ -611,7 +599,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                       .w400,
                                                               color: Color(
                                                                   0xff000000),
-                                                              fontSize: 12,
+                                                              fontSize: 10,
                                                             ),
                                                           ),
                                                         ],
@@ -2346,32 +2334,13 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                                   await _wishListModel.getWishLists(_productModel.categoryWiseproducts![index].id);
                                                                                 },
                                                                                 child: _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.categoryWiseproducts![index].id && wishList.userId == _configModel.user.id).toList().length == 0
-                                                                                    ? Align(
-                                                                                        // vectorRZx (318:2001)
-                                                                                        alignment: Alignment.topRight,
-                                                                                        child: SizedBox(
-                                                                                          width: 25,
-                                                                                          height: 22.4,
-                                                                                          child: Image.asset(
-                                                                                            'assets/images/vector-yse.png',
-                                                                                            width: 25,
-                                                                                            height: 22.4,
-                                                                                          ),
-                                                                                        ),
-                                                                                      )
+                                                                                    ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
                                                                                     : Align(
-                                                                                        // vectorRZx (318:2001)
                                                                                         alignment: Alignment.topRight,
-                                                                                        child: SizedBox(
-                                                                                          width: 25,
-                                                                                          height: 22.4,
-                                                                                          child: Image.asset(
-                                                                                            'assets/images/vector-wXc.png',
-                                                                                            width: 25,
-                                                                                            height: 22.4,
-                                                                                          ),
-                                                                                        ),
-                                                                                      ),
+                                                                                        child: Icon(
+                                                                                          Icons.favorite_outlined,
+                                                                                          color: Colors.red,
+                                                                                        )),
                                                                               ),
                                                                             ),
                                                                           ),

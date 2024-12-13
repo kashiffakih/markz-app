@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pinch_zoom/pinch_zoom.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
@@ -21,7 +22,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   TextEditingController _controller = TextEditingController();
   Map<String, dynamic> _CartData = {
     'kindOfFlower': '',
@@ -29,73 +31,144 @@ class _HomePageState extends State<HomePage> {
     'writeOnCake': '',
     'pack': ''
   };
+  late AnimationController _animationController;
+  late Animation<double> _nextPage;
+  late PageController _pageController;
+
+  int _currentPage = 0;
+  List<dynamic> bannerUrls = [];
   @override
   void initState() {
     super.initState();
     var productId = '';
+    // Fetch banners and other data after widget build
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Fetch product data
       await Provider.of<ProductModel>(context, listen: false).getProduct();
-      await Provider.of<ProductModel>(context, listen: false).getBanners();
+
+      // // Fetch banners
+      // await Provider.of<ProductModel>(context, listen: false).getBanners();
+
+      // Fetch wishlist data
       var productId = '';
       await Provider.of<WishListModel>(context, listen: false)
           .getWishLists(productId);
+
+      // Fetch categories data
       await Provider.of<ProductModel>(context, listen: false).getCategories();
+
+      // Fetch cart data
       Provider.of<AddToCartModel>(context, listen: false)
           .getAddToCart(productId, '', _CartData);
+
+      var productModel = Provider.of<ProductModel>(context, listen: false);
+      await productModel.getBanners();
+
+      final ConfigModel _configModel = locator<ConfigModel>();
+
+      // Fetch and build banners
+      var bannerList = [
+        productModel.banners?['banner_path_1'] != null
+            ? _configModel.apiConfig['mediaURL'] +
+                productModel.banners!['banner_path_1'].toString()
+            : null,
+        productModel.banners?['banner_path_2'] != null
+            ? _configModel.apiConfig['mediaURL'] +
+                productModel.banners!['banner_path_2'].toString()
+            : null,
+        productModel.banners?['banner_path_3'] != null
+            ? _configModel.apiConfig['mediaURL'] +
+                productModel.banners!['banner_path_3'].toString()
+            : null,
+        productModel.banners?['banner_path_11'] != null
+            ? _configModel.apiConfig['mediaURL'] +
+                productModel.banners!['banner_path_11'].toString()
+            : null,
+        productModel.banners?['banner_path_12'] != null
+            ? _configModel.apiConfig['mediaURL'] +
+                productModel.banners!['banner_path_12'].toString()
+            : null,
+        productModel.banners?['banner_path_13'] != null
+            ? _configModel.apiConfig['mediaURL'] +
+                productModel.banners!['banner_path_13'].toString()
+            : null,
+      ]
+          .where((imageUrl) => imageUrl != null)
+          .map((imageUrl) => imageUrl!)
+          .toList();
+
+      // Set banner URLs
+      setState(() {
+        bannerUrls = bannerList;
+      });
+      print("banners : $bannerUrls");
     });
+
+    // Initialize AnimationController
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    );
+
+    // Tween for the page animation
+    _nextPage = Tween(begin: 0.0, end: 1.0).animate(_animationController);
+
+    // Initialize PageController
+    _pageController = PageController(initialPage: 0);
+
+    // Add a listener to trigger page changes
+    _animationController.addListener(() {
+      if (_animationController.status == AnimationStatus.completed) {
+        _animationController.reset();
+        _moveToNextPage();
+      }
+    });
+
+    // Start the animation
+    _animationController.forward();
+  }
+
+  void _moveToNextPage() {
+    if (_pageController.hasClients) {
+      final int nextPage = (_currentPage + 1) % bannerUrls.length;
+      _pageController.animateToPage(
+        nextPage,
+        duration: const Duration(seconds: 5),
+        curve: Curves.easeInOut,
+      );
+      setState(() {
+        _currentPage = nextPage;
+      });
+    }
+  }
+
+  void _pauseAutoScroll() {
+    _animationController.stop();
+  }
+
+  void _resumeAutoScroll() {
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _pageController.dispose();
+    super.dispose();
   }
 
   final GlobalKey<ScaffoldState> _key = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
+    _animationController.forward(); //Start controller with widget
+    print(_nextPage.value);
     final ConfigModel _configModel = locator<ConfigModel>();
     final ProductModel _productModel = Provider.of<ProductModel>(context);
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
-    final PageController _sliderController = PageController();
 
     double discountPrice = 0.0;
-    var images = [
-      _productModel.banners?['banner_path_1'] != null
-          ? _configModel.apiConfig['mediaURL'] +
-              _productModel.banners!['banner_path_1'].toString()
-          : null,
-      _productModel.banners?['banner_path_2'] != null
-          ? _configModel.apiConfig['mediaURL'] +
-              _productModel.banners!['banner_path_2'].toString()
-          : null,
-      _productModel.banners?['banner_path_3'] != null
-          ? _configModel.apiConfig['mediaURL'] +
-              _productModel.banners!['banner_path_3'].toString()
-          : null,
-      // _productModel.banners?['banner_path_4'] != null
-      //     ? _configModel.apiConfig['mediaURL'] +
-      //         _productModel.banners!['banner_path_4'].toString()
-      //     : null,
-      // _productModel.banners?['banner_path_5'] != null
-      //     ? _configModel.apiConfig['mediaURL'] +
-      //         _productModel.banners!['banner_path_5'].toString()
-      //     : null,
-      // _productModel.banners?['banner_path_6'] != null
-      //     ? _configModel.apiConfig['mediaURL'] +
-      //         _productModel.banners!['banner_path_6'].toString()
-      //     : null,
-      _productModel.banners?['banner_path_11'] != null
-          ? _configModel.apiConfig['mediaURL'] +
-              _productModel.banners!['banner_path_11'].toString()
-          : null,
-      _productModel.banners?['banner_path_12'] != null
-          ? _configModel.apiConfig['mediaURL'] +
-              _productModel.banners!['banner_path_12'].toString()
-          : null,
-      _productModel.banners?['banner_path_13'] != null
-          ? _configModel.apiConfig['mediaURL'] +
-              _productModel.banners!['banner_path_13'].toString()
-          : null,
-    ]
-        .where((imageUrl) => imageUrl != null)
-        .map((imageUrl) => imageUrl!)
-        .toList();
 
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
@@ -115,951 +188,860 @@ class _HomePageState extends State<HomePage> {
           SystemNavigator.pop();
           return false; // Prevent the default back button behavior
         },
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Banner
-              Container(
-                width: double.infinity,
-                child: Container(
-                  padding:
-                      EdgeInsets.fromLTRB(0 * fem, 30 * fem, 0 * fem, 8 * fem),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Color(0xffffffff),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        height: 247 * fem,
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              left: 0 * fem,
-                              top: 67 * fem,
-                              child: SizedBox(
-                                  width: 360 * fem,
-                                  height: 180 * fem,
-                                  child: PageView.builder(
-                                      itemCount: images.length,
-                                      controller: _sliderController,
-                                      pageSnapping: true,
-                                      itemBuilder: (context, pagePosition) {
-                                        return Container(
-                                          margin: EdgeInsets.all(10),
-                                          child: Image.network(
-                                            images[pagePosition],
-                                            fit: BoxFit.cover,
-                                            alignment: Alignment.center,
-                                          ),
-                                        );
-                                      })),
-                            ),
-                            const SizedBox(height: 16),
-                            Positioned(
-                              left: 165 * fem,
-                              top: 238 * fem,
-                              child: SmoothPageIndicator(
-                                controller: _sliderController,
-                                count: images.length,
-                                effect: ExpandingDotsEffect(
-                                  dotHeight: 8,
-                                  dotWidth: 8,
-                                  activeDotColor: Colors.blue,
-                                  dotColor: Colors.grey,
-                                ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 20,
+                ),
+                // Banner
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.75,
+                      height: MediaQuery.of(context).size.height * 0.05,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      clipBehavior: Clip.antiAlias,
+                      decoration: ShapeDecoration(
+                        shape: RoundedRectangleBorder(
+                          side:
+                              BorderSide(width: 0.50, color: Color(0xFFC7B456)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment:
+                            CrossAxisAlignment.center, // Center vertically
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _controller,
+                              onChanged: (value) {
+                                // if (value.length % 3 == 0) {
+                                // Call your API here
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ShopsPage(
+                                        initialText: value
+                                            .toString()), // Pass initialText if needed
+                                  ),
+                                );
+                                _controller.clear();
+                              },
+                              decoration: InputDecoration(
+                                hintText: 'Search',
+                                border: InputBorder.none,
+                              ),
+                              style: TextStyle(
+                                color: Colors.black.withOpacity(0.6),
+                                fontSize: 18,
+                                fontFamily: 'Urbanist',
+                                fontWeight: FontWeight.w600,
+                                // letterSpacing: -0.36,
                               ),
                             ),
-                            Positioned(
-                              left: 0 * fem,
-                              top: 0 * fem,
-                              child: Container(
-                                padding: EdgeInsets.fromLTRB(
-                                    5 * fem, 12.6 * fem, 10.64 * fem, 5 * fem),
-                                width: 460 * fem,
-                                height: 71.04 * fem,
-                                child: Row(
-                                  children: [
-                                    const SizedBox(width: 20),
-                                    Container(
-                                      width: 320,
-                                      height: 38,
-                                      padding: const EdgeInsets.only(
-                                        left: 21,
-                                        right: 20.70,
+                          ),
+                          Container(
+                            width: 20,
+                            height: 20,
+                            child: Image.asset(
+                              'assets/images/Search-1.png',
+                              height: 20,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: bannerUrls.length,
+                    itemBuilder: (context, pagePosition) {
+                      return GestureDetector(
+                        onTapDown: (_) => _pauseAutoScroll(),
+                        onTapUp: (_) => _resumeAutoScroll(),
+                        onHorizontalDragStart: (_) => _pauseAutoScroll(),
+                        onHorizontalDragEnd: (_) => _resumeAutoScroll(),
+                        child: PinchZoom(
+                          maxScale: 3.0, // Set maximum zoom level
+                          child: Container(
+                            margin: EdgeInsets.all(10),
+                            child: Image.network(
+                              bannerUrls[pagePosition],
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                Center(
+                  child: SmoothPageIndicator(
+                    controller: _pageController,
+                    count: bannerUrls.length,
+                    effect: ExpandingDotsEffect(
+                      dotHeight: 8,
+                      dotWidth: 8,
+                      activeDotColor: Colors.blue,
+                      dotColor: Colors.grey,
+                    ),
+                  ),
+                ),
+                // End Banner
+
+                // New Arrivals
+                Container(
+                  child: Center(
+                    child: Image.asset(
+                      'assets/images/NewArrivals.png',
+                      width: 500.58 * fem,
+                      height: 60.58 * fem,
+                    ),
+                  ),
+                ),
+                _productModel.productsLoader
+                    ? LinearProgressIndicator()
+                    : SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.33,
+                        child: _productModel.productsLoader
+                            ? SizedBox(
+                                child: Center(child: Text('No new arrivals')),
+                              )
+                            : ListView.builder(
+                                // padding:
+                                //     const EdgeInsets.only(left: 5, right: 8),
+                                scrollDirection: Axis.horizontal,
+                                shrinkWrap: true,
+                                itemCount: _productModel.products!.length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.4,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.45,
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(15 * fem),
                                       ),
-                                      clipBehavior: Clip.antiAlias,
-                                      decoration: ShapeDecoration(
-                                        shape: RoundedRectangleBorder(
-                                          side: BorderSide(
-                                              width: 0.50,
-                                              color: Color(0xFFC7B456)),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment: CrossAxisAlignment
-                                            .center, // Center vertically
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         children: [
-                                          Expanded(
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 5.0),
-                                              child: TextFormField(
-                                                controller: _controller,
-                                                onChanged: (value) {
-                                                  // if (value.length % 3 == 0) {
-                                                  // Call your API here
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ShopsPage(
-                                                              initialText: value
-                                                                  .toString()), // Pass initialText if needed
-                                                    ),
-                                                  );
-                                                  _controller.clear();
-                                                },
-                                                decoration: InputDecoration(
-                                                  hintText: 'Search',
-                                                  border: InputBorder.none,
+                                          InkWell(
+                                            onTap: () {
+                                              Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ProductIdPage(arguments: {
+                                                    'product': _productModel
+                                                        .products![index]
+                                                        .toJson(),
+                                                    'product_images':
+                                                        _productModel
+                                                            .products![index]
+                                                            .productImages
+                                                  }),
                                                 ),
-                                                style: TextStyle(
-                                                  color: Colors.black
-                                                      .withOpacity(0.6),
-                                                  fontSize: 18,
+                                              );
+                                            },
+                                            child: Container(
+                                              margin: EdgeInsets.fromLTRB(
+                                                  0 * fem,
+                                                  0 * fem,
+                                                  0 * fem,
+                                                  5 * fem),
+                                              padding: EdgeInsets.fromLTRB(
+                                                  106 * fem,
+                                                  13 * fem,
+                                                  14 * fem,
+                                                  15 * fem),
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.4,
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.26,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        15 * fem),
+                                                image: DecorationImage(
+                                                  fit: BoxFit.contain,
+                                                  image: NetworkImage(
+                                                      _configModel.apiConfig[
+                                                              'mediaURL'] +
+                                                          _productModel
+                                                              .products![index]
+                                                              .productImages
+                                                              ?.first
+                                                              .imagepath
+                                                              .toString()),
+                                                ),
+                                              ),
+                                              child: InkWell(
+                                                onTap: () async {
+                                                  await _wishListModel
+                                                      .getWishLists(
+                                                          _productModel
+                                                              .products![index]
+                                                              .id);
+                                                },
+                                                child: _wishListModel
+                                                        .wishListLoader
+                                                    ? Align(
+                                                        alignment:
+                                                            Alignment.topRight,
+                                                        child: Icon(Icons
+                                                            .favorite_border_outlined))
+                                                    : _wishListModel.wishLists!
+                                                                .where((wishList) =>
+                                                                    wishList.productId ==
+                                                                        _productModel
+                                                                            .products![
+                                                                                index]
+                                                                            .id &&
+                                                                    wishList.userId ==
+                                                                        _configModel
+                                                                            .user
+                                                                            .id)
+                                                                .toList()
+                                                                .length ==
+                                                            0
+                                                        ? Align(
+                                                            alignment: Alignment
+                                                                .topRight,
+                                                            child: Icon(Icons
+                                                                .favorite_border_outlined))
+                                                        : Align(
+                                                            alignment: Alignment
+                                                                .topRight,
+                                                            child: Icon(
+                                                              Icons
+                                                                  .favorite_outlined,
+                                                              color: Colors.red,
+                                                            )),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          InkWell(
+                                            onTap: () {
+                                              Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ProductIdPage(
+                                                              arguments: {
+                                                                'product': _productModel
+                                                                    .products![
+                                                                        index]
+                                                                    .toJson(),
+                                                                'category': _productModel
+                                                                    .products![
+                                                                        index]
+                                                                    .category!
+                                                                    .name
+                                                                    .toString(),
+                                                              })));
+                                            },
+                                            child: Container(
+                                              child: Text(
+                                                _productModel
+                                                    .products![index].name
+                                                    .toString(),
+                                                textAlign: TextAlign.center,
+                                                style: MyGoogleFontStyle(
                                                   fontFamily: 'Urbanist',
-                                                  fontWeight: FontWeight.w600,
-                                                  // letterSpacing: -0.36,
+                                                  fontSize: 15 * ffem,
+                                                  fontWeight: FontWeight.w700,
+                                                  height: 1.2 * ffem / fem,
+                                                  letterSpacing: -0.3 * fem,
+                                                  color: Color(0xff000000),
                                                 ),
                                               ),
                                             ),
                                           ),
                                           Container(
-                                            width: 20,
-                                            height: 20,
-                                            child: Image.asset(
-                                              'assets/images/Search-1.png',
-                                              height: 20,
-                                              fit: BoxFit.cover,
-                                            ),
+                                            child: _productModel
+                                                        .products![index]
+                                                        .productPrices![0]
+                                                        .offerPrice !=
+                                                    0
+                                                ? Text.rich(TextSpan(children: [
+                                                    new TextSpan(
+                                                      text:
+                                                          'RS. ${_productModel.products![index].productPrices![0].price.toString()}',
+                                                      style: new TextStyle(
+                                                        color: Colors.grey,
+                                                        decoration:
+                                                            TextDecoration
+                                                                .lineThrough,
+                                                      ),
+                                                    ),
+                                                    new TextSpan(
+                                                      text:
+                                                          ' RS.${_productModel.products![index].productPrices![0].offerPrice.toString()}',
+                                                    ),
+                                                  ]))
+                                                : Text(
+                                                    _productModel
+                                                            .products![index]
+                                                            .productPrices![0]
+                                                            .price
+                                                            .toString() +
+                                                        " " +
+                                                        'RS',
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Poppins',
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      height: 1.5,
+                                                      letterSpacing:
+                                                          -0.2190869331,
+                                                      color: Color(0x99000000),
+                                                    ),
+                                                  ),
                                           ),
+                                          if (discountPrice != 0.0)
+                                            Center(
+                                              child: Text(
+                                                '( ${discountPrice.round()}% Off)',
+                                                style: MyGoogleFontStyle(
+                                                  fontFamily: 'Poppins',
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color(0x99000000),
+                                                ),
+                                              ),
+                                            ),
                                         ],
                                       ),
                                     ),
-                                    // const SizedBox(width: 20),
-                                    // Container(
-                                    //   width: 20,
-                                    //   height: 20,
-                                    //   child: Column(
-                                    //     mainAxisSize: MainAxisSize.min,
-                                    //     mainAxisAlignment: MainAxisAlignment
-                                    //         .center, // Center vertically
-                                    //     crossAxisAlignment:
-                                    //         CrossAxisAlignment.start,
-                                    //     children: [
-                                    //       Image.asset(
-                                    //         'assets/images/filter.png',
-                                    //         height: 20,
-                                    //         fit: BoxFit.cover,
-                                    //       ),
-                                    //     ],
-                                    //   ),
-                                    // ),
-                                  ],
+                                  );
+                                },
+                              ),
+                      ),
+                // End New Arrivals
+                SizedBox(
+                  height: 10,
+                ),
+                // Category
+                Container(
+                  height: 20,
+                  child: Center(
+                    child: Image.asset(
+                      'assets/images/ShopByCategory.png',
+                    ),
+                  ),
+                ),
+                Container(
+                  // width: 345 * fem,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      ..._productModel.categories!
+                          .map(
+                            (_category) => Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 5, vertical: 5),
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          ProductsPage(arguments: {
+                                            'categoryId': _category['id'],
+                                            'subCategory':
+                                                _category['sub_categories'],
+                                            'category':
+                                                _category['name'].toString()
+                                          })));
+                                },
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.15,
+                                  child: Stack(
+                                    children: [
+                                      Positioned(
+                                        // image24Suc (318:1963)
+                                        left: 0 * fem,
+                                        top: 0 * fem,
+                                        child: Align(
+                                          child: SizedBox(
+                                            width: 344 * fem,
+                                            height: 106.69 * fem,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      10 * fem),
+                                              child: Image.network(
+                                                _configModel
+                                                        .apiConfig['mediaURL'] +
+                                                    _category['imagepath']
+                                                        .toString(),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        // rectangle2422kfQ (318:1964)
+                                        left: 0 * fem,
+                                        top: 0 * fem,
+                                        child: Align(
+                                          child: SizedBox(
+                                            width: 344 * fem,
+                                            height: 107 * fem,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        10.1176462173 * fem),
+                                                gradient: _category['id'] % 2 ==
+                                                        0
+                                                    ? LinearGradient(
+                                                        begin:
+                                                            Alignment(1, 0.138),
+                                                        end: Alignment(
+                                                            -1, 0.128),
+                                                        colors: <Color>[
+                                                          Color(0x99000000),
+                                                          Color(0x00d9d9d9)
+                                                        ],
+                                                        stops: <double>[0, 1],
+                                                      )
+                                                    : LinearGradient(
+                                                        begin: Alignment(
+                                                            -1, 0.138),
+                                                        end:
+                                                            Alignment(1, 0.128),
+                                                        colors: <Color>[
+                                                          Color(0x99000000),
+                                                          Color(0x00d9d9d9)
+                                                        ],
+                                                        stops: <double>[0, 1],
+                                                      ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      if (_category['id'] % 2 != 0)
+                                        Positioned(
+                                          left: 22 * fem,
+                                          top: 39.5 * fem,
+                                          child: Container(
+                                            width: 200 * fem,
+                                            height: 48.31 * fem,
+                                            child: Stack(
+                                              children: [
+                                                Positioned(
+                                                  left: 0 * fem,
+                                                  top: 0 * fem,
+                                                  child: Align(
+                                                    child: SizedBox(
+                                                      width: 200 * fem,
+                                                      height: 30 * fem,
+                                                      child: Text(
+                                                        _category['name'],
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily: 'Poppins',
+                                                          fontSize:
+                                                              18.3132514954 *
+                                                                  ffem,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          height:
+                                                              1.5 * ffem / fem,
+                                                          color:
+                                                              Color(0xffffffff),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  left: 2.7470703125 * fem,
+                                                  top: 24.3071899414 * fem,
+                                                  child: Align(
+                                                    child: SizedBox(
+                                                      width: 38 * fem,
+                                                      height: 14 * fem,
+                                                      child: Text(
+                                                        _category['products']
+                                                                .length
+                                                                .toString() +
+                                                            ' Items',
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily: 'Poppins',
+                                                          fontSize:
+                                                              9.1566257477 *
+                                                                  ffem,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          height:
+                                                              1.5 * ffem / fem,
+                                                          color:
+                                                              Color(0xffffffff),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      if (_category['id'] % 2 == 0)
+                                        Positioned(
+                                          left: 230 * fem,
+                                          top: 33.5 * fem,
+                                          child: Container(
+                                            width: 100 * fem,
+                                            height: 38.31 * fem,
+                                            child: Stack(
+                                              children: [
+                                                Positioned(
+                                                  left: 0 * fem,
+                                                  top: 0 * fem,
+                                                  child: Align(
+                                                    child: SizedBox(
+                                                      width: 250 * fem,
+                                                      height: 28 * fem,
+                                                      child: Text(
+                                                        _category['name'],
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily: 'Poppins',
+                                                          fontSize:
+                                                              18.3132514954 *
+                                                                  ffem,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          height:
+                                                              1.5 * ffem / fem,
+                                                          color:
+                                                              Color(0xffffffff),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  left: 2.7470703125 * fem,
+                                                  top: 24.3071899414 * fem,
+                                                  child: Align(
+                                                    child: SizedBox(
+                                                      width: 38 * fem,
+                                                      height: 14 * fem,
+                                                      child: Text(
+                                                        _category['products']
+                                                                .length
+                                                                .toString() +
+                                                            ' Items',
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily: 'Poppins',
+                                                          fontSize:
+                                                              9.1566257477 *
+                                                                  ffem,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          height:
+                                                              1.5 * ffem / fem,
+                                                          color:
+                                                              Color(0xffffffff),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ],
+                          )
+                          .toList(),
+                    ],
+                  ),
+                ),
+                // End Category
+
+                // Last Banner
+                SizedBox(
+                  height: 20,
+                ),
+                Container(
+                  width: double.infinity,
+                  height: 180 * fem,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5 * fem),
+                  ),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        left: 0 * fem,
+                        top: 0 * fem,
+                        child: Align(
+                          child: SizedBox(
+                            width: 360 * fem,
+                            height: 150 * fem,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5 * fem),
+                                color: Color(0x33eecf56),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        // group46Ler (318:1938)
+                        left: 268.130859375 * fem,
+                        top: 84.827545166 * fem,
+                        child: Align(
+                          child: SizedBox(
+                            width: 81.72 * fem,
+                            height: 65.17 * fem,
+                            child: Image.asset(
+                              'assets/images/group-46.png',
+                              width: 81.72 * fem,
+                              height: 65.17 * fem,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        // ellipse25pa2 (318:1944)
+                        left: 324.5180664062 * fem,
+                        top: 15.5172424316 * fem,
+                        child: Align(
+                          child: SizedBox(
+                            width: 5.34 * fem,
+                            height: 5.17 * fem,
+                            child: Image.asset(
+                              'assets/images/ellipse-25.png',
+                              width: 5.34 * fem,
+                              height: 5.17 * fem,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        // ellipse32Kmg (318:1945)
+                        left: 2.1362304688 * fem,
+                        top: 37.2411804199 * fem,
+                        child: Align(
+                          child: SizedBox(
+                            width: 8.82 * fem,
+                            height: 8.54 * fem,
+                            child: Image.asset(
+                              'assets/images/ellipse-32.png',
+                              width: 8.82 * fem,
+                              height: 8.54 * fem,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        // ellipse27Edk (318:1946)
+                        left: 334.1323242188 * fem,
+                        top: 26.8965454102 * fem,
+                        child: Align(
+                          child: SizedBox(
+                            width: 11.75 * fem,
+                            height: 11.38 * fem,
+                            child: Image.asset(
+                              'assets/images/ellipse-27.png',
+                              width: 11.75 * fem,
+                              height: 11.38 * fem,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        // ellipse33MyG (318:1947)
+                        left: 16.0239257812 * fem,
+                        top: 2.0690307617 * fem,
+                        child: Align(
+                          child: SizedBox(
+                            width: 16.38 * fem,
+                            height: 15.86 * fem,
+                            child: Image.asset(
+                              'assets/images/ellipse-33.png',
+                              width: 16.38 * fem,
+                              height: 15.86 * fem,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        // ellipse26UY6 (318:1948)
+                        left: 311.69921875 * fem,
+                        top: 41.3793029785 * fem,
+                        child: Align(
+                          child: SizedBox(
+                            width: 18.16 * fem,
+                            height: 17.59 * fem,
+                            child: Image.asset(
+                              'assets/images/ellipse-26.png',
+                              width: 18.16 * fem,
+                              height: 17.59 * fem,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        // ellipse34PQA (318:1949)
+                        left: 329.859375 * fem,
+                        top: 66.2068786621 * fem,
+                        child: Align(
+                          child: SizedBox(
+                            width: 14.96 * fem,
+                            height: 14.48 * fem,
+                            child: Image.asset(
+                              'assets/images/ellipse-34.png',
+                              width: 14.96 * fem,
+                              height: 14.48 * fem,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        // ellipse35WUn (318:1950)
+                        left: 290.333984375 * fem,
+                        top: 66.2068786621 * fem,
+                        child: Align(
+                          child: SizedBox(
+                            width: 11.75 * fem,
+                            height: 11.38 * fem,
+                            child: Image.asset(
+                              'assets/images/ellipse-34.png',
+                              width: 11.75 * fem,
+                              height: 11.38 * fem,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        // inviteafriendandearnplantifyre (318:1951)
+                        left: 24.5698242188 * fem,
+                        top: 18.6206817627 * fem,
+                        child: Align(
+                          child: SizedBox(
+                            width: 252 * fem,
+                            height: 60 * fem,
+                            child: Text(
+                              'Invite a Friend and earn Plantify rewards',
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Philosopher',
+                                fontSize: 24 * ffem,
+                                fontWeight: FontWeight.w700,
+                                height: 1.2400000095 * ffem / fem,
+                                color: Color(0xff000000),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        // redeemthemtogetinstantdiscount (318:1952)
+                        left: 28.8427734375 * fem,
+                        top: 95.1724243164 * fem,
+                        child: Align(
+                          child: SizedBox(
+                            width: 135 * fem,
+                            height: 30 * fem,
+                            child: Text(
+                              'Redeem them to get instant discounts',
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 13 * ffem,
+                                fontWeight: FontWeight.w600,
+                                height: 1.1538461538 * ffem / fem,
+                                color: Color(0xff888888),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        // rectangle59cAS (318:1953)
+                        left: 190.1484375 * fem,
+                        top: 95.1724243164 * fem,
+                        child: Align(
+                          child: SizedBox(
+                            width: 64.09 * fem,
+                            height: 31.03 * fem,
+                            child: TextButton(
+                              onPressed: () {},
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                              ),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5 * fem),
+                                  color: Color(0xffeecf56),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        // invite6rJ (318:1954)
+                        left: 202.9672851562 * fem,
+                        top: 99.655166626 * fem,
+                        child: Align(
+                          child: SizedBox(
+                            width: 40 * fem,
+                            height: 25 * fem,
+                            child: Text(
+                              'Invite',
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 13 * ffem,
+                                fontWeight: FontWeight.w600,
+                                height: 1.5 * ffem / fem,
+                                color: Color(0xffffffff),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
-              // End Banner
-
-              // New Arrivals
-              Container(
-                child: Center(
-                  child: Image.asset(
-                    'assets/images/NewArrivals.png',
-                    width: 500.58 * fem,
-                    height: 60.58 * fem,
-                  ),
-                ),
-              ),
-              _productModel.productsLoader
-                  ? LinearProgressIndicator()
-                  : SizedBox(
-                      height: 320,
-                      child: _productModel.productsLoader
-                          ? SizedBox(
-                              child: Center(child: Text('No new arrivals')),
-                            )
-                          : ListView.builder(
-                              padding: const EdgeInsets.only(left: 5, right: 8),
-                              scrollDirection: Axis.horizontal,
-                              shrinkWrap: true,
-                              itemCount: _productModel.products!.length,
-                              itemBuilder: (context, index) {
-                                return Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 5, right: 8),
-                                      child: Container(
-                                        width: 145 * fem,
-                                        height: double.infinity,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(15 * fem),
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            InkWell(
-                                              onTap: () {
-                                                Navigator.of(context).push(
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        ProductIdPage(
-                                                            arguments: {
-                                                          'product':
-                                                              _productModel
-                                                                  .products![
-                                                                      index]
-                                                                  .toJson(),
-                                                          'product_images':
-                                                              _productModel
-                                                                  .products![
-                                                                      index]
-                                                                  .productImages
-                                                        }),
-                                                  ),
-                                                );
-                                              },
-                                              child: Container(
-                                                margin: EdgeInsets.fromLTRB(
-                                                    0 * fem,
-                                                    0 * fem,
-                                                    0 * fem,
-                                                    5 * fem),
-                                                padding: EdgeInsets.fromLTRB(
-                                                    106 * fem,
-                                                    13 * fem,
-                                                    14 * fem,
-                                                    15 * fem),
-                                                width: double.infinity,
-                                                height: 193 * fem,
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          15 * fem),
-                                                  image: DecorationImage(
-                                                    fit: BoxFit.cover,
-                                                    image: NetworkImage(
-                                                        _configModel.apiConfig[
-                                                                'mediaURL'] +
-                                                            _productModel
-                                                                .products![
-                                                                    index]
-                                                                .imagepath1
-                                                                .toString()),
-                                                  ),
-                                                ),
-                                                child: InkWell(
-                                                  onTap: () async {
-                                                    await _wishListModel
-                                                        .getWishLists(
-                                                            _productModel
-                                                                .products![
-                                                                    index]
-                                                                .id);
-                                                  },
-                                                  child: _wishListModel
-                                                          .wishListLoader
-                                                      ? Align(
-                                                          // vectorRZx (318:2001)
-                                                          alignment: Alignment
-                                                              .topRight,
-                                                          child: SizedBox(
-                                                            width: 25 * fem,
-                                                            height: 22.4 * fem,
-                                                            child: Image.asset(
-                                                              'assets/images/vector-wXc.png',
-                                                              width: 25 * fem,
-                                                              height:
-                                                                  22.4 * fem,
-                                                            ),
-                                                          ),
-                                                        )
-                                                      : _wishListModel
-                                                                  .wishLists!
-                                                                  .where((wishList) =>
-                                                                      wishList.productId ==
-                                                                          _productModel
-                                                                              .products![
-                                                                                  index]
-                                                                              .id &&
-                                                                      wishList.userId ==
-                                                                          _configModel
-                                                                              .user
-                                                                              .id)
-                                                                  .toList()
-                                                                  .length ==
-                                                              0
-                                                          ? Align(
-                                                              // vectorRZx (318:2001)
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topRight,
-                                                              child: SizedBox(
-                                                                width: 25 * fem,
-                                                                height:
-                                                                    22.4 * fem,
-                                                                child:
-                                                                    Image.asset(
-                                                                  'assets/images/vector-yse.png',
-                                                                  width:
-                                                                      25 * fem,
-                                                                  height: 22.4 *
-                                                                      fem,
-                                                                ),
-                                                              ),
-                                                            )
-                                                          : Align(
-                                                              // vectorRZx (318:2001)
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topRight,
-                                                              child: SizedBox(
-                                                                width: 25 * fem,
-                                                                height:
-                                                                    22.4 * fem,
-                                                                child:
-                                                                    Image.asset(
-                                                                  'assets/images/vector-wXc.png',
-                                                                  width:
-                                                                      25 * fem,
-                                                                  height: 22.4 *
-                                                                      fem,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                ),
-                                              ),
-                                            ),
-                                            InkWell(
-                                              onTap: () {
-                                                Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ProductIdPage(
-                                                                arguments: {
-                                                                  'product': _productModel
-                                                                      .products![
-                                                                          index]
-                                                                      .toJson(),
-                                                                  'category': _productModel
-                                                                      .products![
-                                                                          index]
-                                                                      .category!
-                                                                      .name
-                                                                      .toString(),
-                                                                })));
-                                              },
-                                              child: Container(
-                                                margin: EdgeInsets.fromLTRB(
-                                                    0 * fem,
-                                                    6 * fem,
-                                                    0 * fem,
-                                                    4 * fem),
-                                                constraints: BoxConstraints(
-                                                  maxWidth: 123 * fem,
-                                                ),
-                                                child: Text(
-                                                  _productModel
-                                                      .products![index].name
-                                                      .toString(),
-                                                  textAlign: TextAlign.center,
-                                                  style: MyGoogleFontStyle(
-                                                    fontFamily: 'Urbanist',
-                                                    fontSize: 15 * ffem,
-                                                    fontWeight: FontWeight.w700,
-                                                    height: 1.2 * ffem / fem,
-                                                    letterSpacing: -0.3 * fem,
-                                                    color: Color(0xff000000),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Container(
-                                              margin: EdgeInsets.fromLTRB(
-                                                  0 * fem,
-                                                  0 * fem,
-                                                  1 * fem,
-                                                  0 * fem),
-                                              child: _productModel
-                                                          .products![index]
-                                                          .productPrices![0]
-                                                          .offerPrice !=
-                                                      0
-                                                  ? Text.rich(
-                                                      TextSpan(children: [
-                                                      new TextSpan(
-                                                        text:
-                                                            'RS. ${_productModel.products![index].productPrices![0].price.toString()}',
-                                                        style: new TextStyle(
-                                                          color: Colors.grey,
-                                                          decoration:
-                                                              TextDecoration
-                                                                  .lineThrough,
-                                                        ),
-                                                      ),
-                                                      new TextSpan(
-                                                        text:
-                                                            ' RS.${_productModel.products![index].productPrices![0].offerPrice.toString()}',
-                                                      ),
-                                                    ]))
-                                                  : Text(
-                                                      _productModel
-                                                              .products![index]
-                                                              .productPrices![0]
-                                                              .price
-                                                              .toString() +
-                                                          " " +
-                                                          'RS',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Poppins',
-                                                        fontSize: 13,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        height: 1.5,
-                                                        letterSpacing:
-                                                            -0.2190869331,
-                                                        color:
-                                                            Color(0x99000000),
-                                                      ),
-                                                    ),
-                                            ),
-                                            if (discountPrice != 0.0)
-                                              Center(
-                                                child: Text(
-                                                  '( ${discountPrice.round()}% Off)',
-                                                  style: MyGoogleFontStyle(
-                                                    fontFamily: 'Poppins',
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Color(0x99000000),
-                                                  ),
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              }),
-                    ),
-              // End New Arrivals
-
-              // Category
-              Container(
-                height: 20,
-                child: Center(
-                  child: Image.asset(
-                    'assets/images/ShopByCategory.png',
-                    width: 500.58 * fem,
-                    height: 60.58 * fem,
-                  ),
-                ),
-              ),
-              Container(
-                width: 345 * fem,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    ..._productModel.categories!
-                        .map(
-                          (_category) => Padding(
-                            padding: const EdgeInsets.only(top: 15),
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        ProductsPage(arguments: {
-                                          'categoryId': _category['id'],
-                                          'subCategory':
-                                              _category['sub_categories'],
-                                          'category':
-                                              _category['name'].toString()
-                                        })));
-                              },
-                              child: Container(
-                                width: 344 * fem,
-                                height: 110 * fem,
-                                child: Stack(
-                                  children: [
-                                    Positioned(
-                                      // image24Suc (318:1963)
-                                      left: 0 * fem,
-                                      top: 0 * fem,
-                                      child: Align(
-                                        child: SizedBox(
-                                          width: 344 * fem,
-                                          height: 106.69 * fem,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10 * fem),
-                                            child: Image.network(
-                                              _configModel
-                                                      .apiConfig['mediaURL'] +
-                                                  _category['imagepath']
-                                                      .toString(),
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      // rectangle2422kfQ (318:1964)
-                                      left: 0 * fem,
-                                      top: 0 * fem,
-                                      child: Align(
-                                        child: SizedBox(
-                                          width: 344 * fem,
-                                          height: 107 * fem,
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                      10.1176462173 * fem),
-                                              gradient: _category['id'] % 2 == 0
-                                                  ? LinearGradient(
-                                                      begin:
-                                                          Alignment(1, 0.138),
-                                                      end: Alignment(-1, 0.128),
-                                                      colors: <Color>[
-                                                        Color(0x99000000),
-                                                        Color(0x00d9d9d9)
-                                                      ],
-                                                      stops: <double>[0, 1],
-                                                    )
-                                                  : LinearGradient(
-                                                      begin:
-                                                          Alignment(-1, 0.138),
-                                                      end: Alignment(1, 0.128),
-                                                      colors: <Color>[
-                                                        Color(0x99000000),
-                                                        Color(0x00d9d9d9)
-                                                      ],
-                                                      stops: <double>[0, 1],
-                                                    ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    if (_category['id'] % 2 != 0)
-                                      Positioned(
-                                        left: 22 * fem,
-                                        top: 39.5 * fem,
-                                        child: Container(
-                                          width: 200 * fem,
-                                          height: 48.31 * fem,
-                                          child: Stack(
-                                            children: [
-                                              Positioned(
-                                                left: 0 * fem,
-                                                top: 0 * fem,
-                                                child: Align(
-                                                  child: SizedBox(
-                                                    width: 200 * fem,
-                                                    height: 30 * fem,
-                                                    child: Text(
-                                                      _category['name'],
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Poppins',
-                                                        fontSize:
-                                                            18.3132514954 *
-                                                                ffem,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        height:
-                                                            1.5 * ffem / fem,
-                                                        color:
-                                                            Color(0xffffffff),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              Positioned(
-                                                left: 2.7470703125 * fem,
-                                                top: 24.3071899414 * fem,
-                                                child: Align(
-                                                  child: SizedBox(
-                                                    width: 38 * fem,
-                                                    height: 14 * fem,
-                                                    child: Text(
-                                                      _category['products']
-                                                              .length
-                                                              .toString() +
-                                                          ' Items',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Poppins',
-                                                        fontSize:
-                                                            9.1566257477 * ffem,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        height:
-                                                            1.5 * ffem / fem,
-                                                        color:
-                                                            Color(0xffffffff),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    if (_category['id'] % 2 == 0)
-                                      Positioned(
-                                        left: 230 * fem,
-                                        top: 33.5 * fem,
-                                        child: Container(
-                                          width: 100 * fem,
-                                          height: 38.31 * fem,
-                                          child: Stack(
-                                            children: [
-                                              Positioned(
-                                                left: 0 * fem,
-                                                top: 0 * fem,
-                                                child: Align(
-                                                  child: SizedBox(
-                                                    width: 250 * fem,
-                                                    height: 28 * fem,
-                                                    child: Text(
-                                                      _category['name'],
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Poppins',
-                                                        fontSize:
-                                                            18.3132514954 *
-                                                                ffem,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        height:
-                                                            1.5 * ffem / fem,
-                                                        color:
-                                                            Color(0xffffffff),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              Positioned(
-                                                left: 2.7470703125 * fem,
-                                                top: 24.3071899414 * fem,
-                                                child: Align(
-                                                  child: SizedBox(
-                                                    width: 38 * fem,
-                                                    height: 14 * fem,
-                                                    child: Text(
-                                                      _category['products']
-                                                              .length
-                                                              .toString() +
-                                                          ' Items',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Poppins',
-                                                        fontSize:
-                                                            9.1566257477 * ffem,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        height:
-                                                            1.5 * ffem / fem,
-                                                        color:
-                                                            Color(0xffffffff),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  ],
-                ),
-              ),
-              // End Category
-
-              // Last Banner
-              SizedBox(
-                height: 20,
-              ),
-              Container(
-                width: double.infinity,
-                height: 180 * fem,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5 * fem),
-                ),
-                child: Stack(
-                  children: [
-                    Positioned(
-                      left: 0 * fem,
-                      top: 0 * fem,
-                      child: Align(
-                        child: SizedBox(
-                          width: 360 * fem,
-                          height: 150 * fem,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5 * fem),
-                              color: Color(0x33eecf56),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      // group46Ler (318:1938)
-                      left: 268.130859375 * fem,
-                      top: 84.827545166 * fem,
-                      child: Align(
-                        child: SizedBox(
-                          width: 81.72 * fem,
-                          height: 65.17 * fem,
-                          child: Image.asset(
-                            'assets/images/group-46.png',
-                            width: 81.72 * fem,
-                            height: 65.17 * fem,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      // ellipse25pa2 (318:1944)
-                      left: 324.5180664062 * fem,
-                      top: 15.5172424316 * fem,
-                      child: Align(
-                        child: SizedBox(
-                          width: 5.34 * fem,
-                          height: 5.17 * fem,
-                          child: Image.asset(
-                            'assets/images/ellipse-25.png',
-                            width: 5.34 * fem,
-                            height: 5.17 * fem,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      // ellipse32Kmg (318:1945)
-                      left: 2.1362304688 * fem,
-                      top: 37.2411804199 * fem,
-                      child: Align(
-                        child: SizedBox(
-                          width: 8.82 * fem,
-                          height: 8.54 * fem,
-                          child: Image.asset(
-                            'assets/images/ellipse-32.png',
-                            width: 8.82 * fem,
-                            height: 8.54 * fem,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      // ellipse27Edk (318:1946)
-                      left: 334.1323242188 * fem,
-                      top: 26.8965454102 * fem,
-                      child: Align(
-                        child: SizedBox(
-                          width: 11.75 * fem,
-                          height: 11.38 * fem,
-                          child: Image.asset(
-                            'assets/images/ellipse-27.png',
-                            width: 11.75 * fem,
-                            height: 11.38 * fem,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      // ellipse33MyG (318:1947)
-                      left: 16.0239257812 * fem,
-                      top: 2.0690307617 * fem,
-                      child: Align(
-                        child: SizedBox(
-                          width: 16.38 * fem,
-                          height: 15.86 * fem,
-                          child: Image.asset(
-                            'assets/images/ellipse-33.png',
-                            width: 16.38 * fem,
-                            height: 15.86 * fem,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      // ellipse26UY6 (318:1948)
-                      left: 311.69921875 * fem,
-                      top: 41.3793029785 * fem,
-                      child: Align(
-                        child: SizedBox(
-                          width: 18.16 * fem,
-                          height: 17.59 * fem,
-                          child: Image.asset(
-                            'assets/images/ellipse-26.png',
-                            width: 18.16 * fem,
-                            height: 17.59 * fem,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      // ellipse34PQA (318:1949)
-                      left: 329.859375 * fem,
-                      top: 66.2068786621 * fem,
-                      child: Align(
-                        child: SizedBox(
-                          width: 14.96 * fem,
-                          height: 14.48 * fem,
-                          child: Image.asset(
-                            'assets/images/ellipse-34.png',
-                            width: 14.96 * fem,
-                            height: 14.48 * fem,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      // ellipse35WUn (318:1950)
-                      left: 290.333984375 * fem,
-                      top: 66.2068786621 * fem,
-                      child: Align(
-                        child: SizedBox(
-                          width: 11.75 * fem,
-                          height: 11.38 * fem,
-                          child: Image.asset(
-                            'assets/images/ellipse-34.png',
-                            width: 11.75 * fem,
-                            height: 11.38 * fem,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      // inviteafriendandearnplantifyre (318:1951)
-                      left: 24.5698242188 * fem,
-                      top: 18.6206817627 * fem,
-                      child: Align(
-                        child: SizedBox(
-                          width: 252 * fem,
-                          height: 60 * fem,
-                          child: Text(
-                            'Invite a Friend and earn Plantify rewards',
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Philosopher',
-                              fontSize: 24 * ffem,
-                              fontWeight: FontWeight.w700,
-                              height: 1.2400000095 * ffem / fem,
-                              color: Color(0xff000000),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      // redeemthemtogetinstantdiscount (318:1952)
-                      left: 28.8427734375 * fem,
-                      top: 95.1724243164 * fem,
-                      child: Align(
-                        child: SizedBox(
-                          width: 135 * fem,
-                          height: 30 * fem,
-                          child: Text(
-                            'Redeem them to get instant discounts',
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 13 * ffem,
-                              fontWeight: FontWeight.w600,
-                              height: 1.1538461538 * ffem / fem,
-                              color: Color(0xff888888),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      // rectangle59cAS (318:1953)
-                      left: 190.1484375 * fem,
-                      top: 95.1724243164 * fem,
-                      child: Align(
-                        child: SizedBox(
-                          width: 64.09 * fem,
-                          height: 31.03 * fem,
-                          child: TextButton(
-                            onPressed: () {},
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                            ),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5 * fem),
-                                color: Color(0xffeecf56),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      // invite6rJ (318:1954)
-                      left: 202.9672851562 * fem,
-                      top: 99.655166626 * fem,
-                      child: Align(
-                        child: SizedBox(
-                          width: 37 * fem,
-                          height: 20 * fem,
-                          child: Text(
-                            'Invite',
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 13 * ffem,
-                              fontWeight: FontWeight.w600,
-                              height: 1.5 * ffem / fem,
-                              color: Color(0xffffffff),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // End Last Banner
-            ],
+                // End Last Banner
+              ],
+            ),
           ),
         ),
       ),

@@ -46,6 +46,7 @@ dependencies:
   get_ip_address: ^0.0.5
   device_info_plus: ^10.1.1
   smooth_page_indicator: ^1.2.0+3
+  pinch_zoom: ^2.0.0
   # multiple_images_picker: ^1.0.1
 
 dev_dependencies:
