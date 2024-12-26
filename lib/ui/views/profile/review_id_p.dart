@@ -97,11 +97,10 @@ class _ReviewUpdatePageState extends State<ReviewUpdatePage> {
                               border: InputBorder.none,
                               focusedBorder: InputBorder.none,
                               enabledBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-                              hintText: 'Review',
-                              hintStyle: TextStyle(color: Color(0x3f000000)),
+                              contentPadding: EdgeInsets.all(
+                                  10), // Added padding for better text alignment
+                              hintText:
+                                  'Enter your review here', // Added hint text for better UX
                             ),
                             style: MyGoogleFontStyle(
                               fontFamily: 'Urbanist',
@@ -139,6 +138,7 @@ class _ReviewUpdatePageState extends State<ReviewUpdatePage> {
                               await _reviewModel.getMyReviews(
                                 _review.productId,
                                 _review.description,
+                                '',
                               );
                               // if (review.length != 0) {
                               //   print('object');
@@ -192,57 +192,6 @@ class _ReviewUpdatePageState extends State<ReviewUpdatePage> {
           ),
         ),
       ),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   elevation: 10,
-      //   iconSize: 30,
-      //   type: BottomNavigationBarType.fixed,
-      //   backgroundColor: Colors.white,
-      //   selectedItemColor: Colors.black,
-      //   unselectedItemColor: Colors.black,
-      //   selectedFontSize: 14,
-      //   unselectedFontSize: 14,
-      //   onTap: (value) async {
-      //     if (value == 0) {
-      //       Navigator.pushNamed(context, '/homePage');
-      //     }
-      //     if (value == 1) {
-      //       Navigator.pushNamed(context, '/wishlistPage');
-      //     }
-
-      //     if (value == 2) {
-      //       Map<String, dynamic> _CartData = {
-      //         'kindOfFlower': '',
-      //         'flavour': '',
-      //         'writeOnCake': '',
-      //         'pack': ''
-      //       };
-      //       await _addToCartModel.getAddToCart('', '', _CartData);
-      //       Navigator.pushNamed(context, '/cartPage');
-      //     }
-      //     if (value == 3) {
-      //       Navigator.pushNamed(context, '/profilePage');
-      //     }
-      //   },
-      //   items: const [
-      //     BottomNavigationBarItem(
-      //       label: 'Home',
-      //       icon: Iconoir(Iconoir.home_simple),
-      //       // icon: Icon(DonIcons.wap_home, size: 23),
-      //     ),
-      //     BottomNavigationBarItem(label: 'Saved', icon: Iconoir(Iconoir.heart)),
-      //     BottomNavigationBarItem(
-      //       label: 'Cart',
-      //       icon: Iconoir(Iconoir.shopping_bag),
-      //     ),
-      //     BottomNavigationBarItem(
-      //       label: 'Profile',
-      //       icon: Icon(
-      //         DonIcons.user_o,
-      //         size: 23,
-      //       ),
-      //     ),
-      //   ],
-      // ),
     );
   }
 }

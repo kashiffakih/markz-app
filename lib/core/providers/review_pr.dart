@@ -17,7 +17,7 @@ class ReviewModel with ChangeNotifier {
   }
 
   List<Review>? get reviews => _reviews;
-  getMyReviews(productId, description) async {
-    reviews = await _reviewService.getMyReviews(productId, description);
+  getMyReviews(productId, description, rating) async {
+    reviews = await _reviewService.getMyReviews(productId, description, rating);
   }
 }

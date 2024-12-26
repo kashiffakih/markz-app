@@ -10,10 +10,10 @@ class ReviewService {
   final ConfigModel _configModel = locator<ConfigModel>();
   List<Review> _reviews = [];
 
-  Future<List<Review>> getMyReviews([productId, description]) async {
+  Future<List<Review>> getMyReviews([productId, description, rating]) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
     var userId = _configModel.user.id;
-
+    print('rating $rating');
     // _configModel.files.forEach((imageFile) async {
     // if (imageFile.file != null) {
 // Add each image file to the request
@@ -38,6 +38,7 @@ class ReviewService {
         ..fields['userId'] = userId.toString()
         ..fields['productId'] = productId.toString()
         ..fields['description'] = description.toString()
+        ..fields['rating'] = rating.toString()
         ..fields['filename'] = element.fileName ?? ''
         ..files.add(
           await http.MultipartFile.fromPath(
@@ -61,6 +62,8 @@ class ReviewService {
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
+
+    print("Review ${_responseData['data'][0]['review_images']}");
     if (_responseData['success']) {
       _reviews = [];
       _responseData['data'].forEach((data) {

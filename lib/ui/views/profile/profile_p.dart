@@ -31,7 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
       'pack': ''
     };
     Provider.of<ReviewModel>(context, listen: false)
-        .getMyReviews(productId, reviewDescription);
+        .getMyReviews(productId, reviewDescription, '');
     Provider.of<WishListModel>(context, listen: false).getWishLists(productId);
     Provider.of<OrderModel>(context, listen: false).getOrder();
     Provider.of<AddToCartModel>(context, listen: false)

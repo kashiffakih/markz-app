@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/review_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/products/product_id_p.dart';
 import 'package:sales_app/ui/views/profile/review_id_p.dart';
-
-import '../products/shops_p.dart';
+import 'package:sales_app/ui/widgets/image_zoom_w.dart';
 
 class ReviewsPage extends StatefulWidget {
   const ReviewsPage({Key? key}) : super(key: key);
@@ -17,393 +18,254 @@ class ReviewsPage extends StatefulWidget {
 }
 
 class _ReviewsPageState extends State<ReviewsPage> {
-  DateFormat? _format;
+  late final DateFormat _dateFormat;
+
   @override
   void initState() {
-    _format = DateFormat('yyyy-MM-dd');
-    var productId = '';
-    var reviewDescription = '';
-    Provider.of<ReviewModel>(context, listen: false)
-        .getMyReviews(productId, reviewDescription);
     super.initState();
+    _dateFormat = DateFormat('yyyy-MM-dd');
+    // Fetch reviews during initialization
+    Provider.of<ReviewModel>(context, listen: false).getMyReviews('', '', '');
   }
 
   @override
   Widget build(BuildContext context) {
-    final ReviewModel _reviewModel = Provider.of<ReviewModel>(context);
-    final ConfigModel _configModel = locator<ConfigModel>();
-    TextEditingController _controller = TextEditingController();
+    final reviewModel = Provider.of<ReviewModel>(context);
+    final configModel = locator<ConfigModel>();
 
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-            child: Column(
-              children: [
-                // Title
-                Container(
-                  margin: EdgeInsets.only(top: 20, left: 20),
-                  width: double.infinity,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Center(
-                          child: Text(
-                            'Reviews',
-                            textAlign: TextAlign.center,
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xff1e232c),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      Row(
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Container(
-                              width: 15,
-                              height: 15,
-                              child: Icon(
-                                Icons.arrow_back_ios,
-                                size: 18,
-                                color: Color(0xffEED056),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 15),
-                          Container(
-                            width: 258,
-                            height: 38,
-                            padding: const EdgeInsets.only(
-                              left: 21,
-                              right: 20.70,
-                            ),
-                            clipBehavior: Clip.antiAlias,
-                            decoration: ShapeDecoration(
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                    width: 0.50, color: Color(0xFFC7B456)),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment
-                                  .center, // Center vertically
-                              children: [
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(top: 15.0),
-                                    child: TextFormField(
-                                      controller: _controller,
-                                      onChanged: (value) {
-                                        // if (value.length % 3 == 0) {
-                                        // Call your API here
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => ShopsPage(
-                                                initialText: value
-                                                    .toString()), // Pass initialText if needed
-                                          ),
-                                        );
-                                        _controller.clear();
-                                      },
-                                      decoration: InputDecoration(
-                                        hintText: 'Search',
-                                        border: InputBorder.none,
-                                      ),
-                                      style: TextStyle(
-                                        color: Colors.black.withOpacity(0.6),
-                                        fontSize: 18,
-                                        fontFamily: 'Urbanist',
-                                        fontWeight: FontWeight.w600,
-                                        // letterSpacing: -0.36,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  child: Image.asset(
-                                    'assets/images/Search-1.png',
-                                    height: 20,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Container(
-                            width: 20,
-                            height: 20,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment:
-                                  MainAxisAlignment.center, // Center vertically
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Image.asset(
-                                  'assets/images/filter.png',
-                                  height: 20,
-                                  fit: BoxFit.cover,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-                // Body
-                Container(
-                  height: MediaQuery.of(context).size.height - 150,
-                  margin: EdgeInsets.all(20),
-                  child: _reviewModel.reviews!.isEmpty
-                      ? Center(child: Text('No reviews'))
-                      : ListView.builder(
-                          itemCount: _reviewModel.reviews!.length,
-                          itemBuilder: (BuildContext context, index) =>
-                              SingleChildScrollView(
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        ReviewUpdatePage(arguments: {
-                                          'review': _reviewModel.reviews![index]
-                                        })));
-                              },
-                              child: Column(
-                                children: [
-                                  Container(
-                                    margin: EdgeInsets.only(bottom: 10),
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      border:
-                                          Border.all(color: Color(0xffc7b456)),
-                                      color: Color(0xffffffff),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(5),
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Color(0x338a959e),
-                                          offset: Offset(0, 7.6690645218),
-                                          blurRadius: 19.1726608276,
-                                        ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        // Photo and Title
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    children: [
-                                                      Container(
-                                                        // mediaF3t (I318:2555;0:1388)
-                                                        margin:
-                                                            EdgeInsets.fromLTRB(
-                                                                0, 0, 15, 0),
-                                                        width: 66.71,
-                                                        height: 66.71,
-                                                        child: Image.network(
-                                                          _configModel.apiConfig[
-                                                                  'mediaURL'] +
-                                                              _reviewModel
-                                                                  .reviews![
-                                                                      index]
-                                                                  .product!
-                                                                  .imagepath1
-                                                                  .toString(),
-                                                          // 'assets/images/media.png',
-                                                          width: 66.71,
-                                                          height: 66.71,
-                                                        ),
-                                                      ),
-                                                      Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            _reviewModel
-                                                                .reviews![index]
-                                                                .product!
-                                                                .name
-                                                                .toString(),
-                                                            style:
-                                                                MyGoogleFontStyle(
-                                                              fontFamily:
-                                                                  'Poppins',
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400,
-                                                              color: Color(
-                                                                  0xff232323),
-                                                            ),
-                                                          ),
-                                                          Text(
-                                                            // BLr (I318:2555;0:1392)
-                                                            '₹ ' +
-                                                                _reviewModel
-                                                                    .reviews![
-                                                                        index]
-                                                                    .product!
-                                                                    .productPrices![
-                                                                        0]
-                                                                    .price
-                                                                    .toString(),
-                                                            style:
-                                                                MyGoogleFontStyle(
-                                                              fontFamily:
-                                                                  'Poppins',
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                              color: Color(
-                                                                  0xff232323),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        // Stars
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(_configModel
-                                                  .user.firstName
-                                                  .toString()),
-                                            ),
-                                            Expanded(
-                                              child: Text(
-                                                _format!.format(DateTime.parse(
-                                                    _reviewModel.reviews![index]
-                                                        .createdAt
-                                                        .toString())),
-                                                textAlign: TextAlign.right,
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Poppins',
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w400,
-                                                  color: Color(0xff909090),
-                                                ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        // Description
-                                        Text(
-                                          _reviewModel
-                                              .reviews![index].description
-                                              .toString(),
-                                          style: MyGoogleFontStyle(
-                                            fontFamily: 'Poppins',
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w400,
-                                            color: Color(0xff909090),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                )
-              ],
-            ),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          'Reviews',
+          style: MyGoogleFontStyle(
+            fontFamily: 'Urbanist',
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xff1e232c),
           ),
         ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Color(0xffEED056)),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   elevation: 10,
-      //   iconSize: 30,
-      //   type: BottomNavigationBarType.fixed,
-      //   backgroundColor: Colors.white,
-      //   selectedItemColor: Colors.black,
-      //   unselectedItemColor: Colors.black,
-      //   selectedFontSize: 14,
-      //   unselectedFontSize: 14,
-      //   onTap: (value) async {
-      //     if (value == 0) {
-      //       Navigator.pushNamed(context, '/homePage');
-      //     }
-      //     if (value == 1) {
-      //       Navigator.pushNamed(context, '/wishlistPage');
-      //     }
+      body: reviewModel.reviews == null
+          ? const Center(child: Text('No reviews available'))
+          : Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: ListView.builder(
+                itemCount: reviewModel.reviews!.length,
+                itemBuilder: (context, index) {
+                  final review = reviewModel.reviews![index];
+                  return ReviewCard(
+                    review: review,
+                    configModel: configModel,
+                    dateFormat: _dateFormat,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ReviewUpdatePage(
+                            arguments: {'review': review},
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+    );
+  }
+}
 
-      //     if (value == 2) {
-      //       Map<String, dynamic> _CartData = {
-      //         'kindOfFlower': '',
-      //         'flavour': '',
-      //         'writeOnCake': '',
-      //         'pack': ''
-      //       };
-      //       await _addToCartModel.getAddToCart('', '', _CartData);
-      //       Navigator.pushNamed(context, '/cartPage');
-      //     }
-      //     if (value == 3) {
-      //       Navigator.pushNamed(context, '/profilePage');
-      //     }
-      //   },
-      //   items: const [
-      //     BottomNavigationBarItem(
-      //       label: 'Home',
-      //       icon: Iconoir(Iconoir.home_simple),
-      //       // icon: Icon(DonIcons.wap_home, size: 23),
-      //     ),
-      //     BottomNavigationBarItem(label: 'Saved', icon: Iconoir(Iconoir.heart)),
-      //     BottomNavigationBarItem(
-      //       label: 'Cart',
-      //       icon: Iconoir(Iconoir.shopping_bag),
-      //     ),
-      //     BottomNavigationBarItem(
-      //       label: 'Profile',
-      //       icon: Icon(
-      //         DonIcons.user_o,
-      //         size: 23,
-      //       ),
-      //     ),
-      //   ],
-      // ),
+class ReviewCard extends StatelessWidget {
+  final dynamic review;
+  final ConfigModel configModel;
+  final DateFormat dateFormat;
+  final VoidCallback onTap;
+
+  const ReviewCard({
+    required this.review,
+    required this.configModel,
+    required this.dateFormat,
+    required this.onTap,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          border: Border.all(color: const Color(0xffc7b456)),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x338a959e),
+              offset: Offset(0, 7.6),
+              blurRadius: 19.1,
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                // Product Image
+                InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => ProductIdPage(arguments: {
+                          'product': review.product.toJson(),
+                          'product_images': review.product.productImages
+                        }),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    margin: const EdgeInsets.only(right: 15),
+                    child: Image.network(
+                      configModel.apiConfig['mediaURL'] +
+                          (review.product?.imagepath1 ?? ''),
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Icon(Icons.error),
+                    ),
+                  ),
+                ),
+                // Product Info
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      review.product?.name ?? 'Unknown Product',
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: const Color(0xff232323),
+                      ),
+                    ),
+                    Text(
+                      '₹ ${review.product?.productPrices?[0]?.price ?? '0.0'}',
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xff232323),
+                      ),
+                    ),
+                    review.rating == null
+                        ? SizedBox.shrink()
+                        : Center(
+                            child: RatingBar.builder(
+                              itemSize: 15,
+                              initialRating:
+                                  double.parse(review.rating.toString()),
+                              direction: Axis.horizontal,
+                              itemCount: 5,
+                              allowHalfRating: true,
+                              ignoreGestures: true,
+                              itemBuilder: (context, _) => const Icon(
+                                Icons.star,
+                                color: Colors.amber,
+                              ),
+                              onRatingUpdate: (double value) {},
+                            ),
+                          )
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            // Reviewer Info
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  configModel.user.firstName.toString(),
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xff909090),
+                  ),
+                ),
+                Text(
+                  dateFormat.format(DateTime.parse(review.createdAt)),
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xff909090),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            // Review Description
+            if (review.description != null && review.description!.isNotEmpty)
+              Text(
+                review.description!,
+                style: MyGoogleFontStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                  color: const Color(0xff909090),
+                ),
+              ),
+            const SizedBox(height: 15),
+            // Review Images
+            if (review.reviewImages != null && review.reviewImages.isNotEmpty)
+              SizedBox(
+                height: 100,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: review.reviewImages.length,
+                  itemBuilder: (context, index) {
+                    final image = review.reviewImages[index];
+                    return InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => ImageScreen(
+                                image: configModel.apiConfig['mediaURL'] +
+                                    image.imagePath),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 10),
+                        width: 66.71,
+                        height: 66.71,
+                        child: Image.network(
+                          configModel.apiConfig['mediaURL'] + image.imagePath,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.error),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              )
+            else
+              const Text('No review images available'),
+          ],
+        ),
+      ),
     );
   }
 }

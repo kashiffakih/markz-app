@@ -1,6 +1,6 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pinch_zoom/pinch_zoom.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
@@ -13,7 +13,7 @@ import 'package:sales_app/ui/views/products/products_p.dart';
 import 'package:sales_app/ui/views/products/shops_p.dart';
 import 'package:sales_app/ui/widgets/drawer_w.dart';
 import 'package:badges/badges.dart' as badges;
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:sales_app/ui/widgets/image_zoom_w.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -31,16 +31,17 @@ class _HomePageState extends State<HomePage>
     'writeOnCake': '',
     'pack': ''
   };
-  late AnimationController _animationController;
-  late Animation<double> _nextPage;
-  late PageController _pageController;
 
-  int _currentPage = 0;
-  List<dynamic> bannerUrls = [];
+  // late PageController _pageController;
+
+  List<String> bannerUrls = [];
+  int _current = 0;
+  final CarouselSliderController _carousalController =
+      CarouselSliderController();
+
   @override
   void initState() {
     super.initState();
-    var productId = '';
     // Fetch banners and other data after widget build
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // Fetch product data
@@ -93,8 +94,8 @@ class _HomePageState extends State<HomePage>
                 productModel.banners!['banner_path_13'].toString()
             : null,
       ]
-          .where((imageUrl) => imageUrl != null)
-          .map((imageUrl) => imageUrl!)
+          .where((imageUrl) => imageUrl != null) // Filter out null values
+          .map((imageUrl) => imageUrl as String) // Explicitly cast to String
           .toList();
 
       // Set banner URLs
@@ -103,66 +104,18 @@ class _HomePageState extends State<HomePage>
       });
       print("banners : $bannerUrls");
     });
-
-    // Initialize AnimationController
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    );
-
-    // Tween for the page animation
-    _nextPage = Tween(begin: 0.0, end: 1.0).animate(_animationController);
-
-    // Initialize PageController
-    _pageController = PageController(initialPage: 0);
-
-    // Add a listener to trigger page changes
-    _animationController.addListener(() {
-      if (_animationController.status == AnimationStatus.completed) {
-        _animationController.reset();
-        _moveToNextPage();
-      }
-    });
-
-    // Start the animation
-    _animationController.forward();
   }
 
-  void _moveToNextPage() {
-    if (_pageController.hasClients) {
-      final int nextPage = (_currentPage + 1) % bannerUrls.length;
-      _pageController.animateToPage(
-        nextPage,
-        duration: const Duration(seconds: 5),
-        curve: Curves.easeInOut,
-      );
-      setState(() {
-        _currentPage = nextPage;
-      });
-    }
-  }
-
-  void _pauseAutoScroll() {
-    _animationController.stop();
-  }
-
-  void _resumeAutoScroll() {
-    _animationController.forward();
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    _pageController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _pageController.dispose();
+  //   super.dispose();
+  // }
 
   final GlobalKey<ScaffoldState> _key = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
-    _animationController.forward(); //Start controller with widget
-    print(_nextPage.value);
     final ConfigModel _configModel = locator<ConfigModel>();
     final ProductModel _productModel = Provider.of<ProductModel>(context);
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
@@ -262,42 +215,69 @@ class _HomePageState extends State<HomePage>
                 SizedBox(
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height * 0.3,
-                  child: PageView.builder(
-                    controller: _pageController,
-                    itemCount: bannerUrls.length,
-                    itemBuilder: (context, pagePosition) {
-                      return GestureDetector(
-                        onTapDown: (_) => _pauseAutoScroll(),
-                        onTapUp: (_) => _resumeAutoScroll(),
-                        onHorizontalDragStart: (_) => _pauseAutoScroll(),
-                        onHorizontalDragEnd: (_) => _resumeAutoScroll(),
-                        child: PinchZoom(
-                          maxScale: 3.0, // Set maximum zoom level
-                          child: Container(
-                            margin: EdgeInsets.all(10),
-                            child: Image.network(
-                              bannerUrls[pagePosition],
-                              fit: BoxFit.cover,
+                  child: CarouselSlider(
+                    carouselController: _carousalController,
+                    options: CarouselOptions(
+                      autoPlay: true,
+                      aspectRatio: 2.0,
+                      enlargeCenterPage: true,
+                      padEnds: true,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          _current = index;
+                        });
+                      },
+                    ),
+                    items: bannerUrls.map((url) {
+                      return Builder(
+                        builder: (BuildContext context) {
+                          return InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => ImageScreen(image: url),
+                                ),
+                              );
+                            },
+                            child: SizedBox(
+                              height: MediaQuery.of(context).size.height *
+                                  0.3, // Adjust the height as needed
+                              width: MediaQuery.of(context).size.width *
+                                  0.8, // Adjust the height as needed
+                              child: Image.network(
+                                url,
+                                fit: BoxFit.fill,
+                              ),
                             ),
-                          ),
-                        ),
+                          );
+                        },
                       );
-                    },
+                    }).toList(),
                   ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: bannerUrls.asMap().entries.map((entry) {
+                    return GestureDetector(
+                      onTap: () => _carousalController.animateToPage(entry.key),
+                      child: Container(
+                        width: 12.0,
+                        height: 12.0,
+                        margin: EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 4.0),
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color:
+                                (Theme.of(context).brightness == Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black)
+                                    .withOpacity(
+                                        _current == entry.key ? 0.9 : 0.4)),
+                      ),
+                    );
+                  }).toList(),
                 ),
 
-                Center(
-                  child: SmoothPageIndicator(
-                    controller: _pageController,
-                    count: bannerUrls.length,
-                    effect: ExpandingDotsEffect(
-                      dotHeight: 8,
-                      dotWidth: 8,
-                      activeDotColor: Colors.blue,
-                      dotColor: Colors.grey,
-                    ),
-                  ),
-                ),
                 // End Banner
 
                 // New Arrivals
@@ -488,7 +468,7 @@ class _HomePageState extends State<HomePage>
                                                 ? Text.rich(TextSpan(children: [
                                                     new TextSpan(
                                                       text:
-                                                          'RS. ${_productModel.products![index].productPrices![0].price.toString()}',
+                                                          '₹${_productModel.products![index].productPrices![0].price.toString()}',
                                                       style: new TextStyle(
                                                         color: Colors.grey,
                                                         decoration:
@@ -498,7 +478,7 @@ class _HomePageState extends State<HomePage>
                                                     ),
                                                     new TextSpan(
                                                       text:
-                                                          ' RS.${_productModel.products![index].productPrices![0].offerPrice.toString()}',
+                                                          ' ₹${_productModel.products![index].productPrices![0].offerPrice.toString()}',
                                                     ),
                                                   ]))
                                                 : Text(
@@ -508,7 +488,7 @@ class _HomePageState extends State<HomePage>
                                                             .price
                                                             .toString() +
                                                         " " +
-                                                        'RS',
+                                                        '₹',
                                                     style: MyGoogleFontStyle(
                                                       fontFamily: 'Poppins',
                                                       fontSize: 13,

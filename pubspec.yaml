@@ -47,6 +47,8 @@ dependencies:
   device_info_plus: ^10.1.1
   smooth_page_indicator: ^1.2.0+3
   pinch_zoom: ^2.0.0
+  carousel_slider: ^5.0.0
+  flutter_rating_bar: ^4.0.1
   # multiple_images_picker: ^1.0.1
 
 dev_dependencies:

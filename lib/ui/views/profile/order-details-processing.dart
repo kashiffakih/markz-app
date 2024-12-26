@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/review_pr.dart';
@@ -19,6 +20,7 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
   final _reviewFormKey = GlobalKey<FormState>();
   var _reviewDescription = '';
   bool _loading = false;
+  double currentRating = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -203,13 +205,44 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                                               BorderRadius.circular(20)),
                                       title: Text("Add your review"),
                                       content: SizedBox(
-                                        height: 350,
+                                        height: 365,
                                         child: Column(
                                           children: [
                                             Form(
                                               key: _reviewFormKey,
                                               child: Column(
                                                 children: [
+                                                  Center(
+                                                    child: RatingBar.builder(
+                                                      itemSize: 30,
+                                                      initialRating:
+                                                          currentRating,
+                                                      minRating: 0.5,
+                                                      direction:
+                                                          Axis.horizontal,
+                                                      allowHalfRating: true,
+                                                      itemCount: 5,
+                                                      itemPadding:
+                                                          const EdgeInsets
+                                                              .symmetric(
+                                                              horizontal: 4.0),
+                                                      itemBuilder:
+                                                          (context, _) =>
+                                                              const Icon(
+                                                        Icons.star,
+                                                        color: Colors.amber,
+                                                      ),
+                                                      onRatingUpdate: (rating) {
+                                                        setState(() {
+                                                          currentRating =
+                                                              rating;
+                                                        });
+                                                      },
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 10,
+                                                  ),
                                                   Container(
                                                     decoration: BoxDecoration(
                                                       border: Border.all(
@@ -221,7 +254,7 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                                                               20),
                                                     ),
                                                     child: TextFormField(
-                                                      maxLines: 6,
+                                                      maxLines: 5,
                                                       decoration:
                                                           InputDecoration(
                                                         border:
@@ -306,15 +339,14 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                                                                         true;
                                                                   });
 
-                                                                  await _reviewModel
-                                                                      .getMyReviews(
-                                                                    widget.arguments['order']['order_details']
-                                                                            [
-                                                                            index]
-                                                                        [
-                                                                        'product']['id'],
-                                                                    _reviewDescription,
-                                                                  );
+                                                                  await _reviewModel.getMyReviews(
+                                                                      widget.arguments['order']['order_details'][index]
+                                                                              [
+                                                                              'product']
+                                                                          [
+                                                                          'id'],
+                                                                      _reviewDescription,
+                                                                      currentRating);
 
                                                                   setState(() {
                                                                     _loading =

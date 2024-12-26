@@ -278,7 +278,7 @@ class _ProductsPageState extends State<ProductsPage> {
                       width: 5 * fem,
                     ),
                     SizedBox(
-                      width: MediaQuery.of(context).size.width,
+                      width: MediaQuery.of(context).size.width * 0.75,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: widget.arguments['subCategory'].length,
@@ -447,7 +447,9 @@ class _ProductsPageState extends State<ProductsPage> {
                                                                       'mediaURL'] +
                                                                   filteredProducts![
                                                                           index]
-                                                                      .imagepath1
+                                                                      .productImages!
+                                                                      .first
+                                                                      .imagepath
                                                                       .toString(),
                                                             ),
                                                             // 'assets/images/shades-chocolate-cake-3-1-2-1-bg.png',
@@ -464,60 +466,29 @@ class _ProductsPageState extends State<ProductsPage> {
                                                           child: _wishListModel
                                                                       .wishLists!
                                                                       .where((wishList) =>
-                                                                          wishList.productId ==
-                                                                              filteredProducts![index]
-                                                                                  .id &&
+                                                                          wishList.productId == filteredProducts![index].id &&
                                                                           wishList.userId ==
-                                                                              _configModel.user.id)
+                                                                              _configModel
+                                                                                  .user.id)
                                                                       .toList()
                                                                       .length ==
                                                                   0
                                                               ? Align(
-                                                                  // vectorRZx (318:2001)
                                                                   alignment:
                                                                       Alignment
                                                                           .topRight,
-                                                                  child:
-                                                                      SizedBox(
-                                                                    width: 25 *
-                                                                        fem,
-                                                                    height:
-                                                                        22.4 *
-                                                                            fem,
-                                                                    child: Image
-                                                                        .asset(
-                                                                      'assets/images/vector-yse.png',
-                                                                      width: 25 *
-                                                                          fem,
-                                                                      height:
-                                                                          22.4 *
-                                                                              fem,
-                                                                    ),
-                                                                  ),
-                                                                )
+                                                                  child: Icon(Icons
+                                                                      .favorite_border_outlined))
                                                               : Align(
-                                                                  // vectorRZx (318:2001)
                                                                   alignment:
                                                                       Alignment
                                                                           .topRight,
-                                                                  child:
-                                                                      SizedBox(
-                                                                    width: 25 *
-                                                                        fem,
-                                                                    height:
-                                                                        22.4 *
-                                                                            fem,
-                                                                    child: Image
-                                                                        .asset(
-                                                                      'assets/images/vector-wXc.png',
-                                                                      width: 25 *
-                                                                          fem,
-                                                                      height:
-                                                                          22.4 *
-                                                                              fem,
-                                                                    ),
-                                                                  ),
-                                                                ),
+                                                                  child: Icon(
+                                                                    Icons
+                                                                        .favorite_outlined,
+                                                                    color: Colors
+                                                                        .red,
+                                                                  )),
                                                         ),
                                                       ),
                                                     ),
@@ -581,7 +552,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                                         TextSpan(children: [
                                                         new TextSpan(
                                                           text:
-                                                              'RS. ${filteredProducts![index].productPrices![0].price.toString()}',
+                                                              '₹${filteredProducts![index].productPrices![0].price.toString()}',
                                                           style: new TextStyle(
                                                             color: Colors.grey,
                                                             decoration:
@@ -591,11 +562,11 @@ class _ProductsPageState extends State<ProductsPage> {
                                                         ),
                                                         new TextSpan(
                                                           text:
-                                                              ' RS.${filteredProducts![index].productPrices![0].offerPrice.toString()}',
+                                                              ' ₹${filteredProducts![index].productPrices![0].offerPrice.toString()}',
                                                         ),
                                                       ]))
                                                     : Text(
-                                                        'RS. ${filteredProducts![index].productPrices![0].price.toString()}',
+                                                        '₹${filteredProducts![index].productPrices![0].price.toString()}',
                                                         style:
                                                             MyGoogleFontStyle(
                                                           fontFamily: 'Poppins',
