@@ -11,7 +11,7 @@ class UserWalletService {
 
   getMyUserWallets() async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    var userId = _configModel.user.id;
+    var userId = _configModel.user!.id;
 
     http.Response _response = await http.get(
       Uri.parse('${_apiConfig['baseURL']}/user_wallets?userId=$userId'),

@@ -42,25 +42,26 @@ class OrderService {
         couponAmount: int.parse(couponValue),
         couponId: couponId,
         deliveryAmount: double.parse(
-            _configModel.user.companies![0].deliveryCharges.toString()),
+            _configModel.user!.companies![0].deliveryCharges.toString()),
         details: '-',
         isApprovedByHotelier: 0,
         orderCost: int.parse(cartTotal.toString()),
-        packagingAmount: _configModel.user.companies![0].packagingCharges,
+        packagingAmount: _configModel.user!.companies![0].packagingCharges,
         taxAmount: double.parse(cartTotal) /
             100 *
-            double.parse(_configModel.user.companies![0].taxPercent.toString()),
-        taxPercent: _configModel.user.companies![0].taxPercent.toString(),
+            double.parse(
+                _configModel.user!.companies![0].taxPercent.toString()),
+        taxPercent: _configModel.user!.companies![0].taxPercent.toString(),
         tipAmount: 0,
         totalAmount: double.parse(((double.parse(cartTotal)) +
                 (double.parse(cartTotal) /
                     100 *
-                    double.parse(
-                        _configModel.user.companies![0].taxPercent.toString())))
+                    double.parse(_configModel.user!.companies![0].taxPercent
+                        .toString())))
             .toString()),
         totalCashback: 0,
         walletAmountUsed: double.parse(userWalletUsed.toString()).toInt(),
-        userId: _configModel.user.id,
+        userId: _configModel.user!.id,
         isDelivered: 0,
         isDeliveryBoyAccepted: 0,
         isDinein: 0,
@@ -88,7 +89,7 @@ class OrderService {
 
   getOrders() async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    var userId = _configModel.user.id;
+    var userId = _configModel.user!.id;
     http.Response _response = await http.get(
       Uri.parse('${_apiConfig['baseURL']}/orders?userId=$userId'),
       headers: _apiConfig['headers'],

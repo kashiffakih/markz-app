@@ -51,7 +51,7 @@ class _ProfilePageState extends State<ProfilePage> {
         Provider.of<UserAddressModel>(context);
     final UserWalletModel _userWalletModel =
         Provider.of<UserWalletModel>(context);
-    String initials = getInitials(_configModel.user.firstName.toString());
+    String initials = getInitials(_configModel.user!.firstName.toString());
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -106,7 +106,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       // Photo and Name
                       Row(
                         children: [
-                          _configModel.user.imagepath != null
+                          _configModel.user!.imagepath != null
                               ? Container(
                                   margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
                                   width: 65,
@@ -117,7 +117,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       fit: BoxFit.cover,
                                       image: NetworkImage(
                                           _configModel.apiConfig['mediaURL'] +
-                                              _configModel.user.imagepath
+                                              _configModel.user!.imagepath
                                                   .toString()),
                                     ),
                                   ),
@@ -144,7 +144,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  _configModel.user.firstName.toString(),
+                                  _configModel.user!.firstName.toString(),
                                   style: MyGoogleFontStyle(
                                     fontFamily: 'Urbanist',
                                     fontWeight: FontWeight.w700,
@@ -152,7 +152,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ),
                                 ),
                                 Text(
-                                  _configModel.user.email.toString(),
+                                  _configModel.user!.email.toString(),
                                   style: MyGoogleFontStyle(
                                     fontFamily: 'Urbanist',
                                     fontWeight: FontWeight.w400,

@@ -9,6 +9,7 @@ import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/products/product_id_p.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:sales_app/ui/widgets/login_required_popup.dart';
 
 class ShopsPage extends StatefulWidget {
   final initialText;
@@ -28,19 +29,20 @@ class ShopsPageState extends State<ShopsPage> {
   bool _isInitialLoad = false;
   List<Product>? filteredProducts = [];
   int activeIndex = -1;
-
-  // TextEditingController _controller = TextEditingController();
   var search = '';
+
   @override
   void initState() {
     super.initState();
-
-    Provider.of<ProductModel>(context, listen: false).getCategories();
-    Provider.of<ProductModel>(context, listen: false).getAllProducts(search);
-    var productId = '';
-    Provider.of<AddToCartModel>(context, listen: false)
-        .getAddToCart(productId, '', _CartData);
-    Provider.of<WishListModel>(context, listen: false).getWishLists(productId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ProductModel>(context, listen: false).getCategories();
+      Provider.of<ProductModel>(context, listen: false).getAllProducts(search);
+      var productId = '';
+      Provider.of<AddToCartModel>(context, listen: false)
+          .getAddToCart(productId, '', _CartData);
+      Provider.of<WishListModel>(context, listen: false)
+          .getWishLists(productId);
+    });
   }
 
   @override
@@ -52,22 +54,19 @@ class ShopsPageState extends State<ShopsPage> {
     final ProductModel _productModel = Provider.of<ProductModel>(context);
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
-
-    setState(() {
-      if (!_isInitialLoad && _productModel.allProducts!.length > 0) {
-        filteredProducts = _productModel.allProducts?.toList();
-        _isInitialLoad = true;
-      }
-      // else {
-      //   _isInitialLoad = false;
-      // }
-    });
     var cartCount = 0;
-    setState(() {
-      cartCount = _addToCartModel.addToCarts == null
-          ? 0
-          : _addToCartModel.addToCarts!.length;
-    });
+
+    if (!_isInitialLoad &&
+        _productModel.allProducts != null &&
+        _productModel.allProducts!.isNotEmpty) {
+      filteredProducts = _productModel.allProducts?.toList();
+      _isInitialLoad = true;
+    }
+
+    cartCount = _addToCartModel.addToCarts == null
+        ? 0
+        : _addToCartModel.addToCarts!.length;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -206,7 +205,16 @@ class ShopsPageState extends State<ShopsPage> {
                         const SizedBox(width: 10),
                         InkWell(
                           onTap: () {
-                            Navigator.pushNamed(context, '/cartPage');
+                            if (_configModel.user == null) {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) =>
+                                    LoginRequiredPopupWidget(),
+                              );
+                              // Show error dialog when user is null
+                            } else {
+                              Navigator.pushNamed(context, '/cartPage');
+                            }
                           },
                           child: Container(
                             width: 20,
@@ -426,7 +434,7 @@ class ShopsPageState extends State<ShopsPage> {
                                                       onTap: () {
                                                         print(filteredProducts![
                                                                 index]
-                                                            .productImages);
+                                                            .id);
                                                         Navigator.of(context).push(
                                                             MaterialPageRoute(
                                                                 builder: (context) =>
@@ -434,109 +442,194 @@ class ShopsPageState extends State<ShopsPage> {
                                                                         arguments: {
                                                                           'product':
                                                                               filteredProducts![index].toJson(),
-                                                                          'product_images': filteredProducts!
-                                                                              .first
-                                                                              .productImages
+                                                                          'product_images':
+                                                                              filteredProducts![index].productImages
                                                                         })));
                                                       },
                                                       child: Container(
-                                                        padding:
-                                                            EdgeInsets.fromLTRB(
-                                                                106 * fem,
-                                                                13 * fem,
-                                                                14 * fem,
-                                                                13 * fem),
-                                                        width: 145 * fem,
-                                                        height: 193 * fem,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      15 * fem),
-                                                          color:
-                                                              Color(0x0c000000),
-                                                          image:
-                                                              DecorationImage(
-                                                            fit: BoxFit.cover,
-                                                            image: NetworkImage(
-                                                              _configModel.apiConfig[
-                                                                      'mediaURL'] +
-                                                                  filteredProducts![
-                                                                          index]
-                                                                      .imagepath1
-                                                                      .toString(),
-                                                            ),
-                                                            // 'assets/images/shades-chocolate-cake-3-1-2-1-bg.png',
-                                                          ),
-                                                        ),
-                                                        child: InkWell(
-                                                          onTap: () async {
-                                                            await _wishListModel
-                                                                .getWishLists(
+                                                          padding: EdgeInsets
+                                                              .fromLTRB(
+                                                                  106 * fem,
+                                                                  13 * fem,
+                                                                  14 * fem,
+                                                                  13 * fem),
+                                                          width: 145 * fem,
+                                                          height: 193 * fem,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        15 *
+                                                                            fem),
+                                                            color: Color(
+                                                                0x0c000000),
+                                                            image:
+                                                                DecorationImage(
+                                                              fit: BoxFit.cover,
+                                                              image:
+                                                                  NetworkImage(
+                                                                _configModel.apiConfig[
+                                                                        'mediaURL'] +
                                                                     filteredProducts![
                                                                             index]
-                                                                        .id);
-                                                          },
-                                                          child: _wishListModel
-                                                                      .wishLists!
-                                                                      .where((wishList) =>
-                                                                          wishList.productId ==
-                                                                              filteredProducts![index]
-                                                                                  .id &&
-                                                                          wishList.userId ==
-                                                                              _configModel.user.id)
-                                                                      .toList()
-                                                                      .length ==
-                                                                  0
-                                                              ? Align(
-                                                                  // vectorRZx (318:2001)
+                                                                        .productImages!
+                                                                        .first
+                                                                        .imagepath
+                                                                        .toString(),
+                                                              ),
+                                                              // 'assets/images/shades-chocolate-cake-3-1-2-1-bg.png',
+                                                            ),
+                                                          ),
+                                                          child: InkWell(
+                                                            onTap: () async {
+                                                              if (_configModel
+                                                                      .user ==
+                                                                  null) {
+                                                                showDialog(
+                                                                  context:
+                                                                      context,
+                                                                  builder: (BuildContext
+                                                                          context) =>
+                                                                      LoginRequiredPopupWidget(),
+                                                                );
+                                                                // Show error dialog when user is null
+                                                              } else {
+                                                                // Fetch wishlist for a specific product
+                                                                await _wishListModel
+                                                                    .getWishLists(
+                                                                        filteredProducts![index]
+                                                                            .id);
+                                                              }
+                                                            },
+                                                            child: Builder(
+                                                              builder:
+                                                                  (context) {
+                                                                if (_configModel
+                                                                        .user
+                                                                        ?.id ==
+                                                                    null) {
+                                                                  // If user ID is null, show default icon
+                                                                  return const Align(
+                                                                    alignment:
+                                                                        Alignment
+                                                                            .topRight,
+                                                                    child: Icon(
+                                                                        Icons
+                                                                            .favorite_border_outlined),
+                                                                  );
+                                                                }
+
+                                                                if (_wishListModel
+                                                                    .wishListLoader) {
+                                                                  // Show loading state
+                                                                  return const Align(
+                                                                    alignment:
+                                                                        Alignment
+                                                                            .topRight,
+                                                                    child: Icon(
+                                                                        Icons
+                                                                            .favorite_border_outlined),
+                                                                  );
+                                                                }
+
+                                                                // Check if the product is in the user's wishlist
+                                                                bool isWishListed = _wishListModel.wishLists!.any((wishList) =>
+                                                                    wishList.productId ==
+                                                                        filteredProducts![index]
+                                                                            .id &&
+                                                                    wishList.userId ==
+                                                                        _configModel
+                                                                            .user!
+                                                                            .id);
+
+                                                                // Return the appropriate icon based on wishlist status
+                                                                return Align(
                                                                   alignment:
                                                                       Alignment
                                                                           .topRight,
-                                                                  child:
-                                                                      SizedBox(
-                                                                    width: 25 *
-                                                                        fem,
-                                                                    height:
-                                                                        22.4 *
-                                                                            fem,
-                                                                    child: Image
-                                                                        .asset(
-                                                                      'assets/images/vector-yse.png',
-                                                                      width: 25 *
-                                                                          fem,
-                                                                      height:
-                                                                          22.4 *
-                                                                              fem,
-                                                                    ),
+                                                                  child: Icon(
+                                                                    isWishListed
+                                                                        ? Icons
+                                                                            .favorite_outlined
+                                                                        : Icons
+                                                                            .favorite_border_outlined,
+                                                                    color: isWishListed
+                                                                        ? Colors
+                                                                            .red
+                                                                        : null,
                                                                   ),
-                                                                )
-                                                              : Align(
-                                                                  // vectorRZx (318:2001)
-                                                                  alignment:
-                                                                      Alignment
-                                                                          .topRight,
-                                                                  child:
-                                                                      SizedBox(
-                                                                    width: 25 *
-                                                                        fem,
-                                                                    height:
-                                                                        22.4 *
-                                                                            fem,
-                                                                    child: Image
-                                                                        .asset(
-                                                                      'assets/images/vector-wXc.png',
-                                                                      width: 25 *
-                                                                          fem,
-                                                                      height:
-                                                                          22.4 *
-                                                                              fem,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                        ),
-                                                      ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          )
+                                                          // InkWell(
+                                                          //   onTap: () async {
+                                                          //     await _wishListModel
+                                                          //         .getWishLists(
+                                                          //             filteredProducts![
+                                                          //                     index]
+                                                          //                 .id);
+                                                          //   },
+                                                          //   child: _wishListModel
+                                                          //               .wishLists!
+                                                          //               .where((wishList) =>
+                                                          //                   wishList.productId ==
+                                                          //                       filteredProducts![index]
+                                                          //                           .id &&
+                                                          //                   wishList.userId ==
+                                                          //                       _configModel.user!.id)
+                                                          //               .toList()
+                                                          //               .length ==
+                                                          //           0
+                                                          //       ? Align(
+                                                          //           // vectorRZx (318:2001)
+                                                          //           alignment:
+                                                          //               Alignment
+                                                          //                   .topRight,
+                                                          //           child:
+                                                          //               SizedBox(
+                                                          //             width: 25 *
+                                                          //                 fem,
+                                                          //             height:
+                                                          //                 22.4 *
+                                                          //                     fem,
+                                                          //             child: Image
+                                                          //                 .asset(
+                                                          //               'assets/images/vector-yse.png',
+                                                          //               width: 25 *
+                                                          //                   fem,
+                                                          //               height:
+                                                          //                   22.4 *
+                                                          //                       fem,
+                                                          //             ),
+                                                          //           ),
+                                                          //         )
+                                                          //       : Align(
+                                                          //           // vectorRZx (318:2001)
+                                                          //           alignment:
+                                                          //               Alignment
+                                                          //                   .topRight,
+                                                          //           child:
+                                                          //               SizedBox(
+                                                          //             width: 25 *
+                                                          //                 fem,
+                                                          //             height:
+                                                          //                 22.4 *
+                                                          //                     fem,
+                                                          //             child: Image
+                                                          //                 .asset(
+                                                          //               'assets/images/vector-wXc.png',
+                                                          //               width: 25 *
+                                                          //                   fem,
+                                                          //               height:
+                                                          //                   22.4 *
+                                                          //                       fem,
+                                                          //             ),
+                                                          //           ),
+                                                          //         ),
+                                                          // ),
+                                                          ),
                                                     ),
                                                   ),
                                                 ],
@@ -553,9 +646,9 @@ class ShopsPageState extends State<ShopsPage> {
                                                                       'product':
                                                                           filteredProducts![index]
                                                                               .toJson(),
-                                                                      'product_images': filteredProducts!
-                                                                          .first
-                                                                          .productImages
+                                                                      'product_images':
+                                                                          filteredProducts![index]
+                                                                              .productImages
                                                                     })));
                                               },
                                               child: Container(
@@ -674,7 +767,7 @@ class ShopsPageState extends State<ShopsPage> {
                           )
                         : SizedBox(
                             height: 550,
-                            child: Center(child: Text('No product found.'))),
+                            child: Center(child: CircularProgressIndicator())),
                   ],
                 ),
               ),

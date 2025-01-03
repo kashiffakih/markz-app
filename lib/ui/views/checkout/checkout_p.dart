@@ -158,7 +158,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        _configModel.user.firstName.toString() +
+                                        _configModel.user!.firstName
+                                                .toString() +
                                             " [${widget.arguments!['address']['label'].toString()}]",
                                         style: MyGoogleFontStyle(
                                           fontFamily: 'Urbanist',
@@ -542,7 +543,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                         Text(
                                           'RS' +
                                               ' ' +
-                                              _configModel.user.companies![0]
+                                              _configModel.user!.companies![0]
                                                   .deliveryCharges
                                                   .toString(),
                                           textAlign: TextAlign.right,
@@ -572,8 +573,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                         Text(
                                           'RS' +
                                               ' ' +
-                                              _configModel
-                                                  .user.companies![0].taxPercent
+                                              _configModel.user!.companies![0]
+                                                  .taxPercent
                                                   .toString(),
                                           textAlign: TextAlign.right,
                                           style: MyGoogleFontStyle(
@@ -607,7 +608,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                           .toString()) /
                                                       100 *
                                                       int.parse(_configModel
-                                                          .user
+                                                          .user!
                                                           .companies![0]
                                                           .taxPercent
                                                           .toString()))
@@ -702,14 +703,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                               ' ' +
                                               (int.parse(widget.arguments['cartTotal'].toString()) +
                                                       int.parse(_configModel
-                                                          .user
+                                                          .user!
                                                           .companies![0]
                                                           .deliveryCharges
                                                           .toString()) +
                                                       (int.parse(widget.arguments['cartTotal'].toString()) /
                                                           100 *
                                                           int.parse(_configModel
-                                                              .user
+                                                              .user!
                                                               .companies![0]
                                                               .taxPercent
                                                               .toString())) +
@@ -754,12 +755,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           .arguments['cartTotal']
                                           .toString()) +
                                       int.parse(_configModel
-                                          .user.companies![0].deliveryCharges
+                                          .user!.companies![0].deliveryCharges
                                           .toString()) +
                                       (int.parse(widget.arguments['cartTotal'].toString()) /
                                           100 *
                                           int.parse(_configModel
-                                              .user.companies![0].taxPercent
+                                              .user!.companies![0].taxPercent
                                               .toString())) +
                                       -(int.parse(widget
                                           .arguments['couponValue']

@@ -70,8 +70,9 @@ class _ContactPageState extends State<ContactPage> {
                       // Email
                       InkWell(
                         onTap: () async {
-                          String email = Uri.encodeComponent(
-                              _configModel.user.companies![0].email.toString());
+                          String email = Uri.encodeComponent(_configModel
+                              .user!.companies![0].email
+                              .toString());
                           String subject = Uri.encodeComponent("Hello Aadab");
                           String body = Uri.encodeComponent(
                               "Hello! I would like to order a delicious cake.");
@@ -143,7 +144,7 @@ class _ContactPageState extends State<ContactPage> {
                                       height: 5,
                                     ),
                                     Text(
-                                      _configModel.user.companies![0].email
+                                      _configModel.user!.companies![0].email
                                           .toString(),
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
@@ -166,7 +167,7 @@ class _ContactPageState extends State<ContactPage> {
                           final message =
                               'Hello! I would like to order a delicious cake.';
                           final phone =
-                              _configModel.user.companies![0].phone.toString();
+                              _configModel.user!.companies![0].phone.toString();
                           var whatsappUrl = "whatsapp://send?phone=${phone}" +
                               "&text=${Uri.encodeComponent(message)}";
                           try {
@@ -237,7 +238,7 @@ class _ContactPageState extends State<ContactPage> {
                                       height: 5,
                                     ),
                                     Text(
-                                      _configModel.user.companies![0].phone
+                                      _configModel.user!.companies![0].phone
                                           .toString(),
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',

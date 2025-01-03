@@ -447,7 +447,7 @@ class _CartPageState extends State<CartPage> {
                                                                           },
                                                                           child: _wishListModel.wishListLoader
                                                                               ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
-                                                                              : _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.products![index].id && wishList.userId == _configModel.user.id).toList().length == 0
+                                                                              : _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.products![index].id && wishList.userId == _configModel.user!?.id).toList().length == 0
                                                                                   ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
                                                                                   : Align(
                                                                                       alignment: Alignment.topRight,
@@ -1313,9 +1313,7 @@ class _CartPageState extends State<CartPage> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  _configModel.user.firstName
-                                                          .toString() +
-                                                      " [${address.label.toString()}]",
+                                                  "${_configModel.user!?.firstName.toString()} [ ${address.label.toString()}]",
                                                   style: MyGoogleFontStyle(
                                                     fontFamily: 'Urbanist',
                                                     fontWeight: FontWeight.w700,
@@ -1692,7 +1690,7 @@ class _CartPageState extends State<CartPage> {
                                                     'RS' +
                                                         ' ' +
                                                         _configModel
-                                                            .user
+                                                            .user!
                                                             .companies![0]
                                                             .deliveryCharges
                                                             .toString(),
@@ -1727,7 +1725,7 @@ class _CartPageState extends State<CartPage> {
                                                     'RS' +
                                                         ' ' +
                                                         _configModel
-                                                            .user
+                                                            .user!
                                                             .companies![0]
                                                             .taxPercent
                                                             .toString(),
@@ -1766,7 +1764,7 @@ class _CartPageState extends State<CartPage> {
                                                                     .toString()) /
                                                                 100 *
                                                                 int.parse(_configModel
-                                                                    .user
+                                                                    .user!
                                                                     .companies![
                                                                         0]
                                                                     .taxPercent
@@ -1906,7 +1904,7 @@ class _CartPageState extends State<CartPage> {
                                                                     .cartTotal
                                                                     .toString()) +
                                                                 int.parse(_configModel
-                                                                    .user
+                                                                    .user!
                                                                     .companies![
                                                                         0]
                                                                     .deliveryCharges
@@ -1916,7 +1914,7 @@ class _CartPageState extends State<CartPage> {
                                                                         .toString()) /
                                                                     100 *
                                                                     int.parse(_configModel
-                                                                        .user
+                                                                        .user!
                                                                         .companies![
                                                                             0]
                                                                         .taxPercent
@@ -1979,7 +1977,7 @@ class _CartPageState extends State<CartPage> {
                                                                 .cartTotal
                                                                 .toString()) +
                                                         int.parse(_configModel
-                                                            .user
+                                                            .user!
                                                             .companies![0]
                                                             .deliveryCharges
                                                             .toString()) +
@@ -1988,7 +1986,7 @@ class _CartPageState extends State<CartPage> {
                                                                 .toString()) /
                                                             100 *
                                                             int.parse(_configModel
-                                                                .user
+                                                                .user!
                                                                 .companies![0]
                                                                 .taxPercent
                                                                 .toString())) +
@@ -2171,7 +2169,7 @@ class _CartPageState extends State<CartPage> {
                                                                               onTap: () async {
                                                                                 await _wishListModel.getWishLists(_productModel.categoryWiseproducts![index].id);
                                                                               },
-                                                                              child: _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.categoryWiseproducts![index].id && wishList.userId == _configModel.user.id).toList().length == 0
+                                                                              child: _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.categoryWiseproducts![index].id && wishList.userId == _configModel.user!.id).toList().length == 0
                                                                                   ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
                                                                                   : Align(
                                                                                       alignment: Alignment.topRight,

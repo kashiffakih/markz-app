@@ -284,7 +284,7 @@ class _HomeCopyPageState extends State<HomeCopyPage> {
                             shrinkWrap: true,
                             itemCount: _productModel.products!.length,
                             itemBuilder: (context, index) {
-                              // if (_configModel.user.roles![0].name ==
+                              // if (_configModel.user!.roles![0].name ==
                               //     'Distributor') {
                               //   discountPrice = (int.parse(_productModel
                               //               .products![index]
@@ -412,7 +412,7 @@ class _HomeCopyPageState extends State<HomeCopyPage> {
                                                                             .id &&
                                                                     wishList.userId ==
                                                                         _configModel
-                                                                            .user
+                                                                            .user!
                                                                             .id)
                                                                 .toList()
                                                                 .length ==

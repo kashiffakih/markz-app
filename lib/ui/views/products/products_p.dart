@@ -469,7 +469,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                                                           wishList.productId == filteredProducts![index].id &&
                                                                           wishList.userId ==
                                                                               _configModel
-                                                                                  .user.id)
+                                                                                  .user!.id)
                                                                       .toList()
                                                                       .length ==
                                                                   0

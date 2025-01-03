@@ -464,8 +464,17 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                                 fontWeight: FontWeight.w500,
                                 color: Color(0xff000000),
                               ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter a phone number';
+                                }
+                                if (value.length != 10) {
+                                  return 'Number should be 10 digits';
+                                }
+                                return null;
+                              },
                               onSaved: (value) {
-                                _userAddress.altPhone = value;
+                                _userAddress.altPhone = value!;
                               },
                             ),
                           ),

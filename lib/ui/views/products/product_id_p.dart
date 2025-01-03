@@ -10,6 +10,7 @@ import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/products/shops_p.dart';
 import 'package:sales_app/ui/widgets/image_zoom_w.dart';
+import 'package:sales_app/ui/widgets/login_required_popup.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -26,6 +27,7 @@ class ProductIdPage extends StatefulWidget {
 
 class _ProductIdPageState extends State<ProductIdPage> {
   List<Map<String, dynamic>> _sizes = [];
+  List<Map<String, dynamic>> _prices = [];
   late ScrollController _scrollController;
 
   void initState() {
@@ -108,29 +110,31 @@ class _ProductIdPageState extends State<ProductIdPage> {
         unitName = productDisplayImages[0].unit.name;
         _CartData['flavour'] = unitName;
       }
-      if (_sizes.isEmpty)
+      if (_sizes.isEmpty) {
         _sizes = widget.arguments['product']['product_packs']
             .where((_pack) =>
                 _pack['unit']['name'] == productDisplayImages[0].unit.name)
             .toList();
+      }
+
+      if (_prices.isEmpty) {
+        _prices = widget.arguments['product']['product_prices']
+            .where((_price) => _price['product_pack_id'] == _sizes[0]['id'])
+            .toList();
+      }
     });
     Product product = Product.fromJson(widget.arguments['product']);
 
-    Set<dynamic> seen = {};
-    List<Map<String, dynamic>> _s =
-        _sizes.where((item) => seen.add(item['unit']['name'])).toList();
+    // Set<dynamic> seen = {};
+    // List<Map<String, dynamic>> _s =
+    //     _sizes.where((item) => seen.add(item['unit']['name'])).toList();
 
-    print('Sizes');
-    print(_sizes);
+    // print('Sizes');
+    // print('Prices: ${_sizes[0]['id']}');
 
-    discountPrice = (int.parse(widget.arguments['product']['product_prices']![0]
-                    ['price']
-                .toString()) -
-            int.parse(widget.arguments['product']['product_prices']![0]
-                    ['offer_price']
-                .toString())) /
-        int.parse(widget.arguments['product']['product_prices']![0]['price']
-            .toString()) *
+    discountPrice = (int.parse(_prices[0]['price'].toString()) -
+            int.parse(_prices[0]['offer_price'].toString())) /
+        int.parse(_prices[0]['price'].toString()) *
         100;
 
     double baseWidth = 360;
@@ -277,7 +281,16 @@ class _ProductIdPageState extends State<ProductIdPage> {
                           // Cart
                           InkWell(
                             onTap: () {
-                              Navigator.pushNamed(context, '/cartPage');
+                              if (_configModel.user == null) {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      LoginRequiredPopupWidget(),
+                                );
+                                // Show error dialog when user is null
+                              } else {
+                                Navigator.pushNamed(context, '/cartPage');
+                              }
                             },
                             child: badges.Badge(
                               badgeContent: Text(
@@ -362,55 +375,129 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                           children: [
                                             InkWell(
                                               onTap: () async {
-                                                await _wishListModel
-                                                    .getWishLists(
-                                                        widget.arguments[
-                                                            'product']['id']);
+                                                if (_configModel.user == null) {
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (BuildContext
+                                                            context) =>
+                                                        LoginRequiredPopupWidget(),
+                                                  );
+                                                  // Show error dialog when user is null
+                                                } else {
+                                                  // Fetch wishlist for a specific product
+                                                  await _wishListModel
+                                                      .getWishLists(
+                                                          widget.arguments[
+                                                              'product']['id']);
+                                                }
                                               },
-                                              child: _wishListModel
-                                                      .wishListLoader
-                                                  ? Align(
+                                              child: Builder(
+                                                builder: (context) {
+                                                  if (_configModel.user?.id ==
+                                                      null) {
+                                                    // If user ID is null, show default icon
+                                                    return const Align(
                                                       alignment:
                                                           Alignment.topRight,
-                                                      child: Align(
-                                                          alignment: Alignment
-                                                              .topRight,
-                                                          child: Icon(Icons
-                                                              .favorite_border_outlined)),
-                                                    )
-                                                  : _wishListModel.wishLists!
-                                                              .where((wishList) =>
-                                                                  wishList.productId ==
-                                                                      widget.arguments[
-                                                                              'product'][
-                                                                          'id'] &&
-                                                                  wishList.userId ==
-                                                                      _configModel
-                                                                          .user
-                                                                          .id)
-                                                              .toList()
-                                                              .length ==
-                                                          0
-                                                      ? Align(
-                                                          // vectorRZx (318:2001)
-                                                          alignment: Alignment
-                                                              .topRight,
-                                                          child: Align(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topRight,
-                                                              child: Icon(Icons
-                                                                  .favorite_border_outlined)),
-                                                        )
-                                                      : Align(
-                                                          alignment: Alignment
-                                                              .topRight,
-                                                          child: Icon(
-                                                            Icons
-                                                                .favorite_outlined,
-                                                            color: Colors.red,
-                                                          )),
+                                                      child: Icon(Icons
+                                                          .favorite_border_outlined),
+                                                    );
+                                                  }
+
+                                                  if (_wishListModel
+                                                      .wishListLoader) {
+                                                    // Show loading state
+                                                    return const Align(
+                                                      alignment:
+                                                          Alignment.topRight,
+                                                      child: Icon(Icons
+                                                          .favorite_border_outlined),
+                                                    );
+                                                  }
+
+                                                  // Check if the product is in the user's wishlist
+                                                  bool isWishListed = _wishListModel
+                                                      .wishLists!
+                                                      .any((wishList) =>
+                                                          wishList.productId ==
+                                                              widget.arguments[
+                                                                      'product']
+                                                                  ['id'] &&
+                                                          wishList.userId ==
+                                                              _configModel
+                                                                  .user!.id);
+
+                                                  // Return the appropriate icon based on wishlist status
+                                                  return Align(
+                                                    alignment:
+                                                        Alignment.topRight,
+                                                    child: Icon(
+                                                      isWishListed
+                                                          ? Icons
+                                                              .favorite_outlined
+                                                          : Icons
+                                                              .favorite_border_outlined,
+                                                      color: isWishListed
+                                                          ? Colors.red
+                                                          : null,
+                                                    ),
+                                                  );
+                                                },
+                                              ),
                                             ),
+                                            // InkWell(
+                                            //   onTap: () async {
+                                            // await _wishListModel
+                                            //     .getWishLists(
+                                            // widget.arguments[
+                                            //     'product']['id']);
+                                            //   },
+                                            //   child: _wishListModel
+                                            //           .wishListLoader
+                                            //       ? Align(
+                                            //           alignment:
+                                            //               Alignment.topRight,
+                                            //           child: Align(
+                                            //               alignment: Alignment
+                                            //                   .topRight,
+                                            //               child: Icon(Icons
+                                            //                   .favorite_border_outlined)),
+                                            //         )
+                                            //       : _wishListModel.wishLists!
+                                            //                   .where((wishList) =>
+                                            //                       wishList.productId ==
+                                            //                           widget.arguments[
+                                            //                                   'product']
+                                            //                               [
+                                            //                               'id'] &&
+                                            //                       wishList.userId ==
+                                            //                           _configModel
+                                            //                               .user!
+                                            //                               .id)
+                                            //                   .toList()
+                                            //                   .length ==
+                                            //               0
+                                            //           ? Align(
+                                            //               // vectorRZx (318:2001)
+                                            //               alignment: Alignment
+                                            //                   .topRight,
+                                            //               child: Align(
+                                            //                   alignment:
+                                            //                       Alignment
+                                            //                           .topRight,
+                                            //                   child: Icon(Icons
+                                            //                       .favorite_border_outlined)),
+                                            //             )
+                                            //           : Align(
+                                            //               alignment: Alignment
+                                            //                   .topRight,
+                                            //               child: Icon(
+                                            //                 Icons
+                                            //                     .favorite_outlined,
+                                            //                 color: Colors.red,
+                                            //               ),
+                                            //             ),
+                                            // ),
                                             SizedBox(width: 5),
                                             IconButton(
                                               onPressed: () {
@@ -840,69 +927,80 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                     onPressed: () async {
                                                       // if (_formKey.currentState!
                                                       //     .validate()) {
-                                                      _formKey.currentState!
-                                                          .save();
-                                                      bool type = true;
-
-                                                      if (_CartData[
-                                                                  'kindOfFlower'] ==
-                                                              '' ||
-                                                          _CartData[
-                                                                  'flavour'] ==
-                                                              '') {
+                                                      if (_configModel.user ==
+                                                          null) {
                                                         showDialog(
                                                           context: context,
                                                           builder: (BuildContext
                                                                   context) =>
-                                                              AlertDialog(
-                                                            shape: RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            20)),
-                                                            title: _CartData[
-                                                                            'kindOfFlower'] ==
-                                                                        '' &&
-                                                                    _CartData[
-                                                                            'flavour'] !=
-                                                                        ''
-                                                                ? Text(
-                                                                    "kindly choose size.")
-                                                                : _CartData['flavour'] ==
-                                                                            '' &&
-                                                                        _CartData[
-                                                                                'kindOfFlower'] !=
-                                                                            ''
-                                                                    ? Text(
-                                                                        "kindly choose colour.")
-                                                                    : Text(
-                                                                        "kindly choose colour and size."),
-                                                            actions: <Widget>[
-                                                              TextButton(
-                                                                onPressed: () {
-                                                                  Navigator.pop(
-                                                                      context);
-                                                                },
-                                                                child: Text(
-                                                                  'Ok',
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .black,
-                                                                      fontSize:
-                                                                          16),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
+                                                              LoginRequiredPopupWidget(),
                                                         );
+                                                        // Show error dialog when user is null
                                                       } else {
-                                                        await _addToCartModel
-                                                            .getAddToCart(
-                                                                widget.arguments![
-                                                                        'product']
-                                                                    ['id'],
-                                                                type,
-                                                                _CartData);
+                                                        _formKey.currentState!
+                                                            .save();
+                                                        bool type = true;
+
+                                                        if (_CartData[
+                                                                    'kindOfFlower'] ==
+                                                                '' ||
+                                                            _CartData[
+                                                                    'flavour'] ==
+                                                                '') {
+                                                          showDialog(
+                                                            context: context,
+                                                            builder: (BuildContext
+                                                                    context) =>
+                                                                AlertDialog(
+                                                              shape: RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              20)),
+                                                              title: _CartData[
+                                                                              'kindOfFlower'] ==
+                                                                          '' &&
+                                                                      _CartData[
+                                                                              'flavour'] !=
+                                                                          ''
+                                                                  ? Text(
+                                                                      "kindly choose size.")
+                                                                  : _CartData['flavour'] ==
+                                                                              '' &&
+                                                                          _CartData['kindOfFlower'] !=
+                                                                              ''
+                                                                      ? Text(
+                                                                          "kindly choose colour.")
+                                                                      : Text(
+                                                                          "kindly choose colour and size."),
+                                                              actions: <Widget>[
+                                                                TextButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  child: Text(
+                                                                    'Ok',
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontSize:
+                                                                            16),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          );
+                                                        } else {
+                                                          await _addToCartModel
+                                                              .getAddToCart(
+                                                                  widget.arguments![
+                                                                          'product']
+                                                                      ['id'],
+                                                                  type,
+                                                                  _CartData);
+                                                        }
                                                       }
                                                     },
                                                     style: TextButton.styleFrom(
@@ -1091,10 +1189,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                   child: Column(
                                     children: [
                                       // Price
-                                      widget.arguments['product']
-                                                      ['product_prices']![0]
-                                                  ['offer_price'] !=
-                                              0
+                                      _prices[0]['offer_price'] != 0
                                           ? Padding(
                                               padding: const EdgeInsets.only(
                                                   left: 25.0),
@@ -1114,7 +1209,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       ),
                                                       TextSpan(
                                                         text:
-                                                            '₹${widget.arguments['product']['product_prices']![0]['price'].toString()} ',
+                                                            '₹${_prices[0]['price'].toString()} ',
                                                         style: TextStyle(
                                                             color: Color(
                                                                 0xFFC7B456),
@@ -1133,7 +1228,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       ),
                                                       TextSpan(
                                                           text:
-                                                              '₹${widget.arguments['product']['product_prices']![0]['offer_price'].toString()}',
+                                                              '₹${_prices[0]['offer_price'].toString()}',
                                                           style: TextStyle(
                                                               fontSize: 18,
                                                               fontWeight:
@@ -1160,7 +1255,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                               ),
                                             )
                                           : Text(
-                                              '₹ ${widget.arguments['product']['product_prices']![0]['price'].toString()}',
+                                              '₹ ${_prices[0]['price'].toString()}',
                                               style: MyGoogleFontStyle(
                                                 fontFamily: 'Poppins',
                                                 fontSize: 13,
@@ -1229,6 +1324,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                     activeIndex;
                                                                 print(
                                                                     'isActive $isActive');
+
                                                                 return Row(
                                                                   children: [
                                                                     Padding(
@@ -1249,9 +1345,13 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                             setState(() {
                                                                               activeIndex = index;
                                                                               print('tab');
-                                                                              print(_sizes[index]);
 
                                                                               _CartData['kindOfFlower'] = _sizes[index]['value'].toString();
+
+                                                                              _prices = widget.arguments['product']['product_prices'].where((_price) => _price['product_pack_id'] == _sizes[index]['id']).toList();
+
+                                                                              print('Prices: ${_prices[0]}');
+                                                                              // print(_prices[index]);
                                                                             });
                                                                           },
                                                                           style:
@@ -2387,7 +2487,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                           Row(
                                                                             children: [
                                                                               Expanded(
-                                                                                child: Text(_configModel.user.firstName.toString()),
+                                                                                child: Text(_configModel.user!.firstName.toString()),
                                                                               ),
                                                                               Expanded(
                                                                                 child: Text(
@@ -2596,17 +2696,63 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                               ),
                                                                               child: InkWell(
                                                                                 onTap: () async {
-                                                                                  await _wishListModel.getWishLists(_productModel.categoryWiseproducts![index].id);
+                                                                                  if (_configModel.user == null) {
+                                                                                    showDialog(
+                                                                                      context: context,
+                                                                                      builder: (BuildContext context) => LoginRequiredPopupWidget(),
+                                                                                    );
+                                                                                    // Show error dialog when user is null
+                                                                                  } else {
+                                                                                    // Fetch wishlist for a specific product
+                                                                                    await _wishListModel.getWishLists(_productModel.categoryWiseproducts![index].id);
+                                                                                  }
                                                                                 },
-                                                                                child: _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.categoryWiseproducts![index].id && wishList.userId == _configModel.user.id).toList().length == 0
-                                                                                    ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
-                                                                                    : Align(
+                                                                                child: Builder(
+                                                                                  builder: (context) {
+                                                                                    if (_configModel.user?.id == null) {
+                                                                                      // If user ID is null, show default icon
+                                                                                      return const Align(
                                                                                         alignment: Alignment.topRight,
-                                                                                        child: Icon(
-                                                                                          Icons.favorite_outlined,
-                                                                                          color: Colors.red,
-                                                                                        )),
+                                                                                        child: Icon(Icons.favorite_border_outlined),
+                                                                                      );
+                                                                                    }
+
+                                                                                    if (_wishListModel.wishListLoader) {
+                                                                                      // Show loading state
+                                                                                      return const Align(
+                                                                                        alignment: Alignment.topRight,
+                                                                                        child: Icon(Icons.favorite_border_outlined),
+                                                                                      );
+                                                                                    }
+
+                                                                                    // Check if the product is in the user's wishlist
+                                                                                    bool isWishListed = _wishListModel.wishLists!.any((wishList) => wishList.productId == _productModel.categoryWiseproducts![index].id && wishList.userId == _configModel.user!.id);
+
+                                                                                    // Return the appropriate icon based on wishlist status
+                                                                                    return Align(
+                                                                                      alignment: Alignment.topRight,
+                                                                                      child: Icon(
+                                                                                        isWishListed ? Icons.favorite_outlined : Icons.favorite_border_outlined,
+                                                                                        color: isWishListed ? Colors.red : null,
+                                                                                      ),
+                                                                                    );
+                                                                                  },
+                                                                                ),
                                                                               ),
+
+                                                                              // InkWell(
+                                                                              //   onTap: () async {
+                                                                              //     await _wishListModel.getWishLists(_productModel.categoryWiseproducts![index].id);
+                                                                              //   },
+                                                                              //   child: _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.categoryWiseproducts![index].id && wishList.userId == _configModel.user!.id).toList().length == 0
+                                                                              //       ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
+                                                                              //       : Align(
+                                                                              //           alignment: Alignment.topRight,
+                                                                              //           child: Icon(
+                                                                              //             Icons.favorite_outlined,
+                                                                              //             color: Colors.red,
+                                                                              //           )),
+                                                                              // ),
                                                                             ),
                                                                           ),
                                                                         ],
@@ -2779,159 +2925,161 @@ class _ProductIdPageState extends State<ProductIdPage> {
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        child: Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-          child: Row(
-            children: [
-              Expanded(
-                flex: 6,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    width: 150,
-                    height: 41,
-                    child: TextButton(
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          _formKey.currentState!.save();
-                          bool type = true;
+      bottomNavigationBar: _configModel.user == null
+          ? SizedBox.shrink()
+          : Container(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 6,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          width: 150,
+                          height: 41,
+                          child: TextButton(
+                            onPressed: () async {
+                              if (_formKey.currentState!.validate()) {
+                                _formKey.currentState!.save();
+                                bool type = true;
 
-                          // await _addToCartModel
-                          //     .getAddToCart(
-                          //         widget.arguments![
-                          //             'product']['id'],
-                          //         type,
-                          //         _CartData);
-                          Navigator.pushNamed(context, '/cartPage');
-                        }
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                      ),
-                      child: Container(
-                        padding: EdgeInsets.fromLTRB(20, 10, 10, 10),
-                        decoration: BoxDecoration(
-                          color: Color(0xff1e1e1e),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.only(right: 10),
-                              child: Image.asset(
-                                'assets/images/shopping-bag-03.png',
-                                width: 18,
-                                height: 17,
+                                // await _addToCartModel
+                                //     .getAddToCart(
+                                //         widget.arguments![
+                                //             'product']['id'],
+                                //         type,
+                                //         _CartData);
+                                Navigator.pushNamed(context, '/cartPage');
+                              }
+                            },
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                            ),
+                            child: Container(
+                              padding: EdgeInsets.fromLTRB(20, 10, 10, 10),
+                              decoration: BoxDecoration(
+                                color: Color(0xff1e1e1e),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(right: 10),
+                                    child: Image.asset(
+                                      'assets/images/shopping-bag-03.png',
+                                      width: 18,
+                                      height: 17,
+                                    ),
+                                  ),
+                                  Text(
+                                    // addtocartB9Y (318:2187)
+                                    'Go To Cart',
+                                    style: MyGoogleFontStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xffffffff),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            Text(
-                              // addtocartB9Y (318:2187)
-                              'Go To Cart',
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Urbanist',
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xffffffff),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 6,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    width: 150,
-                    height: 41,
-                    child: TextButton(
-                      onPressed: () async {
-                        _formKey.currentState!.save();
-                        bool type = true;
-                        Navigator.pushNamed(context, '/cartPage');
+                    Expanded(
+                      flex: 6,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          width: 150,
+                          height: 41,
+                          child: TextButton(
+                            onPressed: () async {
+                              _formKey.currentState!.save();
+                              bool type = true;
+                              Navigator.pushNamed(context, '/cartPage');
 
-                        // if (_CartData['kindOfFlower'] == '' ||
-                        //     _CartData['flavour'] == '') {
-                        //   showDialog(
-                        //     context: context,
-                        //     builder: (BuildContext context) => AlertDialog(
-                        //       shape: RoundedRectangleBorder(
-                        //           borderRadius: BorderRadius.circular(20)),
-                        //       title: _CartData['kindOfFlower'] == '' &&
-                        //               _CartData['flavour'] != ''
-                        //           ? Text("kindly choose size.")
-                        //           : _CartData['flavour'] == '' &&
-                        //                   _CartData['kindOfFlower'] != ''
-                        //               ? Text("kindly choose colour.")
-                        //               : Text("kindly choose colour and size."),
-                        //       actions: <Widget>[
-                        //         TextButton(
-                        //           onPressed: () {
-                        //             Navigator.pop(context);
-                        //           },
-                        //           child: Text(
-                        //             'Ok',
-                        //             style: TextStyle(
-                        //                 color: Colors.black, fontSize: 16),
-                        //           ),
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   );
-                        // } else {
-                        //   await _addToCartModel.getAddToCart(
-                        //       widget.arguments!['product']['id'],
-                        //       type,
-                        //       _CartData);
-                        //   Navigator.pushNamed(context, '/cartPage');
-                        // }
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                      ),
-                      child: Container(
-                        padding: EdgeInsets.fromLTRB(30, 10, 10, 10),
-                        decoration: BoxDecoration(
-                          color: Color(0xFFC7B456),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.only(right: 10),
-                              child: Image.asset(
-                                'assets/images/shopping-bag-03.png',
-                                width: 18,
-                                height: 17,
+                              // if (_CartData['kindOfFlower'] == '' ||
+                              //     _CartData['flavour'] == '') {
+                              //   showDialog(
+                              //     context: context,
+                              //     builder: (BuildContext context) => AlertDialog(
+                              //       shape: RoundedRectangleBorder(
+                              //           borderRadius: BorderRadius.circular(20)),
+                              //       title: _CartData['kindOfFlower'] == '' &&
+                              //               _CartData['flavour'] != ''
+                              //           ? Text("kindly choose size.")
+                              //           : _CartData['flavour'] == '' &&
+                              //                   _CartData['kindOfFlower'] != ''
+                              //               ? Text("kindly choose colour.")
+                              //               : Text("kindly choose colour and size."),
+                              //       actions: <Widget>[
+                              //         TextButton(
+                              //           onPressed: () {
+                              //             Navigator.pop(context);
+                              //           },
+                              //           child: Text(
+                              //             'Ok',
+                              //             style: TextStyle(
+                              //                 color: Colors.black, fontSize: 16),
+                              //           ),
+                              //         ),
+                              //       ],
+                              //     ),
+                              //   );
+                              // } else {
+                              //   await _addToCartModel.getAddToCart(
+                              //       widget.arguments!['product']['id'],
+                              //       type,
+                              //       _CartData);
+                              //   Navigator.pushNamed(context, '/cartPage');
+                              // }
+                            },
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                            ),
+                            child: Container(
+                              padding: EdgeInsets.fromLTRB(30, 10, 10, 10),
+                              decoration: BoxDecoration(
+                                color: Color(0xFFC7B456),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(right: 10),
+                                    child: Image.asset(
+                                      'assets/images/shopping-bag-03.png',
+                                      width: 18,
+                                      height: 17,
+                                    ),
+                                  ),
+                                  Text(
+                                    // addtocartB9Y (318:2187)
+                                    'Buy Now',
+                                    style: MyGoogleFontStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xffffffff),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            Text(
-                              // addtocartB9Y (318:2187)
-                              'Buy Now',
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Urbanist',
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xffffffff),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }

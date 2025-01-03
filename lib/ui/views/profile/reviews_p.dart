@@ -172,8 +172,9 @@ class ReviewCard extends StatelessWidget {
                         : Center(
                             child: RatingBar.builder(
                               itemSize: 15,
-                              initialRating:
-                                  double.parse(review.rating.toString()),
+                              initialRating: review.rating == null
+                                  ? 0.0
+                                  : double.parse(review.rating.toString()),
                               direction: Axis.horizontal,
                               itemCount: 5,
                               allowHalfRating: true,
@@ -195,7 +196,7 @@ class ReviewCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  configModel.user.firstName.toString(),
+                  configModel.user!.firstName.toString(),
                   style: MyGoogleFontStyle(
                     fontFamily: 'Poppins',
                     fontSize: 12,

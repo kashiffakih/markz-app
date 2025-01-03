@@ -14,6 +14,7 @@ import 'package:sales_app/ui/views/products/shops_p.dart';
 import 'package:sales_app/ui/widgets/drawer_w.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:sales_app/ui/widgets/image_zoom_w.dart';
+import 'package:sales_app/ui/widgets/login_required_popup.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -377,46 +378,79 @@ class _HomePageState extends State<HomePage>
                                               ),
                                               child: InkWell(
                                                 onTap: () async {
-                                                  await _wishListModel
-                                                      .getWishLists(
-                                                          _productModel
-                                                              .products![index]
-                                                              .id);
+                                                  if (_configModel.user ==
+                                                      null) {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                              context) =>
+                                                          LoginRequiredPopupWidget(),
+                                                    );
+                                                    // Show error dialog when user is null
+                                                  } else {
+                                                    // Fetch wishlist for a specific product
+                                                    await _wishListModel
+                                                        .getWishLists(
+                                                            _productModel
+                                                                .products![
+                                                                    index]
+                                                                .id);
+                                                  }
                                                 },
-                                                child: _wishListModel
-                                                        .wishListLoader
-                                                    ? Align(
+                                                child: Builder(
+                                                  builder: (context) {
+                                                    if (_configModel.user?.id ==
+                                                        null) {
+                                                      // If user ID is null, show default icon
+                                                      return const Align(
                                                         alignment:
                                                             Alignment.topRight,
                                                         child: Icon(Icons
-                                                            .favorite_border_outlined))
-                                                    : _wishListModel.wishLists!
-                                                                .where((wishList) =>
-                                                                    wishList.productId ==
-                                                                        _productModel
-                                                                            .products![
-                                                                                index]
-                                                                            .id &&
-                                                                    wishList.userId ==
-                                                                        _configModel
-                                                                            .user
-                                                                            .id)
-                                                                .toList()
-                                                                .length ==
-                                                            0
-                                                        ? Align(
-                                                            alignment: Alignment
-                                                                .topRight,
-                                                            child: Icon(Icons
-                                                                .favorite_border_outlined))
-                                                        : Align(
-                                                            alignment: Alignment
-                                                                .topRight,
-                                                            child: Icon(
-                                                              Icons
-                                                                  .favorite_outlined,
-                                                              color: Colors.red,
-                                                            )),
+                                                            .favorite_border_outlined),
+                                                      );
+                                                    }
+
+                                                    if (_wishListModel
+                                                        .wishListLoader) {
+                                                      // Show loading state
+                                                      return const Align(
+                                                        alignment:
+                                                            Alignment.topRight,
+                                                        child: Icon(Icons
+                                                            .favorite_border_outlined),
+                                                      );
+                                                    }
+
+                                                    // Check if the product is in the user's wishlist
+                                                    bool isWishListed = _wishListModel
+                                                        .wishLists!
+                                                        .any((wishList) =>
+                                                            wishList.productId ==
+                                                                _productModel
+                                                                    .products![
+                                                                        index]
+                                                                    .id &&
+                                                            wishList.userId ==
+                                                                _configModel
+                                                                    .user!.id);
+
+                                                    // Return the appropriate icon based on wishlist status
+                                                    return Align(
+                                                      alignment:
+                                                          Alignment.topRight,
+                                                      child: Icon(
+                                                        isWishListed
+                                                            ? Icons
+                                                                .favorite_outlined
+                                                            : Icons
+                                                                .favorite_border_outlined,
+                                                        color: isWishListed
+                                                            ? Colors.red
+                                                            : null,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -1073,20 +1107,44 @@ class _HomePageState extends State<HomePage>
             }
 
             if (value == 2) {
-              Map<String, dynamic> _CartData = {
-                'kindOfFlower': '',
-                'flavour': '',
-                'writeOnCake': '',
-                'pack': ''
-              };
-              await _addToCartModel.getAddToCart('', '', _CartData);
-              Navigator.pushNamed(context, '/cartPage');
+              if (_configModel.user == null) {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => LoginRequiredPopupWidget(),
+                );
+                // Show error dialog when user is null
+              } else {
+                Map<String, dynamic> _CartData = {
+                  'kindOfFlower': '',
+                  'flavour': '',
+                  'writeOnCake': '',
+                  'pack': ''
+                };
+                await _addToCartModel.getAddToCart('', '', _CartData);
+                Navigator.pushNamed(context, '/cartPage');
+              }
             }
             if (value == 3) {
-              Navigator.pushNamed(context, '/profilePage');
+              if (_configModel.user == null) {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => LoginRequiredPopupWidget(),
+                );
+                // Show error dialog when user is null
+              } else {
+                Navigator.pushNamed(context, '/profilePage');
+              }
             }
             if (value == 4) {
-              Navigator.pushNamed(context, '/notificationPage');
+              if (_configModel.user == null) {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => LoginRequiredPopupWidget(),
+                );
+                // Show error dialog when user is null
+              } else {
+                Navigator.pushNamed(context, '/notificationPage');
+              }
             }
           },
           items: [

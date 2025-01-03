@@ -241,7 +241,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   SettingUpdatePage(arguments: {
-                                                    'user': _configModel.user
+                                                    'user': _configModel.user!
                                                   })));
                                     },
                                     child: Image.asset(
@@ -285,7 +285,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                       height: 3,
                                     ),
                                     Text(
-                                      _configModel.user.firstName.toString(),
+                                      _configModel.user!.firstName.toString(),
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontWeight: FontWeight.w400,
@@ -328,7 +328,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                       height: 3,
                                     ),
                                     Text(
-                                      _configModel.user.email.toString(),
+                                      _configModel.user!.email.toString(),
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontWeight: FontWeight.w400,
@@ -371,7 +371,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                       height: 3,
                                     ),
                                     Text(
-                                      _configModel.user.phone.toString(),
+                                      _configModel.user!.phone.toString(),
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontWeight: FontWeight.w400,

@@ -31,7 +31,7 @@ class Review {
     userId = json['user_id'];
     productId = json['product_id'];
     description = json['description'];
-    rating = json['rating'];
+    rating = json['rating'].toString();
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     user = json['user'] != null ? new User.fromJson(json['user']) : null;

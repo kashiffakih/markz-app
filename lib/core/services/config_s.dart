@@ -27,8 +27,12 @@ class ConfigService {
 
   Future<void> saveLoginData(
       {@required Map<String, dynamic>? newLoginData}) async {
-    SharedPreferences _prefs = await SharedPreferences.getInstance();
-    await _prefs.setString('loginData', json.encode(newLoginData));
+    if (newLoginData == null) {
+      return null;
+    } else {
+      SharedPreferences _prefs = await SharedPreferences.getInstance();
+      await _prefs.setString('loginData', json.encode(newLoginData));
+    }
   }
 
   Future<Map<String, dynamic>> fetchLoginData() async {
