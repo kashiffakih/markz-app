@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
@@ -15,8 +16,10 @@ import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/routing/router.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 
-void main() {
+Future<void> main() async {
   setupLocator();
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 

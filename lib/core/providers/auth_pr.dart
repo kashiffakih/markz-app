@@ -37,4 +37,21 @@ class AuthModel with ChangeNotifier {
       data: data,
     );
   }
+
+  Future<dynamic> signInWithGoogle() async {
+    try {
+      var userCredential = await _authService.signInWithGoogle();
+      if (userCredential != null) {
+        // Handle successful Google Sign-In (e.g., save user data or notify listeners)
+        print("Google Sign-In successful: ${userCredential.user}");
+        notifyListeners();
+      }
+      return userCredential;
+    } catch (e) {
+      // Handle error during Google Sign-In
+      print("Error during Google Sign-In: $e");
+      rethrow; // Optionally rethrow the error for further handling in the UI
+    }
+  }
+
 }
