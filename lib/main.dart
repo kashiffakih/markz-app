@@ -20,6 +20,7 @@ Future<void> main() async {
   setupLocator();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
   runApp(MyApp());
 }
 

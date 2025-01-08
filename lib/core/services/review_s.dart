@@ -63,7 +63,7 @@ class ReviewService {
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
 
-    print("Review ${_responseData['data'][0]['review_images']}");
+    // print("Review ${_responseData['data'][0]['review_images']}");
     if (_responseData['success']) {
       _reviews = [];
       _responseData['data'].forEach((data) {
