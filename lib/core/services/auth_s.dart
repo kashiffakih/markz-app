@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -162,6 +164,65 @@ class AuthService {
     } on Exception catch (e) {
       // TODO
       print('exception->$e');
+    }
+  }
+
+  Future<Map<String, dynamic>> uploadImage({
+    required File imageFile,
+    required String userId,
+  }) async {
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+
+    // Define the API endpoint for uploading the image
+    final String uploadUrl =
+        '${_apiConfig['baseURL']}/upload_user_images'; // Adjust to your actual endpoint
+
+    try {
+      // Create a multipart request for the image upload
+      var request = http.MultipartRequest('POST', Uri.parse(uploadUrl));
+
+      // Add the userId as a form field
+      request.fields['userid'] = userId;
+
+      // Attach the image file to the request
+      request.files.add(await http.MultipartFile.fromPath(
+        'image_path', // The key expected by the server for the file
+        imageFile.path,
+      ));
+
+      // Add headers
+      request.headers.addAll(_apiConfig['headers']);
+
+      // Send the request
+      var response = await request.send();
+
+      // Handle the response
+      if (response.statusCode == 200) {
+        // Parse the response body
+        var responseBody = await http.Response.fromStream(response);
+        Map<String, dynamic> responseData = json.decode(responseBody.body);
+        print('Image upload successful: $responseData');
+        print('Image path successful: ${responseData['data']['image_path']}');
+        _configModel.updateProfileImage(responseData['data']['image_path']);
+        return {
+          'success': true,
+          'data': responseData,
+          'image_path':responseData['data']['image_path']
+        };
+      } else {
+        // If the upload fails, return an error message
+        return {
+          'success': false,
+          'message':
+          'Image upload failed with status code: ${response.statusCode}',
+        };
+      }
+    } catch (e) {
+      // Handle any errors
+      return {
+        'success': false,
+        'message': 'Error uploading image API: $e',
+      };
     }
   }
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
@@ -189,6 +191,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                             TextButton(
                                               onPressed: () async {
                                                 Navigator.of(context).pop();
+                                                await GoogleSignIn().signOut();
+                                                await FacebookAuth.instance.logOut();
                                                 await _configModel
                                                     .removeLoginData();
                                                 Navigator.pushReplacementNamed(

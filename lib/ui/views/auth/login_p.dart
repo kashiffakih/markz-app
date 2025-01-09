@@ -537,29 +537,29 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-                        Expanded(
-                          child: Container(
-                            padding: EdgeInsets.fromLTRB(30.88 * fem,
-                                14.14 * fem, 35.59 * fem, 14.14 * fem),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Color(0xffe8ecf4)),
-                              color: Color(0xffffffff),
-                              borderRadius:
-                                  BorderRadius.circular(7.5407857895 * fem),
-                            ),
-                            child: Center(
-                              child: SizedBox(
-                                width: 24.51 * fem,
-                                height: 24.51 * fem,
-                                child: Image.asset(
-                                  'assets/images/cib-apple-KaY.png',
-                                  width: 24.51 * fem,
-                                  height: 24.51 * fem,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                        // Expanded(
+                        //   child: Container(
+                        //     padding: EdgeInsets.fromLTRB(30.88 * fem,
+                        //         14.14 * fem, 35.59 * fem, 14.14 * fem),
+                        //     decoration: BoxDecoration(
+                        //       border: Border.all(color: Color(0xffe8ecf4)),
+                        //       color: Color(0xffffffff),
+                        //       borderRadius:
+                        //           BorderRadius.circular(7.5407857895 * fem),
+                        //     ),
+                        //     child: Center(
+                        //       child: SizedBox(
+                        //         width: 24.51 * fem,
+                        //         height: 24.51 * fem,
+                        //         child: Image.asset(
+                        //           'assets/images/cib-apple-KaY.png',
+                        //           width: 24.51 * fem,
+                        //           height: 24.51 * fem,
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:sales_app/core/services/auth_s.dart';
@@ -6,7 +7,14 @@ import 'package:sales_app/locator.dart';
 
 class AuthModel with ChangeNotifier {
   final AuthService _authService = locator<AuthService>();
+  bool _loading = false;
 
+  set loading(bool newLoading) {
+    _loading = newLoading;
+    notifyListeners();
+  }
+
+  bool get loading => _loading;
   Future<void> login({required Map<String, dynamic> loginData}) async {
     await _authService.getLoggedInUser(
       loginData: loginData,
@@ -53,5 +61,26 @@ class AuthModel with ChangeNotifier {
       rethrow; // Optionally rethrow the error for further handling in the UI
     }
   }
+  Future<Map<String, dynamic>> uploadImage({
+    required File imageFile,
+    required String userId,
+  }) async {
+    loading = true;
+    // Call the uploadImage method from AuthService
+    final response = await _authService.uploadImage(
+      imageFile: imageFile,
+      userId: userId,
+    );
 
+    // Optionally, handle any logic or state changes, then notify listeners
+    if (response['success']) {
+      // String selectedImage = response['image_path'];
+      // debugPrint("Image Path ${selectedImage}");
+      notifyListeners();
+
+      // Notify UI about any state changes if necessary
+    }
+    loading = false;
+    return response;
+  }
 }
