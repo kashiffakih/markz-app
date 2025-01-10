@@ -766,7 +766,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           .arguments['couponValue']
                                           .toString())) -
                                       (int.parse(_userWaletModel.totaRemainingPoint.toString()) /
-                                          3))
+                                          1))
                                   .toStringAsFixed(0);
 
                               var userWalletUsed = (int.parse(_userWaletModel
