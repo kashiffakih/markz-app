@@ -75,7 +75,7 @@ class AuthModel with ChangeNotifier {
     // Optionally, handle any logic or state changes, then notify listeners
     if (response['success']) {
       // String selectedImage = response['image_path'];
-      // debugPrint("Image Path ${selectedImage}");
+      debugPrint("Image Path ${response}");
       notifyListeners();
 
       // Notify UI about any state changes if necessary

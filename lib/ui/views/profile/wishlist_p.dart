@@ -409,6 +409,7 @@ class _WishlistPageState extends State<WishlistPage> {
                                                                                           activeIndex = index; // Update the selected product image
                                                                                           sizeActiveIndex = -1;
                                                                                           _CartData['flavour'] = productImages[index].unit!.name.toString();
+                                                                                          _CartData['pack'] = productImages[index].id;
                                                                                         });
                                                                                       },
                                                                                       style: TextButton.styleFrom(
@@ -524,7 +525,7 @@ class _WishlistPageState extends State<WishlistPage> {
                                                                                         ),
                                                                                         child: Center(
                                                                                           child: Text(
-                                                                                            filteredProductPacks[index].value.toString(),
+                                                                                            "${filteredProductPacks[index].value}",
                                                                                             style: MyGoogleFontStyle(
                                                                                               fontFamily: 'Urbanist',
                                                                                               fontSize: 12,
@@ -548,34 +549,91 @@ class _WishlistPageState extends State<WishlistPage> {
                                                                           height:
                                                                               20,
                                                                         ),
+
                                                                         InkWell(
-                                                                          onTap:
-                                                                              () async {
+                                                                          onTap: () async {
+                                                                            if (activeIndex == -1) {
+                                                                              showDialog(
+                                                                                context: context,
+                                                                                builder: (BuildContext context) {
+                                                                                  return AlertDialog(
+                                                                                    title: Text(
+                                                                                      'Oops...!',
+                                                                                      style: TextStyle(
+                                                                                        fontWeight: FontWeight.bold,
+                                                                                        color: Colors.red,
+                                                                                      ),
+                                                                                    ),
+                                                                                    content: Text('Please select a variant before adding to cart.'),
+                                                                                    actions: [
+                                                                                      TextButton(
+                                                                                        onPressed: () {
+                                                                                          Navigator.of(context).pop(); // Close the dialog
+                                                                                        },
+                                                                                        child: Text(
+                                                                                          'OK',
+                                                                                          style: TextStyle(color: Colors.black),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ],
+                                                                                  );
+                                                                                },
+                                                                              );
+                                                                              return; // Stop execution if variant is not selected
+                                                                            }
+                                                                            if (sizeActiveIndex == -1) {
+                                                                              showDialog(
+                                                                                context: context,
+                                                                                builder: (BuildContext context) {
+                                                                                  return AlertDialog(
+                                                                                    title: Text(
+                                                                                      'Oops...!',
+                                                                                      style: TextStyle(
+                                                                                        fontWeight: FontWeight.bold,
+                                                                                        color: Colors.red,
+                                                                                      ),
+                                                                                    ),
+                                                                                    content: Text('Please select a size before adding to cart.'),
+                                                                                    actions: [
+                                                                                      TextButton(
+                                                                                        onPressed: () {
+                                                                                          Navigator.of(context).pop(); // Close the dialog
+                                                                                        },
+                                                                                        child: Text(
+                                                                                          'OK',
+                                                                                          style: TextStyle(color: Colors.black),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ],
+                                                                                  );
+                                                                                },
+                                                                              );
+                                                                              return; // Stop execution if size is not selected
+                                                                            }
+
+
+
+
                                                                             print(_CartData);
                                                                             setState(() {
                                                                               isPageLoading = true;
                                                                             });
-                                                                            bool
-                                                                                type =
-                                                                                true;
+                                                                            bool type = true;
 
                                                                             await _addToCartModel.getAddToCart(
-                                                                                _wishListModel.wishLists![index].product!.id,
-                                                                                type,
-                                                                                _CartData);
+                                                                              _wishListModel.wishLists![index].product!.id,
+                                                                              type,
+                                                                              _CartData,
+                                                                            );
 
                                                                             setState(() {
-                                                                              // productImages = [];
-                                                                              // productPacks = [];
                                                                               isPageLoading = false;
                                                                               _wishListModel.getWishLists('');
                                                                               Navigator.pop(context);
                                                                             });
                                                                           },
-                                                                          child:
-                                                                              Center(
-                                                                            child:
-                                                                                Container(
+                                                                          child: Center(
+                                                                            child: Container(
                                                                               padding: EdgeInsets.fromLTRB(13, 4, 14, 6),
                                                                               width: 160,
                                                                               height: 50,
@@ -590,15 +648,17 @@ class _WishlistPageState extends State<WishlistPage> {
                                                                                     padding: EdgeInsets.symmetric(horizontal: 5),
                                                                                     child: isPageLoading == false
                                                                                         ? Text(
-                                                                                            'Add to Cart',
-                                                                                            style: MyGoogleFontStyle(
-                                                                                              fontFamily: 'Poppins',
-                                                                                              fontSize: 15,
-                                                                                              fontWeight: FontWeight.w600,
-                                                                                              color: Color(0xffffffff),
-                                                                                            ),
-                                                                                          )
-                                                                                        : CircularProgressIndicator(),
+                                                                                      'Add to Cart',
+                                                                                      style: MyGoogleFontStyle(
+                                                                                        fontFamily: 'Poppins',
+                                                                                        fontSize: 15,
+                                                                                        fontWeight: FontWeight.w600,
+                                                                                        color: Color(0xffffffff),
+                                                                                      ),
+                                                                                    )
+                                                                                        : CircularProgressIndicator(
+                                                                                      color: Colors.white,
+                                                                                    ),
                                                                                   ),
                                                                                   Image.asset(
                                                                                     'assets/images/shopping-bag-03-YoY.png',
@@ -610,6 +670,7 @@ class _WishlistPageState extends State<WishlistPage> {
                                                                             ),
                                                                           ),
                                                                         ),
+
                                                                       ],
                                                                     ),
                                                                   ),

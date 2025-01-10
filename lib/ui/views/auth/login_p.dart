@@ -104,6 +104,7 @@ class _LoginPageState extends State<LoginPage> {
     'email': '',
     'password': '',
     'rememberme': 1,
+    'role':''
   };
   bool _isLoading = false;
 
@@ -112,6 +113,10 @@ class _LoginPageState extends State<LoginPage> {
 
   //   super.initState();
   // }
+  bool _isValidEmail(String input) {
+    String emailPattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
+    return RegExp(emailPattern).hasMatch(input);
+  }
 
   fetchLoginData() async {
     await _configModel.fetchLoginData();
@@ -122,6 +127,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     // print(widget.argument['role']);
+    // debugPrint("role login ${widget.argument['role']}");
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
@@ -223,6 +229,9 @@ class _LoginPageState extends State<LoginPage> {
                     initialValue: _loginData['email'],
                     validator: (value) {
                       if (value!.isEmpty) return 'Username cannot be empty';
+                      if (!_isValidEmail(value)) {
+                        return 'Please enter a valid email address';
+                      }
                       return null;
                     },
                     onSaved: (value) {
@@ -311,6 +320,7 @@ class _LoginPageState extends State<LoginPage> {
                       });
                       if (_loginKey.currentState!.validate()) {
                         _loginKey.currentState!.save();
+                        _loginData['role'] =widget.argument['role'];
                         await authModel.login(loginData: _loginData);
                         if (_configModel.isLoggedIn) {
                           Navigator.pushReplacementNamed(

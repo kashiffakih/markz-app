@@ -175,7 +175,7 @@ class AuthService {
 
     // Define the API endpoint for uploading the image
     final String uploadUrl =
-        '${_apiConfig['baseURL']}/upload_user_images'; // Adjust to your actual endpoint
+        '${_apiConfig['baseURL']}/upload_user_photo'; // Adjust to your actual endpoint
 
     try {
       // Create a multipart request for the image upload
@@ -186,7 +186,7 @@ class AuthService {
 
       // Attach the image file to the request
       request.files.add(await http.MultipartFile.fromPath(
-        'image_path', // The key expected by the server for the file
+        'attachment', // The key expected by the server for the file
         imageFile.path,
       ));
 

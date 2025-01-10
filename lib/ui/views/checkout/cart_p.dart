@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 // import 'package:get_ip_address/get_ip_address.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/models/user_address.dart';
@@ -23,6 +24,7 @@ import '../products/product_id_p.dart';
 
 class CartPage extends StatefulWidget {
   final arguments;
+
   const CartPage({
     Key? key,
     this.arguments,
@@ -44,17 +46,25 @@ class _CartPageState extends State<CartPage> {
     'writeOnCake': '',
     'pack': ''
   };
+
   // bool type = true;
   @override
   void initState() {
+    super.initState();
     var productId = '';
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Provider.of<AddToCartModel>(context, listen: false)
-          .getAddToCart('', '', _CartData);
-      await Provider.of<ProductModel>(context, listen: false)
-          .getCategoryWiseProduct(widget.arguments!['product']['category_id']);
+      if(_CartData.isNotEmpty || _CartData != null){
+        await Provider.of<AddToCartModel>(context, listen: false).getAddToCart('', '', _CartData);
+      }
+
+      if (widget.arguments?['product']['category_id'] != null) {
+        await Provider.of<ProductModel>(context, listen: false)
+            .getCategoryWiseProduct(
+                widget.arguments?['product']['category_id']);
+      }
+
       await Provider.of<OrderModel>(context, listen: false).getOrder();
-      super.initState();
+
       await Provider.of<UserWalletModel>(context, listen: false)
           .getMyUserWallets();
 
@@ -143,6 +153,7 @@ class _CartPageState extends State<CartPage> {
   var paymentOption = '';
 
   bool isGift = false;
+
   @override
   Widget build(BuildContext context) {
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
@@ -787,15 +798,20 @@ class _CartPageState extends State<CartPage> {
                                                       SizedBox(
                                                         width: 10,
                                                       ),
-                                                      Align(
-                                                        alignment: Alignment
-                                                            .centerLeft,
-                                                        child: Text(
-                                                          'Colour: ${_addToCartModel.addToCarts![index].flavour}',
-                                                          style:
-                                                              MyGoogleFontStyle(
-                                                            fontFamily:
-                                                                'Poppins',
+                                                      Expanded(
+                                                        child: Align(
+                                                          alignment: Alignment
+                                                              .centerLeft,
+                                                          child: Text(
+                                                        
+                                                            'Colour: ${_addToCartModel.addToCarts![index].flavour}',
+                                                            overflow: TextOverflow.ellipsis,
+                                                            style:
+                                                                MyGoogleFontStyle(
+                                                              fontFamily:
+                                                                  'Poppins',
+                                                        
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
@@ -1869,7 +1885,8 @@ class _CartPageState extends State<CartPage> {
                                                       ),
                                                     ),
                                                   Text(
-                                                    'RS ${(_userWaletModel.totaRemainingPoint ~/ 3)}', // Division by 3 directly
+                                                    'RS ${(_userWaletModel.totaRemainingPoint ~/ 3)}',
+                                                    // Division by 3 directly
                                                     textAlign: TextAlign.right,
                                                     style: MyGoogleFontStyle(
                                                       fontFamily: 'Inter',

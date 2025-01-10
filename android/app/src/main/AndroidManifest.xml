@@ -50,7 +50,8 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="www.flutter-deep-link.com" />
+<!--                <data android:scheme="http" android:host="www.flutter-deep-link.com" />-->
+                <data android:scheme="http" android:host="org.pms.Aadab" />
             </intent-filter>
 
             <!-- Deep Link sample -->

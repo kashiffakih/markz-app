@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:sales_app/core/models/product.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/review_pr.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
@@ -11,7 +12,9 @@ import '../../../locator.dart';
 
 class OrderDetailsPage extends StatefulWidget {
   final arguments;
+
   const OrderDetailsPage({Key? key, this.arguments}) : super(key: key);
+
   @override
   State<OrderDetailsPage> createState() => OorderDetailsPageState();
 }
@@ -21,12 +24,16 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
   var _reviewDescription = '';
   bool _loading = false;
   double currentRating = 0;
+  List<ProductImages>? productImages;
 
   @override
   Widget build(BuildContext context) {
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     final ConfigModel _configModel = locator<ConfigModel>();
     final ReviewModel _reviewModel = Provider.of<ReviewModel>(context);
+
+    debugPrint(
+        "Image processing----------${widget.arguments["product_images"][0].imagepath}");
 
     // print(widget.arguments['order']['id'].toString());
     double baseWidth = 360;
@@ -153,459 +160,516 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                                     .arguments['order']['order_details'].length
                                 : 2)),
                     child: ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      itemCount:
-                          widget.arguments['order']['order_details'].length,
-                      itemBuilder: (BuildContext context, index) => Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+                        scrollDirection: Axis.vertical,
+                        itemCount:
+                            widget.arguments['order']['order_details'].length,
+                        itemBuilder: (BuildContext context, index) {
+                          debugPrint("ImagePAth------${widget.arguments["product_images"][index].imagepath}");
+                          // final filteredImages = widget.arguments["product_images"]
+                          //     .where((data) {
+                          //       return
+                          //   widget.arguments['order']['order_details']
+                          //   [index]['product_pack'] ==
+                          //       data["id"]});
+
+                          String? imagePath;
+                          productImages = widget.arguments["product_images"];
+
+
+
+                          List<String?> imagePaths = [];  // Create a list to store image paths.
+
+                          try {
+                            // Debug print the values you're comparing.
+                            final productPack = widget.arguments['order']['order_details'][index]['product_pack'];
+                            debugPrint("Comparing data.id with product_pack: data.id = $productPack");
+
+                            // Filter the product images based on the condition and store the matching imagepaths.
+                            productImages?.forEach((data) {
+                              debugPrint("Checking data.id: ${data.id} against product_pack: $productPack");
+                              if (data.id == productPack) {
+                                debugPrint("Match found, adding imagepath: ${data.imagepath}");
+                                imagePaths.add(data.imagepath);  // Store the matching imagepath.
+                              }
+                            });
+                            debugPrint("ImagePaths------$imagePaths");
+                            // If any matches were found, you can access the first one or handle as needed.
+                            if (imagePaths.isNotEmpty) {
+                              imagePath = imagePaths.first;  // You can choose to get the first match or use the entire list.
+                              debugPrint("ImagePath------$imagePath");
+                            } else {
+                              imagePath = null;  // If no matches, set imagePath to null.
+                            }
+
+                          } catch (e) {
+                            debugPrint("Error retrieving image path: $e");
+                          }
+
+
+
+
+
+
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    margin: EdgeInsets.fromLTRB(
+                                        0 * fem, 0 * fem, 0 * fem, 11 * fem),
+                                    child: Text(
+                                      widget.arguments['order']['order_details']
+                                              [index]['product']['name']
+                                          .toString(),
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 15 * ffem,
+                                        fontWeight: FontWeight.w600,
+                                        height: 1.2 * ffem / fem,
+                                        letterSpacing: -0.3 * fem,
+                                        color: Color(0xff1e1e1e),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 50,
+                                  ),
+                                  Container(
+                                    width: 60,
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                            image: productImages?.first.imagepath != null
+                                                ? NetworkImage(_configModel
+                                                        .apiConfig['mediaURL'] +
+                                                productImages?.first.imagepath)
+                                                : AssetImage(
+                                                        "assets/images/avatar-bg.png")
+                                                    as ImageProvider)),
+                                  ),
+                                  Spacer(),
+                                  InkWell(
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            title: Text("Add your review"),
+                                            content: SizedBox(
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.5,
+                                              width: 400,
+                                              // Set height relative to screen
+                                              child: SingleChildScrollView(
+                                                child: Column(
+                                                  children: [
+                                                    Form(
+                                                      key: _reviewFormKey,
+                                                      child: Column(
+                                                        children: [
+                                                          Center(
+                                                            child: RatingBar
+                                                                .builder(
+                                                              itemSize: 30,
+                                                              initialRating:
+                                                                  currentRating,
+                                                              minRating: 0.5,
+                                                              direction: Axis
+                                                                  .horizontal,
+                                                              allowHalfRating:
+                                                                  true,
+                                                              itemCount: 5,
+                                                              itemPadding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          4.0),
+                                                              itemBuilder:
+                                                                  (context,
+                                                                          _) =>
+                                                                      const Icon(
+                                                                Icons.star,
+                                                                color: Colors
+                                                                    .amber,
+                                                              ),
+                                                              onRatingUpdate:
+                                                                  (rating) {
+                                                                setState(() {
+                                                                  currentRating =
+                                                                      rating;
+                                                                });
+                                                              },
+                                                            ),
+                                                          ),
+                                                          SizedBox(height: 10),
+                                                          Container(
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              border: Border.all(
+                                                                  color: const Color(
+                                                                      0xffdadada)),
+                                                              color: const Color(
+                                                                  0xffffffff),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          20),
+                                                            ),
+                                                            child:
+                                                                TextFormField(
+                                                              maxLines: 5,
+                                                              decoration:
+                                                                  const InputDecoration(
+                                                                border:
+                                                                    InputBorder
+                                                                        .none,
+                                                                focusedBorder:
+                                                                    InputBorder
+                                                                        .none,
+                                                                enabledBorder:
+                                                                    InputBorder
+                                                                        .none,
+                                                                errorBorder:
+                                                                    InputBorder
+                                                                        .none,
+                                                                disabledBorder:
+                                                                    InputBorder
+                                                                        .none,
+                                                                hintText:
+                                                                    'Write your review here.',
+                                                                contentPadding:
+                                                                    EdgeInsets
+                                                                        .all(
+                                                                            10),
+                                                                hintStyle: TextStyle(
+                                                                    color: Color(
+                                                                        0xff8390a1)),
+                                                              ),
+                                                              initialValue:
+                                                                  _reviewDescription,
+                                                              onSaved: (value) {
+                                                                _reviewDescription =
+                                                                    value
+                                                                        .toString();
+                                                              },
+                                                              validator:
+                                                                  (value) {
+                                                                if (value!
+                                                                    .isEmpty) {
+                                                                  return 'Please write some review.';
+                                                                }
+                                                                return null;
+                                                              },
+                                                            ),
+                                                          ),
+                                                          SizedBox(height: 10),
+                                                          SizedBox(
+                                                            height: 120,
+                                                            child:
+                                                                MultipleImageUploadPage(),
+                                                          ),
+                                                          Container(
+                                                            margin:
+                                                                const EdgeInsets
+                                                                    .fromLTRB(5,
+                                                                    0, 6.34, 0),
+                                                            child: TextButton(
+                                                              onPressed: _loading
+                                                                  ? null
+                                                                  : () async {
+                                                                      if (_reviewFormKey
+                                                                          .currentState!
+                                                                          .validate()) {
+                                                                        _reviewFormKey
+                                                                            .currentState!
+                                                                            .save();
+
+                                                                        // Remove or bypass the image validation logic
+                                                                        setState(
+                                                                            () {
+                                                                          _loading =
+                                                                              true;
+                                                                        });
+
+                                                                        await _reviewModel
+                                                                            .getMyReviews(
+                                                                          widget.arguments['order']['order_details'][index]['product']
+                                                                              [
+                                                                              'id'],
+                                                                          _reviewDescription,
+                                                                          currentRating,
+                                                                        );
+
+                                                                        setState(
+                                                                            () {
+                                                                          _loading =
+                                                                              false;
+                                                                        });
+
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                      }
+                                                                    },
+                                                              style: TextButton
+                                                                  .styleFrom(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .zero,
+                                                              ),
+                                                              child: Container(
+                                                                width: double
+                                                                    .infinity,
+                                                                height: 53,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: const Color(
+                                                                      0xff1e1e1e),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              10),
+                                                                ),
+                                                                child: Center(
+                                                                  child: _loading
+                                                                      ? const SizedBox(
+                                                                          child:
+                                                                              CircularProgressIndicator(
+                                                                            backgroundColor:
+                                                                                Colors.white,
+                                                                          ),
+                                                                          height:
+                                                                              20,
+                                                                          width:
+                                                                              20,
+                                                                        )
+                                                                      : Text(
+                                                                          'Post Review',
+                                                                          textAlign:
+                                                                              TextAlign.center,
+                                                                          style:
+                                                                              MyGoogleFontStyle(
+                                                                            fontFamily:
+                                                                                'Urbanist',
+                                                                            fontSize:
+                                                                                15.1428556442,
+                                                                            fontWeight:
+                                                                                FontWeight.w700,
+                                                                            height:
+                                                                                1.4999999685,
+                                                                            color:
+                                                                                const Color(0xffffffff),
+                                                                          ),
+                                                                        ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text(
+                                                  'Cancel',
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 16),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Container(
+                                      width: 74.5,
+                                      height: 30,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xff232323),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          '+ Review',
+                                          textAlign: TextAlign.center,
+                                          style: MyGoogleFontStyle(
+                                            fontFamily: 'Poppins',
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w400,
+                                            color: const Color(0xffffffff),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
                               Container(
                                 margin: EdgeInsets.fromLTRB(
-                                    0 * fem, 0 * fem, 0 * fem, 11 * fem),
-                                child: Text(
-                                  widget.arguments['order']['order_details']
-                                          [index]['product']['name']
-                                      .toString(),
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 15 * ffem,
-                                    fontWeight: FontWeight.w600,
-                                    height: 1.2 * ffem / fem,
-                                    letterSpacing: -0.3 * fem,
-                                    color: Color(0xff1e1e1e),
+                                    0 * fem, 0 * fem, 0 * fem, 7 * fem),
+                                constraints: BoxConstraints(
+                                  maxWidth: 205 * fem,
+                                ),
+                                child: RichText(
+                                  text: TextSpan(
+                                    style: MyGoogleFontStyle(
+                                      fontFamily: 'Poppins',
+                                      fontSize: 12 * ffem,
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.5 * ffem / fem,
+                                      letterSpacing: -0.24 * fem,
+                                      color: Color(0xff1e1e1e),
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text: 'Colour: ',
+                                        style: MyGoogleFontStyle(
+                                          fontFamily: 'Urbanist',
+                                          fontSize: 12 * ffem,
+                                          fontWeight: FontWeight.w500,
+                                          height: 1.2 * ffem / fem,
+                                          letterSpacing: -0.24 * fem,
+                                          color: Color(0xff1e1e1e),
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: widget.arguments['order']
+                                                        ['order_details'][index]
+                                                    ['flavour'] !=
+                                                null
+                                            ? widget.arguments['order']
+                                                    ['order_details'][index]
+                                                    ['flavour']
+                                                .toString()
+                                            : '',
+                                        style: MyGoogleFontStyle(
+                                          fontFamily: 'Urbanist',
+                                          fontSize: 12 * ffem,
+                                          fontWeight: FontWeight.w500,
+                                          height: 1.2 * ffem / fem,
+                                          letterSpacing: -0.24 * fem,
+                                          color: Color(0xff1e1e1e),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                              SizedBox(
-                                width: 50,
-                              ),
                               Container(
-                                width: 60,
-                                height: 80,
-                                child: Image.network(
-                                  _configModel.apiConfig['mediaURL'] +
-                                      widget.arguments['order']['order_details']
-                                              [index]['product']['imagepath1']
-                                          .toString(),
-                                  fit: BoxFit.fill,
-                                  // fit: BoxFit.cover,
-                                ),
-                              ),
-                              Spacer(),
-                              InkWell(
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) =>
-                                        AlertDialog(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20)),
-                                      title: Text("Add your review"),
-                                      content: SizedBox(
-                                        height: 365,
-                                        child: Column(
+                                margin: EdgeInsets.fromLTRB(
+                                    1 * fem, 0 * fem, 0 * fem, 0 * fem),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      margin: EdgeInsets.fromLTRB(
+                                          0 * fem, 0 * fem, 34 * fem, 0 * fem),
+                                      child: RichText(
+                                        text: TextSpan(
+                                          style: MyGoogleFontStyle(
+                                            fontFamily: 'Urbanist',
+                                            fontSize: 12 * ffem,
+                                            fontWeight: FontWeight.w600,
+                                            height: 1.2 * ffem / fem,
+                                            letterSpacing: -0.24 * fem,
+                                            color: Color(0xff1e1e1e),
+                                          ),
                                           children: [
-                                            Form(
-                                              key: _reviewFormKey,
-                                              child: Column(
-                                                children: [
-                                                  Center(
-                                                    child: RatingBar.builder(
-                                                      itemSize: 30,
-                                                      initialRating:
-                                                          currentRating,
-                                                      minRating: 0.5,
-                                                      direction:
-                                                          Axis.horizontal,
-                                                      allowHalfRating: true,
-                                                      itemCount: 5,
-                                                      itemPadding:
-                                                          const EdgeInsets
-                                                              .symmetric(
-                                                              horizontal: 4.0),
-                                                      itemBuilder:
-                                                          (context, _) =>
-                                                              const Icon(
-                                                        Icons.star,
-                                                        color: Colors.amber,
-                                                      ),
-                                                      onRatingUpdate: (rating) {
-                                                        setState(() {
-                                                          currentRating =
-                                                              rating;
-                                                        });
-                                                      },
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    height: 10,
-                                                  ),
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                          color: Color(
-                                                              0xffdadada)),
-                                                      color: Color(0xffffffff),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              20),
-                                                    ),
-                                                    child: TextFormField(
-                                                      maxLines: 5,
-                                                      decoration:
-                                                          InputDecoration(
-                                                        border:
-                                                            InputBorder.none,
-                                                        focusedBorder:
-                                                            InputBorder.none,
-                                                        enabledBorder:
-                                                            InputBorder.none,
-                                                        errorBorder:
-                                                            InputBorder.none,
-                                                        disabledBorder:
-                                                            InputBorder.none,
-                                                        hintText:
-                                                            'Write your review here.',
-                                                        contentPadding:
-                                                            EdgeInsets.all(10),
-                                                        hintStyle: TextStyle(
-                                                            color: Color(
-                                                                0xff8390a1)),
-                                                      ),
-                                                      initialValue:
-                                                          _reviewDescription,
-                                                      onSaved: (value) {
-                                                        _reviewDescription =
-                                                            value.toString();
-                                                      },
-                                                      validator: (value) {
-                                                        if (value!.isEmpty) {
-                                                          return 'Please write some review.';
-                                                        }
-                                                        return null;
-                                                      },
-                                                    ),
-                                                  ),
-                                                  SizedBox(height: 10),
-                                                  SizedBox(
-                                                      height: 120,
-                                                      // width: 150,
-                                                      child:
-                                                          MultipleImageUploadPage()),
-                                                  Container(
-                                                    margin: EdgeInsets.fromLTRB(
-                                                        5, 0, 6.34, 0),
-                                                    child: TextButton(
-                                                      onPressed: _loading
-                                                          ? null
-                                                          : () async {
-                                                              if (_reviewFormKey
-                                                                  .currentState!
-                                                                  .validate()) {
-                                                                _reviewFormKey
-                                                                    .currentState!
-                                                                    .save();
-
-                                                                if (_configModel
-                                                                        .files
-                                                                        .length ==
-                                                                    0)
-                                                                  showDialog(
-                                                                    context:
-                                                                        context,
-                                                                    builder: (BuildContext
-                                                                            context) =>
-                                                                        AlertDialog(
-                                                                      title: Text(
-                                                                          'Please upload an image'),
-                                                                      actions: [
-                                                                        TextButton(
-                                                                          onPressed:
-                                                                              () {
-                                                                            Navigator.pop(context);
-                                                                          },
-                                                                          child:
-                                                                              Text('Ok'),
-                                                                        )
-                                                                      ],
-                                                                    ),
-                                                                  );
-                                                                else {
-                                                                  setState(() {
-                                                                    _loading =
-                                                                        true;
-                                                                  });
-
-                                                                  await _reviewModel.getMyReviews(
-                                                                      widget.arguments['order']['order_details'][index]
-                                                                              [
-                                                                              'product']
-                                                                          [
-                                                                          'id'],
-                                                                      _reviewDescription,
-                                                                      currentRating);
-
-                                                                  setState(() {
-                                                                    _loading =
-                                                                        false;
-                                                                  });
-
-                                                                  Navigator.pop(
-                                                                      context);
-                                                                }
-                                                              }
-                                                            },
-                                                      style:
-                                                          TextButton.styleFrom(
-                                                        padding:
-                                                            EdgeInsets.zero,
-                                                      ),
-                                                      child: Container(
-                                                        width: double.infinity,
-                                                        height: 53,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color:
-                                                              Color(0xff1e1e1e),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
-                                                        ),
-                                                        child: Center(
-                                                          child: _loading
-                                                              ? SizedBox(
-                                                                  child:
-                                                                      CircularProgressIndicator(
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .white,
-                                                                  ),
-                                                                  height: 20,
-                                                                  width: 20,
-                                                                )
-                                                              : Text(
-                                                                  'Post Review',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style:
-                                                                      MyGoogleFontStyle(
-                                                                    fontFamily:
-                                                                        'Urbanist',
-                                                                    fontSize:
-                                                                        15.1428556442,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w700,
-                                                                    height:
-                                                                        1.4999999685,
-                                                                    color: Color(
-                                                                        0xffffffff),
-                                                                  ),
-                                                                ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
+                                            TextSpan(
+                                              text: 'Size: ',
+                                              style: MyGoogleFontStyle(
+                                                fontFamily: 'Urbanist',
+                                                fontSize: 12 * ffem,
+                                                fontWeight: FontWeight.w400,
+                                                height: 1.2 * ffem / fem,
+                                                letterSpacing: -0.24 * fem,
+                                                color: Color(0xff1e1e1e),
                                               ),
+                                            ),
+                                            TextSpan(
+                                              text: widget.arguments['order']
+                                                      ['order_details'][index]
+                                                      ['kind_of_flower']
+                                                  .toString(),
                                             ),
                                           ],
                                         ),
                                       ),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: Text(
-                                            'Cancel',
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 16),
-                                          ),
-                                        ),
-                                      ],
                                     ),
-                                  );
-                                },
-                                child: Container(
-                                  width: 74.5,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    color: Color(0xff232323),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      '+ Review',
-                                      textAlign: TextAlign.center,
-                                      style: MyGoogleFontStyle(
-                                        fontFamily: 'Poppins',
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xffffffff),
+                                    Container(
+                                      margin: EdgeInsets.fromLTRB(
+                                          0 * fem, 0 * fem, 151 * fem, 0 * fem),
+                                      child: RichText(
+                                        text: TextSpan(
+                                          style: MyGoogleFontStyle(
+                                            fontFamily: 'Urbanist',
+                                            fontSize: 12 * ffem,
+                                            fontWeight: FontWeight.w600,
+                                            height: 1.2 * ffem / fem,
+                                            letterSpacing: -0.24 * fem,
+                                            color: Color(0xff1e1e1e),
+                                          ),
+                                          children: [
+                                            TextSpan(
+                                              text: 'Quantity: ',
+                                              style: MyGoogleFontStyle(
+                                                fontFamily: 'Urbanist',
+                                                fontSize: 12 * ffem,
+                                                fontWeight: FontWeight.w400,
+                                                height: 1.2 * ffem / fem,
+                                                letterSpacing: -0.24 * fem,
+                                                color: Color(0xff1e1e1e),
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: widget.arguments['order']
+                                                      ['order_details'][index]
+                                                      ['quantity']
+                                                  .toString(),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
+                                    Text(
+                                      'RS' +
+                                          ' ' +
+                                          widget.arguments['order']
+                                                  ['order_details'][index]
+                                                  ['order_detail_cost']
+                                              .toString(),
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 12 * ffem,
+                                        fontWeight: FontWeight.w600,
+                                        height: 1.2 * ffem / fem,
+                                        letterSpacing: -0.24 * fem,
+                                        color: Color(0xff1e1e1e),
+                                      ),
+                                    ),
+                                  ],
                                 ),
+                              ),
+                              Divider(
+                                color: Colors.black,
                               )
                             ],
-                          ),
-                          Container(
-                            margin: EdgeInsets.fromLTRB(
-                                0 * fem, 0 * fem, 0 * fem, 7 * fem),
-                            constraints: BoxConstraints(
-                              maxWidth: 205 * fem,
-                            ),
-                            child: RichText(
-                              text: TextSpan(
-                                style: MyGoogleFontStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 12 * ffem,
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.5 * ffem / fem,
-                                  letterSpacing: -0.24 * fem,
-                                  color: Color(0xff1e1e1e),
-                                ),
-                                children: [
-                                  TextSpan(
-                                    text: 'Colour: ',
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontSize: 12 * ffem,
-                                      fontWeight: FontWeight.w500,
-                                      height: 1.2 * ffem / fem,
-                                      letterSpacing: -0.24 * fem,
-                                      color: Color(0xff1e1e1e),
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: widget.arguments['order']
-                                                    ['order_details'][index]
-                                                ['flavour'] !=
-                                            null
-                                        ? widget.arguments['order']
-                                                ['order_details'][index]
-                                                ['flavour']
-                                            .toString()
-                                        : '',
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontSize: 12 * ffem,
-                                      fontWeight: FontWeight.w500,
-                                      height: 1.2 * ffem / fem,
-                                      letterSpacing: -0.24 * fem,
-                                      color: Color(0xff1e1e1e),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.fromLTRB(
-                                1 * fem, 0 * fem, 0 * fem, 0 * fem),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Container(
-                                  margin: EdgeInsets.fromLTRB(
-                                      0 * fem, 0 * fem, 34 * fem, 0 * fem),
-                                  child: RichText(
-                                    text: TextSpan(
-                                      style: MyGoogleFontStyle(
-                                        fontFamily: 'Urbanist',
-                                        fontSize: 12 * ffem,
-                                        fontWeight: FontWeight.w600,
-                                        height: 1.2 * ffem / fem,
-                                        letterSpacing: -0.24 * fem,
-                                        color: Color(0xff1e1e1e),
-                                      ),
-                                      children: [
-                                        TextSpan(
-                                          text: 'Size: ',
-                                          style: MyGoogleFontStyle(
-                                            fontFamily: 'Urbanist',
-                                            fontSize: 12 * ffem,
-                                            fontWeight: FontWeight.w400,
-                                            height: 1.2 * ffem / fem,
-                                            letterSpacing: -0.24 * fem,
-                                            color: Color(0xff1e1e1e),
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: widget.arguments['order']
-                                                  ['order_details'][index]
-                                                  ['product_pack']
-                                              .toString(),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.fromLTRB(
-                                      0 * fem, 0 * fem, 151 * fem, 0 * fem),
-                                  child: RichText(
-                                    text: TextSpan(
-                                      style: MyGoogleFontStyle(
-                                        fontFamily: 'Urbanist',
-                                        fontSize: 12 * ffem,
-                                        fontWeight: FontWeight.w600,
-                                        height: 1.2 * ffem / fem,
-                                        letterSpacing: -0.24 * fem,
-                                        color: Color(0xff1e1e1e),
-                                      ),
-                                      children: [
-                                        TextSpan(
-                                          text: 'Quantity: ',
-                                          style: MyGoogleFontStyle(
-                                            fontFamily: 'Urbanist',
-                                            fontSize: 12 * ffem,
-                                            fontWeight: FontWeight.w400,
-                                            height: 1.2 * ffem / fem,
-                                            letterSpacing: -0.24 * fem,
-                                            color: Color(0xff1e1e1e),
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: widget.arguments['order']
-                                                  ['order_details'][index]
-                                                  ['quantity']
-                                              .toString(),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  'RS' +
-                                      ' ' +
-                                      widget.arguments['order']['order_details']
-                                              [index]['order_detail_cost']
-                                          .toString(),
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 12 * ffem,
-                                    fontWeight: FontWeight.w600,
-                                    height: 1.2 * ffem / fem,
-                                    letterSpacing: -0.24 * fem,
-                                    color: Color(0xff1e1e1e),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Divider(
-                            color: Colors.black,
-                          )
-                        ],
-                      ),
-                    ),
+                          );
+                        }),
                   ),
                   // ),
                   Column(
