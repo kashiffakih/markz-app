@@ -1,4 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
 // import 'package:get_ip_address/get_ip_address.dart';
 // import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +14,7 @@ import 'package:sales_app/ui/shared/font_sh.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 class LoginPage extends StatefulWidget {
   final argument;
+
   const LoginPage({Key? key, this.argument}) : super(key: key);
 
   @override
@@ -99,6 +104,7 @@ class _LoginPageState extends State<LoginPage> {
     'email': '',
     'password': '',
     'rememberme': 1,
+    'role':''
   };
   bool _isLoading = false;
 
@@ -107,6 +113,10 @@ class _LoginPageState extends State<LoginPage> {
 
   //   super.initState();
   // }
+  bool _isValidEmail(String input) {
+    String emailPattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
+    return RegExp(emailPattern).hasMatch(input);
+  }
 
   fetchLoginData() async {
     await _configModel.fetchLoginData();
@@ -117,6 +127,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     // print(widget.argument['role']);
+    // debugPrint("role login ${widget.argument['role']}");
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
@@ -218,6 +229,9 @@ class _LoginPageState extends State<LoginPage> {
                     initialValue: _loginData['email'],
                     validator: (value) {
                       if (value!.isEmpty) return 'Username cannot be empty';
+                      if (!_isValidEmail(value)) {
+                        return 'Please enter a valid email address';
+                      }
                       return null;
                     },
                     onSaved: (value) {
@@ -306,6 +320,7 @@ class _LoginPageState extends State<LoginPage> {
                       });
                       if (_loginKey.currentState!.validate()) {
                         _loginKey.currentState!.save();
+                        _loginData['role'] =widget.argument['role'];
                         await authModel.login(loginData: _loginData);
                         if (_configModel.isLoggedIn) {
                           Navigator.pushReplacementNamed(
@@ -401,43 +416,52 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                 ),
-                Container(
-                  margin: EdgeInsets.only(left: 20, right: 20, bottom: 10),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          margin: EdgeInsets.all(5),
-                          padding: EdgeInsets.fromLTRB(31.47 * fem, 15.08 * fem,
-                              36.19 * fem, 15.08 * fem),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Color(0xffe8ecf4)),
-                            color: Color(0xffffffff),
-                            borderRadius:
-                                BorderRadius.circular(7.5407857895 * fem),
-                          ),
-                          child: Center(
-                            child: SizedBox(
-                              width: 11.31 * fem,
-                              height: 22.62 * fem,
-                              child: Image.asset(
-                                'assets/images/facebookic.png',
-                                width: 11.31 * fem,
-                                height: 52.62 * fem,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: InkWell(
-                          onTap: () {
-                            // _handleSignIn();
-                          },
+                InkWell(
+                  onTap: () {
+                    {
+                      FacebookAuth.instance
+                          .login(
+                              //   permissions: [
+                              //   "public_profile",
+                              //   "email"
+                              // ]
+                              )
+                          .then((value) {
+                        FacebookAuth.instance
+                            .getUserData()
+                            .then((userData) async {
+                          print(userData);
+                          print(userData['email']);
+
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          _loginData['email'] = userData['email'];
+                          _loginData['is_social_login'] = true;
+                          _loginData['social_login_name'] = "FACEBOOK";
+
+                          var authModel =
+                              Provider.of<AuthModel>(context, listen: false);
+                          await authModel.login(loginData: _loginData);
+                          if (_configModel.isLoggedIn) {
+                            Navigator.pushReplacementNamed(
+                              context,
+                              '/',
+                            );
+                          }
+                        });
+                      });
+                    }
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(left: 20, right: 20, bottom: 10),
+                    child: Row(
+                      children: [
+                        Expanded(
                           child: Container(
                             margin: EdgeInsets.all(5),
-                            padding: EdgeInsets.fromLTRB(30.99 * fem,
-                                15.25 * fem, 35.7 * fem, 15.25 * fem),
+                            padding: EdgeInsets.fromLTRB(31.47 * fem,
+                                15.08 * fem, 36.19 * fem, 15.08 * fem),
                             decoration: BoxDecoration(
                               border: Border.all(color: Color(0xffe8ecf4)),
                               color: Color(0xffffffff),
@@ -446,42 +470,108 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             child: Center(
                               child: SizedBox(
-                                width: 22.28 * fem,
-                                height: 22.28 * fem,
+                                width: 11.31 * fem,
+                                height: 22.62 * fem,
                                 child: Image.asset(
-                                  'assets/images/googleic-3Lc.png',
-                                  width: 22.28 * fem,
-                                  height: 22.28 * fem,
+                                  'assets/images/facebookic.png',
+                                  width: 11.31 * fem,
+                                  height: 52.62 * fem,
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.fromLTRB(30.88 * fem, 14.14 * fem,
-                              35.59 * fem, 14.14 * fem),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Color(0xffe8ecf4)),
-                            color: Color(0xffffffff),
-                            borderRadius:
-                                BorderRadius.circular(7.5407857895 * fem),
-                          ),
-                          child: Center(
-                            child: SizedBox(
-                              width: 24.51 * fem,
-                              height: 24.51 * fem,
-                              child: Image.asset(
-                                'assets/images/cib-apple-KaY.png',
-                                width: 24.51 * fem,
-                                height: 24.51 * fem,
+                        Expanded(
+                          child: InkWell(
+                            onTap: () async {
+                              // _handleSignIn();
+                              {
+                                final googleAccount =
+                                    await GoogleSignIn().signIn();
+                                final googleAuth =
+                                    await googleAccount?.authentication;
+
+                                final credential =
+                                    GoogleAuthProvider.credential(
+                                  accessToken: googleAuth?.accessToken,
+                                  idToken: googleAuth?.idToken,
+                                );
+
+                                final userCredential = await FirebaseAuth
+                                    .instance
+                                    .signInWithCredential(credential);
+
+                                print(userCredential.user?.email);
+
+                                setState(() {
+                                  _isLoading = true;
+                                });
+
+                                _loginData['email'] =
+                                    userCredential.user?.email;
+                                _loginData['is_social_login'] = true;
+                                _loginData['social_login_name'] = "GOOGLE";
+
+                                var authModel = Provider.of<AuthModel>(context,
+                                    listen: false);
+                                await authModel.login(loginData: _loginData);
+                                if (_configModel.isLoggedIn) {
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    '/',
+                                  );
+                                }
+                              }
+                            },
+                            child: Container(
+                              margin: EdgeInsets.all(5),
+                              padding: EdgeInsets.fromLTRB(30.99 * fem,
+                                  15.25 * fem, 35.7 * fem, 15.25 * fem),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Color(0xffe8ecf4)),
+                                color: Color(0xffffffff),
+                                borderRadius:
+                                    BorderRadius.circular(7.5407857895 * fem),
+                              ),
+                              child: Center(
+                                child: SizedBox(
+                                  width: 22.28 * fem,
+                                  height: 22.28 * fem,
+                                  child: Image.asset(
+                                    'assets/images/googleic-3Lc.png',
+                                    width: 22.28 * fem,
+                                    height: 22.28 * fem,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                        // Expanded(
+                        //   child: Container(
+                        //     padding: EdgeInsets.fromLTRB(30.88 * fem,
+                        //         14.14 * fem, 35.59 * fem, 14.14 * fem),
+                        //     decoration: BoxDecoration(
+                        //       border: Border.all(color: Color(0xffe8ecf4)),
+                        //       color: Color(0xffffffff),
+                        //       borderRadius:
+                        //           BorderRadius.circular(7.5407857895 * fem),
+                        //     ),
+                        //     child: Center(
+                        //       child: SizedBox(
+                        //         width: 24.51 * fem,
+                        //         height: 24.51 * fem,
+                        //         child: Image.asset(
+                        //           'assets/images/cib-apple-KaY.png',
+                        //           width: 24.51 * fem,
+                        //           height: 24.51 * fem,
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
+                      ],
+                    ),
                   ),
                 ),
                 // Text(_platformVersion),

@@ -328,7 +328,7 @@ class ProductPrices {
 class ProductPack {
   int? id;
   int? productId;
-  int? value;
+  String? value;
   int? unitId;
   String? createdAt;
   String? updatedAt;

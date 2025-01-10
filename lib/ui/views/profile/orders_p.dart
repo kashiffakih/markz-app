@@ -314,9 +314,13 @@ class _OrdersPageState extends State<OrdersPage> {
                                                                           children: [
                                                                             InkWell(
                                                                               onTap: () {
+                                                                                final filteredImages = _order.orderDetails?.first.product?.productImages;
+
+
                                                                                 Navigator.of(context).push(MaterialPageRoute(
                                                                                     builder: (context) => OrderDetailsPage(arguments: {
                                                                                           'order': _order.toJson(),
+                                                                                          "product_images": filteredImages,
                                                                                           'status': 'Order Placed'
                                                                                         })));
                                                                               },

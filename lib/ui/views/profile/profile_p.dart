@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
@@ -9,7 +11,9 @@ import 'package:sales_app/core/providers/user_wallet_pr.dart';
 import 'package:sales_app/core/providers/wish_list_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/auth/login_p.dart';
 import 'package:sales_app/ui/views/profile/address_p.dart';
+import 'package:sales_app/ui/views/profile/widgets/photo_picker_w.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -106,39 +110,40 @@ class _ProfilePageState extends State<ProfilePage> {
                       // Photo and Name
                       Row(
                         children: [
-                          _configModel.user!.imagepath != null
-                              ? Container(
-                                  margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
-                                  width: 65,
-                                  height: 65,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(40),
-                                    image: DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: NetworkImage(
-                                          _configModel.apiConfig['mediaURL'] +
-                                              _configModel.user!.imagepath
-                                                  .toString()),
-                                    ),
-                                  ),
-                                )
-                              : Container(
-                                  margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
-                                  width: 65,
-                                  height: 65,
-                                  child: CircleAvatar(
-                                    radius: 50,
-                                    backgroundColor: Colors.black,
-                                    child: Text(
-                                      initials,
-                                      style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                          // _configModel.user!.imagepath != null
+                          //     ? Container(
+                          //         margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                          //         width: 65,
+                          //         height: 65,
+                          //         decoration: BoxDecoration(
+                          //           borderRadius: BorderRadius.circular(40),
+                          //           image: DecorationImage(
+                          //             fit: BoxFit.cover,
+                          //             image: NetworkImage(
+                          //                 _configModel.apiConfig['mediaURL'] + _configModel.user!.imagepath
+                          //                         .toString()),
+                          //           ),
+                          //         ),
+                          //       )
+                              // : Container(
+                              //     margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                              //     width: 65,
+                              //     height: 65,
+                              //     child: CircleAvatar(
+                              //       radius: 50,
+                              //       backgroundColor: Colors.black,
+                              //       child: Text(
+                              //         initials,
+                              //         style: TextStyle(
+                              //           fontSize: 24,
+                              //           fontWeight: FontWeight.bold,
+                              //           color: Colors.white,
+                              //         ),
+                              //       ),
+                              //     ),
+                              //   ),
+                          // :
+                          PhotoPickerWidget(),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,6 +194,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                             TextButton(
                                               onPressed: () async {
                                                 Navigator.of(context).pop();
+                                                await GoogleSignIn().signOut();
+                                                await FacebookAuth.instance.logOut();
                                                 await _configModel
                                                     .removeLoginData();
                                                 Navigator.pushReplacementNamed(
@@ -230,6 +237,73 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                           ),
                         ],
+                      ),
+                      //wholesale login
+                      Container(
+                        // margin: EdgeInsets.fromLTRB(5, 0, 6.34, 0),
+                        child: TextButton(
+                          onPressed: () async {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) =>
+                                  AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                        BorderRadius.circular(20)),
+                                    title: Text(
+                                        'Are you sure you want to logout?'),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('NO'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () async {
+                                          Navigator.of(context).pop();
+                                          await GoogleSignIn().signOut();
+                                          await FacebookAuth.instance.logOut();
+                                          await _configModel.removeLoginData();
+                                          Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => const LoginPage(argument: {'role': 'Distributor'},),
+                                            ),
+                                                (Route<dynamic> route) => false,
+                                          );
+                                        },
+                                        child: Text('YES'),
+                                      ),
+                                    ],
+                                  ),
+                            );
+                          },
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                          ),
+                          child: Container(
+                            width: 200,
+                            height: 35,
+                            decoration: BoxDecoration(
+                              color: Color(0xff1e1e1e),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Login As Wholesaler',
+                                textAlign: TextAlign.center,
+                                style: MyGoogleFontStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontSize: 15.1428556442,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.4999999685,
+                                  color: Color(0xffffffff),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                       // My Orders
                       InkWell(

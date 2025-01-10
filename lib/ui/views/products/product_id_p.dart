@@ -651,8 +651,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                             .unit
                                                             .name
                                                             .toString();
-                                                    _CartData['flavour'] =
-                                                        unitName;
+                                                    _CartData['flavour'] = unitName;
+                                                    _CartData['pack'] = productDisplayImages[index].id;
 
                                                     updateProductDisplayImages =
                                                         widget.arguments[
@@ -993,11 +993,10 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                             ),
                                                           );
                                                         } else {
+
                                                           await _addToCartModel
                                                               .getAddToCart(
-                                                                  widget.arguments![
-                                                                          'product']
-                                                                      ['id'],
+                                                                  widget.arguments!['product']['id'],
                                                                   type,
                                                                   _CartData);
                                                         }

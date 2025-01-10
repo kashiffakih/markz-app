@@ -38,14 +38,14 @@ class _RootPageState extends State<RootPage> {
       print('API: ' + configModel.currentAndroidVersionFromApi);
 
       if (configModel.isLoggedIn) {
-        if (currentAppVersion != configModel.currentAndroidVersionFromApi) {
-          Navigator.pushReplacementNamed(context, '/updateApp');
-        } else {
+        // if (currentAppVersion != configModel.currentAndroidVersionFromApi) {
+        //   Navigator.pushReplacementNamed(context, '/updateApp');
+        // } else {
           Future.delayed(
             Duration.zero,
             () => Navigator.pushReplacementNamed(context, '/homePage'),
           );
-        }
+        // }
       } else {
         Future.delayed(
           Duration.zero,

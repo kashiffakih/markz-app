@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
@@ -14,9 +15,14 @@ import 'package:sales_app/core/providers/wish_list_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/routing/router.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:sales_app/ui/views/deeplink/deep_link_listener.dart';
+import 'package:sales_app/ui/views/home/home_p.dart';
 
-void main() {
+Future<void> main() async {
   setupLocator();
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
   runApp(MyApp());
 }
 
@@ -74,6 +80,9 @@ class MyApp extends StatelessWidget {
                 labelLarge: MyGoogleFontStyle(),
                 bodySmall: MyGoogleFontStyle(),
               ),
+        ),
+        home: DeepLinkListener(child: HomePage(),
+          
         ),
       ),
     );

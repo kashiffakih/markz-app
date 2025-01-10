@@ -1,6 +1,8 @@
 import 'package:sales_app/core/models/user.dart';
 import 'package:sales_app/core/models/user_address.dart';
 
+import 'product.dart';
+
 class Order {
   int? id;
   int? companyId;
@@ -340,106 +342,106 @@ class OrderDetails {
   }
 }
 
-class Product {
-  int? id;
-  int? companyId;
-  int? userId;
-  int? categoryId;
-  String? inventoryId;
-  String? name;
-  String? smallDescription;
-  String? description;
-  String? location;
-  int? isActive;
-  String? createdAt;
-  String? updatedAt;
-  String? imagepath1;
-  String? imagepath2;
-  String? imagepath3;
-  String? imagepath4;
-  int? subCategoryId;
-  String? position;
-  String? sub2CategoryId;
-  String? sub3CategoryId;
-  String? vegNonveg;
-  String? inventory;
-
-  Product(
-      {this.id,
-      this.companyId,
-      this.userId,
-      this.categoryId,
-      this.inventoryId,
-      this.name,
-      this.smallDescription,
-      this.description,
-      this.location,
-      this.isActive,
-      this.createdAt,
-      this.updatedAt,
-      this.imagepath1,
-      this.imagepath2,
-      this.imagepath3,
-      this.imagepath4,
-      this.subCategoryId,
-      this.position,
-      this.sub2CategoryId,
-      this.sub3CategoryId,
-      this.vegNonveg,
-      this.inventory});
-
-  Product.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    companyId = json['company_id'];
-    userId = json['user_id'];
-    categoryId = json['category_id'];
-    inventoryId = json['inventory_id'];
-    name = json['name'];
-    smallDescription = json['small_description'];
-    description = json['description'];
-    location = json['location'];
-    isActive = json['is_active'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
-    imagepath1 = json['imagepath1'];
-    imagepath2 = json['imagepath2'];
-    imagepath3 = json['imagepath3'];
-    imagepath4 = json['imagepath4'];
-    subCategoryId = json['sub_category_id'];
-    position = json['position'].toString();
-    sub2CategoryId = json['sub_2_category_id'];
-    sub3CategoryId = json['sub_3_category_id'];
-    vegNonveg = json['veg_nonveg'];
-    inventory = json['inventory'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['company_id'] = this.companyId;
-    data['user_id'] = this.userId;
-    data['category_id'] = this.categoryId;
-    data['inventory_id'] = this.inventoryId;
-    data['name'] = this.name;
-    data['small_description'] = this.smallDescription;
-    data['description'] = this.description;
-    data['location'] = this.location;
-    data['is_active'] = this.isActive;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
-    data['imagepath1'] = this.imagepath1;
-    data['imagepath2'] = this.imagepath2;
-    data['imagepath3'] = this.imagepath3;
-    data['imagepath4'] = this.imagepath4;
-    data['sub_category_id'] = this.subCategoryId;
-    data['position'] = this.position;
-    data['sub_2_category_id'] = this.sub2CategoryId;
-    data['sub_3_category_id'] = this.sub3CategoryId;
-    data['veg_nonveg'] = this.vegNonveg;
-    data['inventory'] = this.inventory;
-    return data;
-  }
-}
+// class Product {
+//   int? id;
+//   int? companyId;
+//   int? userId;
+//   int? categoryId;
+//   String? inventoryId;
+//   String? name;
+//   String? smallDescription;
+//   String? description;
+//   String? location;
+//   int? isActive;
+//   String? createdAt;
+//   String? updatedAt;
+//   String? imagepath1;
+//   String? imagepath2;
+//   String? imagepath3;
+//   String? imagepath4;
+//   int? subCategoryId;
+//   String? position;
+//   String? sub2CategoryId;
+//   String? sub3CategoryId;
+//   String? vegNonveg;
+//   String? inventory;
+//
+//   Product(
+//       {this.id,
+//       this.companyId,
+//       this.userId,
+//       this.categoryId,
+//       this.inventoryId,
+//       this.name,
+//       this.smallDescription,
+//       this.description,
+//       this.location,
+//       this.isActive,
+//       this.createdAt,
+//       this.updatedAt,
+//       this.imagepath1,
+//       this.imagepath2,
+//       this.imagepath3,
+//       this.imagepath4,
+//       this.subCategoryId,
+//       this.position,
+//       this.sub2CategoryId,
+//       this.sub3CategoryId,
+//       this.vegNonveg,
+//       this.inventory});
+//
+//   Product.fromJson(Map<String, dynamic> json) {
+//     id = json['id'];
+//     companyId = json['company_id'];
+//     userId = json['user_id'];
+//     categoryId = json['category_id'];
+//     inventoryId = json['inventory_id'];
+//     name = json['name'];
+//     smallDescription = json['small_description'];
+//     description = json['description'];
+//     location = json['location'];
+//     isActive = json['is_active'];
+//     createdAt = json['created_at'];
+//     updatedAt = json['updated_at'];
+//     imagepath1 = json['imagepath1'];
+//     imagepath2 = json['imagepath2'];
+//     imagepath3 = json['imagepath3'];
+//     imagepath4 = json['imagepath4'];
+//     subCategoryId = json['sub_category_id'];
+//     position = json['position'].toString();
+//     sub2CategoryId = json['sub_2_category_id'];
+//     sub3CategoryId = json['sub_3_category_id'];
+//     vegNonveg = json['veg_nonveg'];
+//     inventory = json['inventory'];
+//   }
+//
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = new Map<String, dynamic>();
+//     data['id'] = this.id;
+//     data['company_id'] = this.companyId;
+//     data['user_id'] = this.userId;
+//     data['category_id'] = this.categoryId;
+//     data['inventory_id'] = this.inventoryId;
+//     data['name'] = this.name;
+//     data['small_description'] = this.smallDescription;
+//     data['description'] = this.description;
+//     data['location'] = this.location;
+//     data['is_active'] = this.isActive;
+//     data['created_at'] = this.createdAt;
+//     data['updated_at'] = this.updatedAt;
+//     data['imagepath1'] = this.imagepath1;
+//     data['imagepath2'] = this.imagepath2;
+//     data['imagepath3'] = this.imagepath3;
+//     data['imagepath4'] = this.imagepath4;
+//     data['sub_category_id'] = this.subCategoryId;
+//     data['position'] = this.position;
+//     data['sub_2_category_id'] = this.sub2CategoryId;
+//     data['sub_3_category_id'] = this.sub3CategoryId;
+//     data['veg_nonveg'] = this.vegNonveg;
+//     data['inventory'] = this.inventory;
+//     return data;
+//   }
+// }
 
 class OrderStatuses {
   int? id;

@@ -121,6 +121,19 @@ import 'package:sales_app/core/models/file.dart';
 
 class ConfigModel with ChangeNotifier {
   final ConfigService _configService = locator<ConfigService>();
+  String _selectedImage = '';
+
+  String get selectedImage => _selectedImage;
+
+  set selectedImage(String value) {
+    _selectedImage = value;
+    notifyListeners();
+  }
+  void updateProfileImage(String newPath) {
+    user?.imagepath = newPath; // Update the user's imagePath
+    selectedImage = newPath; // Store the selected image path
+    notifyListeners();
+  }
 
   // File Management
   late List<File> _files = [];

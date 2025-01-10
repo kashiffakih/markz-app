@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:sales_app/core/models/add_to_cart.dart';
 import 'package:sales_app/core/models/order.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
@@ -26,12 +27,13 @@ class OrderService {
     }
     var orderDetails = [];
     cartItems.forEach((item) {
+      debugPrint("Item pack order s :${item.pack}");
       orderDetails.add({
         'cashback': 0,
         'order_detail_cost': item.product!.productPrices![0].price,
         'product_id': item.productId,
         'quantity': item.qty,
-        'product_pack': item.kindOfFlower,
+        'product_pack': item.pack,
         'kind_of_flower': item.kindOfFlower,
         'flavour': item.flavour,
         'write_on_cake': item.writeOnCake,
@@ -99,10 +101,12 @@ class OrderService {
       _orders = [];
       _responseData['data'].forEach((data) {
         _orders.add(Order.fromJson(data));
-        print(1);
+
+        print(data);
+        // debugPrint("gt orders data${data}");
       });
     }
-    print(_orders);
+    debugPrint("gt orders----------${_orders.first.orderDetails?.first?.product?.productImages?.first.imagepath}");
     return _orders;
   }
 }
