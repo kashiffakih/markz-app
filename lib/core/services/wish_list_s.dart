@@ -10,7 +10,7 @@ class WishListService {
   List<WishList> _wishLists = [];
   Future<List<WishList>> getWishLists(productId) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    var userId = _configModel.user!.id;
+    var userId = _configModel.user?.id;
 
     http.Response _response = await http.get(
       Uri.parse(

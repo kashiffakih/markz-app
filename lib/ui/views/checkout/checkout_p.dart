@@ -771,8 +771,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
                               var userWalletUsed = (int.parse(_userWaletModel
                                           .totaRemainingPoint
-                                          .toString()) /
-                                      3)
+                                          .toString()) *
+                                      0.3)
                                   .toStringAsFixed(0);
                               var addressId = widget.arguments['address']['id'];
                               bool response = await _orderModel.placedOrder(

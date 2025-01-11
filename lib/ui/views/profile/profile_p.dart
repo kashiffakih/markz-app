@@ -125,23 +125,23 @@ class _ProfilePageState extends State<ProfilePage> {
                           //           ),
                           //         ),
                           //       )
-                              // : Container(
-                              //     margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
-                              //     width: 65,
-                              //     height: 65,
-                              //     child: CircleAvatar(
-                              //       radius: 50,
-                              //       backgroundColor: Colors.black,
-                              //       child: Text(
-                              //         initials,
-                              //         style: TextStyle(
-                              //           fontSize: 24,
-                              //           fontWeight: FontWeight.bold,
-                              //           color: Colors.white,
-                              //         ),
-                              //       ),
-                              //     ),
-                              //   ),
+                          // : Container(
+                          //     margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                          //     width: 65,
+                          //     height: 65,
+                          //     child: CircleAvatar(
+                          //       radius: 50,
+                          //       backgroundColor: Colors.black,
+                          //       child: Text(
+                          //         initials,
+                          //         style: TextStyle(
+                          //           fontSize: 24,
+                          //           fontWeight: FontWeight.bold,
+                          //           color: Colors.white,
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   ),
                           // :
                           PhotoPickerWidget(),
                           Expanded(
@@ -195,7 +195,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                               onPressed: () async {
                                                 Navigator.of(context).pop();
                                                 await GoogleSignIn().signOut();
-                                                await FacebookAuth.instance.logOut();
+                                                await FacebookAuth.instance
+                                                    .logOut();
                                                 await _configModel
                                                     .removeLoginData();
                                                 Navigator.pushReplacementNamed(
@@ -245,38 +246,37 @@ class _ProfilePageState extends State<ProfilePage> {
                           onPressed: () async {
                             showDialog(
                               context: context,
-                              builder: (BuildContext context) =>
-                                  AlertDialog(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                        BorderRadius.circular(20)),
-                                    title: Text(
-                                        'Are you sure you want to logout?'),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text('NO'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                          await GoogleSignIn().signOut();
-                                          await FacebookAuth.instance.logOut();
-                                          await _configModel.removeLoginData();
-                                          Navigator.pushAndRemoveUntil(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => const LoginPage(argument: {'role': 'Distributor'},),
-                                            ),
-                                                (Route<dynamic> route) => false,
-                                          );
-                                        },
-                                        child: Text('YES'),
-                                      ),
-                                    ],
+                              builder: (BuildContext context) => AlertDialog(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20)),
+                                title: Text('Are you sure you want to logout?'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('NO'),
                                   ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      Navigator.of(context).pop();
+                                      await GoogleSignIn().signOut();
+                                      await FacebookAuth.instance.logOut();
+                                      await _configModel.removeLoginData();
+                                      Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const LoginPage(
+                                            argument: {'role': 'Distributor'},
+                                          ),
+                                        ),
+                                        (Route<dynamic> route) => false,
+                                      );
+                                    },
+                                    child: Text('YES'),
+                                  ),
+                                ],
+                              ),
                             );
                           },
                           style: TextButton.styleFrom(
@@ -553,7 +553,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                   _addToCartModel
                                                       .addToCarts!.length
                                                       .toString() +
-                                                  ' orders',
+                                                  ' products',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontSize: 11,
@@ -819,7 +819,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                     Text(
                                       // alreadyhave10orders9Ca (I318:2511;0:1158)
-                                      'Already have 10 orders',
+                                      'Update your profile',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontSize: 11,

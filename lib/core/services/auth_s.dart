@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:sales_app/core/models/user.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:http/http.dart' as http;
@@ -153,7 +152,7 @@ class AuthService {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
       final GoogleSignInAuthentication? googleAuth =
-      await googleUser?.authentication;
+          await googleUser?.authentication;
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth?.accessToken,
@@ -207,14 +206,14 @@ class AuthService {
         return {
           'success': true,
           'data': responseData,
-          'image_path':responseData['data']['image_path']
+          'image_path': responseData['data']['image_path']
         };
       } else {
         // If the upload fails, return an error message
         return {
           'success': false,
           'message':
-          'Image upload failed with status code: ${response.statusCode}',
+              'Image upload failed with status code: ${response.statusCode}',
         };
       }
     } catch (e) {

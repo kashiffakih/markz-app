@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -16,9 +14,11 @@ class RootPage extends StatefulWidget {
 
 class _RootPageState extends State<RootPage> {
   authenticateUser(_, AuthModel authModel, ConfigModel configModel) async {
-    // configModel.getApiConfig(domain: 'http://192.168.0.101:8080');
+    configModel.getApiConfig(domain: 'http://192.168.0.102:8089');
+    // configModel.getApiConfig(domain: 'http://172.20.10.2:8089');
     // configModel.getApiConfig(domain: 'http://192.168.0.160:8080');
-    configModel.getApiConfig(domain: 'http://api.aadab.aaibuzz.com');
+    // configModel.getApiConfig(domain: 'http://api.aadab.aaibuzz.com');
+    print(configModel.apiConfig['baseURL']);
     await configModel.fetchLoginData();
 
     String currentAppVersion = await getPackageDetails();
@@ -41,10 +41,10 @@ class _RootPageState extends State<RootPage> {
         // if (currentAppVersion != configModel.currentAndroidVersionFromApi) {
         //   Navigator.pushReplacementNamed(context, '/updateApp');
         // } else {
-          Future.delayed(
-            Duration.zero,
-            () => Navigator.pushReplacementNamed(context, '/homePage'),
-          );
+        Future.delayed(
+          Duration.zero,
+          () => Navigator.pushReplacementNamed(context, '/homePage'),
+        );
         // }
       } else {
         Future.delayed(

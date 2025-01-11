@@ -26,10 +26,9 @@ class _PhotoPickerWidgetState extends State<PhotoPickerWidget> {
 
   void _loadProfileImage() {
     // Check if there's a locally stored profile image in ConfigModel
-    if (_configModel.selectedImage != null &&
-        File(_configModel.selectedImage!).existsSync()) {
+    if (File(_configModel.selectedImage).existsSync()) {
       setState(() {
-        _profileImage = File(_configModel.selectedImage!);
+        _profileImage = File(_configModel.selectedImage);
       });
     }
   }

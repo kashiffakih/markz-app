@@ -32,9 +32,6 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
     final ConfigModel _configModel = locator<ConfigModel>();
     final ReviewModel _reviewModel = Provider.of<ReviewModel>(context);
 
-    debugPrint(
-        "Image processing----------${widget.arguments["product_images"][0].imagepath}");
-
     // print(widget.arguments['order']['id'].toString());
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
@@ -164,51 +161,64 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                         itemCount:
                             widget.arguments['order']['order_details'].length,
                         itemBuilder: (BuildContext context, index) {
-                          debugPrint("ImagePAth------${widget.arguments["product_images"][index].imagepath}");
+                          // debugPrint(
+                          //     "ImagePAth------${widget.arguments["product_images"][index].imagepath}");
                           // final filteredImages = widget.arguments["product_images"]
                           //     .where((data) {
                           //       return
                           //   widget.arguments['order']['order_details']
                           //   [index]['product_pack'] ==
                           //       data["id"]});
+                          debugPrint(widget.arguments["product_images"][0].id
+                              .toString());
+                          String newImageDisplay = widget
+                              .arguments["product_images"]
+                              .where((element) =>
+                                  element.id.toString() ==
+                                  widget.arguments['order']['order_details']
+                                          [index]['product_pack']
+                                      .toString())
+                              .toList()[0]
+                              .imagepath;
+                          // print("New Image Display: $newImageDisplay");
 
-                          String? imagePath;
-                          productImages = widget.arguments["product_images"];
+                          // String? imagePath;
+                          // productImages = widget.arguments["product_images"];
 
+                          // List<String?> imagePaths =
+                          //     []; // Create a list to store image paths.
 
+                          // try {
+                          //   // Debug print the values you're comparing.
+                          //   final productPack = widget.arguments['order']
+                          //       ['order_details'][index]['product_pack'];
+                          //   debugPrint(
+                          //       "Comparing data.id with product_pack: data.id = $productPack");
 
-                          List<String?> imagePaths = [];  // Create a list to store image paths.
-
-                          try {
-                            // Debug print the values you're comparing.
-                            final productPack = widget.arguments['order']['order_details'][index]['product_pack'];
-                            debugPrint("Comparing data.id with product_pack: data.id = $productPack");
-
-                            // Filter the product images based on the condition and store the matching imagepaths.
-                            productImages?.forEach((data) {
-                              debugPrint("Checking data.id: ${data.id} against product_pack: $productPack");
-                              if (data.id == productPack) {
-                                debugPrint("Match found, adding imagepath: ${data.imagepath}");
-                                imagePaths.add(data.imagepath);  // Store the matching imagepath.
-                              }
-                            });
-                            debugPrint("ImagePaths------$imagePaths");
-                            // If any matches were found, you can access the first one or handle as needed.
-                            if (imagePaths.isNotEmpty) {
-                              imagePath = imagePaths.first;  // You can choose to get the first match or use the entire list.
-                              debugPrint("ImagePath------$imagePath");
-                            } else {
-                              imagePath = null;  // If no matches, set imagePath to null.
-                            }
-
-                          } catch (e) {
-                            debugPrint("Error retrieving image path: $e");
-                          }
-
-
-
-
-
+                          //   // Filter the product images based on the condition and store the matching imagepaths.
+                          //   productImages?.forEach((data) {
+                          //     debugPrint(
+                          //         "Checking data.id: ${data.id} against product_pack: $productPack");
+                          //     if (data.id == productPack) {
+                          //       debugPrint(
+                          //           "Match found, adding imagepath: ${data.imagepath}");
+                          //       imagePaths.add(data
+                          //           .imagepath); // Store the matching imagepath.
+                          //     }
+                          //   });
+                          //   debugPrint("ImagePaths------$imagePaths");
+                          //   // If any matches were found, you can access the first one or handle as needed.
+                          //   if (imagePaths.isNotEmpty) {
+                          //     imagePath = imagePaths
+                          //         .first; // You can choose to get the first match or use the entire list.
+                          //     debugPrint("ImagePath------$imagePath");
+                          //   } else {
+                          //     imagePath =
+                          //         null; // If no matches, set imagePath to null.
+                          //   }
+                          // } catch (e) {
+                          //   debugPrint("Error retrieving image path: $e");
+                          // }
 
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,10 +250,10 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                                     height: 80,
                                     decoration: BoxDecoration(
                                         image: DecorationImage(
-                                            image: productImages?.first.imagepath != null
+                                            image: newImageDisplay != null
                                                 ? NetworkImage(_configModel
                                                         .apiConfig['mediaURL'] +
-                                                productImages?.first.imagepath)
+                                                    newImageDisplay)
                                                 : AssetImage(
                                                         "assets/images/avatar-bg.png")
                                                     as ImageProvider)),
@@ -612,7 +622,7 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                                     ),
                                     Container(
                                       margin: EdgeInsets.fromLTRB(
-                                          0 * fem, 0 * fem, 151 * fem, 0 * fem),
+                                          0 * fem, 0 * fem, 131 * fem, 0 * fem),
                                       child: RichText(
                                         text: TextSpan(
                                           style: MyGoogleFontStyle(

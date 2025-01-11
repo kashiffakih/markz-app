@@ -14,12 +14,14 @@ class AddToCartService {
     var flavour = cartData!['flavour'].toString();
     var writeOnCake = cartData!['writeOnCake'].toString();
     var pack = cartData!['pack'].toString();
+    var points = cartData!['points'].toString();
+    var productPrice = cartData!['product_price'].toString();
     print(
-        'kind_of_flower=$kindOfFlower&flavour=$flavour&write_on_cake=$writeOnCake&pack=$pack');
+        'kind_of_flower=$kindOfFlower&flavour=$flavour&write_on_cake=$writeOnCake&pack=$pack&points=$points');
 
     http.Response _response = await http.get(
       Uri.parse(
-          '${_apiConfig['baseURL']}/add_to_cart?userId=$userId&productId=$productId&type=$type&kind_of_flower=$kindOfFlower&flavour=$flavour&write_on_cake=$writeOnCake&pack=$pack'),
+          '${_apiConfig['baseURL']}/add_to_cart?userId=$userId&productId=$productId&type=$type&kind_of_flower=$kindOfFlower&flavour=$flavour&write_on_cake=$writeOnCake&pack=$pack&points=$points&product_price=$productPrice'),
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);

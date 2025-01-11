@@ -29,4 +29,19 @@ class UserWalletService {
     }
     return null;
   }
+
+  mapRedeemReferralCode(referralCode) async {
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    var userId = _configModel.user!.id;
+
+    http.Response _response = await http.get(
+      Uri.parse(
+          '${_apiConfig['baseURL']}/map_referrer?referral_code=$referralCode&user_id=$userId'),
+      headers: _apiConfig['headers'],
+    );
+    Map<String, dynamic> _responseData = json.decode(_response.body);
+
+    print(_responseData);
+    return _responseData['data'];
+  }
 }

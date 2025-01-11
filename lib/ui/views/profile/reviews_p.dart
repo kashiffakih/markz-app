@@ -11,7 +11,8 @@ import 'package:sales_app/ui/views/profile/review_id_p.dart';
 import 'package:sales_app/ui/widgets/image_zoom_w.dart';
 
 class ReviewsPage extends StatefulWidget {
-  const ReviewsPage({Key? key}) : super(key: key);
+  final arguments;
+  const ReviewsPage({Key? key, this.arguments}) : super(key: key);
 
   @override
   State<ReviewsPage> createState() => _ReviewsPageState();
@@ -24,8 +25,15 @@ class _ReviewsPageState extends State<ReviewsPage> {
   void initState() {
     super.initState();
     _dateFormat = DateFormat('yyyy-MM-dd');
+    String productId = '';
+    if (widget.arguments?['productId'] != null) {
+      setState(() {
+        productId = widget.arguments['productId'].toString();
+      });
+    }
     // Fetch reviews during initialization
-    Provider.of<ReviewModel>(context, listen: false).getMyReviews('', '', '');
+    Provider.of<ReviewModel>(context, listen: false)
+        .getMyReviews(productId, '', '');
   }
 
   @override
@@ -167,25 +175,22 @@ class ReviewCard extends StatelessWidget {
                         color: const Color(0xff232323),
                       ),
                     ),
-                    review.rating == null
-                        ? SizedBox.shrink()
-                        : Center(
-                            child: RatingBar.builder(
-                              itemSize: 15,
-                              initialRating: review.rating == null
-                                  ? 0.0
-                                  : double.parse(review.rating.toString()),
-                              direction: Axis.horizontal,
-                              itemCount: 5,
-                              allowHalfRating: true,
-                              ignoreGestures: true,
-                              itemBuilder: (context, _) => const Icon(
-                                Icons.star,
-                                color: Colors.amber,
-                              ),
-                              onRatingUpdate: (double value) {},
-                            ),
-                          )
+                    if (review.rating != null || review.rating.isNotEmpty)
+                      Center(
+                        child: RatingBar.builder(
+                          itemSize: 15,
+                          initialRating: double.tryParse(review.rating) ?? 0.0,
+                          direction: Axis.horizontal,
+                          itemCount: 5,
+                          allowHalfRating: true,
+                          ignoreGestures: true,
+                          itemBuilder: (context, _) => const Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                          ),
+                          onRatingUpdate: (double value) {},
+                        ),
+                      )
                   ],
                 ),
               ],
@@ -196,7 +201,7 @@ class ReviewCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  configModel.user!.firstName.toString(),
+                  review.user!.firstName.toString(),
                   style: MyGoogleFontStyle(
                     fontFamily: 'Poppins',
                     fontSize: 12,

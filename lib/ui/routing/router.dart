@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:sales_app/core/providers/product_pr.dart';
 import 'package:sales_app/ui/routing/routes.dart';
 import 'package:sales_app/ui/views/auth/change-password.dart';
 import 'package:sales_app/ui/views/auth/forgot-password.dart';
@@ -148,7 +146,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       });
     case reviewsPage:
       return MaterialPageRoute(builder: (BuildContext context) {
-        return ReviewsPage();
+        return ReviewsPage(
+          arguments: settings.arguments,
+        );
       });
     case reviewUpdatePage:
       return MaterialPageRoute(builder: (BuildContext context) {

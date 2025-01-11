@@ -29,8 +29,8 @@ class OrderService {
     cartItems.forEach((item) {
       debugPrint("Item pack order s :${item.pack}");
       orderDetails.add({
-        'cashback': 0,
-        'order_detail_cost': item.product!.productPrices![0].price,
+        'cashback': item.points,
+        'order_detail_cost': item.productPrice,
         'product_id': item.productId,
         'quantity': item.qty,
         'product_pack': item.pack,
@@ -106,7 +106,8 @@ class OrderService {
         // debugPrint("gt orders data${data}");
       });
     }
-    debugPrint("gt orders----------${_orders.first.orderDetails?.first?.product?.productImages?.first.imagepath}");
+    debugPrint(
+        "gt orders----------${_orders.first.orderDetails?.first.product?.productImages?.first.imagepath}");
     return _orders;
   }
 }

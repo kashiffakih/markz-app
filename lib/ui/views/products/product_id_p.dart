@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/product_pr.dart';
-import 'package:sales_app/core/providers/review_pr.dart';
 import 'package:sales_app/core/providers/wish_list_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
@@ -32,12 +33,24 @@ class _ProductIdPageState extends State<ProductIdPage> {
 
   void initState() {
     super.initState();
+    final ConfigModel _configModel = locator<ConfigModel>();
+    print(widget.arguments);
     var productId = '';
-    Provider.of<AddToCartModel>(context, listen: false)
-        .getAddToCart(productId, '', _CartData);
-    Provider.of<ProductModel>(context, listen: false)
-        .getCategoryWiseProduct(widget.arguments!['product']['category_id']);
-    Provider.of<WishListModel>(context, listen: false).getWishLists(productId);
+    if (widget.arguments['product'] != null) {
+      productId = widget.arguments['product']['id'].toString();
+    }
+    if (_configModel.user != null) {
+      Provider.of<AddToCartModel>(context, listen: false)
+          .getAddToCart(productId, '', _CartData);
+      Provider.of<WishListModel>(context, listen: false)
+          .getWishLists(productId);
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Provider.of<ProductModel>(context, listen: false)
+          .getCategoryWiseProduct(widget.arguments!['product']['category_id']);
+    });
+
     _format = DateFormat('yyyy-MM-dd');
     _scrollController = ScrollController();
     // _sizes = widget.arguments['product']['product_packs'];
@@ -58,7 +71,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
   bool? check1 = false;
 
   double discountPrice = 0.0;
-
+  String _productpoints = '';
   var unitName = '';
   List<dynamic> productDisplayImages = [];
   List<dynamic> updateProductDisplayImages = [];
@@ -95,7 +108,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
     final ProductModel _productModel = Provider.of<ProductModel>(context);
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
-    final ReviewModel _reviewModel = Provider.of<ReviewModel>(context);
+    // final ReviewModel _reviewModel = Provider.of<ReviewModel>(context);
 
     setState(() {
       cartCount = _addToCartModel.addToCarts == null
@@ -651,8 +664,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                             .unit
                                                             .name
                                                             .toString();
-                                                    _CartData['flavour'] = unitName;
-                                                    _CartData['pack'] = productDisplayImages[index].id;
+                                                    _CartData['flavour'] =
+                                                        unitName;
+                                                    _CartData['pack'] =
+                                                        productDisplayImages[
+                                                                index]
+                                                            .id;
 
                                                     updateProductDisplayImages =
                                                         widget.arguments[
@@ -859,26 +876,62 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                     Container(
                                                       child: Row(
                                                         children: [
-                                                          Row(
-                                                            children:
-                                                                List.generate(5,
-                                                                    (index) {
-                                                              return Icon(
-                                                                index < 5
-                                                                    ? Icons.star
-                                                                    : Icons
-                                                                        .star_border,
+                                                          if (product.rating !=
+                                                              '0')
+                                                            RatingBar.builder(
+                                                              itemSize: 15,
+                                                              initialRating: product
+                                                                          .rating ==
+                                                                      null
+                                                                  ? 0.0
+                                                                  : double.parse(
+                                                                      product
+                                                                          .rating
+                                                                          .toString()),
+                                                              direction: Axis
+                                                                  .horizontal,
+                                                              itemCount: 5,
+                                                              allowHalfRating:
+                                                                  true,
+                                                              ignoreGestures:
+                                                                  true,
+                                                              itemBuilder:
+                                                                  (context,
+                                                                          _) =>
+                                                                      const Icon(
+                                                                Icons.star,
                                                                 color: Colors
                                                                     .amber,
-                                                                size: 16,
-                                                              );
-                                                            }),
-                                                          ),
+                                                              ),
+                                                              onRatingUpdate:
+                                                                  (double
+                                                                      value) {},
+                                                            ),
+
+                                                          // Row(
+                                                          //   children:
+
+                                                          //   List.generate(
+                                                          //       int.parse(product
+                                                          //           .rating
+                                                          //           .toString()),
+                                                          //       (index) {
+                                                          //     return Icon(
+                                                          //       index < 5
+                                                          //           ? Icons.star
+                                                          //           : Icons
+                                                          //               .star_border,
+                                                          //       color: Colors
+                                                          //           .amber,
+                                                          //       size: 16,
+                                                          //     );
+                                                          //   }),
+                                                          // ),
                                                           Text(
                                                             '( ' +
-                                                                (product.reviews ==
-                                                                            null
-                                                                        ? 0
+                                                                (product.reviews!
+                                                                            .isEmpty
+                                                                        ? 'No'
                                                                         : product
                                                                             .reviews
                                                                             ?.length)
@@ -920,8 +973,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                     ['id'] &&
                                                             cart.flavour ==
                                                                 unitName)
-                                                        ?.toList()
-                                                        ?.isEmpty ??
+                                                        .toList()
+                                                        .isEmpty ??
                                                     true)
                                                   TextButton(
                                                     onPressed: () async {
@@ -993,10 +1046,23 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                             ),
                                                           );
                                                         } else {
-
+                                                          _CartData['points'] =
+                                                              _productpoints;
+                                                          _CartData[
+                                                              'product_price'] = _prices[0]
+                                                                      [
+                                                                      'offer_price'] !=
+                                                                  0
+                                                              ? _prices[0][
+                                                                  'offer_price']
+                                                              : _prices[0]
+                                                                      ['price']
+                                                                  .toString();
                                                           await _addToCartModel
                                                               .getAddToCart(
-                                                                  widget.arguments!['product']['id'],
+                                                                  widget.arguments![
+                                                                          'product']
+                                                                      ['id'],
                                                                   type,
                                                                   _CartData);
                                                         }
@@ -1054,8 +1120,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                     ['id'] &&
                                                             cart.flavour ==
                                                                 unitName)
-                                                        ?.toList()
-                                                        ?.isNotEmpty ==
+                                                        .toList()
+                                                        .isNotEmpty ==
                                                     true)
                                                   Center(
                                                     child: Row(
@@ -1300,108 +1366,131 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       margin:
                                                           EdgeInsets.fromLTRB(
                                                               0, 0, 10, 8),
-                                                      width: 381,
+                                                      width: MediaQuery.sizeOf(
+                                                                  context)
+                                                              .width *
+                                                          0.7,
                                                       height: 60,
-                                                      child: Row(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          SizedBox(
-                                                            width: 295,
-                                                            child: ListView
-                                                                .builder(
-                                                              scrollDirection:
-                                                                  Axis.horizontal,
-                                                              itemCount:
-                                                                  _sizes.length,
-                                                              itemBuilder:
-                                                                  (BuildContext
-                                                                          context,
-                                                                      index) {
-                                                                isActive = index ==
-                                                                    activeIndex;
-                                                                print(
-                                                                    'isActive $isActive');
+                                                      child: ListView.builder(
+                                                        scrollDirection:
+                                                            Axis.horizontal,
+                                                        itemCount:
+                                                            _sizes.length,
+                                                        itemBuilder:
+                                                            (BuildContext
+                                                                    context,
+                                                                index) {
+                                                          isActive = index ==
+                                                              activeIndex;
+                                                          // print(
+                                                          //     'isActive $isActive');
 
-                                                                return Row(
-                                                                  children: [
-                                                                    Padding(
-                                                                      padding: const EdgeInsets
-                                                                          .symmetric(
-                                                                          horizontal:
-                                                                              8.0),
+                                                          return Row(
+                                                            children: [
+                                                              Padding(
+                                                                padding: const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        8.0),
+                                                                child: SizedBox(
+                                                                  width: 50,
+                                                                  height: 52,
+                                                                  child:
+                                                                      TextButton(
+                                                                    onPressed:
+                                                                        () {
+                                                                      setState(
+                                                                          () {
+                                                                        activeIndex =
+                                                                            index;
+                                                                        print(
+                                                                            'tab');
+
+                                                                        _CartData[
+                                                                            'kindOfFlower'] = _sizes[index]
+                                                                                ['value']
+                                                                            .toString();
+
+                                                                        _prices = widget
+                                                                            .arguments['product'][
+                                                                                'product_prices']
+                                                                            .where((_price) =>
+                                                                                _price['product_pack_id'] ==
+                                                                                _sizes[index]['id'])
+                                                                            .toList();
+                                                                        _productpoints = widget
+                                                                            .arguments['product'][
+                                                                                'product_packs']
+                                                                            .where((_pack) =>
+                                                                                _pack['id'] ==
+                                                                                _prices[0]['product_pack_id'])
+                                                                            .toList()[0]['points']
+                                                                            .toString();
+
+                                                                        // print('points: $_productpoints');
+                                                                        // print(_prices[index]);
+                                                                      });
+                                                                    },
+                                                                    style: TextButton
+                                                                        .styleFrom(
+                                                                      padding:
+                                                                          EdgeInsets
+                                                                              .zero,
+                                                                      backgroundColor: isActive
+                                                                          ? Colors.black // Set the active color here
+                                                                          : null,
+                                                                      shape:
+                                                                          RoundedRectangleBorder(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(30.0), // Adjust the border radius
+                                                                      ),
+                                                                    ),
+                                                                    child:
+                                                                        Container(
+                                                                      width: 50,
+                                                                      height:
+                                                                          50,
+                                                                      decoration:
+                                                                          ShapeDecoration(
+                                                                        shape:
+                                                                            OvalBorder(
+                                                                          side: BorderSide(
+                                                                              width: 0.95,
+                                                                              color: Color(0xFFDDDDDD)),
+                                                                        ),
+                                                                      ),
                                                                       child:
-                                                                          SizedBox(
-                                                                        width:
-                                                                            50,
-                                                                        height:
-                                                                            52,
+                                                                          Center(
                                                                         child:
-                                                                            TextButton(
-                                                                          onPressed:
-                                                                              () {
-                                                                            setState(() {
-                                                                              activeIndex = index;
-                                                                              print('tab');
-
-                                                                              _CartData['kindOfFlower'] = _sizes[index]['value'].toString();
-
-                                                                              _prices = widget.arguments['product']['product_prices'].where((_price) => _price['product_pack_id'] == _sizes[index]['id']).toList();
-
-                                                                              print('Prices: ${_prices[0]}');
-                                                                              // print(_prices[index]);
-                                                                            });
-                                                                          },
+                                                                            Text(
+                                                                          _sizes[index]['value']
+                                                                              .toString(),
                                                                           style:
-                                                                              TextButton.styleFrom(
-                                                                            padding:
-                                                                                EdgeInsets.zero,
-                                                                            backgroundColor: isActive
-                                                                                ? Colors.black // Set the active color here
-                                                                                : null,
-                                                                            shape:
-                                                                                RoundedRectangleBorder(
-                                                                              borderRadius: BorderRadius.circular(30.0), // Adjust the border radius
-                                                                            ),
-                                                                          ),
-                                                                          child:
-                                                                              Container(
-                                                                            width:
-                                                                                50,
+                                                                              MyGoogleFontStyle(
+                                                                            fontFamily:
+                                                                                'Urbanist',
+                                                                            fontSize:
+                                                                                15,
+                                                                            fontWeight:
+                                                                                FontWeight.w600,
                                                                             height:
-                                                                                50,
-                                                                            decoration:
-                                                                                ShapeDecoration(
-                                                                              shape: OvalBorder(
-                                                                                side: BorderSide(width: 0.95, color: Color(0xFFDDDDDD)),
-                                                                              ),
-                                                                            ),
-                                                                            child:
-                                                                                Center(
-                                                                              child: Text(
-                                                                                _sizes[index]['value'].toString(),
-                                                                                style: MyGoogleFontStyle(
-                                                                                  fontFamily: 'Urbanist',
-                                                                                  fontSize: 15,
-                                                                                  fontWeight: FontWeight.w600,
-                                                                                  height: 1.2,
-                                                                                  letterSpacing: -0.36,
-                                                                                  color: isActive ? Colors.white : Color(0x99000000),
-                                                                                  // Set the text color based on active state
-                                                                                ),
-                                                                              ),
-                                                                            ),
+                                                                                1.2,
+                                                                            letterSpacing:
+                                                                                -0.36,
+                                                                            color: isActive
+                                                                                ? Colors.white
+                                                                                : Color(0x99000000),
+                                                                            // Set the text color based on active state
                                                                           ),
                                                                         ),
                                                                       ),
                                                                     ),
-                                                                  ],
-                                                                );
-                                                              },
-                                                            ),
-                                                          ),
-                                                        ],
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          );
+                                                        },
                                                       ),
                                                     ),
                                                   ),
@@ -1420,757 +1509,24 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                           context: context,
                                                           builder: (BuildContext
                                                               context) {
-                                                            return widget.arguments[
-                                                                            'product']
-                                                                        [
-                                                                        'category_id'] ==
-                                                                    4
-                                                                ? Container(
-                                                                    margin: EdgeInsets
-                                                                        .only(
-                                                                            top:
-                                                                                30),
-                                                                    height: 200,
-                                                                    child:
-                                                                        Table(
-                                                                      columnWidths: {
-                                                                        0: FlexColumnWidth(
-                                                                            7), // Set width of column 0 to 2 times of default width
-                                                                        1: FlexColumnWidth(
-                                                                            3), // Set width of column 0 to 2 times of default width
-                                                                        2: FlexColumnWidth(
-                                                                            3), // Set width of column 0 to 2 times of default width
-                                                                        3: FlexColumnWidth(
-                                                                            3), // Set width of column 0 to 2 times of default width
-                                                                        4: FlexColumnWidth(
-                                                                            3), // Set width of column 0 to 2 times of default width
-                                                                        5: FlexColumnWidth(
-                                                                            3), // Set width of column 0 to 2 times of default width
-                                                                      },
-                                                                      border: TableBorder
-                                                                          .all(), // Add border decoration
-                                                                      children: [
-                                                                        TableRow(
-                                                                          children: [
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'XS',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'S',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'M',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'L',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'XL',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        TableRow(
-                                                                          children: [
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'Chest',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '34',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '36',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '38',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '40',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '42',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        TableRow(
-                                                                          children: [
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'Waist',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '32',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '33',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '36',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '38',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '40',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        TableRow(
-                                                                          children: [
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'Hip',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '37',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '39',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '42',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '44',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '47',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        TableRow(
-                                                                          children: [
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'Shoulder',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '12.5',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '13',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '13.5',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '14',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '14.5',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        TableRow(
-                                                                          children: [
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'Sleev Length',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '16',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '16.5',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '17',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '17.5',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '17.5',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        TableRow(
-                                                                          children: [
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'Length',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '46',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '46',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '46',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '46',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '46',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  )
-                                                                : Container(
-                                                                    margin: EdgeInsets
-                                                                        .only(
-                                                                            top:
-                                                                                30),
-                                                                    height: 200,
-                                                                    child:
-                                                                        Table(
-                                                                      columnWidths: {
-                                                                        0: FlexColumnWidth(
-                                                                            7), // Set width of column 0 to 2 times of default width
-                                                                        1: FlexColumnWidth(
-                                                                            3), // Set width of column 0 to 2 times of default width
-                                                                        2: FlexColumnWidth(
-                                                                            3), // Set width of column 0 to 2 times of default width
-                                                                        3: FlexColumnWidth(
-                                                                            3), // Set width of column 0 to 2 times of default width
-                                                                        4: FlexColumnWidth(
-                                                                            3), // Set width of column 0 to 2 times of default width
-                                                                        5: FlexColumnWidth(
-                                                                            3), // Set width of column 0 to 2 times of default width
-                                                                      },
-                                                                      border: TableBorder
-                                                                          .all(), // Add border decoration
-                                                                      children: [
-                                                                        TableRow(
-                                                                          children: [
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'Label Size',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'XS',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'S',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'M',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'L',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'XL',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        TableRow(
-                                                                          children: [
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'Standard Size',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '36',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '38',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '40',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '42',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '44',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        TableRow(
-                                                                          children: [
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'Chest',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '41',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '43',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '45',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '47',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '49',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        TableRow(
-                                                                          children: [
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'Shoulder',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '16',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '17',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '18',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '19',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '20',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        TableRow(
-                                                                          children: [
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'Waist',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '40',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '42',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '44',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '46',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '48',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        TableRow(
-                                                                          children: [
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'Length',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '41',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '41',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '42',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '44',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '45',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        TableRow(
-                                                                          children: [
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'Sleev Length',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '23 1/2',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '24',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '24 1/2',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '25',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '25 1/2',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        TableRow(
-                                                                          children: [
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                'Neck',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '17',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '17 1/2',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '18',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '18 1/2',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                            TableCell(
-                                                                              child: Center(
-                                                                                  child: Text(
-                                                                                '19',
-                                                                                style: TextStyle(fontSize: 15),
-                                                                              )),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  );
+                                                            return Container(
+                                                                width: double
+                                                                    .infinity,
+                                                                margin: EdgeInsets
+                                                                    .only(
+                                                                        top:
+                                                                            30),
+                                                                height: 200,
+                                                                child: Image
+                                                                    .network(
+                                                                  _configModel.apiConfig[
+                                                                          'mediaURL'] +
+                                                                      product
+                                                                          .sizeChartPath
+                                                                          .toString(),
+                                                                  fit: BoxFit
+                                                                      .contain,
+                                                                ));
                                                           },
                                                         );
                                                       },
@@ -2285,299 +1641,374 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                           ),
                                         ),
                                       ),
-                                      Row(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 20.0, top: 10),
-                                            child: Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: Text(
-                                                '4.7',
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Poppins',
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                  // height: 1.5 * ffem / fem,
-                                                  // letterSpacing:
-                                                  //     -0.2190869331 * fem,
-                                                  color: Color(0x99000000),
+                                      if (product.rating.toString() != '0')
+                                        Row(
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 20.0, top: 10),
+                                              child: Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Text(
+                                                  product.rating.toString(),
+                                                  style: MyGoogleFontStyle(
+                                                    fontFamily: 'Poppins',
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    // height: 1.5 * ffem / fem,
+                                                    // letterSpacing:
+                                                    //     -0.2190869331 * fem,
+                                                    color: Color(0x99000000),
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 5.0, left: 3),
-                                            child: Icon(
-                                              Icons.star,
-                                              color: Colors.amber,
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 20.0, top: 10),
-                                            child: Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: Text(
-                                                ' ( ${(product.reviews == null ? 0 : product.reviews?.length)} ratings )',
-                                                style: TextStyle(fontSize: 12),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 5.0, left: 3),
+                                              child: Icon(
+                                                Icons.star,
+                                                color: Colors.amber,
                                               ),
                                             ),
-                                          ),
-                                          Spacer(),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 20.0, top: 10),
-                                            child: Align(
-                                              alignment: Alignment.centerRight,
-                                              child: Text(
-                                                'View Ratings',
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Poppins',
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold,
-                                                  // height: 1.5 * ffem / fem,
-                                                  // letterSpacing:
-                                                  //     -0.2190869331 * fem,
-                                                  color: Color(0x99000000),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 20.0, top: 10),
+                                              child: Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Text(
+                                                  ' ( ${(product.reviews == null ? 0 : product.reviews?.length)} ratings )',
+                                                  style:
+                                                      TextStyle(fontSize: 12),
                                                 ),
                                               ),
                                             ),
-                                          )
-                                        ],
-                                      )
+                                            Spacer(),
+                                            InkWell(
+                                              onTap: () {
+                                                Navigator.pushNamed(context,
+                                                    '/reviewsPage', arguments: {
+                                                  'productId': widget
+                                                          .arguments['product']
+                                                      ['id']
+                                                });
+                                              },
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 20.0, top: 10),
+                                                child: Align(
+                                                  alignment:
+                                                      Alignment.centerRight,
+                                                  child: Text(
+                                                    'View Reviews & Ratings',
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Poppins',
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      // height: 1.5 * ffem / fem,
+                                                      // letterSpacing:
+                                                      //     -0.2190869331 * fem,
+                                                      color: Color(0x99000000),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        )
                                     ],
                                   ),
                                 ),
-
-                                // Description and Reviews
-                                Container(
-                                  margin: EdgeInsets.only(top: 10),
-                                  height: 380,
-                                  child: DefaultTabController(
-                                    length: 2,
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width -
-                                              50,
-                                          child: TabBar(
-                                            indicatorColor: Colors.black,
-                                            tabs: [
-                                              Text(
-                                                'Description',
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 13),
-                                              ),
-                                              Text(
-                                                'Reviews',
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 13),
-                                              ),
-                                              // Text(
-                                              //   'Write a review',
-                                              //   style: TextStyle(
-                                              //       color: Colors.black,
-                                              //       fontSize: 13),
-                                              // ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width -
-                                              50,
-                                          height: 350,
-                                          child: TabBarView(
-                                            children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Text(widget.arguments![
-                                                                'product']![
-                                                            'description'] !=
-                                                        null
-                                                    ? widget
-                                                        .arguments!['product']![
-                                                            'description']
-                                                        .toString()
-                                                    : ''),
-                                              ),
-                                              Container(
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Container(
-                                                      // height:
-                                                      // MediaQuery.of(context)
-                                                      //         .size
-                                                      //         .height -
-                                                      //     50,
-                                                      child: product.reviews ==
-                                                              null
-                                                          ? Center(
-                                                              child: Text(
-                                                                  'No reviews'))
-                                                          : SingleChildScrollView(
-                                                              child: Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        top:
-                                                                            8.0),
-                                                                child: SizedBox(
-                                                                  height: MediaQuery.of(
-                                                                              context)
-                                                                          .size
-                                                                          .height *
-                                                                      0.45,
-                                                                  child: ListView
-                                                                      .builder(
-                                                                    scrollDirection:
-                                                                        Axis.vertical,
-                                                                    itemCount: widget
-                                                                        .arguments![
-                                                                            'product']
-                                                                            [
-                                                                            'reviews']!
-                                                                        .length,
-                                                                    itemBuilder:
-                                                                        (BuildContext context,
-                                                                                index) =>
-                                                                            Container(
-                                                                      margin: EdgeInsets.only(
-                                                                          bottom:
-                                                                              10),
-                                                                      padding:
-                                                                          EdgeInsets.all(
-                                                                              10),
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        border: Border.all(
-                                                                            color:
-                                                                                Color(0xffc7b456)),
-                                                                        color: Color(
-                                                                            0xffffffff),
-                                                                        borderRadius:
-                                                                            BorderRadius.all(Radius.circular(5)),
-                                                                        boxShadow: [
-                                                                          BoxShadow(
-                                                                            color:
-                                                                                Color(0x338a959e),
-                                                                            offset:
-                                                                                Offset(0, 7.6690645218),
-                                                                            blurRadius:
-                                                                                19.1726608276,
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                      child:
-                                                                          Column(
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.start,
-                                                                        children: [
-                                                                          Row(
-                                                                            children: [
-                                                                              Expanded(
-                                                                                child: Text(_configModel.user!.firstName.toString()),
-                                                                              ),
-                                                                              Expanded(
-                                                                                child: Text(
-                                                                                  _format!.format(DateTime.parse(widget.arguments!['product']['reviews']![index]['created_at'].toString())),
-                                                                                  textAlign: TextAlign.right,
-                                                                                  style: MyGoogleFontStyle(
-                                                                                    fontFamily: 'Poppins',
-                                                                                    fontSize: 12,
-                                                                                    fontWeight: FontWeight.w400,
-                                                                                    color: Color(0xff909090),
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            ],
-                                                                          ),
-                                                                          SizedBox(
-                                                                              height: 10),
-                                                                          Text(
-                                                                            widget.arguments!['product']['reviews']![index]['description'] ??
-                                                                                '',
-                                                                            style:
-                                                                                MyGoogleFontStyle(
-                                                                              fontFamily: 'Poppins',
-                                                                              fontSize: 12,
-                                                                              fontWeight: FontWeight.w400,
-                                                                              color: Color(0xff909090),
-                                                                            ),
-                                                                          ),
-
-                                                                          SizedBox(
-                                                                            height:
-                                                                                100,
-                                                                            child:
-                                                                                ListView.builder(
-                                                                              scrollDirection: Axis.horizontal,
-                                                                              itemCount: widget.arguments!['product']['reviews']![index]['review_images'].length,
-                                                                              itemBuilder: (context, index) {
-                                                                                final image = widget.arguments!['product']['reviews']![index]['review_images'][index];
-
-                                                                                return InkWell(
-                                                                                  onTap: () {
-                                                                                    Navigator.of(context).push(
-                                                                                      MaterialPageRoute(
-                                                                                        builder: (context) => ImageScreen(image: _configModel.apiConfig['mediaURL'] + image['image_path']),
-                                                                                      ),
-                                                                                    );
-                                                                                  },
-                                                                                  child: Container(
-                                                                                    margin: const EdgeInsets.only(right: 10),
-                                                                                    width: 60,
-                                                                                    height: 50,
-                                                                                    child: Image.network(
-                                                                                      _configModel.apiConfig['mediaURL'] + image['image_path'],
-                                                                                      fit: BoxFit.contain,
-                                                                                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
-                                                                                    ),
-                                                                                  ),
-                                                                                );
-                                                                              },
-                                                                            ),
-                                                                          ),
-                                                                          // Text(
-                                                                          //   widget.arguments!['product']['reviews']![index]['review_images'].toString(),
-                                                                          //   style:
-                                                                          //       MyGoogleFontStyle(
-                                                                          //     fontFamily: 'Poppins',
-                                                                          //     fontSize: 12,
-                                                                          //     fontWeight: FontWeight.w400,
-                                                                          //     color: Color(0xff909090),
-                                                                          //   ),
-                                                                          // ),
-                                                                          // Image.network(_configModel.apiConfig['mediaUrl'] +
-                                                                          //     widget.arguments!['product']['reviews']![index]['review_images'][0]['image_path'].toString())
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                // Description
+                                if (product.description != null)
+                                  Container(
+                                    width: double.infinity,
+                                    child: Card(
+                                      elevation: 4,
+                                      color: Colors.white,
+                                      child: Padding(
+                                          padding: const EdgeInsets.all(
+                                              16.0), // Optional padding
+                                          child:
+                                              // Text(product.description.toString()),
+                                              Html(
+                                            data:
+                                                """${product.description.toString()}""",
+                                          )),
                                     ),
                                   ),
-                                ),
+                                if (product.description1 != null)
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                if (product.description1 != null)
+                                  Container(
+                                    width: double.infinity,
+                                    child: Card(
+                                      elevation: 4,
+                                      color: Colors.white,
+                                      child: Padding(
+                                          padding: const EdgeInsets.all(
+                                              16.0), // Optional padding
+                                          child:
+                                              // Text(product.description.toString()),
+                                              Html(
+                                            data:
+                                                """${product.description1.toString()}""",
+                                          )),
+                                    ),
+                                  ),
+                                if (product.description2 != null)
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                if (product.description2 != null)
+                                  Container(
+                                    width: double.infinity,
+                                    child: Card(
+                                      elevation: 4,
+                                      color: Colors.white,
+                                      child: Padding(
+                                          padding: const EdgeInsets.all(
+                                              16.0), // Optional padding
+                                          child:
+                                              // Text(product.description.toString()),
+                                              Html(
+                                            data:
+                                                """${product.description2.toString()}""",
+                                          )),
+                                    ),
+                                  ),
+                                // Container(
+                                //   margin: EdgeInsets.only(top: 10),
+                                //   height: 380,
+                                //   child: DefaultTabController(
+                                //     length: 2,
+                                //     child: Column(
+                                //       children: [
+                                //         Container(
+                                //           width: MediaQuery.of(context)
+                                //                   .size
+                                //                   .width -
+                                //               50,
+                                //           child: TabBar(
+                                //             indicatorColor: Colors.black,
+                                //             tabs: [
+                                //               Text(
+                                //                 'Description',
+                                //                 style: TextStyle(
+                                //                     color: Colors.black,
+                                //                     fontSize: 13),
+                                //               ),
+                                //               Text(
+                                //                 'Reviews',
+                                //                 style: TextStyle(
+                                //                     color: Colors.black,
+                                //                     fontSize: 13),
+                                //               ),
+                                //               // Text(
+                                //               //   'Write a review',
+                                //               //   style: TextStyle(
+                                //               //       color: Colors.black,
+                                //               //       fontSize: 13),
+                                //               // ),
+                                //             ],
+                                //           ),
+                                //         ),
+                                //         Container(
+                                //           width: MediaQuery.of(context)
+                                //                   .size
+                                //                   .width -
+                                //               50,
+                                //           height: 350,
+                                //           child: TabBarView(
+                                //             children: [
+                                //               Padding(
+                                //                 padding:
+                                //                     const EdgeInsets.all(8.0),
+                                //                 child: Text(widget.arguments![
+                                //                                 'product']![
+                                //                             'description'] !=
+                                //                         null
+                                //                     ? widget
+                                //                         .arguments!['product']![
+                                //                             'description']
+                                //                         .toString()
+                                //                     : ''),
+                                //               ),
+                                //               Container(
+                                //                 child: Column(
+                                //                   crossAxisAlignment:
+                                //                       CrossAxisAlignment.start,
+                                //                   children: [
+                                //                     Container(
+                                //                       // height:
+                                //                       // MediaQuery.of(context)
+                                //                       //         .size
+                                //                       //         .height -
+                                //                       //     50,
+                                //                       child: product.reviews ==
+                                //                               null
+                                //                           ? Center(
+                                //                               child: Text(
+                                //                                   'No reviews'))
+                                //                           : SingleChildScrollView(
+                                //                               child: Padding(
+                                //                                 padding:
+                                //                                     const EdgeInsets
+                                //                                         .only(
+                                //                                         top:
+                                //                                             8.0),
+                                //                                 child: SizedBox(
+                                //                                   height: MediaQuery.of(
+                                //                                               context)
+                                //                                           .size
+                                //                                           .height *
+                                //                                       0.45,
+                                //                                   child: ListView
+                                //                                       .builder(
+                                //                                     scrollDirection:
+                                //                                         Axis.vertical,
+                                //                                     itemCount: widget
+                                //                                         .arguments![
+                                //                                             'product']
+                                //                                             [
+                                //                                             'reviews']!
+                                //                                         .length,
+                                //                                     itemBuilder:
+                                //                                         (BuildContext context,
+                                //                                                 index) =>
+                                //                                             Container(
+                                //                                       margin: EdgeInsets.only(
+                                //                                           bottom:
+                                //                                               10),
+                                //                                       padding:
+                                //                                           EdgeInsets.all(
+                                //                                               10),
+                                //                                       decoration:
+                                //                                           BoxDecoration(
+                                //                                         border: Border.all(
+                                //                                             color:
+                                //                                                 Color(0xffc7b456)),
+                                //                                         color: Color(
+                                //                                             0xffffffff),
+                                //                                         borderRadius:
+                                //                                             BorderRadius.all(Radius.circular(5)),
+                                //                                         boxShadow: [
+                                //                                           BoxShadow(
+                                //                                             color:
+                                //                                                 Color(0x338a959e),
+                                //                                             offset:
+                                //                                                 Offset(0, 7.6690645218),
+                                //                                             blurRadius:
+                                //                                                 19.1726608276,
+                                //                                           ),
+                                //                                         ],
+                                //                                       ),
+                                //                                       child:
+                                //                                           Column(
+                                //                                         crossAxisAlignment:
+                                //                                             CrossAxisAlignment.start,
+                                //                                         children: [
+                                //                                           Row(
+                                //                                             children: [
+                                //                                               Expanded(
+                                //                                                 child: Text(_configModel.user!.firstName.toString()),
+                                //                                               ),
+                                //                                               Expanded(
+                                //                                                 child: Text(
+                                //                                                   _format!.format(DateTime.parse(widget.arguments!['product']['reviews']![index]['created_at'].toString())),
+                                //                                                   textAlign: TextAlign.right,
+                                //                                                   style: MyGoogleFontStyle(
+                                //                                                     fontFamily: 'Poppins',
+                                //                                                     fontSize: 12,
+                                //                                                     fontWeight: FontWeight.w400,
+                                //                                                     color: Color(0xff909090),
+                                //                                                   ),
+                                //                                                 ),
+                                //                                               ),
+                                //                                             ],
+                                //                                           ),
+                                //                                           SizedBox(
+                                //                                               height: 10),
+                                //                                           Text(
+                                //                                             widget.arguments!['product']['reviews']![index]['description'] ??
+                                //                                                 '',
+                                //                                             style:
+                                //                                                 MyGoogleFontStyle(
+                                //                                               fontFamily: 'Poppins',
+                                //                                               fontSize: 12,
+                                //                                               fontWeight: FontWeight.w400,
+                                //                                               color: Color(0xff909090),
+                                //                                             ),
+                                //                                           ),
+
+                                //                                           SizedBox(
+                                //                                             height:
+                                //                                                 100,
+                                //                                             child:
+                                //                                                 ListView.builder(
+                                //                                               scrollDirection: Axis.horizontal,
+                                //                                               itemCount: widget.arguments!['product']['reviews']![index]['review_images'].length,
+                                //                                               itemBuilder: (context, index) {
+                                //                                                 final image = widget.arguments!['product']['reviews']![index]['review_images'][index];
+
+                                //                                                 return InkWell(
+                                //                                                   onTap: () {
+                                //                                                     Navigator.of(context).push(
+                                //                                                       MaterialPageRoute(
+                                //                                                         builder: (context) => ImageScreen(image: _configModel.apiConfig['mediaURL'] + image['image_path']),
+                                //                                                       ),
+                                //                                                     );
+                                //                                                   },
+                                //                                                   child: Container(
+                                //                                                     margin: const EdgeInsets.only(right: 10),
+                                //                                                     width: 60,
+                                //                                                     height: 50,
+                                //                                                     child: Image.network(
+                                //                                                       _configModel.apiConfig['mediaURL'] + image['image_path'],
+                                //                                                       fit: BoxFit.contain,
+                                //                                                       errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+                                //                                                     ),
+                                //                                                   ),
+                                //                                                 );
+                                //                                               },
+                                //                                             ),
+                                //                                           ),
+                                //                                           // Text(
+                                //                                           //   widget.arguments!['product']['reviews']![index]['review_images'].toString(),
+                                //                                           //   style:
+                                //                                           //       MyGoogleFontStyle(
+                                //                                           //     fontFamily: 'Poppins',
+                                //                                           //     fontSize: 12,
+                                //                                           //     fontWeight: FontWeight.w400,
+                                //                                           //     color: Color(0xff909090),
+                                //                                           //   ),
+                                //                                           // ),
+                                //                                           // Image.network(_configModel.apiConfig['mediaUrl'] +
+                                //                                           //     widget.arguments!['product']['reviews']![index]['review_images'][0]['image_path'].toString())
+                                //                                         ],
+                                //                                       ),
+                                //                                     ),
+                                //                                   ),
+                                //                                 ),
+                                //                               ),
+                                //                             ),
+                                //                     ),
+                                //                   ],
+                                //                 ),
+                                //               ),
+                                //             ],
+                                //           ),
+                                //         ),
+                                //       ],
+                                //     ),
+                                //   ),
+                                // ),
 
                                 // Add More Items
                                 Container(
@@ -2680,16 +2111,17 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                                 0,
                                                                             child:
                                                                                 Container(
-                                                                              padding: EdgeInsets.fromLTRB(106, 13, 14, 13),
+                                                                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                                                                               width: 145,
                                                                               height: 133,
                                                                               decoration: BoxDecoration(
                                                                                 borderRadius: BorderRadius.circular(15),
                                                                                 color: Color(0x0c000000),
                                                                                 image: DecorationImage(
-                                                                                  fit: BoxFit.cover,
+                                                                                  fit: BoxFit.contain,
                                                                                   image: NetworkImage(_configModel.apiConfig['mediaURL'] + _productModel.categoryWiseproducts![index].productImages!.first.imagepath.toString()
                                                                                       // 'assets/images/shades-chocolate-cake-3-1-2-1-bg.png',
+
                                                                                       ),
                                                                                 ),
                                                                               ),
@@ -2838,77 +2270,34 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                 ),
 
                                 // Earn Points Text
-                                Container(
-                                  width: MediaQuery.of(context).size.width - 50,
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        'Earn 20 points for this product',
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xff000000),
+                                if (_productpoints != '0')
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width - 50,
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          'Earn ${_productpoints} points for this product',
+                                          style: MyGoogleFontStyle(
+                                            fontFamily: 'Urbanist',
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xff000000),
+                                          ),
                                         ),
-                                      ),
-                                      Divider(
-                                        thickness: 2,
-                                        color: Colors.black,
-                                      ),
-                                      // SizedBox(
-                                      //   height: 20,
-                                      // ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          // Expanded(
-                                          //   child: RichText(
-                                          //     text: TextSpan(
-                                          //       style: MyGoogleFontStyle(
-                                          //         fontFamily: 'Poppins',
-                                          //         fontWeight: FontWeight.w700,
-                                          //         color: Color(0xff000000),
-                                          //       ),
-                                          //       children: [
-                                          //         TextSpan(
-                                          //           text: 'Total Price\n',
-                                          //           style: MyGoogleFontStyle(
-                                          //             fontFamily: 'Urbanist',
-                                          //             fontWeight:
-                                          //                 FontWeight.w400,
-                                          //             color:
-                                          //                 Color(0xffaaaaaa),
-                                          //           ),
-                                          //         ),
-                                          //         TextSpan(
-                                          //           text: '₹' +
-                                          //               ' ' +
-                                          //               widget.arguments![
-                                          //                       'product'][
-                                          //                       'product_prices']
-                                          //                       [0]['price']
-                                          //                   .toString(),
-                                          //           style: MyGoogleFontStyle(
-                                          //             fontFamily: 'Poppins',
-                                          //             fontWeight:
-                                          //                 FontWeight.w700,
-                                          //             fontSize: 20,
-                                          //             color:
-                                          //                 Color(0xff000000),
-                                          //           ),
-                                          //         ),
-                                          //       ],
-                                          //     ),
-                                          //   ),
-                                          // ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      )
-                                    ],
+                                        Divider(
+                                          thickness: 2,
+                                          color: Colors.black,
+                                        ),
+                                        // SizedBox(
+                                        //   height: 20,
+                                        // ),
+
+                                        SizedBox(
+                                          height: 10,
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                ),
                               ],
                             ),
                           ),

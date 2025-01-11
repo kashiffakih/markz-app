@@ -9,6 +9,9 @@ class Product {
   String? name;
   String? smallDescription;
   String? description;
+  String? description1;
+  String? description2;
+  String? sizeChartPath;
   String? location;
   int? isActive;
   String? createdAt;
@@ -31,6 +34,7 @@ class Product {
   List<Tags>? tags;
   Company? company;
   List<Review>? reviews;
+  String? rating;
 
   Product(
       {this.id,
@@ -41,6 +45,9 @@ class Product {
       this.name,
       this.smallDescription,
       this.description,
+      this.description1,
+      this.description2,
+      this.sizeChartPath,
       this.location,
       this.isActive,
       this.createdAt,
@@ -61,6 +68,7 @@ class Product {
       this.productPacks,
       this.productImages,
       this.tags,
+      this.rating,
       this.company,
       this.reviews});
 
@@ -73,6 +81,9 @@ class Product {
     name = json['name'];
     smallDescription = json['small_description'];
     description = json['description'];
+    description1 = json['description_1'];
+    description2 = json['description_2'];
+    sizeChartPath = json['size_chart_path'];
     location = json['location'];
     isActive = json['is_active'];
     createdAt = json['created_at'];
@@ -87,6 +98,7 @@ class Product {
     sub3CategoryId = json['sub_3_category_id'];
     vegNonveg = json['veg_nonveg'];
     inventory = json['inventory'];
+    rating = json['rating'].toString();
     category = json['category'] != null
         ? new Category.fromJson(json['category'])
         : null;
@@ -137,6 +149,9 @@ class Product {
     data['name'] = this.name;
     data['small_description'] = this.smallDescription;
     data['description'] = this.description;
+    data['description_1'] = this.description1;
+    data['description_2'] = this.description2;
+    data['size_chart_path'] = this.sizeChartPath;
     data['location'] = this.location;
     data['is_active'] = this.isActive;
     data['created_at'] = this.createdAt;
@@ -151,6 +166,7 @@ class Product {
     data['sub_3_category_id'] = this.sub3CategoryId;
     data['veg_nonveg'] = this.vegNonveg;
     data['inventory'] = this.inventory;
+    data['rating'] = this.rating;
     if (this.category != null) {
       data['category'] = this.category!.toJson();
     }
@@ -333,6 +349,7 @@ class ProductPack {
   String? createdAt;
   String? updatedAt;
   Unit? unit;
+  String? points;
 
   ProductPack(
       {this.id,
@@ -341,7 +358,8 @@ class ProductPack {
       this.unitId,
       this.createdAt,
       this.updatedAt,
-      this.unit});
+      this.unit,
+      this.points});
 
   ProductPack.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -351,6 +369,7 @@ class ProductPack {
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     unit = json['unit'] != null ? new Unit.fromJson(json['unit']) : null;
+    points = json['points'].toString();
   }
 
   Map<String, dynamic> toJson() {
@@ -364,6 +383,7 @@ class ProductPack {
     if (this.unit != null) {
       data['unit'] = this.unit!.toJson();
     }
+    data['points'] = this.points;
     return data;
   }
 }

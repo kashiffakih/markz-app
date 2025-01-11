@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/locator.dart';
-import 'package:sales_app/ui/shared/font_sh.dart';
 
 class LoginRequiredPopupWidget extends StatelessWidget {
   final ConfigModel _configModel = locator<ConfigModel>();

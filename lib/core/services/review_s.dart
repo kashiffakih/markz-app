@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:sales_app/core/models/review.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
@@ -13,7 +12,6 @@ class ReviewService {
   Future<List<Review>> getMyReviews([productId, description, rating]) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
     var userId = _configModel.user!.id;
-    print('rating $rating');
     // _configModel.files.forEach((imageFile) async {
     // if (imageFile.file != null) {
 // Add each image file to the request
@@ -58,12 +56,12 @@ class ReviewService {
     // });
 
     http.Response _response = await http.post(
-      Uri.parse('${_apiConfig['baseURL']}/review?userId=$userId'),
+      Uri.parse(
+          '${_apiConfig['baseURL']}/review?userId=$userId&productId=$productId'),
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
 
-    // print("Review ${_responseData['data'][0]['review_images']}");
     if (_responseData['success']) {
       _reviews = [];
       _responseData['data'].forEach((data) {

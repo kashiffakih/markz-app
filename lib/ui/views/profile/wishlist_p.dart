@@ -7,9 +7,7 @@ import 'package:sales_app/core/providers/product_pr.dart';
 import 'package:sales_app/core/providers/wish_list_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
-import 'package:sales_app/ui/views/products/product_id_p.dart';
 
-import '../products/shops_p.dart';
 import 'package:badges/badges.dart' as badges;
 
 class WishlistPage extends StatefulWidget {
@@ -48,9 +46,7 @@ class _WishlistPageState extends State<WishlistPage> {
   Widget build(BuildContext context) {
     final WishListModel _wishListModel = Provider.of<WishListModel>(context);
     final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
-    final ProductModel _productModel = Provider.of<ProductModel>(context);
     final ConfigModel _configModel = locator<ConfigModel>();
-    TextEditingController _controller = TextEditingController();
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
@@ -180,7 +176,7 @@ class _WishlistPageState extends State<WishlistPage> {
                                                 .wishLists![index]
                                                 .product!
                                                 .productImages!
-                                                .first!
+                                                .first
                                                 .imagepath
                                                 .toString(),
                                         // 'assets/images/mask-group-HvE.png',
@@ -298,6 +294,8 @@ class _WishlistPageState extends State<WishlistPage> {
                                                       productImages = [];
                                                   List<ProductPack>
                                                       productPacks = [];
+                                                  List<ProductPrices>
+                                                      productPrices = [];
 
                                                   productImages = _wishListModel
                                                       .wishLists![index]
@@ -307,6 +305,10 @@ class _WishlistPageState extends State<WishlistPage> {
                                                       .wishLists![index]
                                                       .product!
                                                       .productPacks!;
+                                                  productPrices = _wishListModel
+                                                      .wishLists![index]
+                                                      .product!
+                                                      .productPrices!;
                                                   showModalBottomSheet(
                                                     context: context,
                                                     builder:
@@ -551,8 +553,10 @@ class _WishlistPageState extends State<WishlistPage> {
                                                                         ),
 
                                                                         InkWell(
-                                                                          onTap: () async {
-                                                                            if (activeIndex == -1) {
+                                                                          onTap:
+                                                                              () async {
+                                                                            if (activeIndex ==
+                                                                                -1) {
                                                                               showDialog(
                                                                                 context: context,
                                                                                 builder: (BuildContext context) {
@@ -581,7 +585,8 @@ class _WishlistPageState extends State<WishlistPage> {
                                                                               );
                                                                               return; // Stop execution if variant is not selected
                                                                             }
-                                                                            if (sizeActiveIndex == -1) {
+                                                                            if (sizeActiveIndex ==
+                                                                                -1) {
                                                                               showDialog(
                                                                                 context: context,
                                                                                 builder: (BuildContext context) {
@@ -611,15 +616,27 @@ class _WishlistPageState extends State<WishlistPage> {
                                                                               return; // Stop execution if size is not selected
                                                                             }
 
-
-
-
                                                                             print(_CartData);
                                                                             setState(() {
                                                                               isPageLoading = true;
                                                                             });
-                                                                            bool type = true;
 
+                                                                            String
+                                                                                _prices =
+                                                                                productPrices.where((_price) => _price.productPackId == _CartData['pack']).toList()[0].offerPrice.toString();
+                                                                            bool
+                                                                                type =
+                                                                                true;
+
+                                                                            String
+                                                                                _productpoints =
+                                                                                productPacks.where((_pack) => _pack.id == _CartData['pack']).toList()[0].points.toString();
+                                                                            // print(_productpoints);
+                                                                            _CartData['points'] =
+                                                                                _productpoints;
+                                                                            _CartData['product_price'] =
+                                                                                _prices;
+                                                                            print(_CartData);
                                                                             await _addToCartModel.getAddToCart(
                                                                               _wishListModel.wishLists![index].product!.id,
                                                                               type,
@@ -632,8 +649,10 @@ class _WishlistPageState extends State<WishlistPage> {
                                                                               Navigator.pop(context);
                                                                             });
                                                                           },
-                                                                          child: Center(
-                                                                            child: Container(
+                                                                          child:
+                                                                              Center(
+                                                                            child:
+                                                                                Container(
                                                                               padding: EdgeInsets.fromLTRB(13, 4, 14, 6),
                                                                               width: 160,
                                                                               height: 50,
@@ -648,17 +667,17 @@ class _WishlistPageState extends State<WishlistPage> {
                                                                                     padding: EdgeInsets.symmetric(horizontal: 5),
                                                                                     child: isPageLoading == false
                                                                                         ? Text(
-                                                                                      'Add to Cart',
-                                                                                      style: MyGoogleFontStyle(
-                                                                                        fontFamily: 'Poppins',
-                                                                                        fontSize: 15,
-                                                                                        fontWeight: FontWeight.w600,
-                                                                                        color: Color(0xffffffff),
-                                                                                      ),
-                                                                                    )
+                                                                                            'Add to Cart',
+                                                                                            style: MyGoogleFontStyle(
+                                                                                              fontFamily: 'Poppins',
+                                                                                              fontSize: 15,
+                                                                                              fontWeight: FontWeight.w600,
+                                                                                              color: Color(0xffffffff),
+                                                                                            ),
+                                                                                          )
                                                                                         : CircularProgressIndicator(
-                                                                                      color: Colors.white,
-                                                                                    ),
+                                                                                            color: Colors.white,
+                                                                                          ),
                                                                                   ),
                                                                                   Image.asset(
                                                                                     'assets/images/shopping-bag-03-YoY.png',
@@ -670,7 +689,6 @@ class _WishlistPageState extends State<WishlistPage> {
                                                                             ),
                                                                           ),
                                                                         ),
-
                                                                       ],
                                                                     ),
                                                                   ),

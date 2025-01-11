@@ -53,6 +53,8 @@ class User {
   Location? location;
   List<Roles>? roles;
   List<Company>? companies;
+  String? referralCode;
+  String? referedById;
 
   User(
       {this.id,
@@ -103,6 +105,8 @@ class User {
       this.fcmToken,
       this.referredCode,
       this.referredCodeUser,
+      this.referralCode,
+      this.referedById,
       this.imagepath,
       this.location,
       this.roles,
@@ -157,6 +161,8 @@ class User {
     fcmToken = json['fcm_token'];
     referredCode = json['referred_code'];
     referredCodeUser = json['referred_code_user'];
+    referralCode = json['referral_code'];
+    referedById = json['refered_by_id'].toString();
     imagepath = json['imagepath'];
     location = json['location'] != null
         ? new Location.fromJson(json['location'])
@@ -225,6 +231,8 @@ class User {
     data['fcm_token'] = this.fcmToken;
     data['referred_code'] = this.referredCode;
     data['referred_code_user'] = this.referredCodeUser;
+    data['referral_code'] = this.referralCode;
+    data['refered_by_id'] = this.referedById;
     data['imagepath'] = this.imagepath;
     if (this.location != null) {
       data['location'] = this.location!.toJson();

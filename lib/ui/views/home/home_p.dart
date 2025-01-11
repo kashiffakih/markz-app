@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/product_pr.dart';
+import 'package:sales_app/core/providers/user_wallet_pr.dart';
 import 'package:sales_app/core/providers/wish_list_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
@@ -15,6 +16,7 @@ import 'package:sales_app/ui/widgets/drawer_w.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:sales_app/ui/widgets/image_zoom_w.dart';
 import 'package:sales_app/ui/widgets/login_required_popup.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -43,31 +45,92 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
+    final ConfigModel _configModel = locator<ConfigModel>();
+    print(_configModel.user?.referedById);
     // Fetch banners and other data after widget build
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (_configModel.user?.referedById == null ||
+          _configModel.user?.referedById! == '' ||
+          _configModel.user?.referedById == 'null') {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            TextEditingController referralCodeController =
+                TextEditingController();
+
+            return AlertDialog(
+              title: const Text(
+                'Redeem Referral Code',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: referralCodeController,
+                    decoration: InputDecoration(
+                      labelText: 'Enter Referral Code',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close the dialog
+                  },
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    String referralCode = referralCodeController.text;
+                    if (referralCode.isNotEmpty) {
+                      Provider.of<UserWalletModel>(context, listen: false)
+                          .mapRedeemReferralCode(referralCode);
+
+                      Navigator.pop(context); // Close the dialog
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content:
+                                Text('Referral Code Redeemed: $referralCode')),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content:
+                                Text('Please enter a valid referral code')),
+                      );
+                    }
+                  },
+                  child: const Text('Redeem'),
+                ),
+              ],
+            );
+          },
+        );
+      }
       // Fetch product data
       await Provider.of<ProductModel>(context, listen: false).getProduct();
 
-      // // Fetch banners
-      // await Provider.of<ProductModel>(context, listen: false).getBanners();
-
       // Fetch wishlist data
       var productId = '';
-      await Provider.of<WishListModel>(context, listen: false)
-          .getWishLists(productId);
+      if (_configModel.user != null) {
+        await Provider.of<WishListModel>(context, listen: false)
+            .getWishLists(productId);
+        await Provider.of<AddToCartModel>(context, listen: false)
+            .getAddToCart(productId, '', _CartData);
+      }
 
       // Fetch categories data
       await Provider.of<ProductModel>(context, listen: false).getCategories();
 
       // Fetch cart data
-      Provider.of<AddToCartModel>(context, listen: false)
-          .getAddToCart(productId, '', _CartData);
 
       var productModel = Provider.of<ProductModel>(context, listen: false);
       await productModel.getBanners();
 
-      final ConfigModel _configModel = locator<ConfigModel>();
-
+      print(productModel.banners?.length);
       // Fetch and build banners
       var bannerList = [
         productModel.banners?['banner_path_1'] != null
@@ -1030,21 +1093,31 @@ class _HomePageState extends State<HomePage>
                         ),
                       ),
                       Positioned(
-                        // invite6rJ (318:1954)
                         left: 202.9672851562 * fem,
                         top: 99.655166626 * fem,
-                        child: Align(
-                          child: SizedBox(
-                            width: 40 * fem,
-                            height: 25 * fem,
-                            child: Text(
-                              'Invite',
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 13 * ffem,
-                                fontWeight: FontWeight.w600,
-                                height: 1.5 * ffem / fem,
-                                color: Color(0xffffffff),
+                        child: InkWell(
+                          onTap: () {
+                            final message =
+                                'Hello! This is my referral Code ${_configModel.user?.referralCode.toString()} Redeem them to get instant discounts.';
+                            var whatsappUrl = "whatsapp://send?" +
+                                "text=${Uri.encodeComponent(message)}";
+                            try {
+                              launch(whatsappUrl);
+                            } catch (e) {}
+                          },
+                          child: Align(
+                            child: SizedBox(
+                              width: 40 * fem,
+                              height: 25 * fem,
+                              child: Text(
+                                'Invite',
+                                style: MyGoogleFontStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 13 * ffem,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.5 * ffem / fem,
+                                  color: Color(0xffffffff),
+                                ),
                               ),
                             ),
                           ),

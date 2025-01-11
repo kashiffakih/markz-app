@@ -13,10 +13,11 @@ import 'package:sales_app/core/providers/user_address_pr.dart';
 import 'package:sales_app/core/providers/user_wallet_pr.dart';
 import 'package:sales_app/core/providers/wish_list_pr.dart';
 import 'package:sales_app/locator.dart';
+import 'package:sales_app/ui/root_p.dart';
 import 'package:sales_app/ui/routing/router.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/deeplink/deep_link_listener.dart';
-import 'package:sales_app/ui/views/home/home_p.dart';
+// import 'package:sales_app/ui/views/home/home_p.dart';
 
 Future<void> main() async {
   setupLocator();
@@ -81,8 +82,8 @@ class MyApp extends StatelessWidget {
                 bodySmall: MyGoogleFontStyle(),
               ),
         ),
-        home: DeepLinkListener(child: HomePage(),
-          
+        home: DeepLinkListener(
+          child: RootPage(),
         ),
       ),
     );

@@ -70,102 +70,107 @@ class _PromocodesPageState extends State<PromocodesPage> {
                   ),
                 ),
                 // Body
-                Container(
-                  margin: EdgeInsets.all(10),
-                  child: Column(
-                    children: [
-                      ..._couponModel.coupons!.map((coupon) {
-                        // Convert end date string to DateTime object
-                        DateTime endDate = DateFormat('dd-MM-yyyy')
-                            .parse(coupon.endDate.toString());
+                _couponModel.coupons == null
+                    ? CircularProgressIndicator()
+                    : Container(
+                        margin: EdgeInsets.all(10),
+                        child: Column(
+                          children: [
+                            ..._couponModel.coupons!.map((coupon) {
+                              // Convert end date string to DateTime object
+                              DateTime endDate = DateFormat('dd-MM-yyyy')
+                                  .parse(coupon.endDate.toString());
 
-                        // Get current date
-                        DateTime currentDate = DateTime.now();
+                              // Get current date
+                              DateTime currentDate = DateTime.now();
 
-                        // Check if coupon is expired
-                        bool isExpired = endDate.isBefore(currentDate);
+                              // Check if coupon is expired
+                              bool isExpired = endDate.isBefore(currentDate);
 
-                        // Render InkWell if not expired, otherwise render Text widget
-                        return isExpired
-                            ? Text(
-                                'Expired',
-                                style: MyGoogleFontStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xff232323),
-                                ),
-                              )
-                            : InkWell(
-                                onTap: () async {
-                                  Navigator.pop(context, coupon.name);
-                                },
-                                child: Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  margin: EdgeInsets.only(top: 10, bottom: 10),
-                                  padding: EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Color(0xffc7b456)),
-                                    color: Color(0xffffffff),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(5),
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Color(0x338a959e),
-                                        offset: Offset(0, 7.6690645218),
-                                        blurRadius: 19.1726608276,
+                              // Render InkWell if not expired, otherwise render Text widget
+                              return isExpired
+                                  ? Text(
+                                      'Expired',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xff232323),
                                       ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Coupon code: ' +
-                                            coupon.name.toString(),
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xff232323),
+                                    )
+                                  : InkWell(
+                                      onTap: () async {
+                                        Navigator.pop(context, coupon.name);
+                                      },
+                                      child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        margin: EdgeInsets.only(
+                                            top: 10, bottom: 10),
+                                        padding: EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                              color: Color(0xffc7b456)),
+                                          color: Color(0xffffffff),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(5),
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Color(0x338a959e),
+                                              offset: Offset(0, 7.6690645218),
+                                              blurRadius: 19.1726608276,
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Coupon code: ' +
+                                                  coupon.name.toString(),
+                                              style: MyGoogleFontStyle(
+                                                fontFamily: 'Urbanist',
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xff232323),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 5,
+                                            ),
+                                            Text(
+                                              'Minimum order value: Rs ' +
+                                                  coupon.minOrderValue
+                                                      .toString(),
+                                              style: MyGoogleFontStyle(
+                                                fontFamily: 'Urbanist',
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w400,
+                                                color: Color(0xff232323),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 5,
+                                            ),
+                                            Text(
+                                              'Expire on: ' +
+                                                  coupon.endDate.toString(),
+                                              style: MyGoogleFontStyle(
+                                                fontFamily: 'Urbanist',
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w400,
+                                                color: Color(0xff232323),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                      SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text(
-                                        'Minimum order value: Rs ' +
-                                            coupon.minOrderValue.toString(),
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xff232323),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text(
-                                        'Expire on: ' +
-                                            coupon.endDate.toString(),
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xff232323),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                      }).toList(),
-                    ],
-                  ),
-                )
+                                    );
+                            }).toList(),
+                          ],
+                        ),
+                      )
               ],
             ),
           ),

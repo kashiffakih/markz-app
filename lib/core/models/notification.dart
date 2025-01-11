@@ -1,6 +1,6 @@
 class MyNotification {
   int? id;
-  Null? text;
+  Null text;
   String? to;
   String? details;
   String? createdAt;

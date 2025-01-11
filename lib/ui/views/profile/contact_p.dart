@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
+import 'package:sales_app/core/providers/product_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -15,9 +16,16 @@ class ContactPage extends StatefulWidget {
 
 class _ContactPageState extends State<ContactPage> {
   @override
+  void initState() {
+    Provider.of<ProductModel>(context, listen: false).getBanners();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final ConfigModel _configModel = locator<ConfigModel>();
-    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
+    // final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
+    final ProductModel _productModel = Provider.of<ProductModel>(context);
 
     return Scaffold(
       body: SafeArea(
@@ -77,8 +85,8 @@ class _ContactPageState extends State<ContactPage> {
                           String body = Uri.encodeComponent(
                               "Hello! I would like to order a delicious cake.");
                           print(subject); //output: Hello%20Flutter
-                          Uri mail = Uri.parse(
-                              "mailto:$email?subject=$subject&body=$body");
+                          Uri mail =
+                              Uri.parse("mailto:$email?subject=$subject");
                           if (await launchUrl(mail)) {
                             //email app opened
                           } else {
@@ -144,7 +152,7 @@ class _ContactPageState extends State<ContactPage> {
                                       height: 5,
                                     ),
                                     Text(
-                                      _configModel.user!.companies![0].email
+                                      _productModel.banners!['email']
                                           .toString(),
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
@@ -164,12 +172,11 @@ class _ContactPageState extends State<ContactPage> {
                       // Whatsapp
                       InkWell(
                         onTap: () async {
-                          final message =
-                              'Hello! I would like to order a delicious cake.';
+                          // final message =
+                          //     'Hello! I would like to order a delicious cake.';
                           final phone =
                               _configModel.user!.companies![0].phone.toString();
-                          var whatsappUrl = "whatsapp://send?phone=${phone}" +
-                              "&text=${Uri.encodeComponent(message)}";
+                          var whatsappUrl = "whatsapp://send?phone=${phone}";
                           try {
                             launch(whatsappUrl);
                           } catch (e) {
@@ -238,7 +245,94 @@ class _ContactPageState extends State<ContactPage> {
                                       height: 5,
                                     ),
                                     Text(
-                                      _configModel.user!.companies![0].phone
+                                      _productModel.banners!['phone']
+                                          .toString(),
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xff232323),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () async {
+                          String number =
+                              _productModel.banners!['phone'].toString();
+                          final Uri phoneUri = Uri(scheme: 'tel', path: number);
+                          if (await canLaunch(phoneUri.toString())) {
+                            await launch(phoneUri.toString());
+                          } else {
+                            throw 'Could not launch $number';
+                          }
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(top: 10, bottom: 10),
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Color(0xffc7b456)),
+                            color: Color(0xffffffff),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(5),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0x338a959e),
+                                offset: Offset(0, 7.6690645218),
+                                blurRadius: 19.1726608276,
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                margin: EdgeInsets.fromLTRB(0, 0, 18, 0),
+                                padding: EdgeInsets.fromLTRB(4, 5, 4, 5),
+                                decoration: BoxDecoration(
+                                  color: Color(0xfffbfbfb),
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0x3f000000),
+                                      offset: Offset(0, 4),
+                                      blurRadius: 2,
+                                    ),
+                                  ],
+                                ),
+                                child: Center(
+                                  child: SizedBox(
+                                    width: 32,
+                                    height: 30,
+                                    child: Icon(
+                                      Icons.phone,
+                                      size: 25,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Call Us',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xff232323),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      _productModel.banners!['phone']
                                           .toString(),
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',

@@ -139,8 +139,6 @@
 // }
 // TEst v1
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:sales_app/core/providers/auth_pr.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 
 class Splash2Page extends StatefulWidget {

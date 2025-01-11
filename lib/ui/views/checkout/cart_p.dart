@@ -46,6 +46,7 @@ class _CartPageState extends State<CartPage> {
     'writeOnCake': '',
     'pack': ''
   };
+  String usedCoupon = '';
 
   // bool type = true;
   @override
@@ -53,8 +54,9 @@ class _CartPageState extends State<CartPage> {
     super.initState();
     var productId = '';
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if(_CartData.isNotEmpty || _CartData != null){
-        await Provider.of<AddToCartModel>(context, listen: false).getAddToCart('', '', _CartData);
+      if (_CartData.isNotEmpty || _CartData != null) {
+        await Provider.of<AddToCartModel>(context, listen: false)
+            .getAddToCart('', '', _CartData);
       }
 
       if (widget.arguments?['product']['category_id'] != null) {
@@ -458,7 +460,7 @@ class _CartPageState extends State<CartPage> {
                                                                           },
                                                                           child: _wishListModel.wishListLoader
                                                                               ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
-                                                                              : _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.products![index].id && wishList.userId == _configModel.user!?.id).toList().length == 0
+                                                                              : _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.products![index].id && wishList.userId == _configModel.user!.id).toList().length == 0
                                                                                   ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
                                                                                   : Align(
                                                                                       alignment: Alignment.topRight,
@@ -803,37 +805,37 @@ class _CartPageState extends State<CartPage> {
                                                           alignment: Alignment
                                                               .centerLeft,
                                                           child: Text(
-                                                        
                                                             'Colour: ${_addToCartModel.addToCarts![index].flavour}',
-                                                            overflow: TextOverflow.ellipsis,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
                                                             style:
                                                                 MyGoogleFontStyle(
                                                               fontFamily:
                                                                   'Poppins',
-                                                        
                                                             ),
                                                           ),
                                                         ),
                                                       ),
                                                     ],
                                                   ),
-                                                  Align(
-                                                    alignment:
-                                                        Alignment.centerLeft,
-                                                    child: Row(
-                                                      children: [
-                                                        Icon(
-                                                          Icons.star,
-                                                          color: Colors.amber,
-                                                        ),
-                                                        Text(
-                                                          ' ( ${(_addToCartModel.addToCarts![index].product!.reviews == null ? 0 : _addToCartModel.addToCarts![index].product!.reviews?.length)} ratings )',
-                                                          style: TextStyle(
-                                                              fontSize: 12),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
+                                                  // Align(
+                                                  //   alignment:
+                                                  //       Alignment.centerLeft,
+                                                  //   child: Row(
+                                                  //     children: [
+                                                  //       Icon(
+                                                  //         Icons.star,
+                                                  //         color: Colors.amber,
+                                                  //       ),
+                                                  //       Text(
+                                                  //         ' ( ${(_addToCartModel.addToCarts![index].product!.reviews == null ? 0 : _addToCartModel.addToCarts![index].product!.reviews?.length)} ratings )',
+                                                  //         style: TextStyle(
+                                                  //             fontSize: 12),
+                                                  //       ),
+                                                  //     ],
+                                                  //   ),
+                                                  // ),
                                                   Align(
                                                     alignment:
                                                         Alignment.centerLeft,
@@ -965,132 +967,144 @@ class _CartPageState extends State<CartPage> {
                       child: Column(
                         children: [
                           // if (couponValue == '')
-                          Form(
-                            key: _formKey,
-                            child: Row(children: [
-                              Expanded(
-                                flex: 8,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    border:
-                                        Border.all(color: Color(0xffe3e3e3)),
-                                    color: Color(0xfffbfbfb),
-                                  ),
-                                  child: TextFormField(
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      focusedBorder: InputBorder.none,
-                                      enabledBorder: InputBorder.none,
-                                      errorBorder: InputBorder.none,
-                                      disabledBorder: InputBorder.none,
-                                      contentPadding:
-                                          EdgeInsets.fromLTRB(9, 6, 1, 5),
-                                      hintText: 'Enter your promocode',
-                                      hintStyle:
-                                          TextStyle(color: Color(0x3f000000)),
-                                    ),
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xff000000),
-                                    ),
-                                    onSaved: (value) {
-                                      coupon = value.toString();
-                                    },
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Expanded(
-                                flex: 3,
-                                child: InkWell(
-                                  onTap: () async {
-                                    _formKey.currentState!.save();
-
-                                    await _couponModel.verifyCoupon(coupon);
-                                    // print(_couponModel.coupons![0].minOrderValue);
-                                    if (_couponModel.coupons != null &&
-                                        _couponModel.coupons!.isNotEmpty) {
-                                      final firstCoupon =
-                                          _couponModel.coupons![0];
-                                      final cartTotal = int.parse(
-                                          _addToCartModel.cartTotal.toString());
-
-                                      if (firstCoupon.minOrderValue! <
-                                          cartTotal) {
-                                        setState(() {
-                                          couponValue = double.parse(
-                                                  firstCoupon.value.toString())
-                                              .toInt();
-                                          couponId = firstCoupon.id.toString();
-                                        });
-                                      } else {
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) =>
-                                              AlertDialog(
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(20)),
-                                            title: Text(
-                                                "The Product amount should be greater than ${firstCoupon.minOrderValue.toString()}"),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text('Ok'),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      }
-                                    } else {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) =>
-                                            AlertDialog(
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20)),
-                                          title: Text("Invalid coupon."),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: Text('Ok'),
-                                            ),
-                                          ],
+                          usedCoupon == ''
+                              ? Form(
+                                  key: _formKey,
+                                  child: Row(children: [
+                                    Expanded(
+                                      flex: 8,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          border: Border.all(
+                                              color: Color(0xffe3e3e3)),
+                                          color: Color(0xfffbfbfb),
                                         ),
-                                      );
-                                    }
-                                  },
-                                  child: Container(
-                                    width: 50,
-                                    height: 50,
-                                    decoration: BoxDecoration(
-                                      color: Color(0xff1e1e1e),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        'Apply',
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xffffffff),
+                                        child: TextFormField(
+                                          decoration: InputDecoration(
+                                            border: InputBorder.none,
+                                            focusedBorder: InputBorder.none,
+                                            enabledBorder: InputBorder.none,
+                                            errorBorder: InputBorder.none,
+                                            disabledBorder: InputBorder.none,
+                                            contentPadding:
+                                                EdgeInsets.fromLTRB(9, 6, 1, 5),
+                                            hintText: 'Enter your promocode',
+                                            hintStyle: TextStyle(
+                                                color: Color(0x3f000000)),
+                                          ),
+                                          style: MyGoogleFontStyle(
+                                            fontFamily: 'Urbanist',
+                                            fontWeight: FontWeight.w500,
+                                            color: Color(0xff000000),
+                                          ),
+                                          onSaved: (value) {
+                                            coupon = value.toString();
+                                          },
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                              )
-                            ]),
-                          ),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Expanded(
+                                      flex: 3,
+                                      child: InkWell(
+                                        onTap: () async {
+                                          _formKey.currentState!.save();
+
+                                          await _couponModel
+                                              .verifyCoupon(coupon);
+                                          // print(_couponModel.coupons![0].minOrderValue);
+                                          if (_couponModel.coupons != null &&
+                                              _couponModel
+                                                  .coupons!.isNotEmpty) {
+                                            final firstCoupon =
+                                                _couponModel.coupons![0];
+                                            final cartTotal = int.parse(
+                                                _addToCartModel.cartTotal
+                                                    .toString());
+
+                                            if (firstCoupon.minOrderValue! <
+                                                cartTotal) {
+                                              setState(() {
+                                                couponValue = double.parse(
+                                                        firstCoupon.value
+                                                            .toString())
+                                                    .toInt();
+                                                couponId =
+                                                    firstCoupon.id.toString();
+                                              });
+                                            } else {
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) =>
+                                                        AlertDialog(
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20)),
+                                                  title: Text(
+                                                      "The Product amount should be greater than ${firstCoupon.minOrderValue.toString()}"),
+                                                  actions: <Widget>[
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text('Ok'),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            }
+                                          } else {
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) =>
+                                                  AlertDialog(
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20)),
+                                                title: Text("Invalid coupon."),
+                                                actions: <Widget>[
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: Text('Ok'),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        child: Container(
+                                          width: 50,
+                                          height: 50,
+                                          decoration: BoxDecoration(
+                                            color: Color(0xff1e1e1e),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              'Apply',
+                                              style: MyGoogleFontStyle(
+                                                fontFamily: 'Urbanist',
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xffffffff),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ]),
+                                )
+                              : Text('Coupon Applied: ${usedCoupon}'),
 
                           // Promo Code
                           InkWell(
@@ -1105,6 +1119,10 @@ class _CartPageState extends State<CartPage> {
                               final firstCoupon = _couponModel.coupons![0];
                               final cartTotal = int.parse(
                                   _addToCartModel.cartTotal.toString());
+
+                              setState(() {
+                                usedCoupon = firstCoupon.name.toString();
+                              });
 
                               if (firstCoupon.minOrderValue! < cartTotal) {
                                 setState(() {
@@ -1329,7 +1347,7 @@ class _CartPageState extends State<CartPage> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  "${_configModel.user!?.firstName.toString()} [ ${address.label.toString()}]",
+                                                  "${_configModel.user!.firstName.toString()} [ ${address.label.toString()}]",
                                                   style: MyGoogleFontStyle(
                                                     fontFamily: 'Urbanist',
                                                     fontWeight: FontWeight.w700,

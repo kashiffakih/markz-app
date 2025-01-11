@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/notification_pr.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/auth/splash_p.dart';
-import 'package:sales_app/ui/views/products/shops_p.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({Key? key}) : super(key: key);

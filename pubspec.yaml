@@ -55,6 +55,7 @@ dependencies:
   google_sign_in: ^5.0.0
   flutter_facebook_auth:
   app_links: ^6.3.2
+  flutter_html: ^3.0.0-beta.2
 
 
 

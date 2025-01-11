@@ -15,7 +15,7 @@ class ConfigService {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
-        'company-id': '$companyId',
+        'company-id': '${companyId}',
       },
       'responseType': 'json',
       'baseURL': url! + '/api',
@@ -48,11 +48,11 @@ class ConfigService {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     String _loginData = _prefs.get('loginData').toString();
     Map<String, dynamic> _loginMap = json.decode(_loginData);
-    // _loginMap['password'] = '';
-    // _loginMap['email'] = '';
-    // _loginMap['phone'] = '';
-    // _loginMap['api_token'] = '';
-    _loginMap = {};
+    _loginMap['password'] = '';
+    _loginMap['email'] = '';
+    _loginMap['phone'] = '';
+    _loginMap['api_token'] = '';
+    // _loginMap = {};
     _prefs.setString('loginData', json.encode(_loginMap));
   }
 }

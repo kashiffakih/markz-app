@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:icon_forest/don_icons.dart';
-import 'package:icon_forest/iconoir.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';

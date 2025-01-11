@@ -32,4 +32,9 @@ class UserWalletModel with ChangeNotifier {
     totalUsedPoint = _response['total_used_points'];
     totaRemainingPoint = _response['remaining_points'];
   }
+
+  mapRedeemReferralCode(referralCode) async {
+    Map<String, dynamic> _response =
+        await _userWalletService.mapRedeemReferralCode(referralCode);
+  }
 }

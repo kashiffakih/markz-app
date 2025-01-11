@@ -121,19 +121,6 @@ import 'package:sales_app/core/models/file.dart';
 
 class ConfigModel with ChangeNotifier {
   final ConfigService _configService = locator<ConfigService>();
-  String _selectedImage = '';
-
-  String get selectedImage => _selectedImage;
-
-  set selectedImage(String value) {
-    _selectedImage = value;
-    notifyListeners();
-  }
-  void updateProfileImage(String newPath) {
-    user?.imagepath = newPath; // Update the user's imagePath
-    selectedImage = newPath; // Store the selected image path
-    notifyListeners();
-  }
 
   // File Management
   late List<File> _files = [];
@@ -235,11 +222,26 @@ class ConfigModel with ChangeNotifier {
       apiConfig = _configService.getApiConfig(
         token: user?.apiToken,
         companyId:
-            user?.companies?.isNotEmpty == true ? user!.companies![0].id : null,
+            user?.companies?.isNotEmpty == true ? user!.companies![0].id : 1,
       );
       currentAndroidVersionFromApi =
           responseData['currentAndroidVersionFromApi'];
     }
+    notifyListeners();
+  }
+
+  String _selectedImage = '';
+
+  String get selectedImage => _selectedImage;
+
+  set selectedImage(String value) {
+    _selectedImage = value;
+    notifyListeners();
+  }
+
+  void updateProfileImage(String newPath) {
+    user?.imagepath = newPath; // Update the user's imagePath
+    selectedImage = newPath; // Store the selected image path
     notifyListeners();
   }
 }

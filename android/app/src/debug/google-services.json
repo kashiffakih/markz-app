@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "471438233864",
+    "project_id": "aadab-cc132",
+    "storage_bucket": "aadab-cc132.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:471438233864:android:e2973c344494691a26dcbd",
+        "android_client_info": {
+          "package_name": "org.pms.Aadab"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "471438233864-p88lcdacae5ac714nva5r344ho88k947.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.pms.Aadab",
+            "certificate_hash": "b745215032a061297dc160062f5a02a1fd2ab633"
+          }
+        },
+        {
+          "client_id": "471438233864-ujhkgofdocv51frkad4tbncr9odkcasn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfspOZEfCq2PE2QQXStM-sL1ah9Xh7xfY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "471438233864-ujhkgofdocv51frkad4tbncr9odkcasn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "471438233864-88etp2ub4tvi7pc3sovj47rfofh9l7ug.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.pms.baChannel"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

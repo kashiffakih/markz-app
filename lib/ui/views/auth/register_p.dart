@@ -95,10 +95,12 @@ class _RegisterPageState extends State<RegisterPage> {
       'serialNumber': build.serialNumber,
     };
   }
+
   bool _isValidEmail(String input) {
     String emailPattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
     return RegExp(emailPattern).hasMatch(input);
   }
+
   @override
   Widget build(BuildContext context) {
     // print(widget.argument['role']);
@@ -377,7 +379,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               _registerData['guest_email'] = identifier;
                               _registerData['role'] = widget.argument['role'];
 
-                              // print(_registerData);
+                              print(_registerData);
                               bool response = await authModel.register(
                                   registerData: _registerData);
                               if (response == true) {
@@ -394,7 +396,10 @@ class _RegisterPageState extends State<RegisterPage> {
                                       TextButton(
                                         onPressed: () {
                                           Navigator.pushReplacementNamed(
-                                              context, '/loginPage');
+                                              context, '/loginPage',
+                                              arguments: {
+                                                'role': widget.argument['role']
+                                              });
                                         },
                                         child: Text('Ok'),
                                       ),
@@ -575,17 +580,16 @@ class _RegisterPageState extends State<RegisterPage> {
               //   ),
               // ),
 
-
               InkWell(
                 onTap: () {
                   {
                     FacebookAuth.instance
                         .login(
-                      //   permissions: [
-                      //   "public_profile",
-                      //   "email"
-                      // ]
-                    )
+                            //   permissions: [
+                            //   "public_profile",
+                            //   "email"
+                            // ]
+                            )
                         .then((value) {
                       FacebookAuth.instance
                           .getUserData()
@@ -601,7 +605,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         _loginData['social_login_name'] = "FACEBOOK";
 
                         var authModel =
-                        Provider.of<AuthModel>(context, listen: false);
+                            Provider.of<AuthModel>(context, listen: false);
                         await authModel.login(loginData: _loginData);
                         if (_configModel.isLoggedIn) {
                           Navigator.pushReplacementNamed(
@@ -620,13 +624,13 @@ class _RegisterPageState extends State<RegisterPage> {
                       Expanded(
                         child: Container(
                           margin: EdgeInsets.all(5),
-                          padding: EdgeInsets.fromLTRB(31.47 * fem,
-                              15.08 * fem, 36.19 * fem, 15.08 * fem),
+                          padding: EdgeInsets.fromLTRB(31.47 * fem, 15.08 * fem,
+                              36.19 * fem, 15.08 * fem),
                           decoration: BoxDecoration(
                             border: Border.all(color: Color(0xffe8ecf4)),
                             color: Color(0xffffffff),
                             borderRadius:
-                            BorderRadius.circular(7.5407857895 * fem),
+                                BorderRadius.circular(7.5407857895 * fem),
                           ),
                           child: Center(
                             child: SizedBox(
@@ -647,18 +651,16 @@ class _RegisterPageState extends State<RegisterPage> {
                             // _handleSignIn();
                             {
                               final googleAccount =
-                              await GoogleSignIn().signIn();
+                                  await GoogleSignIn().signIn();
                               final googleAuth =
-                              await googleAccount?.authentication;
+                                  await googleAccount?.authentication;
 
-                              final credential =
-                              GoogleAuthProvider.credential(
+                              final credential = GoogleAuthProvider.credential(
                                 accessToken: googleAuth?.accessToken,
                                 idToken: googleAuth?.idToken,
                               );
 
-                              final userCredential = await FirebaseAuth
-                                  .instance
+                              final userCredential = await FirebaseAuth.instance
                                   .signInWithCredential(credential);
 
                               print(userCredential.user?.email);
@@ -667,8 +669,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 _isLoading = true;
                               });
 
-                              _loginData['email'] =
-                                  userCredential.user?.email;
+                              _loginData['email'] = userCredential.user?.email;
                               _loginData['is_social_login'] = true;
                               _loginData['social_login_name'] = "GOOGLE";
 
@@ -691,7 +692,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               border: Border.all(color: Color(0xffe8ecf4)),
                               color: Color(0xffffffff),
                               borderRadius:
-                              BorderRadius.circular(7.5407857895 * fem),
+                                  BorderRadius.circular(7.5407857895 * fem),
                             ),
                             child: Center(
                               child: SizedBox(
