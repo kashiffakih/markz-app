@@ -14,10 +14,10 @@ class RootPage extends StatefulWidget {
 
 class _RootPageState extends State<RootPage> {
   authenticateUser(_, AuthModel authModel, ConfigModel configModel) async {
-    configModel.getApiConfig(domain: 'http://192.168.0.102:8089');
+    // configModel.getApiConfig(domain: 'http://192.168.0.102:8089');
     // configModel.getApiConfig(domain: 'http://172.20.10.2:8089');
     // configModel.getApiConfig(domain: 'http://192.168.0.160:8080');
-    // configModel.getApiConfig(domain: 'http://api.aadab.aaibuzz.com');
+    configModel.getApiConfig(domain: 'http://api.aadab.aaibuzz.com');
     print(configModel.apiConfig['baseURL']);
     await configModel.fetchLoginData();
 
