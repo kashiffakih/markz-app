@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
+import 'package:sales_app/core/providers/user_wallet_pr.dart';
 import 'package:sales_app/locator.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/profile/setting_id.dart';
@@ -273,8 +275,10 @@ class _SettingsPageState extends State<SettingsPage> {
                                       height: 3,
                                     ),
                                     Text(
-                                      _configModel.user!.referralCode
-                                          .toString(),
+                                      _configModel.user!.referralCode != null
+                                          ? _configModel.user!.referralCode
+                                              .toString()
+                                          : '',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontWeight: FontWeight.w400,
@@ -284,6 +288,121 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ],
                                 ),
                               ),
+                              if (_configModel.user?.referedById == null ||
+                                  _configModel.user?.referedById! == '' ||
+                                  _configModel.user?.referedById == 'null')
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment
+                                        .stretch, // Ensures full width
+                                    children: <Widget>[
+                                      Center(
+                                        child: Text(
+                                          'Redeem Referral Code',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      ElevatedButton(
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty
+                                                    .all<Color>(Color.fromARGB(
+                                                        255, 67, 67, 243))),
+                                        onPressed: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              TextEditingController
+                                                  referralCodeController =
+                                                  TextEditingController();
+
+                                              return AlertDialog(
+                                                title: const Text(
+                                                  'Redeem Referral Code',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                content: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    TextField(
+                                                      controller:
+                                                          referralCodeController,
+                                                      decoration:
+                                                          InputDecoration(
+                                                        labelText:
+                                                            'Enter Referral Code',
+                                                        border:
+                                                            OutlineInputBorder(),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(
+                                                          context); // Close the dialog
+                                                    },
+                                                    child: const Text('Cancel'),
+                                                  ),
+                                                  ElevatedButton(
+                                                    onPressed: () {
+                                                      String referralCode =
+                                                          referralCodeController
+                                                              .text;
+                                                      if (referralCode
+                                                          .isNotEmpty) {
+                                                        Provider.of<UserWalletModel>(
+                                                                context,
+                                                                listen: false)
+                                                            .mapRedeemReferralCode(
+                                                                referralCode);
+
+                                                        Navigator.pop(
+                                                            context); // Close the dialog
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                          SnackBar(
+                                                              content: Text(
+                                                                  'Referral Code Redeemed: $referralCode')),
+                                                        );
+                                                      } else {
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                          const SnackBar(
+                                                              content: Text(
+                                                                  'Please enter a valid referral code')),
+                                                        );
+                                                      }
+                                                    },
+                                                    child: const Text('Redeem'),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
+                                        child: const Text(
+                                          'Redeem',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
                               // Notifications
                               // Row(
                               //   children: [

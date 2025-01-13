@@ -514,6 +514,9 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                               if (value!.isEmpty) {
                                 return "Phone Cannot be empty.";
                               }
+                              if (value.length != 10) {
+                                return 'Number should be 10 digits';
+                              }
                               return null;
                             },
                             onSaved: (value) {
