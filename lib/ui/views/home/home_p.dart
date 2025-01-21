@@ -49,67 +49,6 @@ class _HomePageState extends State<HomePage>
     print(_configModel.user?.referedById);
     // Fetch banners and other data after widget build
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (_configModel.user?.referedById == null ||
-          _configModel.user?.referedById! == '' ||
-          _configModel.user?.referedById == 'null') {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            TextEditingController referralCodeController =
-                TextEditingController();
-
-            return AlertDialog(
-              title: const Text(
-                'Redeem Referral Code',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: referralCodeController,
-                    decoration: InputDecoration(
-                      labelText: 'Enter Referral Code',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context); // Close the dialog
-                  },
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    String referralCode = referralCodeController.text;
-                    if (referralCode.isNotEmpty) {
-                      Provider.of<UserWalletModel>(context, listen: false)
-                          .mapRedeemReferralCode(referralCode);
-
-                      Navigator.pop(context); // Close the dialog
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content:
-                                Text('Referral Code Redeemed: $referralCode')),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content:
-                                Text('Please enter a valid referral code')),
-                      );
-                    }
-                  },
-                  child: const Text('Redeem'),
-                ),
-              ],
-            );
-          },
-        );
-      }
       // Fetch product data
       await Provider.of<ProductModel>(context, listen: false).getProduct();
 
@@ -460,59 +399,64 @@ class _HomePageState extends State<HomePage>
                                                                 .id);
                                                   }
                                                 },
-                                                child: Builder(
-                                                  builder: (context) {
-                                                    if (_configModel.user?.id ==
-                                                        null) {
-                                                      // If user ID is null, show default icon
-                                                      return const Align(
+                                                child: Container(
+                                                  width: 50,
+                                                  child: Builder(
+                                                    builder: (context) {
+                                                      if (_configModel
+                                                              .user?.id ==
+                                                          null) {
+                                                        // If user ID is null, show default icon
+                                                        return const Align(
+                                                          alignment: Alignment
+                                                              .topRight,
+                                                          child: Icon(Icons
+                                                              .favorite_border_outlined),
+                                                        );
+                                                      }
+
+                                                      if (_wishListModel
+                                                          .wishListLoader) {
+                                                        // Show loading state
+                                                        return const Align(
+                                                          alignment: Alignment
+                                                              .topRight,
+                                                          child: Icon(Icons
+                                                              .favorite_border_outlined),
+                                                        );
+                                                      }
+
+                                                      // Check if the product is in the user's wishlist
+                                                      bool isWishListed = _wishListModel
+                                                          .wishLists!
+                                                          .any((wishList) =>
+                                                              wishList.productId ==
+                                                                  _productModel
+                                                                      .products![
+                                                                          index]
+                                                                      .id &&
+                                                              wishList.userId ==
+                                                                  _configModel
+                                                                      .user!
+                                                                      .id);
+
+                                                      // Return the appropriate icon based on wishlist status
+                                                      return Align(
                                                         alignment:
                                                             Alignment.topRight,
-                                                        child: Icon(Icons
-                                                            .favorite_border_outlined),
+                                                        child: Icon(
+                                                          isWishListed
+                                                              ? Icons
+                                                                  .favorite_outlined
+                                                              : Icons
+                                                                  .favorite_border_outlined,
+                                                          color: isWishListed
+                                                              ? Colors.red
+                                                              : null,
+                                                        ),
                                                       );
-                                                    }
-
-                                                    if (_wishListModel
-                                                        .wishListLoader) {
-                                                      // Show loading state
-                                                      return const Align(
-                                                        alignment:
-                                                            Alignment.topRight,
-                                                        child: Icon(Icons
-                                                            .favorite_border_outlined),
-                                                      );
-                                                    }
-
-                                                    // Check if the product is in the user's wishlist
-                                                    bool isWishListed = _wishListModel
-                                                        .wishLists!
-                                                        .any((wishList) =>
-                                                            wishList.productId ==
-                                                                _productModel
-                                                                    .products![
-                                                                        index]
-                                                                    .id &&
-                                                            wishList.userId ==
-                                                                _configModel
-                                                                    .user!.id);
-
-                                                    // Return the appropriate icon based on wishlist status
-                                                    return Align(
-                                                      alignment:
-                                                          Alignment.topRight,
-                                                      child: Icon(
-                                                        isWishListed
-                                                            ? Icons
-                                                                .favorite_outlined
-                                                            : Icons
-                                                                .favorite_border_outlined,
-                                                        color: isWishListed
-                                                            ? Colors.red
-                                                            : null,
-                                                      ),
-                                                    );
-                                                  },
+                                                    },
+                                                  ),
                                                 ),
                                               ),
                                             ),

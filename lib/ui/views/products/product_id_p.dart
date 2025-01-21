@@ -439,6 +439,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                           wishList.userId ==
                                                               _configModel
                                                                   .user!.id);
+                                                  print(
+                                                      "wishlist $isWishListed");
 
                                                   // Return the appropriate icon based on wishlist status
                                                   return Align(

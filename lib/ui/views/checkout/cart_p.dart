@@ -52,12 +52,13 @@ class _CartPageState extends State<CartPage> {
   @override
   void initState() {
     super.initState();
+
     var productId = '';
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (_CartData.isNotEmpty || _CartData != null) {
-        await Provider.of<AddToCartModel>(context, listen: false)
-            .getAddToCart('', '', _CartData);
-      }
+      // if (_CartData.isNotEmpty || _CartData != null) {
+      await Provider.of<AddToCartModel>(context, listen: false)
+          .getAddToCart('', '', _CartData);
+      // }
 
       if (widget.arguments?['product']['category_id'] != null) {
         await Provider.of<ProductModel>(context, listen: false)
@@ -1938,20 +1939,20 @@ class _CartPageState extends State<CartPage> {
                                                         (int.parse(_addToCartModel
                                                                     .cartTotal
                                                                     .toString()) +
-                                                                int.parse(_configModel
-                                                                    .user!
-                                                                    .companies![
-                                                                        0]
-                                                                    .deliveryCharges
-                                                                    .toString()) +
-                                                                (int.parse(_addToCartModel
-                                                                        .cartTotal
+                                                                (_configModel.user!.companies![0].deliveryCharges == null
+                                                                    ? 0
+                                                                    : int.parse(_configModel
+                                                                        .user!
+                                                                        .companies![
+                                                                            0]
+                                                                        .deliveryCharges
+                                                                        .toString())) +
+                                                                (int.parse(_addToCartModel.cartTotal
                                                                         .toString()) /
                                                                     100 *
                                                                     int.parse(_configModel
                                                                         .user!
-                                                                        .companies![
-                                                                            0]
+                                                                        .companies![0]
                                                                         .taxPercent
                                                                         .toString())) +
                                                                 -(int.parse(couponValue.toString())) -
