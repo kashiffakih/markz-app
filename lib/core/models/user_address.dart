@@ -15,6 +15,7 @@ class UserAddress {
   String? fullName;
   String? phone;
   String? altPhone;
+  int? isDeleted;
 
   UserAddress({
     this.userId,
@@ -32,6 +33,7 @@ class UserAddress {
     this.fullName,
     this.phone,
     this.altPhone,
+    this.isDeleted,
   });
 
   UserAddress.fromJson(Map<String, dynamic> json) {
@@ -51,6 +53,7 @@ class UserAddress {
     fullName = json['full_name'];
     phone = json['phone'];
     altPhone = json['alt_phone'];
+    isDeleted = json['is_deleted'];
   }
 
   Map<String, dynamic> toJson() {
@@ -71,6 +74,7 @@ class UserAddress {
     data['full_name'] = this.fullName;
     data['phone'] = this.phone;
     data['alt_phone'] = this.altPhone;
+    data['is_deleted'] = this.isDeleted;
     return data;
   }
 }

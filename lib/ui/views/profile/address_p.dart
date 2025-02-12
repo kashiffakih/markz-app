@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sales_app/core/models/user_address.dart';
 import 'package:sales_app/core/providers/user_address_pr.dart';
 import 'package:sales_app/ui/shared/font_sh.dart';
 import 'package:sales_app/ui/views/checkout/cart_p.dart';
@@ -44,7 +45,8 @@ class _AddressPageState extends State<AddressPage> {
     return Scaffold(
       body: WillPopScope(
         onWillPop: () async {
-          Navigator.pushReplacementNamed(context, '/homePage');
+          Navigator.pop(context);
+          // Navigator.pushReplacementNamed(context, '/homePage');
           return false;
         },
         child: SafeArea(
@@ -174,6 +176,122 @@ class _AddressPageState extends State<AddressPage> {
                                         color: Color(0xff232323),
                                       ),
                                     ),
+                                  Spacer(),
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: IconButton(
+                                      onPressed: () {
+                                        showDialog(
+                                          context: context,
+                                          barrierDismissible: false,
+                                          builder: (BuildContext context) =>
+                                              AlertDialog(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            title: const Text(
+                                              "Are you sure?",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            content: const Text(
+                                              "Do you really want to delete this address? This action cannot be undone.",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.black54,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            actionsPadding:
+                                                const EdgeInsets.symmetric(
+                                                    horizontal: 10,
+                                                    vertical: 10),
+                                            actionsAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            actions: [
+                                              ElevatedButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _selectedAddressIndex =
+                                                        null;
+                                                    Navigator.pop(context);
+                                                  });
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      Colors.redAccent,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                  ),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 10),
+                                                ),
+                                                child: const Text(
+                                                  'No',
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                              ElevatedButton(
+                                                onPressed: () async {
+                                                  UserAddress userAddress =
+                                                      _userAddressModel
+                                                              .userAddresses![
+                                                          index];
+                                                  userAddress.isDeleted = 1;
+
+                                                  _userAddressModel
+                                                      .updateUserAddress(
+                                                          userAddress:
+                                                              userAddress)
+                                                      .then((_) {
+                                                    WidgetsBinding.instance
+                                                        .addPostFrameCallback(
+                                                            (_) async {
+                                                      await Provider.of<
+                                                                  UserAddressModel>(
+                                                              context,
+                                                              listen: false)
+                                                          .getUserAddresses();
+                                                    });
+                                                    setState(() {});
+                                                    Navigator.pop(context);
+                                                  });
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.green,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                  ),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 10),
+                                                ),
+                                                child: const Text(
+                                                  'Yes',
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                      icon: const Icon(Icons.delete),
+                                      color: Colors.red,
+                                    ),
+                                  )
                                 ],
                               ),
                               // Address container
@@ -300,6 +418,7 @@ class _AddressPageState extends State<AddressPage> {
                 'cartTotal': cartTotal,
                 'couponValue': couponValue,
                 'address': [],
+                'isShipping': widget.arguments['isAddress']
               }),
             ),
           );

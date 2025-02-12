@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sales_app/core/providers/add_to_cart_pr.dart';
 import 'package:sales_app/core/providers/config_pr.dart';
 import 'package:sales_app/core/providers/product_pr.dart';
 import 'package:sales_app/locator.dart';
@@ -78,9 +77,8 @@ class _ContactPageState extends State<ContactPage> {
                       // Email
                       InkWell(
                         onTap: () async {
-                          String email = Uri.encodeComponent(_configModel
-                              .user!.companies![0].email
-                              .toString());
+                          String email = Uri.encodeComponent(
+                              _productModel.banners!['email'].toString());
                           String subject = Uri.encodeComponent("Hello Aadab");
                           String body = Uri.encodeComponent(
                               "Hello! I would like to order a delicious cake.");
@@ -152,8 +150,7 @@ class _ContactPageState extends State<ContactPage> {
                                       height: 5,
                                     ),
                                     Text(
-                                      _productModel.banners!['email']
-                                          .toString(),
+                                      _productModel.banners!['email'] ?? '',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontSize: 15,
@@ -175,7 +172,7 @@ class _ContactPageState extends State<ContactPage> {
                           // final message =
                           //     'Hello! I would like to order a delicious cake.';
                           final phone =
-                              _configModel.user!.companies![0].phone.toString();
+                              _productModel.banners!['phone'].toString();
                           var whatsappUrl = "whatsapp://send?phone=${phone}";
                           try {
                             launch(whatsappUrl);
@@ -245,8 +242,7 @@ class _ContactPageState extends State<ContactPage> {
                                       height: 5,
                                     ),
                                     Text(
-                                      _productModel.banners!['phone']
-                                          .toString(),
+                                      _productModel.banners!['phone'] ?? '',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontSize: 15,
@@ -332,8 +328,7 @@ class _ContactPageState extends State<ContactPage> {
                                       height: 5,
                                     ),
                                     Text(
-                                      _productModel.banners!['phone']
-                                          .toString(),
+                                      _productModel.banners!['phone'] ?? '',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontSize: 15,

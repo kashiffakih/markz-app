@@ -38,6 +38,7 @@ class _CartPageState extends State<CartPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String coupon = '';
   String couponId = '';
+  bool buttonLoading = false;
   int couponValue = 0;
   UserAddress address = UserAddress();
   Map<String, dynamic> _CartData = {
@@ -845,6 +846,7 @@ class _CartPageState extends State<CartPage> {
                                                         TextButton(
                                                           onPressed: () async {
                                                             bool minus = false;
+
                                                             await _addToCartModel
                                                                 .getAddToCart(
                                                                     _addToCartModel
@@ -1257,403 +1259,72 @@ class _CartPageState extends State<CartPage> {
                                 // Body
                                 Container(
                                   height:
-                                      MediaQuery.of(context).size.height * 0.68,
+                                      MediaQuery.of(context).size.height * 0.7,
                                   // height: 480,
-                                  child: Container(
-                                    width:
-                                        MediaQuery.of(context).size.width - 50,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        // Shipping Address
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                'Shipping address',
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Urbanist',
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color(0xff909090),
-                                                ),
-                                              ),
-                                            ),
-                                            InkWell(
-                                              onTap: () {
-                                                Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            AddressPage(
-                                                                arguments: {
-                                                                  'cartTotal':
-                                                                      _addToCartModel
-                                                                          .cartTotal
-                                                                          .toString(),
-                                                                  'cartItems':
-                                                                      _addToCartModel
-                                                                          .addToCarts,
-
-                                                                  'couponValue':
-                                                                      couponValue,
-
-                                                                  // 'cartItems':
-                                                                  //     widget
-                                                                  //         .arguments['cartItems'],
-                                                                  // 'cartTotal':
-                                                                  //     widget
-                                                                  //         .arguments['cartTotal'],
-                                                                  // 'couponValue':
-                                                                  //     widget
-                                                                  //         .arguments['couponValue'],
-                                                                  'isAddress':
-                                                                      true
-                                                                })));
-                                              },
-                                              child: Image.asset(
-                                                'assets/images/edit-2-mP4.png',
-                                                width: 15.34,
-                                                height: 19.15,
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                        if (address.id != null)
-                                          Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width -
-                                                50,
-                                            margin: EdgeInsets.only(
-                                                top: 10, bottom: 10),
-                                            padding: EdgeInsets.all(10),
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                  color: Color(0xffc7b456)),
-                                              color: Color(0xffffffff),
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(5),
-                                              ),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Color(0x338a959e),
-                                                  offset:
-                                                      Offset(0, 7.6690645218),
-                                                  blurRadius: 19.1726608276,
-                                                ),
-                                              ],
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "${_configModel.user!.firstName.toString()} [ ${address.label.toString()}]",
-                                                  style: MyGoogleFontStyle(
-                                                    fontFamily: 'Urbanist',
-                                                    fontWeight: FontWeight.w700,
-                                                    color: Color(0xff232323),
-                                                  ),
-                                                ),
-                                                Divider(
-                                                  thickness: 1,
-                                                  color: Colors.grey,
-                                                ),
-                                                Text(
-                                                  (address.fullName != null
-                                                          ? address.fullName
-                                                              .toString()
-                                                          : '') +
-                                                      ', ' +
-                                                      (address.phone != null
-                                                          ? address.phone
-                                                              .toString()
-                                                          : '') +
-                                                      ', ' +
-                                                      (address.altPhone != null
-                                                          ? address.altPhone
-                                                              .toString()
-                                                          : '') +
-                                                      ', ' +
-                                                      (address.add1 != null
-                                                          ? address.add1
-                                                              .toString()
-                                                          : '') +
-                                                      ', ' +
-                                                      (address.add2 != null
-                                                          ? address.add2
-                                                              .toString()
-                                                          : '') +
-                                                      ', ' +
-                                                      (address.add3 != null
-                                                          ? address.add3
-                                                              .toString()
-                                                          : '') +
-                                                      ',' +
-                                                      (address.state != null
-                                                          ? address.state
-                                                              .toString()
-                                                          : '') +
-                                                      ', ' +
-                                                      ', ' +
-                                                      (address.city != null
-                                                          ? address.city
-                                                              .toString()
-                                                          : '') +
-                                                      ', ' +
-                                                      (address.pincode != null
-                                                          ? address.pincode
-                                                              .toString()
-                                                          : '') +
-                                                      '.',
-                                                  style: MyGoogleFontStyle(
-                                                    fontFamily: 'Urbanist',
-                                                    fontWeight: FontWeight.w400,
-                                                    color: Color(0xff909090),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        if (address.id == null)
-                                          Center(
-                                            child: Container(
-                                              width: 150,
-                                              height: 40,
-                                              margin: EdgeInsets.fromLTRB(
-                                                  0.89, 10, 0, 0),
-                                              child: TextButton(
-                                                onPressed: () {
-                                                  // _addToCartModel
-                                                  // .cartTotal
-                                                  Navigator.of(context).push(
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              AddressPage(
-                                                                  arguments: {
-                                                                    'cartTotal':
-                                                                        _addToCartModel
-                                                                            .cartTotal
-                                                                            .toString(),
-                                                                    'cartItems':
-                                                                        _addToCartModel
-                                                                            .addToCarts,
-                                                                    'couponValue':
-                                                                        couponValue,
-                                                                    'isAddress':
-                                                                        true
-                                                                  })));
-                                                  // Navigator.pushNamed(
-                                                  //     context, '/addressPage');
-                                                },
-                                                style: TextButton.styleFrom(
-                                                  padding: EdgeInsets.zero,
-                                                ),
-                                                child: Container(
-                                                  width: 321,
-                                                  height: 53,
-                                                  decoration: BoxDecoration(
-                                                    color: Color(0xff1e1e1e),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                  child: Center(
-                                                    child: Text(
-                                                      'Add Address',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Urbanist',
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                        color:
-                                                            Color(0xffffffff),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // Shipping Address
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              'Shipping address',
+                                              style: MyGoogleFontStyle(
+                                                fontFamily: 'Urbanist',
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xff909090),
                                               ),
                                             ),
                                           ),
-                                        // Payment
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                'Payment',
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Urbanist',
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color(0xff909090),
-                                                ),
-                                              ),
-                                            ),
-                                            // Image.asset(
-                                            //   'assets/images/edit-2-mP4.png',
-                                            //   width: 15.34,
-                                            //   height: 19.15,
-                                            // )
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        Container(
-                                            decoration: BoxDecoration(
-                                              // border: Border.all(color: Color(0xffdadada)),
-                                              color: Color(0xffffffff),
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                              border: Border.all(
-                                                  color: Color(0xffc7b456)),
-                                            ),
-                                            child: DropdownButtonFormField(
-                                                // value: paymentOption,
-                                                decoration: InputDecoration(
-                                                    border: InputBorder.none,
-                                                    focusedBorder:
-                                                        InputBorder.none,
-                                                    enabledBorder:
-                                                        InputBorder.none,
-                                                    errorBorder:
-                                                        InputBorder.none,
-                                                    disabledBorder:
-                                                        InputBorder.none,
-                                                    labelText:
-                                                        'Select Payment Method',
-                                                    contentPadding:
-                                                        EdgeInsets.all(10)),
-                                                items: paymentOptions
-                                                    .map(
-                                                      (_payment) =>
-                                                          DropdownMenuItem(
-                                                        child: Container(
-                                                          width: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .width -
-                                                              100,
-                                                          child: Row(
-                                                            children: [
-                                                              Expanded(
-                                                                child: Text(
-                                                                  _payment[
-                                                                      'name'],
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                height: 50,
-                                                                child:
-                                                                    Image.asset(
-                                                                  _payment[
-                                                                      'icon'],
-                                                                  height: 50,
-                                                                  width: 50,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        value: _payment['name'],
-                                                      ),
-                                                    )
-                                                    .toList(),
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    paymentOption =
-                                                        value.toString();
+                                          InkWell(
+                                            onTap: () {
+                                              Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          AddressPage(
+                                                              arguments: {
+                                                                'cartTotal':
+                                                                    _addToCartModel
+                                                                        .cartTotal
+                                                                        .toString(),
+                                                                'cartItems':
+                                                                    _addToCartModel
+                                                                        .addToCarts,
 
-                                                    // _userAddress.nationality = value.toString();
-                                                  });
-                                                })),
+                                                                'couponValue':
+                                                                    couponValue,
 
-                                        // Send as a gift
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                'Send as a gift',
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Urbanist',
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color(0xff909090),
-                                                ),
-                                              ),
+                                                                // 'cartItems':
+                                                                //     widget
+                                                                //         .arguments['cartItems'],
+                                                                // 'cartTotal':
+                                                                //     widget
+                                                                //         .arguments['cartTotal'],
+                                                                // 'couponValue':
+                                                                //     widget
+                                                                //         .arguments['couponValue'],
+                                                                'isAddress':
+                                                                    true
+                                                              })));
+                                            },
+                                            child: Image.asset(
+                                              'assets/images/edit-2-mP4.png',
+                                              width: 15.34,
+                                              height: 19.15,
                                             ),
-                                            Checkbox(
-                                              value: isGift,
-                                              activeColor: Color.fromARGB(
-                                                  255, 250, 225, 1),
-                                              checkColor: Colors.black,
-                                              onChanged: (bool? value) {
-                                                setState(() {
-                                                  isGift = value ?? false;
-                                                });
-
-                                                if (isGift == true) {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (BuildContext
-                                                            context) =>
-                                                        AlertDialog(
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          20)),
-                                                      title: Text(
-                                                          "Is it the same address as mentioned above?"),
-                                                      actions: <Widget>[
-                                                        TextButton(
-                                                          onPressed: () {
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                          child: Text(
-                                                            'Yes',
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .black,
-                                                                fontSize: 16),
-                                                          ),
-                                                        ),
-                                                        TextButton(
-                                                          onPressed: () {
-                                                            Navigator.of(context).push(
-                                                                MaterialPageRoute(
-                                                                    builder: (context) =>
-                                                                        AddressPage(
-                                                                            arguments: {
-                                                                              'cartTotal': _addToCartModel.cartTotal.toString(),
-                                                                              'cartItems': _addToCartModel.addToCarts,
-                                                                              'couponValue': couponValue,
-                                                                              'isAddress': true
-                                                                            })));
-                                                          },
-                                                          child: Text(
-                                                            'No',
-                                                            style: TextStyle(
-                                                                color:
-                                                                    Colors.red,
-                                                                fontSize: 16),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                }
-                                              },
-                                            )
-                                          ],
-                                        ),
+                                          )
+                                        ],
+                                      ),
+                                      if (address.id != null)
                                         Container(
                                           width: MediaQuery.of(context)
                                                   .size
                                                   .width -
                                               50,
                                           margin: EdgeInsets.only(
-                                            top: 5,
-                                          ),
+                                              top: 10, bottom: 10),
                                           padding: EdgeInsets.all(10),
                                           decoration: BoxDecoration(
                                             border: Border.all(
@@ -1674,305 +1345,595 @@ class _CartPageState extends State<CartPage> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                      'Sub Total',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Urbanist',
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color:
-                                                            Color(0xff909090),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    'RS' +
-                                                        ' ' +
-                                                        _addToCartModel
-                                                            .cartTotal
-                                                            .toString(),
-                                                    textAlign: TextAlign.right,
-                                                    style: MyGoogleFontStyle(
-                                                      fontFamily: 'Inter',
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: Color(0xff303030),
-                                                    ),
-                                                  )
-                                                ],
+                                              Text(
+                                                "${_configModel.user!.firstName.toString()} [ ${address.label.toString()}]",
+                                                style: MyGoogleFontStyle(
+                                                  fontFamily: 'Urbanist',
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xff232323),
+                                                ),
                                               ),
-                                              SizedBox(
-                                                height: 10,
+                                              Divider(
+                                                thickness: 1,
+                                                color: Colors.grey,
                                               ),
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                      'Delivery',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Urbanist',
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color:
-                                                            Color(0xff909090),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    'RS' +
-                                                        ' ' +
-                                                        _configModel
-                                                            .user!
-                                                            .companies![0]
-                                                            .deliveryCharges
-                                                            .toString(),
-                                                    textAlign: TextAlign.right,
-                                                    style: MyGoogleFontStyle(
-                                                      fontFamily: 'Inter',
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: Color(0xff303030),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                      'Tax %',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Urbanist',
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color:
-                                                            Color(0xff909090),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    'RS' +
-                                                        ' ' +
-                                                        _configModel
-                                                            .user!
-                                                            .companies![0]
-                                                            .taxPercent
-                                                            .toString(),
-                                                    textAlign: TextAlign.right,
-                                                    style: MyGoogleFontStyle(
-                                                      fontFamily: 'Inter',
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: Color(0xff303030),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                      'Tax Amount',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Urbanist',
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color:
-                                                            Color(0xff909090),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    'RS' +
-                                                        ' ' +
-                                                        (int.parse(_addToCartModel
-                                                                    .cartTotal
-                                                                    .toString()) /
-                                                                100 *
-                                                                int.parse(_configModel
-                                                                    .user!
-                                                                    .companies![
-                                                                        0]
-                                                                    .taxPercent
-                                                                    .toString()))
-                                                            .toString(),
-                                                    textAlign: TextAlign.right,
-                                                    style: MyGoogleFontStyle(
-                                                      fontFamily: 'Inter',
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: Color(0xff303030),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                      'Coupon (-)',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Urbanist',
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color:
-                                                            Color(0xff909090),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    'RS' +
-                                                        ' ' +
-                                                        couponValue.toString(),
-                                                    textAlign: TextAlign.right,
-                                                    style: MyGoogleFontStyle(
-                                                      fontFamily: 'Inter',
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: Color(0xff303030),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                      'Rewards (-)',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Urbanist',
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color:
-                                                            Color(0xff909090),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  if (_userWaletModel
-                                                          .totaRemainingPoint !=
-                                                      0)
-                                                    InkWell(
-                                                      onTap: () {
-                                                        setState(() {
-                                                          _userWaletModel
-                                                              .totaRemainingPoint = 0;
-                                                        });
-                                                      },
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                right: 8.0),
-                                                        child: Text('(Remove)'),
-                                                      ),
-                                                    ),
-                                                  if (_userWaletModel
-                                                          .totaRemainingPoint ==
-                                                      0)
-                                                    InkWell(
-                                                      onTap: () async {
-                                                        await _userWaletModel
-                                                            .getMyUserWallets();
-                                                        setState(() {
-                                                          // _userWaletModel
-                                                          //         .totaRemainingPoint =
-                                                          //     _userWaletModel
-                                                          //         .totaRemainingPoint; // Not sure what this line is doing
-                                                        });
-                                                      },
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                right: 8.0),
-                                                        child: Text('(Add)'),
-                                                      ),
-                                                    ),
-                                                  Text(
-                                                    'RS ${(_userWaletModel.totaRemainingPoint ~/ 3)}',
-                                                    // Division by 3 directly
-                                                    textAlign: TextAlign.right,
-                                                    style: MyGoogleFontStyle(
-                                                      fontFamily: 'Inter',
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: Color(0xff303030),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                      'Total',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Urbanist',
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color:
-                                                            Color(0xff909090),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    'RS' +
-                                                        ' ' +
-                                                        (int.parse(_addToCartModel
-                                                                    .cartTotal
-                                                                    .toString()) +
-                                                                (_configModel.user!.companies![0].deliveryCharges == null
-                                                                    ? 0
-                                                                    : int.parse(_configModel
-                                                                        .user!
-                                                                        .companies![
-                                                                            0]
-                                                                        .deliveryCharges
-                                                                        .toString())) +
-                                                                (int.parse(_addToCartModel.cartTotal
-                                                                        .toString()) /
-                                                                    100 *
-                                                                    int.parse(_configModel
-                                                                        .user!
-                                                                        .companies![0]
-                                                                        .taxPercent
-                                                                        .toString())) +
-                                                                -(int.parse(couponValue.toString())) -
-                                                                (int.parse(_userWaletModel.totaRemainingPoint.toString()) / 3))
-                                                            .toStringAsFixed(0),
-                                                    textAlign: TextAlign.right,
-                                                    style: MyGoogleFontStyle(
-                                                      fontFamily: 'Inter',
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: Color(0xff303030),
-                                                    ),
-                                                  )
-                                                ],
+                                              Text(
+                                                (address.fullName != null
+                                                        ? address.fullName
+                                                            .toString()
+                                                        : '') +
+                                                    ', ' +
+                                                    (address.phone != null
+                                                        ? address.phone
+                                                            .toString()
+                                                        : '') +
+                                                    ', ' +
+                                                    (address.altPhone != null
+                                                        ? address.altPhone
+                                                            .toString()
+                                                        : '') +
+                                                    ', ' +
+                                                    (address.add1 != null
+                                                        ? address.add1
+                                                            .toString()
+                                                        : '') +
+                                                    ', ' +
+                                                    (address.add2 != null
+                                                        ? address.add2
+                                                            .toString()
+                                                        : '') +
+                                                    ', ' +
+                                                    (address.add3 != null
+                                                        ? address.add3
+                                                            .toString()
+                                                        : '') +
+                                                    ',' +
+                                                    (address.state != null
+                                                        ? address.state
+                                                            .toString()
+                                                        : '') +
+                                                    ', ' +
+                                                    ', ' +
+                                                    (address.city != null
+                                                        ? address.city
+                                                            .toString()
+                                                        : '') +
+                                                    ', ' +
+                                                    (address.pincode != null
+                                                        ? address.pincode
+                                                            .toString()
+                                                        : '') +
+                                                    '.',
+                                                style: MyGoogleFontStyle(
+                                                  fontFamily: 'Urbanist',
+                                                  fontWeight: FontWeight.w400,
+                                                  color: Color(0xff909090),
+                                                ),
                                               ),
                                             ],
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      if (address.id == null)
+                                        Center(
+                                          child: Container(
+                                            width: 150,
+                                            height: 40,
+                                            margin: EdgeInsets.fromLTRB(
+                                                0.89, 10, 0, 0),
+                                            child: TextButton(
+                                              onPressed: () {
+                                                // _addToCartModel
+                                                // .cartTotal
+                                                Navigator.of(context).push(
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            AddressPage(
+                                                                arguments: {
+                                                                  'cartTotal':
+                                                                      _addToCartModel
+                                                                          .cartTotal
+                                                                          .toString(),
+                                                                  'cartItems':
+                                                                      _addToCartModel
+                                                                          .addToCarts,
+                                                                  'couponValue':
+                                                                      couponValue,
+                                                                  'isAddress':
+                                                                      true
+                                                                })));
+                                                // Navigator.pushNamed(
+                                                //     context, '/addressPage');
+                                              },
+                                              style: TextButton.styleFrom(
+                                                padding: EdgeInsets.zero,
+                                              ),
+                                              child: Container(
+                                                width: 321,
+                                                height: 53,
+                                                decoration: BoxDecoration(
+                                                  color: Color(0xff1e1e1e),
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    'Add Address',
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Urbanist',
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Color(0xffffffff),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      // Payment
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              'Payment',
+                                              style: MyGoogleFontStyle(
+                                                fontFamily: 'Urbanist',
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xff909090),
+                                              ),
+                                            ),
+                                          ),
+                                          // Image.asset(
+                                          //   'assets/images/edit-2-mP4.png',
+                                          //   width: 15.34,
+                                          //   height: 19.15,
+                                          // )
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Container(
+                                          decoration: BoxDecoration(
+                                            // border: Border.all(color: Color(0xffdadada)),
+                                            color: Color(0xffffffff),
+                                            borderRadius:
+                                                BorderRadius.circular(5),
+                                            border: Border.all(
+                                                color: Color(0xffc7b456)),
+                                          ),
+                                          child: DropdownButtonFormField(
+                                              // value: paymentOption,
+                                              decoration: InputDecoration(
+                                                  border: InputBorder.none,
+                                                  focusedBorder:
+                                                      InputBorder.none,
+                                                  enabledBorder:
+                                                      InputBorder.none,
+                                                  errorBorder: InputBorder.none,
+                                                  disabledBorder:
+                                                      InputBorder.none,
+                                                  labelText:
+                                                      'Select Payment Method',
+                                                  contentPadding:
+                                                      EdgeInsets.all(10)),
+                                              items: paymentOptions
+                                                  .map(
+                                                    (_payment) =>
+                                                        DropdownMenuItem(
+                                                      child: Container(
+                                                        width: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width -
+                                                            100,
+                                                        child: Row(
+                                                          children: [
+                                                            Expanded(
+                                                              child: Text(
+                                                                _payment[
+                                                                    'name'],
+                                                              ),
+                                                            ),
+                                                            SizedBox(
+                                                              height: 50,
+                                                              child:
+                                                                  Image.asset(
+                                                                _payment[
+                                                                    'icon'],
+                                                                height: 50,
+                                                                width: 50,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      value: _payment['name'],
+                                                    ),
+                                                  )
+                                                  .toList(),
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  paymentOption =
+                                                      value.toString();
+
+                                                  // _userAddress.nationality = value.toString();
+                                                });
+                                              })),
+
+                                      // Send as a gift
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              'Send as a gift',
+                                              style: MyGoogleFontStyle(
+                                                fontFamily: 'Urbanist',
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xff909090),
+                                              ),
+                                            ),
+                                          ),
+                                          Checkbox(
+                                            value: isGift,
+                                            activeColor: Color.fromARGB(
+                                                255, 250, 225, 1),
+                                            checkColor: Colors.black,
+                                            onChanged: (bool? value) {
+                                              setState(() {
+                                                isGift = value ?? false;
+                                              });
+
+                                              if (isGift == true) {
+                                                showDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) =>
+                                                          AlertDialog(
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20)),
+                                                    title: Text(
+                                                        "Is it the same address as mentioned above?"),
+                                                    actions: <Widget>[
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child: Text(
+                                                          'Yes',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontSize: 16),
+                                                        ),
+                                                      ),
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.of(context).push(
+                                                              MaterialPageRoute(
+                                                                  builder: (context) =>
+                                                                      AddressPage(
+                                                                          arguments: {
+                                                                            'cartTotal':
+                                                                                _addToCartModel.cartTotal.toString(),
+                                                                            'cartItems':
+                                                                                _addToCartModel.addToCarts,
+                                                                            'couponValue':
+                                                                                couponValue,
+                                                                            'isAddress':
+                                                                                true
+                                                                          })));
+                                                        },
+                                                        child: Text(
+                                                          'No',
+                                                          style: TextStyle(
+                                                              color: Colors.red,
+                                                              fontSize: 16),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                          )
+                                        ],
+                                      ),
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width -
+                                                50,
+                                        margin: EdgeInsets.only(
+                                          top: 5,
+                                        ),
+                                        padding: EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                              color: Color(0xffc7b456)),
+                                          color: Color(0xffffffff),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(5),
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Color(0x338a959e),
+                                              offset: Offset(0, 7.6690645218),
+                                              blurRadius: 19.1726608276,
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    'Sub Total',
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Urbanist',
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Color(0xff909090),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  'RS' +
+                                                      ' ' +
+                                                      _addToCartModel.cartTotal
+                                                          .toString(),
+                                                  textAlign: TextAlign.right,
+                                                  style: MyGoogleFontStyle(
+                                                    fontFamily: 'Inter',
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Color(0xff303030),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    'Delivery',
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Urbanist',
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Color(0xff909090),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  'RS ${double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ?? '0')?.toStringAsFixed(2) ?? '0'}',
+                                                  textAlign: TextAlign.right,
+                                                  style: MyGoogleFontStyle(
+                                                    fontFamily: 'Inter',
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Color(0xff303030),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    'Tax %',
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Urbanist',
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Color(0xff909090),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  'RS' +
+                                                      ' ' +
+                                                      _configModel
+                                                          .user!
+                                                          .companies![0]
+                                                          .taxPercent
+                                                          .toString(),
+                                                  textAlign: TextAlign.right,
+                                                  style: MyGoogleFontStyle(
+                                                    fontFamily: 'Inter',
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Color(0xff303030),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    'Tax Amount',
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Urbanist',
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Color(0xff909090),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  'RS ${((double.tryParse(_addToCartModel.cartTotal?.toString() ?? '0') ?? 0) / 100 * (double.tryParse(_configModel.user?.companies?[0].taxPercent?.toString() ?? '0') ?? 0))}',
+                                                  textAlign: TextAlign.right,
+                                                  style: MyGoogleFontStyle(
+                                                    fontFamily: 'Inter',
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Color(0xff303030),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    'Coupon (-)',
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Urbanist',
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Color(0xff909090),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  'RS' +
+                                                      ' ' +
+                                                      couponValue.toString(),
+                                                  textAlign: TextAlign.right,
+                                                  style: MyGoogleFontStyle(
+                                                    fontFamily: 'Inter',
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Color(0xff303030),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    'Rewards (-)',
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Urbanist',
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Color(0xff909090),
+                                                    ),
+                                                  ),
+                                                ),
+                                                if (_userWaletModel
+                                                        .totaRemainingPoint !=
+                                                    0)
+                                                  InkWell(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        _userWaletModel
+                                                            .totaRemainingPoint = 0;
+                                                      });
+                                                    },
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 8.0),
+                                                      child: Text('(Remove)'),
+                                                    ),
+                                                  ),
+                                                if (_userWaletModel
+                                                        .totaRemainingPoint ==
+                                                    0)
+                                                  InkWell(
+                                                    onTap: () async {
+                                                      await _userWaletModel
+                                                          .getMyUserWallets();
+                                                      setState(() {
+                                                        // _userWaletModel
+                                                        //         .totaRemainingPoint =
+                                                        //     _userWaletModel
+                                                        //         .totaRemainingPoint; // Not sure what this line is doing
+                                                      });
+                                                    },
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 8.0),
+                                                      child: Text('(Add)'),
+                                                    ),
+                                                  ),
+                                                Text(
+                                                  'RS ${(_userWaletModel.totaRemainingPoint ~/ 3)}',
+                                                  // Division by 3 directly
+                                                  textAlign: TextAlign.right,
+                                                  style: MyGoogleFontStyle(
+                                                    fontFamily: 'Inter',
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Color(0xff303030),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    'Total',
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Urbanist',
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Color(0xff909090),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  'RS' +
+                                                      ' ' +
+                                                      (int.parse(_addToCartModel
+                                                                  .cartTotal
+                                                                  .toString()) +
+                                                              (_configModel.user!.companies![0].deliveryCharges == null
+                                                                  ? 0
+                                                                  : int.parse(_configModel
+                                                                      .user!
+                                                                      .companies![
+                                                                          0]
+                                                                      .deliveryCharges
+                                                                      .toString())) +
+                                                              (int.parse(_addToCartModel.cartTotal
+                                                                      .toString()) /
+                                                                  100 *
+                                                                  int.parse(_configModel
+                                                                      .user!
+                                                                      .companies![0]
+                                                                      .taxPercent
+                                                                      .toString())) +
+                                                              -(int.parse(couponValue.toString())) -
+                                                              (int.parse(_userWaletModel.totaRemainingPoint.toString()) / 3))
+                                                          .toStringAsFixed(0),
+                                                  textAlign: TextAlign.right,
+                                                  style: MyGoogleFontStyle(
+                                                    fontFamily: 'Inter',
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Color(0xff303030),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
 
@@ -1987,7 +1948,6 @@ class _CartPageState extends State<CartPage> {
                                               0.89, 0, 0, 0),
                                           child: TextButton(
                                             onPressed: () async {
-                                              // print(paymentOption);
                                               if (paymentOption == '') {
                                                 showDialog(
                                                   context: context,
@@ -2008,35 +1968,51 @@ class _CartPageState extends State<CartPage> {
                                                   ),
                                                 );
                                               } else {
-                                                var orderCost = (int.parse(
-                                                            _addToCartModel
-                                                                .cartTotal
-                                                                .toString()) +
-                                                        int.parse(_configModel
-                                                            .user!
-                                                            .companies![0]
-                                                            .deliveryCharges
-                                                            .toString()) +
-                                                        (int.parse(_addToCartModel
-                                                                .cartTotal
-                                                                .toString()) /
-                                                            100 *
-                                                            int.parse(_configModel
+                                                // Safe parsing for all numeric values
+                                                int cartTotal = int.tryParse(
+                                                        _addToCartModel
+                                                            .cartTotal
+                                                            .toString()) ??
+                                                    0;
+                                                int deliveryCharges =
+                                                    int.tryParse(_configModel
                                                                 .user!
                                                                 .companies![0]
-                                                                .taxPercent
-                                                                .toString())) +
-                                                        -(int.parse(couponValue.toString())) -
-                                                        (int.parse(_userWaletModel.totaRemainingPoint.toString()) / 3))
+                                                                .deliveryCharges ??
+                                                            '0') ??
+                                                        0;
+                                                int taxPercent = int.tryParse(
+                                                        _configModel
+                                                            .user!
+                                                            .companies![0]
+                                                            .taxPercent
+                                                            .toString()) ??
+                                                    0;
+                                                int couponDiscount =
+                                                    int.tryParse(couponValue
+                                                            .toString()) ??
+                                                        0;
+                                                int walletPoints = int.tryParse(
+                                                        _userWaletModel
+                                                            .totaRemainingPoint
+                                                            .toString()) ??
+                                                    0;
+
+                                                // Calculate order cost safely
+                                                var orderCost = (cartTotal +
+                                                        deliveryCharges +
+                                                        (cartTotal /
+                                                            100 *
+                                                            taxPercent) -
+                                                        couponDiscount -
+                                                        (walletPoints / 3))
                                                     .toStringAsFixed(0);
 
-                                                var userWalletUsed = (int.parse(
-                                                            _userWaletModel
-                                                                .totaRemainingPoint
-                                                                .toString()) /
-                                                        3)
-                                                    .toStringAsFixed(0);
+                                                var userWalletUsed =
+                                                    (walletPoints / 3)
+                                                        .toStringAsFixed(0);
                                                 var addressId = address.id;
+
                                                 bool response =
                                                     await _orderModel
                                                         .placedOrder(
@@ -2052,6 +2028,7 @@ class _CartPageState extends State<CartPage> {
                                                   "deliveryMethod",
                                                   couponValue.toString(),
                                                 );
+
                                                 if (response == true) {
                                                   Navigator.pushNamed(
                                                       context, '/successPage');

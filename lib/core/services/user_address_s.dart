@@ -32,7 +32,7 @@ class UserAddressService {
   Future<bool> saveUserAddress({@required UserAddress? userAddress}) async {
     Map<String, dynamic> apiConfig = _configModel.apiConfig;
     userAddress!.userId = _configModel.user!.id;
-
+    userAddress.isDeleted = 0;
     http.Response _response = await http.post(
         Uri.parse(apiConfig['baseURL'] + '/user_addresses'),
         body: json.encode(userAddress.toJson()),

@@ -42,8 +42,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
     if (_configModel.user != null) {
       Provider.of<AddToCartModel>(context, listen: false)
           .getAddToCart(productId, '', _CartData);
-      Provider.of<WishListModel>(context, listen: false)
-          .getWishLists(productId);
+      Provider.of<WishListModel>(context, listen: false).getWishLists('');
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -73,6 +72,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
   double discountPrice = 0.0;
   String _productpoints = '';
   var unitName = '';
+  var size = '';
   List<dynamic> productDisplayImages = [];
   List<dynamic> updateProductDisplayImages = [];
 
@@ -119,17 +119,20 @@ class _ProductIdPageState extends State<ProductIdPage> {
           // .where((image) => image.unit.name == unitName)
           .toList();
 
+      _CartData['pack'] = productDisplayImages.first.id;
+
       if (unitName == '') {
         unitName = productDisplayImages[0].unit.name;
         _CartData['flavour'] = unitName;
       }
       if (_sizes.isEmpty) {
         _sizes = widget.arguments['product']['product_packs']
-            .where((_pack) =>
-                _pack['unit']['name'] == productDisplayImages[0].unit.name)
+            .where((_pack) => _pack['unit']['name'] == unitName)
             .toList();
+        _CartData['kind_of_flower'] = _sizes[0]['value'];
+        size = _sizes[0]['value'];
       }
-
+      print('sizeasd $size ');
       if (_prices.isEmpty) {
         _prices = widget.arguments['product']['product_prices']
             .where((_price) => _price['product_pack_id'] == _sizes[0]['id'])
@@ -460,59 +463,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 },
                                               ),
                                             ),
-                                            // InkWell(
-                                            //   onTap: () async {
-                                            // await _wishListModel
-                                            //     .getWishLists(
-                                            // widget.arguments[
-                                            //     'product']['id']);
-                                            //   },
-                                            //   child: _wishListModel
-                                            //           .wishListLoader
-                                            //       ? Align(
-                                            //           alignment:
-                                            //               Alignment.topRight,
-                                            //           child: Align(
-                                            //               alignment: Alignment
-                                            //                   .topRight,
-                                            //               child: Icon(Icons
-                                            //                   .favorite_border_outlined)),
-                                            //         )
-                                            //       : _wishListModel.wishLists!
-                                            //                   .where((wishList) =>
-                                            //                       wishList.productId ==
-                                            //                           widget.arguments[
-                                            //                                   'product']
-                                            //                               [
-                                            //                               'id'] &&
-                                            //                       wishList.userId ==
-                                            //                           _configModel
-                                            //                               .user!
-                                            //                               .id)
-                                            //                   .toList()
-                                            //                   .length ==
-                                            //               0
-                                            //           ? Align(
-                                            //               // vectorRZx (318:2001)
-                                            //               alignment: Alignment
-                                            //                   .topRight,
-                                            //               child: Align(
-                                            //                   alignment:
-                                            //                       Alignment
-                                            //                           .topRight,
-                                            //                   child: Icon(Icons
-                                            //                       .favorite_border_outlined)),
-                                            //             )
-                                            //           : Align(
-                                            //               alignment: Alignment
-                                            //                   .topRight,
-                                            //               child: Icon(
-                                            //                 Icons
-                                            //                     .favorite_outlined,
-                                            //                 color: Colors.red,
-                                            //               ),
-                                            //             ),
-                                            // ),
                                             SizedBox(width: 5),
                                             IconButton(
                                               onPressed: () {
@@ -883,9 +833,13 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                             RatingBar.builder(
                                                               itemSize: 15,
                                                               initialRating: product
-                                                                          .rating ==
+                                                                          .reviews ==
                                                                       null
                                                                   ? 0.0
+                                                                  // product
+                                                                  //             .rating ==
+                                                                  //         null
+                                                                  //     ? 0
                                                                   : double.parse(
                                                                       product
                                                                           .rating
@@ -931,8 +885,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                           // ),
                                                           Text(
                                                             '( ' +
-                                                                (product.reviews!
-                                                                            .isEmpty
+                                                                (product.reviews ==
+                                                                            null
                                                                         ? 'No'
                                                                         : product
                                                                             .reviews
@@ -974,7 +928,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                         'product']
                                                                     ['id'] &&
                                                             cart.flavour ==
-                                                                unitName)
+                                                                unitName &&
+                                                            cart.kindOfFlower ==
+                                                                size)
                                                         .toList()
                                                         .isEmpty ??
                                                     true)
@@ -1060,6 +1016,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                               : _prices[0]
                                                                       ['price']
                                                                   .toString();
+                                                          // print(
+                                                          //     "Product Details: $_CartData");
                                                           await _addToCartModel
                                                               .getAddToCart(
                                                                   widget.arguments![
@@ -1121,7 +1079,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                         'product']
                                                                     ['id'] &&
                                                             cart.flavour ==
-                                                                unitName)
+                                                                unitName &&
+                                                            cart.kindOfFlower ==
+                                                                size)
                                                         .toList()
                                                         .isNotEmpty ==
                                                     true)
@@ -1428,7 +1388,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                                 _prices[0]['product_pack_id'])
                                                                             .toList()[0]['points']
                                                                             .toString();
-
+                                                                        size = _sizes[index]['value']
+                                                                            .toString();
                                                                         // print('points: $_productpoints');
                                                                         // print(_prices[index]);
                                                                       });
@@ -2106,88 +2067,38 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                           Stack(
                                                                         children: [
                                                                           Positioned(
-                                                                            // frame9SvA (318:2815)
-                                                                            left:
-                                                                                0,
-                                                                            top:
-                                                                                0,
-                                                                            child:
-                                                                                Container(
-                                                                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                                                                              width: 145,
-                                                                              height: 133,
-                                                                              decoration: BoxDecoration(
-                                                                                borderRadius: BorderRadius.circular(15),
-                                                                                color: Color(0x0c000000),
-                                                                                image: DecorationImage(
-                                                                                  fit: BoxFit.contain,
-                                                                                  image: NetworkImage(_configModel.apiConfig['mediaURL'] + _productModel.categoryWiseproducts![index].productImages!.first.imagepath.toString()
-                                                                                      // 'assets/images/shades-chocolate-cake-3-1-2-1-bg.png',
+                                                                              // frame9SvA (318:2815)
+                                                                              left: 0,
+                                                                              top: 0,
+                                                                              child: Container(
+                                                                                padding: EdgeInsets.fromLTRB(106, 13, 14, 13),
+                                                                                width: 145,
+                                                                                height: 133,
+                                                                                decoration: BoxDecoration(
+                                                                                  borderRadius: BorderRadius.circular(15),
+                                                                                  color: Color(0x0c000000),
+                                                                                  image: DecorationImage(
+                                                                                    fit: BoxFit.cover,
+                                                                                    image: NetworkImage(_configModel.apiConfig['mediaURL'] + _productModel.categoryWiseproducts![index].productImages!.first.imagepath.toString()
+                                                                                        // 'assets/images/shades-chocolate-cake-3-1-2-1-bg.png',
 
-                                                                                      ),
+                                                                                        ),
+                                                                                  ),
                                                                                 ),
-                                                                              ),
-                                                                              child: InkWell(
-                                                                                onTap: () async {
-                                                                                  if (_configModel.user == null) {
-                                                                                    showDialog(
-                                                                                      context: context,
-                                                                                      builder: (BuildContext context) => LoginRequiredPopupWidget(),
-                                                                                    );
-                                                                                    // Show error dialog when user is null
-                                                                                  } else {
-                                                                                    // Fetch wishlist for a specific product
+                                                                                child: InkWell(
+                                                                                  onTap: () async {
                                                                                     await _wishListModel.getWishLists(_productModel.categoryWiseproducts![index].id);
-                                                                                  }
-                                                                                },
-                                                                                child: Builder(
-                                                                                  builder: (context) {
-                                                                                    if (_configModel.user?.id == null) {
-                                                                                      // If user ID is null, show default icon
-                                                                                      return const Align(
-                                                                                        alignment: Alignment.topRight,
-                                                                                        child: Icon(Icons.favorite_border_outlined),
-                                                                                      );
-                                                                                    }
-
-                                                                                    if (_wishListModel.wishListLoader) {
-                                                                                      // Show loading state
-                                                                                      return const Align(
-                                                                                        alignment: Alignment.topRight,
-                                                                                        child: Icon(Icons.favorite_border_outlined),
-                                                                                      );
-                                                                                    }
-
-                                                                                    // Check if the product is in the user's wishlist
-                                                                                    bool isWishListed = _wishListModel.wishLists!.any((wishList) => wishList.productId == _productModel.categoryWiseproducts![index].id && wishList.userId == _configModel.user!.id);
-
-                                                                                    // Return the appropriate icon based on wishlist status
-                                                                                    return Align(
-                                                                                      alignment: Alignment.topRight,
-                                                                                      child: Icon(
-                                                                                        isWishListed ? Icons.favorite_outlined : Icons.favorite_border_outlined,
-                                                                                        color: isWishListed ? Colors.red : null,
-                                                                                      ),
-                                                                                    );
                                                                                   },
+                                                                                  child: _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.categoryWiseproducts![index].id && wishList.userId == _configModel.user!.id).toList().length == 0
+                                                                                      ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
+                                                                                      : Align(
+                                                                                          alignment: Alignment.topRight,
+                                                                                          child: Icon(
+                                                                                            Icons.favorite_outlined,
+                                                                                            color: Colors.red,
+                                                                                          )),
                                                                                 ),
-                                                                              ),
-
-                                                                              // InkWell(
-                                                                              //   onTap: () async {
-                                                                              //     await _wishListModel.getWishLists(_productModel.categoryWiseproducts![index].id);
-                                                                              //   },
-                                                                              //   child: _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.categoryWiseproducts![index].id && wishList.userId == _configModel.user!.id).toList().length == 0
-                                                                              //       ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
-                                                                              //       : Align(
-                                                                              //           alignment: Alignment.topRight,
-                                                                              //           child: Icon(
-                                                                              //             Icons.favorite_outlined,
-                                                                              //             color: Colors.red,
-                                                                              //           )),
-                                                                              // ),
-                                                                            ),
-                                                                          ),
+                                                                              )),
                                                                         ],
                                                                       ),
                                                                     ),

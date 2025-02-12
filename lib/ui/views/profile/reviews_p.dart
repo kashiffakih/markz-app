@@ -69,18 +69,33 @@ class _ReviewsPageState extends State<ReviewsPage> {
                 itemCount: reviewModel.reviews!.length,
                 itemBuilder: (context, index) {
                   final review = reviewModel.reviews![index];
+
+                  // Parse created_at date
+                  DateTime createdAt =
+                      DateTime.parse(review.createdAt.toString());
+
+                  // Calculate difference in days
+                  int daysDifference =
+                      DateTime.now().difference(createdAt).inDays;
+
                   return ReviewCard(
                     review: review,
                     configModel: configModel,
                     dateFormat: _dateFormat,
                     onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => ReviewUpdatePage(
-                            arguments: {'review': review},
+                      if (daysDifference <= 30) {
+                        // Navigate to update page if within 30 days
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => ReviewUpdatePage(
+                              arguments: {'review': review},
+                            ),
                           ),
-                        ),
-                      );
+                        );
+                      } else {
+                        // Show popup if more than 30 days
+                        _showReviewUpdatePopup(context);
+                      }
                     },
                   );
                 },
@@ -88,6 +103,22 @@ class _ReviewsPageState extends State<ReviewsPage> {
             ),
     );
   }
+}
+
+void _showReviewUpdatePopup(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text("Update Not Allowed"),
+      content: Text("You can't update your review after 30 days."),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text("OK"),
+        ),
+      ],
+    ),
+  );
 }
 
 class ReviewCard extends StatelessWidget {
@@ -166,15 +197,15 @@ class ReviewCard extends StatelessWidget {
                         color: const Color(0xff232323),
                       ),
                     ),
-                    Text(
-                      '₹ ${review.product?.productPrices?[0]?.price ?? '0.0'}',
-                      style: MyGoogleFontStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xff232323),
-                      ),
-                    ),
+                    // Text(
+                    //   '₹ ${review.product?.productPrices?[0]?.price ?? '0.0'}',
+                    //   style: MyGoogleFontStyle(
+                    //     fontFamily: 'Poppins',
+                    //     fontSize: 16,
+                    //     fontWeight: FontWeight.w600,
+                    //     color: const Color(0xff232323),
+                    //   ),
+                    // ),
                     if (review.rating != null || review.rating.isNotEmpty)
                       Center(
                         child: RatingBar.builder(

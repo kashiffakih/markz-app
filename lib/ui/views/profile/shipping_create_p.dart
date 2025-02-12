@@ -711,7 +711,9 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                                                   'cartTotal': cartTotal,
                                                   'couponValue': couponValue,
                                                   'address': [],
-                                                  'isAddress': false
+                                                  'isAddress': widget.arguments[
+                                                          'isShipping'] ??
+                                                      false
                                                 })));
                                     // Navigator.pop(context);
                                   }

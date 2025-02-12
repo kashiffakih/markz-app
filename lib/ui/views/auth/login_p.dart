@@ -104,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
     'email': '',
     'password': '',
     'rememberme': 1,
-    'role':''
+    'role': ''
   };
   bool _isLoading = false;
 
@@ -320,7 +320,7 @@ class _LoginPageState extends State<LoginPage> {
                       });
                       if (_loginKey.currentState!.validate()) {
                         _loginKey.currentState!.save();
-                        _loginData['role'] =widget.argument['role'];
+                        _loginData['role'] = widget.argument['role'];
                         await authModel.login(loginData: _loginData);
                         if (_configModel.isLoggedIn) {
                           Navigator.pushReplacementNamed(
@@ -430,8 +430,8 @@ class _LoginPageState extends State<LoginPage> {
                         FacebookAuth.instance
                             .getUserData()
                             .then((userData) async {
-                          print(userData);
-                          print(userData['email']);
+                          // print(userData);
+                          // print(userData['email']);
 
                           setState(() {
                             _isLoading = true;
@@ -439,7 +439,7 @@ class _LoginPageState extends State<LoginPage> {
                           _loginData['email'] = userData['email'];
                           _loginData['is_social_login'] = true;
                           _loginData['social_login_name'] = "FACEBOOK";
-
+                          debugPrint('Gmail Login : ${_loginData}');
                           var authModel =
                               Provider.of<AuthModel>(context, listen: false);
                           await authModel.login(loginData: _loginData);
