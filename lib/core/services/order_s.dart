@@ -125,6 +125,7 @@ class OrderService {
     int parsedCouponAmount = int.tryParse(couponValue.toString()) ?? 0;
     int parsedCartTotal = int.tryParse(cartTotal.toString()) ?? 0;
     int parsedAddressId = int.tryParse(addressId.toString()) ?? 0;
+    int parsedGst = (5 * parsedCartTotal / 100).toInt() ?? 0;
     double parsedDeliveryAmount = double.tryParse(
             _configModel.user?.companies?[0].deliveryCharges?.toString() ??
                 '0') ??
@@ -136,7 +137,7 @@ class OrderService {
     int parsedWalletAmountUsed =
         double.tryParse(userWalletUsed.toString())?.toInt() ?? 0;
 
-    double parsedTotalAmount = (parsedCartTotal + parsedTaxAmount);
+    double parsedTotalAmount = (parsedCartTotal + parsedTaxAmount + parsedGst);
 
     Order order = Order(
       couponAmount: parsedCouponAmount,

@@ -1259,7 +1259,7 @@ class _CartPageState extends State<CartPage> {
                                 // Body
                                 Container(
                                   height:
-                                      MediaQuery.of(context).size.height * 0.7,
+                                      MediaQuery.of(context).size.height * 0.75,
                                   // height: 480,
                                   child: Column(
                                     crossAxisAlignment:
@@ -1728,39 +1728,119 @@ class _CartPageState extends State<CartPage> {
                                             SizedBox(
                                               height: 10,
                                             ),
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Text(
-                                                    'Tax %',
-                                                    style: MyGoogleFontStyle(
-                                                      fontFamily: 'Urbanist',
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Color(0xff909090),
+                                            if (address.state == 'Maharashtra')
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      'SGST 2.5%',
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Urbanist',
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color:
+                                                            Color(0xff909090),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                                Text(
-                                                  'RS' +
-                                                      ' ' +
-                                                      _configModel
-                                                          .user!
-                                                          .companies![0]
-                                                          .taxPercent
-                                                          .toString(),
-                                                  textAlign: TextAlign.right,
-                                                  style: MyGoogleFontStyle(
-                                                    fontFamily: 'Inter',
-                                                    fontWeight: FontWeight.w700,
-                                                    color: Color(0xff303030),
+                                                  Text(
+                                                    'RS' +
+                                                        ' ' +
+                                                        (2.5 *
+                                                                int.parse(_addToCartModel
+                                                                    .cartTotal
+                                                                    .toString()) /
+                                                                100)
+                                                            .toString(),
+                                                    textAlign: TextAlign.right,
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Inter',
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Color(0xff303030),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            if (address.state == 'Maharashtra')
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                            if (address.state == 'Maharashtra')
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      'CGST 2.5%',
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Urbanist',
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color:
+                                                            Color(0xff909090),
+                                                      ),
+                                                    ),
                                                   ),
-                                                )
-                                              ],
-                                            ),
+                                                  Text(
+                                                    'RS' +
+                                                        ' ' +
+                                                        (2.5 *
+                                                                int.parse(_addToCartModel
+                                                                    .cartTotal
+                                                                    .toString()) /
+                                                                100)
+                                                            .toString(),
+                                                    textAlign: TextAlign.right,
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Inter',
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Color(0xff303030),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
                                             SizedBox(
                                               height: 10,
                                             ),
+                                            if (address.state != 'Maharashtra')
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      'IGST 5%',
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Urbanist',
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color:
+                                                            Color(0xff909090),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    'RS' +
+                                                        ' ' +
+                                                        (5 *
+                                                                int.parse(_addToCartModel
+                                                                    .cartTotal
+                                                                    .toString()) /
+                                                                100)
+                                                            .toString(),
+                                                    textAlign: TextAlign.right,
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Inter',
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Color(0xff303030),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            if (address.state != 'Maharashtra')
+                                              SizedBox(
+                                                height: 10,
+                                              ),
                                             Row(
                                               children: [
                                                 Expanded(
@@ -1775,7 +1855,7 @@ class _CartPageState extends State<CartPage> {
                                                   ),
                                                 ),
                                                 Text(
-                                                  'RS ${((double.tryParse(_addToCartModel.cartTotal?.toString() ?? '0') ?? 0) / 100 * (double.tryParse(_configModel.user?.companies?[0].taxPercent?.toString() ?? '0') ?? 0))}',
+                                                  'RS ${(5 * int.parse(_addToCartModel.cartTotal.toString()) / 100).toString()}',
                                                   textAlign: TextAlign.right,
                                                   style: MyGoogleFontStyle(
                                                     fontFamily: 'Inter',
@@ -1869,7 +1949,7 @@ class _CartPageState extends State<CartPage> {
                                                     ),
                                                   ),
                                                 Text(
-                                                  'RS ${(_userWaletModel.totaRemainingPoint ~/ 3)}',
+                                                  'RS ${(_userWaletModel.totaRemainingPoint)}',
                                                   // Division by 3 directly
                                                   textAlign: TextAlign.right,
                                                   style: MyGoogleFontStyle(
@@ -1902,7 +1982,8 @@ class _CartPageState extends State<CartPage> {
                                                       (int.parse(_addToCartModel
                                                                   .cartTotal
                                                                   .toString()) +
-                                                              (_configModel.user!.companies![0].deliveryCharges == null
+                                                              (_configModel.user!.companies![0].deliveryCharges ==
+                                                                      null
                                                                   ? 0
                                                                   : int.parse(_configModel
                                                                       .user!
@@ -1910,16 +1991,17 @@ class _CartPageState extends State<CartPage> {
                                                                           0]
                                                                       .deliveryCharges
                                                                       .toString())) +
-                                                              (int.parse(_addToCartModel.cartTotal
-                                                                      .toString()) /
-                                                                  100 *
-                                                                  int.parse(_configModel
-                                                                      .user!
-                                                                      .companies![0]
-                                                                      .taxPercent
-                                                                      .toString())) +
-                                                              -(int.parse(couponValue.toString())) -
-                                                              (int.parse(_userWaletModel.totaRemainingPoint.toString()) / 3))
+                                                              (int.parse(_addToCartModel.cartTotal.toString()) *
+                                                                      int.parse(_configModel
+                                                                          .user!
+                                                                          .companies![0]
+                                                                          .taxPercent
+                                                                          .toString()) /
+                                                                      100)
+                                                                  .toInt() -
+                                                              int.parse(couponValue.toString()) -
+                                                              int.parse(_userWaletModel.totaRemainingPoint.toString()) +
+                                                              (5 * int.parse(_addToCartModel.cartTotal.toString()) / 100).toInt())
                                                           .toStringAsFixed(0),
                                                   textAlign: TextAlign.right,
                                                   style: MyGoogleFontStyle(
@@ -1992,10 +2074,22 @@ class _CartPageState extends State<CartPage> {
                                                     int.tryParse(couponValue
                                                             .toString()) ??
                                                         0;
-                                                int walletPoints = int.tryParse(
-                                                        _userWaletModel
-                                                            .totaRemainingPoint
-                                                            .toString()) ??
+                                                int deductUserWalletAmount =
+                                                    25 * cartTotal ~/ 100;
+                                                int walletPoints = 0;
+                                                if (deductUserWalletAmount >
+                                                    _userWaletModel
+                                                        .totaRemainingPoint) {
+                                                  setState(() {
+                                                    walletPoints =
+                                                        (deductUserWalletAmount -
+                                                            _userWaletModel
+                                                                .totaRemainingPoint);
+                                                  });
+                                                }
+                                                int.tryParse(_userWaletModel
+                                                        .totaRemainingPoint
+                                                        .toString()) ??
                                                     0;
 
                                                 // Calculate order cost safely
@@ -2005,11 +2099,12 @@ class _CartPageState extends State<CartPage> {
                                                             100 *
                                                             taxPercent) -
                                                         couponDiscount -
-                                                        (walletPoints / 3))
+                                                        (walletPoints) +
+                                                        (5 * cartTotal / 100))
                                                     .toStringAsFixed(0);
 
                                                 var userWalletUsed =
-                                                    (walletPoints / 3)
+                                                    (walletPoints)
                                                         .toStringAsFixed(0);
                                                 var addressId = address.id;
 

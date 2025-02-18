@@ -169,8 +169,8 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                           //   widget.arguments['order']['order_details']
                           //   [index]['product_pack'] ==
                           //       data["id"]});
-                          debugPrint(widget.arguments["product_images"][0].id
-                              .toString());
+                          // debugPrint(widget.arguments["product_images"][0].id
+                          //     .toString());
                           String newImageDisplay = widget
                               .arguments["product_images"]
                               .where((element) =>
@@ -725,47 +725,153 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                           ],
                         ),
                       ),
-                      Container(
-                        width: 321 * fem,
-                        height: 24 * fem,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              margin: EdgeInsets.fromLTRB(
-                                  0 * fem, 0 * fem, 256 * fem, 0 * fem),
-                              child: Text(
-                                'Taxes',
-                                style: MyGoogleFontStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontSize: 12 * ffem,
-                                  fontWeight: FontWeight.w400,
-                                  height: 2 * ffem / fem,
-                                  color: Color(0xff1e1e1e),
+                      if (widget.arguments['order']['address']['state']
+                              .toString() ==
+                          "Maharashtra")
+                        Container(
+                          width: 320 * fem,
+                          height: 24 * fem,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                margin: EdgeInsets.fromLTRB(
+                                    0 * fem, 0 * fem, 226 * fem, 0 * fem),
+                                child: Text(
+                                  'CGST 2.5%',
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontSize: 12 * ffem,
+                                    fontWeight: FontWeight.w400,
+                                    height: 2 * ffem / fem,
+                                    color: Color(0xff1e1e1e),
+                                  ),
                                 ),
                               ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.fromLTRB(
-                                  0 * fem, 1 * fem, 0 * fem, 0 * fem),
-                              child: Text(
-                                'RS' +
-                                    ' ' +
-                                    widget.arguments['order']['tax_amount']
-                                        .toString(),
-                                style: MyGoogleFontStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontSize: 12 * ffem,
-                                  fontWeight: FontWeight.w500,
-                                  height: 1.2 * ffem / fem,
-                                  letterSpacing: -0.24 * fem,
-                                  color: Color(0xff1e1e1e),
+                              Container(
+                                margin: EdgeInsets.fromLTRB(
+                                    0 * fem, 1 * fem, 0 * fem, 0 * fem),
+                                child: Text(
+                                  'RS' +
+                                      ' ' +
+                                      (2.5 *
+                                              int.parse(widget
+                                                  .arguments['order']
+                                                      ['order_cost']
+                                                  .toString()) /
+                                              100)
+                                          .toString(),
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontSize: 12 * ffem,
+                                    fontWeight: FontWeight.w500,
+                                    height: 1.2 * ffem / fem,
+                                    letterSpacing: -0.24 * fem,
+                                    color: Color(0xff1e1e1e),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
+                      if (widget.arguments['order']['address']['state']
+                              .toString() ==
+                          "Maharashtra")
+                        Container(
+                          width: 320 * fem,
+                          height: 24 * fem,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                margin: EdgeInsets.fromLTRB(
+                                    0 * fem, 0 * fem, 226 * fem, 0 * fem),
+                                child: Text(
+                                  'SGST 2.5%',
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontSize: 12 * ffem,
+                                    fontWeight: FontWeight.w400,
+                                    height: 2 * ffem / fem,
+                                    color: Color(0xff1e1e1e),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.fromLTRB(
+                                    0 * fem, 1 * fem, 0 * fem, 0 * fem),
+                                child: Text(
+                                  'RS' +
+                                      ' ' +
+                                      (2.5 *
+                                              int.parse(widget
+                                                  .arguments['order']
+                                                      ['order_cost']
+                                                  .toString()) /
+                                              100)
+                                          .toString(),
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontSize: 12 * ffem,
+                                    fontWeight: FontWeight.w500,
+                                    height: 1.2 * ffem / fem,
+                                    letterSpacing: -0.24 * fem,
+                                    color: Color(0xff1e1e1e),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      if (widget.arguments['order']['address']['state']
+                              .toString() !=
+                          "Maharashtra")
+                        Container(
+                          width: 320 * fem,
+                          height: 24 * fem,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                margin: EdgeInsets.fromLTRB(
+                                    0 * fem, 0 * fem, 226 * fem, 0 * fem),
+                                child: Text(
+                                  'IGST 5%',
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontSize: 12 * ffem,
+                                    fontWeight: FontWeight.w400,
+                                    height: 2 * ffem / fem,
+                                    color: Color(0xff1e1e1e),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.fromLTRB(
+                                    0 * fem, 1 * fem, 0 * fem, 0 * fem),
+                                child: Text(
+                                  'RS' +
+                                      ' ' +
+                                      (5 *
+                                              int.parse(widget
+                                                  .arguments['order']
+                                                      ['order_cost']
+                                                  .toString()) /
+                                              100)
+                                          .toString(),
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontSize: 12 * ffem,
+                                    fontWeight: FontWeight.w500,
+                                    height: 1.2 * ffem / fem,
+                                    letterSpacing: -0.24 * fem,
+                                    color: Color(0xff1e1e1e),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       Container(
                         width: 320 * fem,
                         height: 24 * fem,
