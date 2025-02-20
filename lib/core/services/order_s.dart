@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
-import 'package:sales_app/core/models/add_to_cart.dart';
-import 'package:sales_app/core/models/order.dart';
-import 'package:sales_app/core/providers/config_pr.dart';
-import 'package:sales_app/locator.dart';
+import 'package:aadab/core/models/add_to_cart.dart';
+import 'package:aadab/core/models/order.dart';
+import 'package:aadab/core/providers/config_pr.dart';
+import 'package:aadab/locator.dart';
 import 'package:http/http.dart' as http;
 
 class OrderService {

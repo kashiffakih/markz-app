@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sales_app/core/providers/auth_pr.dart';
-import 'package:sales_app/ui/shared/font_sh.dart';
-import 'package:sales_app/ui/views/auth/change-password.dart';
+import 'package:aadab/core/providers/auth_pr.dart';
+import 'package:aadab/ui/shared/font_sh.dart';
+import 'package:aadab/ui/views/auth/change-password.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({Key? key}) : super(key: key);

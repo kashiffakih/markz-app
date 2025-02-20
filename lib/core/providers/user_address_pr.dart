@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sales_app/core/models/user_address.dart';
-import 'package:sales_app/core/services/user_address_s.dart';
-import 'package:sales_app/locator.dart';
+import 'package:aadab/core/models/user_address.dart';
+import 'package:aadab/core/services/user_address_s.dart';
+import 'package:aadab/locator.dart';
 
 class UserAddressModel with ChangeNotifier {
   final UserAddressService _userAddressService = locator<UserAddressService>();

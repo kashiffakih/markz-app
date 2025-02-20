@@ -1,4 +1,4 @@
-import 'package:sales_app/core/models/review.dart';
+import 'package:aadab/core/models/review.dart';
 
 class Product {
   int? id;

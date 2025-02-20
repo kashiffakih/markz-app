@@ -1,6 +1,6 @@
-import 'package:sales_app/core/models/product.dart';
-import 'package:sales_app/core/models/review_image.dart';
-import 'package:sales_app/core/models/user.dart';
+import 'package:aadab/core/models/product.dart';
+import 'package:aadab/core/models/review_image.dart';
+import 'package:aadab/core/models/user.dart';
 
 class Review {
   int? id;

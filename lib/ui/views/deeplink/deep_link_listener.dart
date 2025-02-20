@@ -2,8 +2,7 @@ import 'dart:developer';
 
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
-import 'package:sales_app/ui/views/home/home_p.dart';
-
+import 'package:aadab/ui/views/home/home_p.dart';
 
 class DeepLinkListener extends StatefulWidget {
   const DeepLinkListener({Key? key, required this.child}) : super(key: key);
@@ -24,8 +23,8 @@ class _DeepLinkListenerState extends State<DeepLinkListener> {
     final sub = appLinks.uriLinkStream.listen((uri) {
       log('URI: ${uri.toString()}');
       if (uri.pathSegments.isNotEmpty) {
-        Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const HomePage()));
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => const HomePage()));
         final id = uri.pathSegments.lastOrNull;
         if (id != null && int.tryParse(id) != null) {
           // Navigator.of(context).push(MaterialPageRoute(

@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:sales_app/core/providers/config_pr.dart';
-import 'package:sales_app/core/providers/review_pr.dart';
-import 'package:sales_app/locator.dart';
-import 'package:sales_app/ui/shared/font_sh.dart';
-import 'package:sales_app/ui/views/products/product_id_p.dart';
-import 'package:sales_app/ui/views/profile/review_id_p.dart';
-import 'package:sales_app/ui/widgets/image_zoom_w.dart';
+import 'package:aadab/core/providers/config_pr.dart';
+import 'package:aadab/core/providers/review_pr.dart';
+import 'package:aadab/locator.dart';
+import 'package:aadab/ui/shared/font_sh.dart';
+import 'package:aadab/ui/views/products/product_id_p.dart';
+import 'package:aadab/ui/views/profile/review_id_p.dart';
+import 'package:aadab/ui/widgets/image_zoom_w.dart';
 
 class ReviewsPage extends StatefulWidget {
   final arguments;

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sales_app/core/providers/notification_pr.dart';
-import 'package:sales_app/ui/shared/font_sh.dart';
-import 'package:sales_app/ui/views/auth/splash_p.dart';
-import 'package:sales_app/ui/views/profile/orders_p.dart';
+import 'package:aadab/core/providers/notification_pr.dart';
+import 'package:aadab/ui/shared/font_sh.dart';
+import 'package:aadab/ui/views/auth/splash_p.dart';
+import 'package:aadab/ui/views/profile/orders_p.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({Key? key}) : super(key: key);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sales_app/core/models/user_wallet.dart';
-import 'package:sales_app/core/services/user_wallet_s.dart';
-import 'package:sales_app/locator.dart';
+import 'package:aadab/core/models/user_wallet.dart';
+import 'package:aadab/core/services/user_wallet_s.dart';
+import 'package:aadab/locator.dart';
 
 class UserWalletModel with ChangeNotifier {
   final UserWalletService _userWalletService = locator<UserWalletService>();

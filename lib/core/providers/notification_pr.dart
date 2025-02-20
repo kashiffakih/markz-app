@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sales_app/core/models/notification.dart';
-import 'package:sales_app/core/services/notification_s.dart';
-import 'package:sales_app/locator.dart';
+import 'package:aadab/core/models/notification.dart';
+import 'package:aadab/core/services/notification_s.dart';
+import 'package:aadab/locator.dart';
 
 class NotificationModel with ChangeNotifier {
   final NotificationService _notificationService =

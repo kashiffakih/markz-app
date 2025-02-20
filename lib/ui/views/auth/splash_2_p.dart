@@ -1,7 +1,7 @@
 // import 'package:flutter/material.dart';
 // import 'package:provider/provider.dart';
-// import 'package:sales_app/core/providers/auth_pr.dart';
-// import 'package:sales_app/ui/shared/font_sh.dart';
+// import 'package:aadab/core/providers/auth_pr.dart';
+// import 'package:aadab/ui/shared/font_sh.dart';
 
 // class Splash2Page extends StatefulWidget {
 //   const Splash2Page({Key? key}) : super(key: key);
@@ -139,7 +139,7 @@
 // }
 // TEst v1
 import 'package:flutter/material.dart';
-import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:aadab/ui/shared/font_sh.dart';
 
 class Splash2Page extends StatefulWidget {
   const Splash2Page({Key? key}) : super(key: key);

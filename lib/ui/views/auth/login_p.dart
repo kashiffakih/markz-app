@@ -6,10 +6,10 @@ import 'package:google_sign_in/google_sign_in.dart';
 // import 'package:get_ip_address/get_ip_address.dart';
 // import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
-import 'package:sales_app/core/providers/auth_pr.dart';
-import 'package:sales_app/core/providers/config_pr.dart';
-import 'package:sales_app/locator.dart';
-import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:aadab/core/providers/auth_pr.dart';
+import 'package:aadab/core/providers/config_pr.dart';
+import 'package:aadab/locator.dart';
+import 'package:aadab/ui/shared/font_sh.dart';
 
 // import 'package:firebase_auth/firebase_auth.dart';
 class LoginPage extends StatefulWidget {
@@ -501,7 +501,7 @@ class _LoginPageState extends State<LoginPage> {
                                     .instance
                                     .signInWithCredential(credential);
 
-                                print(userCredential.user?.email);
+                                // print(userCredential.user?.email);
 
                                 setState(() {
                                   _isLoading = true;

@@ -1,5 +1,5 @@
-import 'package:sales_app/core/models/user.dart';
-import 'package:sales_app/core/models/user_address.dart';
+import 'package:aadab/core/models/user.dart';
+import 'package:aadab/core/models/user_address.dart';
 
 import 'product.dart';
 

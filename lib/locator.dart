@@ -1,16 +1,16 @@
 import 'package:get_it/get_it.dart';
-import 'package:sales_app/core/providers/config_pr.dart';
-import 'package:sales_app/core/services/add_to_cart_s.dart';
-import 'package:sales_app/core/services/auth_s.dart';
-import 'package:sales_app/core/services/config_s.dart';
-import 'package:sales_app/core/services/notification_s.dart';
-import 'package:sales_app/core/services/order_s.dart';
-import 'package:sales_app/core/services/product_s.dart';
-import 'package:sales_app/core/services/review_s.dart';
-import 'package:sales_app/core/services/user_address_s.dart';
-import 'package:sales_app/core/services/user_wallet_s.dart';
-import 'package:sales_app/core/services/wish_list_s.dart';
-import 'package:sales_app/core/services/coupon_s.dart';
+import 'package:aadab/core/providers/config_pr.dart';
+import 'package:aadab/core/services/add_to_cart_s.dart';
+import 'package:aadab/core/services/auth_s.dart';
+import 'package:aadab/core/services/config_s.dart';
+import 'package:aadab/core/services/notification_s.dart';
+import 'package:aadab/core/services/order_s.dart';
+import 'package:aadab/core/services/product_s.dart';
+import 'package:aadab/core/services/review_s.dart';
+import 'package:aadab/core/services/user_address_s.dart';
+import 'package:aadab/core/services/user_wallet_s.dart';
+import 'package:aadab/core/services/wish_list_s.dart';
+import 'package:aadab/core/services/coupon_s.dart';
 
 GetIt locator = GetIt.instance;
 

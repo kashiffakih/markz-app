@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sales_app/core/providers/config_pr.dart';
-import 'package:sales_app/core/providers/order_pr.dart';
-import 'package:sales_app/core/providers/user_wallet_pr.dart';
-import 'package:sales_app/locator.dart';
-import 'package:sales_app/ui/shared/font_sh.dart';
-import 'package:sales_app/ui/views/profile/address_p.dart';
+import 'package:aadab/core/providers/config_pr.dart';
+import 'package:aadab/core/providers/order_pr.dart';
+import 'package:aadab/core/providers/user_wallet_pr.dart';
+import 'package:aadab/locator.dart';
+import 'package:aadab/ui/shared/font_sh.dart';
+import 'package:aadab/ui/views/profile/address_p.dart';
 
 class CheckoutPage extends StatefulWidget {
   final arguments;

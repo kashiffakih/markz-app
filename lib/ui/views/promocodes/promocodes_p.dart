@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:sales_app/core/providers/config_pr.dart';
-import 'package:sales_app/core/providers/coupon_pr.dart';
-import 'package:sales_app/locator.dart';
-import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:aadab/core/providers/config_pr.dart';
+import 'package:aadab/core/providers/coupon_pr.dart';
+import 'package:aadab/locator.dart';
+import 'package:aadab/ui/shared/font_sh.dart';
 
 class PromocodesPage extends StatefulWidget {
   const PromocodesPage({Key? key}) : super(key: key);

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sales_app/core/models/user_address.dart';
-import 'package:sales_app/core/providers/user_address_pr.dart';
-import 'package:sales_app/ui/shared/font_sh.dart';
-import 'package:sales_app/ui/views/checkout/cart_p.dart';
-import 'package:sales_app/ui/views/profile/shipping_create_p.dart';
-import 'package:sales_app/ui/views/profile/shipping_id_p.dart';
+import 'package:aadab/core/models/user_address.dart';
+import 'package:aadab/core/providers/user_address_pr.dart';
+import 'package:aadab/ui/shared/font_sh.dart';
+import 'package:aadab/ui/views/checkout/cart_p.dart';
+import 'package:aadab/ui/views/profile/shipping_create_p.dart';
+import 'package:aadab/ui/views/profile/shipping_id_p.dart';
 
 class AddressPage extends StatefulWidget {
   final arguments;

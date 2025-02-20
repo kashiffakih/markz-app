@@ -1,5 +1,5 @@
-import 'package:sales_app/core/models/product.dart';
-import 'package:sales_app/core/models/user.dart';
+import 'package:aadab/core/models/product.dart';
+import 'package:aadab/core/models/user.dart';
 
 class AddToCart {
   int? id;

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sales_app/core/providers/auth_pr.dart';
-import 'package:sales_app/core/providers/config_pr.dart';
-import 'package:sales_app/locator.dart';
-import 'package:sales_app/ui/shared/images_sh.dart';
+import 'package:aadab/core/providers/auth_pr.dart';
+import 'package:aadab/core/providers/config_pr.dart';
+import 'package:aadab/locator.dart';
+import 'package:aadab/ui/shared/images_sh.dart';
 import 'dart:io' show Platform;
 
 class LoginPage extends StatefulWidget {

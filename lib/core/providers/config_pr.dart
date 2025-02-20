@@ -1,8 +1,8 @@
 // import 'package:flutter/material.dart';
-// import 'package:sales_app/core/models/user.dart';
-// import 'package:sales_app/core/services/config_s.dart';
-// import 'package:sales_app/locator.dart';
-// import 'package:sales_app/core/models/file.dart';
+// import 'package:aadab/core/models/user.dart';
+// import 'package:aadab/core/services/config_s.dart';
+// import 'package:aadab/locator.dart';
+// import 'package:aadab/core/models/file.dart';
 
 // class ConfigModel with ChangeNotifier {
 //   final ConfigService _configService = locator<ConfigService>();
@@ -114,10 +114,10 @@
 // Test V2
 
 import 'package:flutter/material.dart';
-import 'package:sales_app/core/models/user.dart';
-import 'package:sales_app/core/services/config_s.dart';
-import 'package:sales_app/locator.dart';
-import 'package:sales_app/core/models/file.dart';
+import 'package:aadab/core/models/user.dart';
+import 'package:aadab/core/services/config_s.dart';
+import 'package:aadab/locator.dart';
+import 'package:aadab/core/models/file.dart';
 
 class ConfigModel with ChangeNotifier {
   final ConfigService _configService = locator<ConfigService>();

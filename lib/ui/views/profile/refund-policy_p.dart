@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sales_app/core/providers/add_to_cart_pr.dart';
-import 'package:sales_app/core/providers/config_pr.dart';
-import 'package:sales_app/locator.dart';
-import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:aadab/core/providers/add_to_cart_pr.dart';
+import 'package:aadab/core/providers/config_pr.dart';
+import 'package:aadab/locator.dart';
+import 'package:aadab/ui/shared/font_sh.dart';
 
 class RefundPolicyPage extends StatefulWidget {
   const RefundPolicyPage({Key? key}) : super(key: key);

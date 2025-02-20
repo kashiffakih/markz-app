@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sales_app/core/models/coupon.dart';
-import 'package:sales_app/core/services/coupon_s.dart';
-import 'package:sales_app/locator.dart';
+import 'package:aadab/core/models/coupon.dart';
+import 'package:aadab/core/services/coupon_s.dart';
+import 'package:aadab/locator.dart';
 
 class CouponModel with ChangeNotifier {
   final CouponService _couponService = locator<CouponService>();

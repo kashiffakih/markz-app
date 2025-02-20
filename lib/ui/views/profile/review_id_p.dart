@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sales_app/core/models/review.dart';
-import 'package:sales_app/core/providers/add_to_cart_pr.dart';
-import 'package:sales_app/core/providers/review_pr.dart';
-import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:aadab/core/models/review.dart';
+import 'package:aadab/core/providers/add_to_cart_pr.dart';
+import 'package:aadab/core/providers/review_pr.dart';
+import 'package:aadab/ui/shared/font_sh.dart';
 
 class ReviewUpdatePage extends StatefulWidget {
   final arguments;

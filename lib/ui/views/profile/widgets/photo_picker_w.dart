@@ -2,9 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:sales_app/core/providers/auth_pr.dart';
-import 'package:sales_app/core/providers/config_pr.dart';
-import 'package:sales_app/locator.dart';
+import 'package:aadab/core/providers/auth_pr.dart';
+import 'package:aadab/core/providers/config_pr.dart';
+import 'package:aadab/locator.dart';
 
 class PhotoPickerWidget extends StatefulWidget {
   @override

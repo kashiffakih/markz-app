@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
-import 'package:sales_app/core/models/product.dart';
-import 'package:sales_app/core/providers/add_to_cart_pr.dart';
-import 'package:sales_app/core/providers/review_pr.dart';
-import 'package:sales_app/ui/shared/font_sh.dart';
-import 'package:sales_app/ui/widgets/multi_image_w.dart';
+import 'package:aadab/core/models/product.dart';
+import 'package:aadab/core/providers/add_to_cart_pr.dart';
+import 'package:aadab/core/providers/review_pr.dart';
+import 'package:aadab/ui/shared/font_sh.dart';
+import 'package:aadab/ui/widgets/multi_image_w.dart';
 
 import '../../../core/providers/config_pr.dart';
 import '../../../locator.dart';

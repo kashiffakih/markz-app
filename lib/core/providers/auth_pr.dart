@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:sales_app/core/services/auth_s.dart';
-import 'package:sales_app/locator.dart';
+import 'package:aadab/core/services/auth_s.dart';
+import 'package:aadab/locator.dart';
 
 class AuthModel with ChangeNotifier {
   final AuthService _authService = locator<AuthService>();
@@ -61,6 +61,7 @@ class AuthModel with ChangeNotifier {
       rethrow; // Optionally rethrow the error for further handling in the UI
     }
   }
+
   Future<Map<String, dynamic>> uploadImage({
     required File imageFile,
     required String userId,

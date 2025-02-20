@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sales_app/core/models/wish_list.dart';
-import 'package:sales_app/core/services/wish_list_s.dart';
-import 'package:sales_app/locator.dart';
+import 'package:aadab/core/models/wish_list.dart';
+import 'package:aadab/core/services/wish_list_s.dart';
+import 'package:aadab/locator.dart';
 
 class WishListModel with ChangeNotifier {
   final WishListService _wishListService = locator<WishListService>();

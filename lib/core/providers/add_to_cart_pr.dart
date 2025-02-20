@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sales_app/core/models/add_to_cart.dart';
-import 'package:sales_app/core/services/add_to_cart_s.dart';
-import 'package:sales_app/locator.dart';
+import 'package:aadab/core/models/add_to_cart.dart';
+import 'package:aadab/core/services/add_to_cart_s.dart';
+import 'package:aadab/locator.dart';
 
 class AddToCartModel with ChangeNotifier {
   final AddToCartService _addToCartService = locator<AddToCartService>();

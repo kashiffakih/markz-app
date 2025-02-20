@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sales_app/core/providers/config_pr.dart';
-import 'package:sales_app/locator.dart';
+import 'package:aadab/core/providers/config_pr.dart';
+import 'package:aadab/locator.dart';
 
 class LoginRequiredPopupWidget extends StatelessWidget {
   final ConfigModel _configModel = locator<ConfigModel>();

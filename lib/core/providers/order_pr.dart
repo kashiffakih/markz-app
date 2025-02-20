@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:sales_app/core/models/add_to_cart.dart';
-import 'package:sales_app/core/models/order.dart';
-import 'package:sales_app/core/services/order_s.dart';
-import 'package:sales_app/locator.dart';
+import 'package:aadab/core/models/add_to_cart.dart';
+import 'package:aadab/core/models/order.dart';
+import 'package:aadab/core/services/order_s.dart';
+import 'package:aadab/locator.dart';
 
 class OrderModel with ChangeNotifier {
   final OrderService _orderService = locator<OrderService>();

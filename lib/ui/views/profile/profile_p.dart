@@ -1,19 +1,20 @@
+import 'package:aadab/ui/root_p.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
-import 'package:sales_app/core/providers/add_to_cart_pr.dart';
-import 'package:sales_app/core/providers/config_pr.dart';
-import 'package:sales_app/core/providers/order_pr.dart';
-import 'package:sales_app/core/providers/review_pr.dart';
-import 'package:sales_app/core/providers/user_address_pr.dart';
-import 'package:sales_app/core/providers/user_wallet_pr.dart';
-import 'package:sales_app/core/providers/wish_list_pr.dart';
-import 'package:sales_app/locator.dart';
-import 'package:sales_app/ui/shared/font_sh.dart';
-import 'package:sales_app/ui/views/auth/login_p.dart';
-import 'package:sales_app/ui/views/profile/address_p.dart';
-import 'package:sales_app/ui/views/profile/widgets/photo_picker_w.dart';
+import 'package:aadab/core/providers/add_to_cart_pr.dart';
+import 'package:aadab/core/providers/config_pr.dart';
+import 'package:aadab/core/providers/order_pr.dart';
+import 'package:aadab/core/providers/review_pr.dart';
+import 'package:aadab/core/providers/user_address_pr.dart';
+import 'package:aadab/core/providers/user_wallet_pr.dart';
+import 'package:aadab/core/providers/wish_list_pr.dart';
+import 'package:aadab/locator.dart';
+import 'package:aadab/ui/shared/font_sh.dart';
+import 'package:aadab/ui/views/auth/login_p.dart';
+import 'package:aadab/ui/views/profile/address_p.dart';
+import 'package:aadab/ui/views/profile/widgets/photo_picker_w.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -193,14 +194,19 @@ class _ProfilePageState extends State<ProfilePage> {
                                             ),
                                             TextButton(
                                               onPressed: () async {
-                                                Navigator.of(context).pop();
                                                 await GoogleSignIn().signOut();
                                                 await FacebookAuth.instance
                                                     .logOut();
                                                 await _configModel
                                                     .removeLoginData();
-                                                Navigator.pushReplacementNamed(
-                                                    context, '/login');
+                                                Navigator.pushAndRemoveUntil(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          RootPage()),
+                                                  (Route<dynamic> route) =>
+                                                      false, // This removes all previous routes
+                                                );
                                               },
                                               child: Text('YES'),
                                             ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sales_app/core/models/product.dart';
-import 'package:sales_app/core/services/product_s.dart';
-import 'package:sales_app/locator.dart';
+import 'package:aadab/core/models/product.dart';
+import 'package:aadab/core/services/product_s.dart';
+import 'package:aadab/locator.dart';
 
 class ProductModel with ChangeNotifier {
   final ProductService _productService = locator<ProductService>();

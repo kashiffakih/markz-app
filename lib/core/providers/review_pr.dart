@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sales_app/core/models/review.dart';
-import 'package:sales_app/core/services/review_s.dart';
-import 'package:sales_app/locator.dart';
+import 'package:aadab/core/models/review.dart';
+import 'package:aadab/core/services/review_s.dart';
+import 'package:aadab/locator.dart';
 
 class ReviewModel with ChangeNotifier {
   final ReviewService _reviewService = locator<ReviewService>();

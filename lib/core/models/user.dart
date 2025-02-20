@@ -1,4 +1,4 @@
-import 'package:sales_app/core/models/product.dart';
+import 'package:aadab/core/models/product.dart';
 
 class User {
   int? id;

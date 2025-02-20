@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:sales_app/core/models/user.dart';
-import 'package:sales_app/core/providers/add_to_cart_pr.dart';
-import 'package:sales_app/core/providers/auth_pr.dart';
-import 'package:sales_app/ui/shared/font_sh.dart';
+import 'package:aadab/core/models/user.dart';
+import 'package:aadab/core/providers/add_to_cart_pr.dart';
+import 'package:aadab/core/providers/auth_pr.dart';
+import 'package:aadab/ui/shared/font_sh.dart';
 
 class SettingUpdatePage extends StatefulWidget {
   final arguments;

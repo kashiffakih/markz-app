@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../core/providers/config_pr.dart';
 import '../../locator.dart';
-import 'package:sales_app/core/models/file.dart' as myFile;
+import 'package:aadab/core/models/file.dart' as myFile;
 
 class MultipleImageUploadPage extends StatefulWidget {
   @override
