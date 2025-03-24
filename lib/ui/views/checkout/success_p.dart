@@ -1,3 +1,4 @@
+import 'package:aadab/ui/views/profile/orders_p.dart';
 import 'package:flutter/material.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 
@@ -50,7 +51,13 @@ class SuccessPage extends StatelessWidget {
                     margin: EdgeInsets.fromLTRB(0.89, 20, 0, 0),
                     child: TextButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, '/ordersPage');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                OrdersPage(isProfile: {'isProfile': false}),
+                          ),
+                        );
                       },
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,

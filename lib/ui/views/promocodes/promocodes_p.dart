@@ -23,7 +23,8 @@ class _PromocodesPageState extends State<PromocodesPage> {
   @override
   Widget build(BuildContext context) {
     final ConfigModel _configModel = locator<ConfigModel>();
-    final CouponModel _couponModel = Provider.of<CouponModel>(context);
+    final CouponModel _couponModel =
+        Provider.of<CouponModel>(context, listen: false);
     // print(_couponModel.coupons);
     DateTime currentDate = DateTime.now();
     String formattedDate = DateFormat('dd-MM-yyyy').format(currentDate);

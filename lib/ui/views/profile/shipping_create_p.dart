@@ -66,8 +66,9 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
   @override
   Widget build(BuildContext context) {
     final UserAddressModel _userAddressModel =
-        Provider.of<UserAddressModel>(context);
-    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
+        Provider.of<UserAddressModel>(context, listen: false);
+    final AddToCartModel _addToCartModel =
+        Provider.of<AddToCartModel>(context, listen: false);
 
     var cartItems = [];
     var cartTotal = '';

@@ -35,7 +35,8 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
   @override
   Widget build(BuildContext context) {
     AuthModel _userModel = Provider.of<AuthModel>(context, listen: false);
-    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
+    final AddToCartModel _addToCartModel =
+        Provider.of<AddToCartModel>(context, listen: false);
 
     return Scaffold(
       body: SafeArea(

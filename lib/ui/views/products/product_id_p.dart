@@ -34,7 +34,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
   void initState() {
     super.initState();
     final ConfigModel _configModel = locator<ConfigModel>();
-    print(widget.arguments);
+    // print(widget.arguments);
     var productId = '';
     if (widget.arguments['product'] != null) {
       productId = widget.arguments['product']['id'].toString();
@@ -105,9 +105,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
   @override
   Widget build(BuildContext context) {
     final ConfigModel _configModel = locator<ConfigModel>();
-    final ProductModel _productModel = Provider.of<ProductModel>(context);
-    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
-    final WishListModel _wishListModel = Provider.of<WishListModel>(context);
+    final ProductModel _productModel =
+        Provider.of<ProductModel>(context, listen: false);
+    final AddToCartModel _addToCartModel =
+        Provider.of<AddToCartModel>(context, listen: false);
+    final WishListModel _wishListModel =
+        Provider.of<WishListModel>(context, listen: false);
     // final ReviewModel _reviewModel = Provider.of<ReviewModel>(context);
 
     setState(() {
@@ -1687,6 +1690,23 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                   height: 10,
                                 ),
                                 // Description
+                                if (product.smallDescription != null)
+                                  Container(
+                                    width: double.infinity,
+                                    child: Card(
+                                      elevation: 4,
+                                      color: Colors.white,
+                                      child: Padding(
+                                          padding: const EdgeInsets.all(
+                                              16.0), // Optional padding
+                                          child:
+                                              // Text(product.description.toString()),
+                                              Html(
+                                            data:
+                                                """${product.smallDescription.toString()}""",
+                                          )),
+                                    ),
+                                  ),
                                 if (product.description != null)
                                   Container(
                                     width: double.infinity,
@@ -2183,7 +2203,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                 ),
 
                                 // Earn Points Text
-                                if (_productpoints != '0')
+                                if (_productpoints != 0 ||
+                                    _productpoints != null)
                                   Container(
                                     width:
                                         MediaQuery.of(context).size.width - 50,

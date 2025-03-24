@@ -23,12 +23,10 @@ import '../../../core/providers/wish_list_pr.dart';
 import '../products/product_id_p.dart';
 
 class CartPage extends StatefulWidget {
+  final isProfile;
   final arguments;
 
-  const CartPage({
-    Key? key,
-    this.arguments,
-  }) : super(key: key);
+  const CartPage({Key? key, this.arguments, this.isProfile}) : super(key: key);
 
   @override
   State<CartPage> createState() => _CartPageState();
@@ -160,14 +158,19 @@ class _CartPageState extends State<CartPage> {
 
   @override
   Widget build(BuildContext context) {
-    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
+    final AddToCartModel _addToCartModel =
+        Provider.of<AddToCartModel>(context, listen: false);
     final ConfigModel _configModel = locator<ConfigModel>();
-    final OrderModel _orderModel = Provider.of<OrderModel>(context);
-    final CouponModel _couponModel = Provider.of<CouponModel>(context);
+    final OrderModel _orderModel =
+        Provider.of<OrderModel>(context, listen: false);
+    final CouponModel _couponModel =
+        Provider.of<CouponModel>(context, listen: false);
     final UserWalletModel _userWaletModel =
-        Provider.of<UserWalletModel>(context);
-    final ProductModel _productModel = Provider.of<ProductModel>(context);
-    final WishListModel _wishListModel = Provider.of<WishListModel>(context);
+        Provider.of<UserWalletModel>(context, listen: false);
+    final ProductModel _productModel =
+        Provider.of<ProductModel>(context, listen: false);
+    final WishListModel _wishListModel =
+        Provider.of<WishListModel>(context, listen: false);
 
     setState(() {
       if (_orderModel.orders.length > 0) {
@@ -190,7 +193,12 @@ class _CartPageState extends State<CartPage> {
     return Scaffold(
       body: WillPopScope(
         onWillPop: () async {
-          Navigator.pushReplacementNamed(context, '/homePage');
+          if (widget.isProfile['isProfile'] == true) {
+            Navigator.pushNamed(context, '/profilePage');
+          } else {
+            Navigator.pushReplacementNamed(context, '/homePage');
+          }
+
           return false;
         },
         child: SafeArea(
@@ -229,7 +237,13 @@ class _CartPageState extends State<CartPage> {
                               children: [
                                 InkWell(
                                   onTap: () {
-                                    Navigator.pushNamed(context, '/homePage');
+                                    if (widget.isProfile['isProfile'] == true) {
+                                      Navigator.pushNamed(
+                                          context, '/profilePage');
+                                    } else {
+                                      Navigator.pushReplacementNamed(
+                                          context, '/homePage');
+                                    }
                                   },
                                   child: Container(
                                     width: 30,

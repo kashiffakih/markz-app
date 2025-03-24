@@ -44,8 +44,10 @@ class _WishlistPageState extends State<WishlistPage> {
   };
   @override
   Widget build(BuildContext context) {
-    final WishListModel _wishListModel = Provider.of<WishListModel>(context);
-    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
+    final WishListModel _wishListModel =
+        Provider.of<WishListModel>(context, listen: false);
+    final AddToCartModel _addToCartModel =
+        Provider.of<AddToCartModel>(context, listen: false);
     final ConfigModel _configModel = locator<ConfigModel>();
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
@@ -636,7 +638,7 @@ class _WishlistPageState extends State<WishlistPage> {
                                                                                 _productpoints;
                                                                             _CartData['product_price'] =
                                                                                 _prices;
-                                                                            print(_CartData);
+                                                                            // print(_CartData);
                                                                             await _addToCartModel.getAddToCart(
                                                                               _wishListModel.wishLists![index].product!.id,
                                                                               type,

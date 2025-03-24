@@ -1,3 +1,4 @@
+import 'package:aadab/ui/views/checkout/cart_p.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,7 +47,7 @@ class _HomePageState extends State<HomePage>
   void initState() {
     super.initState();
     final ConfigModel _configModel = locator<ConfigModel>();
-    print(_configModel.user?.referedById);
+    // print(_configModel.user?.referedById);
     // Fetch banners and other data after widget build
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // Fetch product data
@@ -69,7 +70,7 @@ class _HomePageState extends State<HomePage>
       var productModel = Provider.of<ProductModel>(context, listen: false);
       await productModel.getBanners();
 
-      print(productModel.banners?.length);
+      // print(productModel.banners?.length);
       // Fetch and build banners
       var bannerList = [
         productModel.banners?['banner_path_1'] != null
@@ -105,7 +106,7 @@ class _HomePageState extends State<HomePage>
       setState(() {
         bannerUrls = bannerList;
       });
-      print("banners : $bannerUrls");
+      // print("banners : $bannerUrls");
     });
   }
 
@@ -120,9 +121,12 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     final ConfigModel _configModel = locator<ConfigModel>();
-    final ProductModel _productModel = Provider.of<ProductModel>(context);
-    final WishListModel _wishListModel = Provider.of<WishListModel>(context);
-    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
+    final ProductModel _productModel =
+        Provider.of<ProductModel>(context, listen: false);
+    final WishListModel _wishListModel =
+        Provider.of<WishListModel>(context, listen: false);
+    final AddToCartModel _addToCartModel =
+        Provider.of<AddToCartModel>(context, listen: false);
 
     double discountPrice = 0.0;
 
@@ -1138,7 +1142,13 @@ class _HomePageState extends State<HomePage>
                   'pack': ''
                 };
                 await _addToCartModel.getAddToCart('', '', _CartData);
-                Navigator.pushNamed(context, '/cartPage');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        CartPage(isProfile: {'isProfile': false}),
+                  ),
+                );
               }
             }
             if (value == 3) {

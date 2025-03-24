@@ -21,7 +21,7 @@ class _RewardsPageState extends State<RewardsPage> {
   @override
   Widget build(BuildContext context) {
     final UserWalletModel _userWaletModel =
-        Provider.of<UserWalletModel>(context);
+        Provider.of<UserWalletModel>(context, listen: false);
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(

@@ -22,7 +22,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final _notificationModel = Provider.of<NotificationModel>(context);
+    final _notificationModel =
+        Provider.of<NotificationModel>(context, listen: false);
     // print(_notificationModel.notifications![0].id);
     return Scaffold(
       body: SafeArea(

@@ -38,7 +38,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final reviewModel = Provider.of<ReviewModel>(context);
+    final reviewModel = Provider.of<ReviewModel>(context, listen: false);
     final configModel = locator<ConfigModel>();
 
     return Scaffold(

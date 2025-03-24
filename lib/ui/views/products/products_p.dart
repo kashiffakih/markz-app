@@ -51,9 +51,12 @@ class _ProductsPageState extends State<ProductsPage> {
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
     final ConfigModel _configModel = locator<ConfigModel>();
-    final ProductModel _productModel = Provider.of<ProductModel>(context);
-    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
-    final WishListModel _wishListModel = Provider.of<WishListModel>(context);
+    final ProductModel _productModel =
+        Provider.of<ProductModel>(context, listen: false);
+    final AddToCartModel _addToCartModel =
+        Provider.of<AddToCartModel>(context, listen: false);
+    final WishListModel _wishListModel =
+        Provider.of<WishListModel>(context, listen: false);
 
     setState(() {
       if (!_isInitialLoad &&

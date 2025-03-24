@@ -13,7 +13,8 @@ class TermsAndConditionsPage extends StatefulWidget {
 class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
   @override
   Widget build(BuildContext context) {
-    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
+    final AddToCartModel _addToCartModel =
+        Provider.of<AddToCartModel>(context, listen: false);
 
     return Scaffold(
       body: SafeArea(

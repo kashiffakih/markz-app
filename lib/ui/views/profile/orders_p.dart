@@ -6,7 +6,9 @@ import 'package:aadab/ui/shared/font_sh.dart';
 import 'package:aadab/ui/views/profile/order-details-processing.dart';
 
 class OrdersPage extends StatefulWidget {
-  const OrdersPage({Key? key}) : super(key: key);
+  final isProfile;
+
+  OrdersPage({Key? key, this.isProfile}) : super(key: key);
 
   @override
   State<OrdersPage> createState() => _OrdersPageState();
@@ -31,12 +33,17 @@ class _OrdersPageState extends State<OrdersPage> {
 
   @override
   Widget build(BuildContext context) {
-    final OrderModel _orderModel = Provider.of<OrderModel>(context);
+    final OrderModel _orderModel =
+        Provider.of<OrderModel>(context, listen: false);
 
     return Scaffold(
       body: WillPopScope(
         onWillPop: () async {
-          Navigator.pushNamed(context, '/homePage');
+          if (widget.isProfile['isProfile'] == true) {
+            Navigator.pushNamed(context, '/profilePage');
+          } else {
+            Navigator.pushReplacementNamed(context, '/homePage');
+          }
           return false;
         },
         child: SafeArea(
@@ -54,7 +61,12 @@ class _OrdersPageState extends State<OrdersPage> {
                       children: [
                         InkWell(
                           onTap: () {
-                            Navigator.pushNamed(context, '/homePage');
+                            if (widget.isProfile['isProfile'] == true) {
+                              Navigator.pushNamed(context, '/profilePage');
+                            } else {
+                              Navigator.pushReplacementNamed(
+                                  context, '/homePage');
+                            }
                           },
                           child: Container(
                             width: 15,

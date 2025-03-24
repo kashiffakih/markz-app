@@ -107,7 +107,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       });
     case cartPage:
       return MaterialPageRoute(builder: (BuildContext context) {
-        return CartPage();
+        return CartPage(
+          isProfile: settings.arguments as bool?,
+        );
       });
     case checkoutPage:
       return MaterialPageRoute(builder: (BuildContext context) {
@@ -127,7 +129,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       });
     case ordersPage:
       return MaterialPageRoute(builder: (BuildContext context) {
-        return OrdersPage();
+        return OrdersPage(
+          isProfile: settings.arguments as bool?,
+        );
       });
     case orderDetailsPage:
       return MaterialPageRoute(builder: (BuildContext context) {

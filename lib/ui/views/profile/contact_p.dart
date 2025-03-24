@@ -24,7 +24,8 @@ class _ContactPageState extends State<ContactPage> {
   Widget build(BuildContext context) {
     final ConfigModel _configModel = locator<ConfigModel>();
     // final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
-    final ProductModel _productModel = Provider.of<ProductModel>(context);
+    final ProductModel _productModel =
+        Provider.of<ProductModel>(context, listen: false);
 
     return Scaffold(
       body: SafeArea(

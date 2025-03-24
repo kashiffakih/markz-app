@@ -16,7 +16,8 @@ class _RefundPolicyPageState extends State<RefundPolicyPage> {
   @override
   Widget build(BuildContext context) {
     final ConfigModel _configModel = locator<ConfigModel>();
-    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
+    final AddToCartModel _addToCartModel =
+        Provider.of<AddToCartModel>(context, listen: false);
 
     return Scaffold(
       body: SafeArea(

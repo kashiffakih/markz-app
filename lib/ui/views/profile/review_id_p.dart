@@ -27,8 +27,10 @@ class _ReviewUpdatePageState extends State<ReviewUpdatePage> {
   bool _loading = false;
   @override
   Widget build(BuildContext context) {
-    final ReviewModel _reviewModel = Provider.of<ReviewModel>(context);
-    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
+    final ReviewModel _reviewModel =
+        Provider.of<ReviewModel>(context, listen: false);
+    final AddToCartModel _addToCartModel =
+        Provider.of<AddToCartModel>(context, listen: false);
 
     return Scaffold(
       body: SafeArea(

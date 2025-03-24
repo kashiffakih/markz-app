@@ -30,7 +30,7 @@ class _AddressPageState extends State<AddressPage> {
   @override
   Widget build(BuildContext context) {
     final UserAddressModel _userAddressModel =
-        Provider.of<UserAddressModel>(context);
+        Provider.of<UserAddressModel>(context, listen: false);
 
     var cartItems = [];
     var cartTotal = '';

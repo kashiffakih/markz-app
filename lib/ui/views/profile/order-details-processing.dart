@@ -28,9 +28,11 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
+    final AddToCartModel _addToCartModel =
+        Provider.of<AddToCartModel>(context, listen: false);
     final ConfigModel _configModel = locator<ConfigModel>();
-    final ReviewModel _reviewModel = Provider.of<ReviewModel>(context);
+    final ReviewModel _reviewModel =
+        Provider.of<ReviewModel>(context, listen: false);
 
     // print(widget.arguments['order']['id'].toString());
     double baseWidth = 360;
