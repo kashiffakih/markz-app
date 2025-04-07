@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:aadab/core/providers/add_to_cart_pr.dart';
 import 'package:aadab/core/providers/config_pr.dart';
 import 'package:aadab/core/providers/product_pr.dart';
-import 'package:aadab/core/providers/user_wallet_pr.dart';
 import 'package:aadab/core/providers/wish_list_pr.dart';
 import 'package:aadab/locator.dart';
 import 'package:aadab/ui/shared/font_sh.dart';

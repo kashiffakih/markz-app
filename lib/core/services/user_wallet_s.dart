@@ -41,7 +41,7 @@ class UserWalletService {
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
 
-    print(_responseData);
+    // print(_responseData);
     return _responseData['data'];
   }
 }

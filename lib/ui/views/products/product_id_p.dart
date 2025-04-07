@@ -1,3 +1,4 @@
+import 'package:aadab/ui/views/checkout/cart_p.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -1028,6 +1029,15 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                       ['id'],
                                                                   type,
                                                                   _CartData);
+                                                          setState(() {
+                                                            // _addToCartModel
+                                                            //     .getAddToCart(
+                                                            //         widget.arguments[
+                                                            //                 'product']
+                                                            //             ['id'],
+                                                            //         type,
+                                                            //         _CartData);
+                                                          });
                                                         }
                                                       }
                                                     },
@@ -1094,13 +1104,65 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                         TextButton(
                                                           onPressed: () async {
                                                             bool minus = false;
-                                                            await _addToCartModel
-                                                                .getAddToCart(
-                                                                    widget.arguments[
-                                                                            'product']
-                                                                        ['id'],
-                                                                    minus,
-                                                                    _CartData);
+                                                            if (_CartData[
+                                                                        'kindOfFlower'] ==
+                                                                    '' ||
+                                                                _CartData[
+                                                                        'flavour'] ==
+                                                                    '') {
+                                                              showDialog(
+                                                                context:
+                                                                    context,
+                                                                builder: (BuildContext
+                                                                        context) =>
+                                                                    AlertDialog(
+                                                                  shape: RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              20)),
+                                                                  title: _CartData['kindOfFlower'] ==
+                                                                              '' &&
+                                                                          _CartData['flavour'] !=
+                                                                              ''
+                                                                      ? Text(
+                                                                          "kindly choose size.")
+                                                                      : _CartData['flavour'] == '' &&
+                                                                              _CartData['kindOfFlower'] !=
+                                                                                  ''
+                                                                          ? Text(
+                                                                              "kindly choose colour.")
+                                                                          : Text(
+                                                                              "kindly choose colour and size."),
+                                                                  actions: <Widget>[
+                                                                    TextButton(
+                                                                      onPressed:
+                                                                          () {
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                      },
+                                                                      child:
+                                                                          Text(
+                                                                        'Ok',
+                                                                        style: TextStyle(
+                                                                            color:
+                                                                                Colors.black,
+                                                                            fontSize: 16),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              );
+                                                            } else {
+                                                              await _addToCartModel
+                                                                  .getAddToCart(
+                                                                      widget.arguments[
+                                                                              'product']
+                                                                          [
+                                                                          'id'],
+                                                                      minus,
+                                                                      _CartData);
+                                                              setState(() {});
+                                                            }
                                                           },
                                                           style: TextButton
                                                               .styleFrom(
@@ -1162,14 +1224,65 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                         TextButton(
                                                           onPressed: () async {
                                                             bool type = true;
-
-                                                            await _addToCartModel
-                                                                .getAddToCart(
-                                                                    widget.arguments[
-                                                                            'product']
-                                                                        ['id'],
-                                                                    type,
-                                                                    _CartData);
+                                                            if (_CartData[
+                                                                        'kindOfFlower'] ==
+                                                                    '' ||
+                                                                _CartData[
+                                                                        'flavour'] ==
+                                                                    '') {
+                                                              showDialog(
+                                                                context:
+                                                                    context,
+                                                                builder: (BuildContext
+                                                                        context) =>
+                                                                    AlertDialog(
+                                                                  shape: RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              20)),
+                                                                  title: _CartData['kindOfFlower'] ==
+                                                                              '' &&
+                                                                          _CartData['flavour'] !=
+                                                                              ''
+                                                                      ? Text(
+                                                                          "kindly choose size.")
+                                                                      : _CartData['flavour'] == '' &&
+                                                                              _CartData['kindOfFlower'] !=
+                                                                                  ''
+                                                                          ? Text(
+                                                                              "kindly choose colour.")
+                                                                          : Text(
+                                                                              "kindly choose colour and size."),
+                                                                  actions: <Widget>[
+                                                                    TextButton(
+                                                                      onPressed:
+                                                                          () {
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                      },
+                                                                      child:
+                                                                          Text(
+                                                                        'Ok',
+                                                                        style: TextStyle(
+                                                                            color:
+                                                                                Colors.black,
+                                                                            fontSize: 16),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              );
+                                                            } else {
+                                                              await _addToCartModel
+                                                                  .getAddToCart(
+                                                                      widget.arguments[
+                                                                              'product']
+                                                                          [
+                                                                          'id'],
+                                                                      type,
+                                                                      _CartData);
+                                                              setState(() {});
+                                                            }
                                                           },
                                                           style: TextButton
                                                               .styleFrom(
@@ -2273,7 +2386,14 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                 //             'product']['id'],
                                 //         type,
                                 //         _CartData);
-                                Navigator.pushNamed(context, '/cartPage');
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CartPage(
+                                        isProfile: {'isProfile': false}),
+                                  ),
+                                );
+                                // Navigator.pushNamed(context, '/cartPage', arguments: 'isProfile': false);
                               }
                             },
                             style: TextButton.styleFrom(
@@ -2323,8 +2443,16 @@ class _ProductIdPageState extends State<ProductIdPage> {
                           child: TextButton(
                             onPressed: () async {
                               _formKey.currentState!.save();
-                              bool type = true;
-                              Navigator.pushNamed(context, '/cartPage');
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      CartPage(isProfile: {'isProfile': false}),
+                                ),
+                              );
+                              // bool type = true;
+                              // Navigator.pushNamed(context, '/cartPage');
 
                               // if (_CartData['kindOfFlower'] == '' ||
                               //     _CartData['flavour'] == '') {

@@ -36,8 +36,8 @@ class AuthService {
       {@required Map<String, dynamic>? registerData}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
-    print('Register Data');
-    print(registerData);
+    // print('Register Data');
+    // print(registerData);
 
     http.Response _response = await http.post(
       Uri.parse('${_apiConfig['baseURL']}/register-user'),
@@ -46,7 +46,7 @@ class AuthService {
     );
 
     Map<String, dynamic> _responseData = json.decode(_response.body);
-    print(_response.body);
+    // print(_response.body);
     if (_responseData['success']) {
       var roleId;
       roleId = registerData!['role'] == 'Distributor' ? 3 : 6;

@@ -196,7 +196,7 @@ class _CartPageState extends State<CartPage> {
           if (widget.isProfile['isProfile'] == true) {
             Navigator.pushNamed(context, '/profilePage');
           } else {
-            Navigator.pushReplacementNamed(context, '/homePage');
+            Navigator.pop(context);
           }
 
           return false;
@@ -241,8 +241,7 @@ class _CartPageState extends State<CartPage> {
                                       Navigator.pushNamed(
                                           context, '/profilePage');
                                     } else {
-                                      Navigator.pushReplacementNamed(
-                                          context, '/homePage');
+                                      Navigator.pop(context);
                                     }
                                   },
                                   child: Container(
@@ -870,6 +869,7 @@ class _CartPageState extends State<CartPage> {
                                                                         .id,
                                                                     minus,
                                                                     _cartData);
+                                                            setState(() {});
                                                           },
                                                           style: TextButton
                                                               .styleFrom(
@@ -922,6 +922,7 @@ class _CartPageState extends State<CartPage> {
                                                                         .id,
                                                                     type,
                                                                     _cartData);
+                                                            setState(() {});
                                                           },
                                                           style: TextButton
                                                               .styleFrom(
@@ -2005,17 +2006,16 @@ class _CartPageState extends State<CartPage> {
                                                                           0]
                                                                       .deliveryCharges
                                                                       .toString())) +
-                                                              (int.parse(_addToCartModel.cartTotal.toString()) *
-                                                                      int.parse(_configModel
-                                                                          .user!
-                                                                          .companies![0]
-                                                                          .taxPercent
-                                                                          .toString()) /
-                                                                      100)
-                                                                  .toInt() -
+                                                              int.parse(_addToCartModel.cartTotal.toString()) *
+                                                                  int.parse(_configModel
+                                                                      .user!
+                                                                      .companies![0]
+                                                                      .taxPercent
+                                                                      .toString()) ~/
+                                                                  100 -
                                                               int.parse(couponValue.toString()) -
                                                               int.parse(_userWaletModel.totaRemainingPoint.toString()) +
-                                                              (5 * int.parse(_addToCartModel.cartTotal.toString()) / 100).toInt())
+                                                              5 * int.parse(_addToCartModel.cartTotal.toString()) ~/ 100)
                                                           .toStringAsFixed(0),
                                                   textAlign: TextAlign.right,
                                                   style: MyGoogleFontStyle(

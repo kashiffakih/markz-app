@@ -312,8 +312,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                       ElevatedButton(
                                         style: ButtonStyle(
                                             backgroundColor:
-                                                MaterialStateProperty
-                                                    .all<Color>(Color.fromARGB(
+                                                WidgetStateProperty.all<Color>(
+                                                    Color.fromARGB(
                                                         255, 67, 67, 243))),
                                         onPressed: () {
                                           showDialog(
