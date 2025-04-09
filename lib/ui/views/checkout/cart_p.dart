@@ -2198,117 +2198,154 @@ class _CartPageState extends State<CartPage> {
                                       Container(
                                         width:
                                             MediaQuery.of(context).size.width,
-                                        height: 190,
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.35,
                                         child: Row(
                                           children: [
                                             Expanded(
                                               child: _productModel
-                                                      .categoryWiseproductsLoader
+                                                      .productsLoader
                                                   ? Center(
                                                       child:
                                                           LinearProgressIndicator())
                                                   : ListView.builder(
-                                                      itemCount: _productModel
-                                                          .categoryWiseproducts!
-                                                          .length,
+                                                      // padding:
+                                                      //     const EdgeInsets.only(left: 5, right: 8),
                                                       scrollDirection:
                                                           Axis.horizontal,
+                                                      shrinkWrap: true,
+                                                      itemCount: _productModel
+                                                          .products!.length,
                                                       itemBuilder:
-                                                          (BuildContext context,
-                                                                  index) =>
-                                                              InkWell(
-                                                        onTap: () {
-                                                          Navigator.of(context).push(
-                                                              MaterialPageRoute(
-                                                                  builder: (context) =>
-                                                                      ProductIdPage(
-                                                                          arguments: {
-                                                                            'product':
-                                                                                _productModel.categoryWiseproducts![index].toJson(),
-                                                                            'product_images':
-                                                                                _productModel.categoryWiseproducts![index].productImages
-                                                                          })));
-                                                        },
-                                                        child: Row(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Container(
-                                                              // margin: EdgeInsets.fromLTRB(
-                                                              //     0, 0, 0, 0),
-                                                              width: 170,
-                                                              height: 320,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            15),
-                                                              ),
-                                                              child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  Container(
-                                                                    width: double
-                                                                        .infinity,
-                                                                    height: 140,
+                                                          (context, index) {
+                                                        return Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      10),
+                                                          child: Container(
+                                                            width: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width *
+                                                                0.4,
+                                                            height: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .height *
+                                                                0.45,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          15),
+                                                            ),
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                InkWell(
+                                                                  onTap: () {
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .push(
+                                                                      MaterialPageRoute(
+                                                                        builder:
+                                                                            (context) =>
+                                                                                ProductIdPage(arguments: {
+                                                                          'product': _productModel
+                                                                              .products![index]
+                                                                              .toJson(),
+                                                                          'product_images': _productModel
+                                                                              .products![index]
+                                                                              .productImages
+                                                                        }),
+                                                                      ),
+                                                                    );
+                                                                  },
+                                                                  child:
+                                                                      Container(
+                                                                    margin: EdgeInsets.fromLTRB(
+                                                                        0 * fem,
+                                                                        0 * fem,
+                                                                        0 * fem,
+                                                                        5 * fem),
+                                                                    padding: EdgeInsets.fromLTRB(
+                                                                        106 *
+                                                                            fem,
+                                                                        13 *
+                                                                            fem,
+                                                                        14 *
+                                                                            fem,
+                                                                        15 *
+                                                                            fem),
+                                                                    width: MediaQuery.of(context)
+                                                                            .size
+                                                                            .width *
+                                                                        0.4,
+                                                                    height: MediaQuery.of(context)
+                                                                            .size
+                                                                            .height *
+                                                                        0.26,
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              15),
+                                                                      image:
+                                                                          DecorationImage(
+                                                                        fit: BoxFit
+                                                                            .contain,
+                                                                        image: NetworkImage(_configModel.apiConfig['mediaURL'] +
+                                                                            _productModel.products![index].productImages?.first.imagepath.toString()),
+                                                                      ),
+                                                                    ),
                                                                     child:
-                                                                        Stack(
-                                                                      children: [
-                                                                        Positioned(
-                                                                          // frame9SvA (318:2815)
-                                                                          left:
-                                                                              0,
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Container(
-                                                                            padding: EdgeInsets.fromLTRB(
-                                                                                106,
-                                                                                13,
-                                                                                14,
-                                                                                13),
-                                                                            width:
-                                                                                145,
-                                                                            height:
-                                                                                133,
-                                                                            decoration:
-                                                                                BoxDecoration(
-                                                                              borderRadius: BorderRadius.circular(15),
-                                                                              color: Color(0x0c000000),
-                                                                              image: DecorationImage(
-                                                                                fit: BoxFit.cover,
-                                                                                image: NetworkImage(_configModel.apiConfig['mediaURL'] + _productModel.categoryWiseproducts![index].imagepath1.toString()
-                                                                                    // 'assets/images/shades-chocolate-cake-3-1-2-1-bg.png',
-                                                                                    ),
-                                                                              ),
-                                                                            ),
-                                                                            child:
-                                                                                InkWell(
-                                                                              onTap: () async {
-                                                                                await _wishListModel.getWishLists(_productModel.categoryWiseproducts![index].id);
-                                                                              },
-                                                                              child: _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.categoryWiseproducts![index].id && wishList.userId == _configModel.user!.id).toList().length == 0
-                                                                                  ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
-                                                                                  : Align(
-                                                                                      alignment: Alignment.topRight,
-                                                                                      child: Icon(
-                                                                                        Icons.favorite_outlined,
-                                                                                        color: Colors.red,
-                                                                                      )),
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ],
+                                                                        InkWell(
+                                                                      onTap:
+                                                                          () async {
+                                                                        await _wishListModel.getWishLists(_productModel
+                                                                            .products![index]
+                                                                            .id);
+                                                                      },
+                                                                      child: _wishListModel
+                                                                              .wishListLoader
+                                                                          ? Align(
+                                                                              alignment: Alignment.topRight,
+                                                                              child: Icon(Icons.favorite_border_outlined))
+                                                                          : _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.products![index].id && wishList.userId == _configModel.user!.id).toList().length == 0
+                                                                              ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
+                                                                              : Align(
+                                                                                  alignment: Alignment.topRight,
+                                                                                  child: Icon(
+                                                                                    Icons.favorite_outlined,
+                                                                                    color: Colors.red,
+                                                                                  )),
                                                                     ),
                                                                   ),
-                                                                  Container(
+                                                                ),
+                                                                SizedBox(
+                                                                  height: 10,
+                                                                ),
+                                                                InkWell(
+                                                                  onTap: () {
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .push(MaterialPageRoute(
+                                                                            builder: (context) => ProductIdPage(arguments: {
+                                                                                  'product': _productModel.products![index].toJson(),
+                                                                                  'category': _productModel.products![index].category!.name.toString(),
+                                                                                })));
+                                                                  },
+                                                                  child:
+                                                                      Container(
                                                                     child: Text(
                                                                       _productModel
-                                                                          .categoryWiseproducts![
+                                                                          .products![
                                                                               index]
                                                                           .name
                                                                           .toString(),
@@ -2323,59 +2360,78 @@ class _CartPageState extends State<CartPage> {
                                                                             15,
                                                                         fontWeight:
                                                                             FontWeight.w700,
-                                                                        height:
-                                                                            1.2,
-                                                                        letterSpacing:
-                                                                            -0.3,
                                                                         color: Color(
                                                                             0xff000000),
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                  InkWell(
-                                                                    onTap: () {
-                                                                      Navigator.of(context).push(MaterialPageRoute(
-                                                                          builder: (context) => ProductIdPage(arguments: {
-                                                                                'product': _productModel.categoryWiseproducts![index].toJson(),
-                                                                                'product_images': _productModel.categoryWiseproducts![index].productImages
-                                                                              })));
-                                                                    },
-                                                                    child:
-                                                                        Container(
-                                                                      child: _productModel.categoryWiseproducts![index].productPrices![0].offerPrice !=
-                                                                              0
-                                                                          ? Text.rich(
-                                                                              TextSpan(children: [
+                                                                ),
+                                                                Container(
+                                                                  child: _productModel
+                                                                              .products![
+                                                                                  index]
+                                                                              .productPrices![
+                                                                                  0]
+                                                                              .offerPrice !=
+                                                                          0
+                                                                      ? Text.rich(
+                                                                          TextSpan(
+                                                                              children: [
                                                                               new TextSpan(
-                                                                                text: 'RS. ${_productModel.categoryWiseproducts![index].productPrices![0].price.toString()}',
+                                                                                text: 'RS. ${_productModel.products![index].productPrices![0].price.toString()}',
                                                                                 style: new TextStyle(
                                                                                   color: Colors.grey,
                                                                                   decoration: TextDecoration.lineThrough,
                                                                                 ),
                                                                               ),
                                                                               new TextSpan(
-                                                                                text: ' RS.${_productModel.categoryWiseproducts![index].productPrices![0].offerPrice.toString()}',
+                                                                                text: ' RS.${_productModel.products![index].productPrices![0].offerPrice.toString()}',
                                                                               ),
                                                                             ]))
-                                                                          : Text(
-                                                                              _productModel.categoryWiseproducts![index].productPrices![0].price.toString() + " " + 'RS',
-                                                                              style: MyGoogleFontStyle(
-                                                                                fontFamily: 'Poppins',
-                                                                                fontSize: 13,
-                                                                                fontWeight: FontWeight.w500,
-                                                                                height: 1.5,
-                                                                                letterSpacing: -0.2190869331,
-                                                                                color: Color(0x99000000),
-                                                                              ),
-                                                                            ),
+                                                                      : Text(
+                                                                          _productModel.products![index].productPrices![0].price.toString() +
+                                                                              " " +
+                                                                              'RS',
+                                                                          style:
+                                                                              MyGoogleFontStyle(
+                                                                            fontFamily:
+                                                                                'Poppins',
+                                                                            fontSize:
+                                                                                13,
+                                                                            fontWeight:
+                                                                                FontWeight.w500,
+                                                                            height:
+                                                                                1.5,
+                                                                            letterSpacing:
+                                                                                -0.2190869331,
+                                                                            color:
+                                                                                Color(0x99000000),
+                                                                          ),
+                                                                        ),
+                                                                ),
+                                                                if (discountPrice !=
+                                                                    0.0)
+                                                                  Center(
+                                                                    child: Text(
+                                                                      '( ${discountPrice.round()}% Off)',
+                                                                      style:
+                                                                          MyGoogleFontStyle(
+                                                                        fontFamily:
+                                                                            'Poppins',
+                                                                        fontSize:
+                                                                            12,
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        color: Color(
+                                                                            0x99000000),
+                                                                      ),
                                                                     ),
                                                                   ),
-                                                                ],
-                                                              ),
+                                                              ],
                                                             ),
-                                                          ],
-                                                        ),
-                                                      ),
+                                                          ),
+                                                        );
+                                                      },
                                                     ),
                                             )
                                           ],

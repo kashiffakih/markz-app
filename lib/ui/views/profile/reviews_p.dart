@@ -206,22 +206,24 @@ class ReviewCard extends StatelessWidget {
                     //     color: const Color(0xff232323),
                     //   ),
                     // ),
-                    if (review.rating != null || review.rating.isNotEmpty)
-                      Center(
-                        child: RatingBar.builder(
-                          itemSize: 15,
-                          initialRating: double.tryParse(review.rating) ?? 0.0,
-                          direction: Axis.horizontal,
-                          itemCount: 5,
-                          allowHalfRating: true,
-                          ignoreGestures: true,
-                          itemBuilder: (context, _) => const Icon(
-                            Icons.star,
-                            color: Colors.amber,
-                          ),
-                          onRatingUpdate: (double value) {},
-                        ),
-                      )
+                    Center(
+                      child: double.tryParse(review.rating) == null
+                          ? Text("No Rating")
+                          : RatingBar.builder(
+                              itemSize: 15,
+                              initialRating:
+                                  double.tryParse(review.rating) ?? 0.0,
+                              direction: Axis.horizontal,
+                              itemCount: 5,
+                              allowHalfRating: true,
+                              ignoreGestures: true,
+                              itemBuilder: (context, _) => const Icon(
+                                Icons.star,
+                                color: Colors.amber,
+                              ),
+                              onRatingUpdate: (double value) {},
+                            ),
+                    )
                   ],
                 ),
               ],
