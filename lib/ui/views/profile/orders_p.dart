@@ -305,7 +305,7 @@ class _OrdersPageState extends State<OrdersPage> {
                                                                                       ),
                                                                                     ),
                                                                                     TextSpan(
-                                                                                      text: _order.totalAmount.toString(),
+                                                                                      text: _order.orderCost.toString(),
                                                                                       style: MyGoogleFontStyle(
                                                                                         fontFamily: 'Poppins',
                                                                                         fontWeight: FontWeight.w700,

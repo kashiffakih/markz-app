@@ -39,6 +39,18 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
 
+    String reverseGstCalculation = '';
+
+    widget.arguments['order']['order_details'].forEach((element) {
+      // if (element['product']['gst'] != null) {
+      double price =
+          double.parse(widget.arguments['order']['order_cost'].toString());
+      double gstAmount = (price / 105) * 100;
+      double totalPrice = price - gstAmount;
+      reverseGstCalculation = totalPrice.round().toString();
+      // print("Reverse GST Calculation: ${(reverseGstCalculation)}");
+      // }
+    });
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -660,10 +672,16 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                                     Text(
                                       'RS' +
                                           ' ' +
-                                          widget.arguments['order']
-                                                  ['order_details'][index]
-                                                  ['order_detail_cost']
+                                          ((widget.arguments['order']
+                                                              ['order_details']
+                                                          [index]
+                                                      ['order_detail_cost'] /
+                                                  105 *
+                                                  100))
+                                              .round()
                                               .toString(),
+
+                                      // .toString(),,
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
                                         fontSize: 12 * ffem,
@@ -712,7 +730,10 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                               child: Text(
                                 'RS' +
                                     ' ' +
-                                    widget.arguments['order']['order_cost']
+                                    (widget.arguments['order']['order_cost'] /
+                                            105 *
+                                            100)
+                                        .round()
                                         .toString(),
                                 style: MyGoogleFontStyle(
                                   fontFamily: 'Urbanist',
@@ -756,12 +777,7 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                                 child: Text(
                                   'RS' +
                                       ' ' +
-                                      (2.5 *
-                                              int.parse(widget
-                                                  .arguments['order']
-                                                      ['order_cost']
-                                                  .toString()) /
-                                              100)
+                                      (int.parse(reverseGstCalculation) ~/ 2)
                                           .toString(),
                                   style: MyGoogleFontStyle(
                                     fontFamily: 'Urbanist',
@@ -805,12 +821,7 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                                 child: Text(
                                   'RS' +
                                       ' ' +
-                                      (2.5 *
-                                              int.parse(widget
-                                                  .arguments['order']
-                                                      ['order_cost']
-                                                  .toString()) /
-                                              100)
+                                      (int.parse(reverseGstCalculation) ~/ 2)
                                           .toString(),
                                   style: MyGoogleFontStyle(
                                     fontFamily: 'Urbanist',
@@ -854,12 +865,7 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                                 child: Text(
                                   'RS' +
                                       ' ' +
-                                      (5 *
-                                              int.parse(widget
-                                                  .arguments['order']
-                                                      ['order_cost']
-                                                  .toString()) /
-                                              100)
+                                      (int.parse(reverseGstCalculation))
                                           .toString(),
                                   style: MyGoogleFontStyle(
                                     fontFamily: 'Urbanist',
@@ -991,7 +997,7 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                             Text(
                               'RS' +
                                   ' ' +
-                                  widget.arguments['order']['total_amount']
+                                  widget.arguments['order']['order_cost']
                                       .toString(),
                               style: MyGoogleFontStyle(
                                 fontFamily: 'Urbanist',

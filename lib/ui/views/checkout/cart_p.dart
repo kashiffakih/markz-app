@@ -1702,8 +1702,18 @@ class _CartPageState extends State<CartPage> {
                                                 Text(
                                                   'RS' +
                                                       ' ' +
-                                                      _addToCartModel.cartTotal
-                                                          .toString(),
+                                                      (int.parse(_addToCartModel
+                                                                  .cartTotal
+                                                                  .toString()) -
+                                                              (int.parse(_addToCartModel
+                                                                      .cartTotal
+                                                                      .toString()) -
+                                                                  (int.parse(_addToCartModel
+                                                                          .cartTotal
+                                                                          .toString()) /
+                                                                      105 *
+                                                                      100)))
+                                                          .toStringAsFixed(2),
                                                   textAlign: TextAlign.right,
                                                   style: MyGoogleFontStyle(
                                                     fontFamily: 'Inter',
@@ -1761,12 +1771,17 @@ class _CartPageState extends State<CartPage> {
                                                   Text(
                                                     'RS' +
                                                         ' ' +
-                                                        (2.5 *
-                                                                int.parse(_addToCartModel
-                                                                    .cartTotal
-                                                                    .toString()) /
-                                                                100)
-                                                            .toString(),
+                                                        ((double.parse((int.parse(_addToCartModel
+                                                                            .cartTotal
+                                                                            .toString()) -
+                                                                        (int.parse(_addToCartModel.cartTotal.toString()) /
+                                                                            105 *
+                                                                            100))
+                                                                    .toStringAsFixed(
+                                                                        2)) /
+                                                                2)
+                                                            .toStringAsFixed(
+                                                                2)),
                                                     textAlign: TextAlign.right,
                                                     style: MyGoogleFontStyle(
                                                       fontFamily: 'Inter',
@@ -1799,12 +1814,17 @@ class _CartPageState extends State<CartPage> {
                                                   Text(
                                                     'RS' +
                                                         ' ' +
-                                                        (2.5 *
-                                                                int.parse(_addToCartModel
-                                                                    .cartTotal
-                                                                    .toString()) /
-                                                                100)
-                                                            .toString(),
+                                                        ((double.parse((int.parse(_addToCartModel
+                                                                            .cartTotal
+                                                                            .toString()) -
+                                                                        (int.parse(_addToCartModel.cartTotal.toString()) /
+                                                                            105 *
+                                                                            100))
+                                                                    .toStringAsFixed(
+                                                                        2)) /
+                                                                2)
+                                                            .toStringAsFixed(
+                                                                2)),
                                                     textAlign: TextAlign.right,
                                                     style: MyGoogleFontStyle(
                                                       fontFamily: 'Inter',
@@ -1836,12 +1856,21 @@ class _CartPageState extends State<CartPage> {
                                                   Text(
                                                     'RS' +
                                                         ' ' +
-                                                        (5 *
-                                                                int.parse(_addToCartModel
+                                                        (int.parse(_addToCartModel
                                                                     .cartTotal
-                                                                    .toString()) /
-                                                                100)
-                                                            .toString(),
+                                                                    .toString()) -
+                                                                (int.parse(_addToCartModel
+                                                                        .cartTotal
+                                                                        .toString()) /
+                                                                    105 *
+                                                                    100))
+                                                            .toStringAsFixed(2),
+                                                    // (5 *
+                                                    //         int.parse(_addToCartModel
+                                                    //             .cartTotal
+                                                    //             .toString()) /
+                                                    //         100)
+                                                    // .toString(),
                                                     textAlign: TextAlign.right,
                                                     style: MyGoogleFontStyle(
                                                       fontFamily: 'Inter',
@@ -1870,7 +1899,7 @@ class _CartPageState extends State<CartPage> {
                                                   ),
                                                 ),
                                                 Text(
-                                                  'RS ${(5 * int.parse(_addToCartModel.cartTotal.toString()) / 100).toString()}',
+                                                  'RS ${(int.parse(_addToCartModel.cartTotal.toString()) - (int.parse(_addToCartModel.cartTotal.toString()) / 105 * 100)).toStringAsFixed(2)}',
                                                   textAlign: TextAlign.right,
                                                   style: MyGoogleFontStyle(
                                                     fontFamily: 'Inter',
@@ -2014,8 +2043,7 @@ class _CartPageState extends State<CartPage> {
                                                                       .toString()) ~/
                                                                   100 -
                                                               int.parse(couponValue.toString()) -
-                                                              int.parse(_userWaletModel.totaRemainingPoint.toString()) +
-                                                              5 * int.parse(_addToCartModel.cartTotal.toString()) ~/ 100)
+                                                              int.parse(_userWaletModel.totaRemainingPoint.toString()))
                                                           .toStringAsFixed(0),
                                                   textAlign: TextAlign.right,
                                                   style: MyGoogleFontStyle(

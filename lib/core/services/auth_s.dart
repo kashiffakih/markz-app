@@ -46,7 +46,7 @@ class AuthService {
     );
 
     Map<String, dynamic> _responseData = json.decode(_response.body);
-    // print(_response.body);
+    print(_response.body);
     if (_responseData['success']) {
       var roleId;
       roleId = registerData!['role'] == 'Distributor' ? 3 : 6;
