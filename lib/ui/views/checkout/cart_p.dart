@@ -1702,18 +1702,8 @@ class _CartPageState extends State<CartPage> {
                                                 Text(
                                                   'RS' +
                                                       ' ' +
-                                                      (int.parse(_addToCartModel
-                                                                  .cartTotal
-                                                                  .toString()) -
-                                                              (int.parse(_addToCartModel
-                                                                      .cartTotal
-                                                                      .toString()) -
-                                                                  (int.parse(_addToCartModel
-                                                                          .cartTotal
-                                                                          .toString()) /
-                                                                      105 *
-                                                                      100)))
-                                                          .toStringAsFixed(2),
+                                                      _addToCartModel.cartTotal
+                                                          .toString(),
                                                   textAlign: TextAlign.right,
                                                   style: MyGoogleFontStyle(
                                                     fontFamily: 'Inter',
@@ -1753,165 +1743,165 @@ class _CartPageState extends State<CartPage> {
                                             SizedBox(
                                               height: 10,
                                             ),
-                                            if (address.state == 'Maharashtra')
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                      'SGST 2.5%',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Urbanist',
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color:
-                                                            Color(0xff909090),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    'RS' +
-                                                        ' ' +
-                                                        ((double.parse((int.parse(_addToCartModel
-                                                                            .cartTotal
-                                                                            .toString()) -
-                                                                        (int.parse(_addToCartModel.cartTotal.toString()) /
-                                                                            105 *
-                                                                            100))
-                                                                    .toStringAsFixed(
-                                                                        2)) /
-                                                                2)
-                                                            .toStringAsFixed(
-                                                                2)),
-                                                    textAlign: TextAlign.right,
-                                                    style: MyGoogleFontStyle(
-                                                      fontFamily: 'Inter',
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: Color(0xff303030),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            if (address.state == 'Maharashtra')
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                            if (address.state == 'Maharashtra')
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                      'CGST 2.5%',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Urbanist',
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color:
-                                                            Color(0xff909090),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    'RS' +
-                                                        ' ' +
-                                                        ((double.parse((int.parse(_addToCartModel
-                                                                            .cartTotal
-                                                                            .toString()) -
-                                                                        (int.parse(_addToCartModel.cartTotal.toString()) /
-                                                                            105 *
-                                                                            100))
-                                                                    .toStringAsFixed(
-                                                                        2)) /
-                                                                2)
-                                                            .toStringAsFixed(
-                                                                2)),
-                                                    textAlign: TextAlign.right,
-                                                    style: MyGoogleFontStyle(
-                                                      fontFamily: 'Inter',
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: Color(0xff303030),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            SizedBox(
-                                              height: 10,
-                                            ),
-                                            if (address.state != 'Maharashtra')
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                      'IGST 5%',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Urbanist',
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color:
-                                                            Color(0xff909090),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    'RS' +
-                                                        ' ' +
-                                                        (int.parse(_addToCartModel
-                                                                    .cartTotal
-                                                                    .toString()) -
-                                                                (int.parse(_addToCartModel
-                                                                        .cartTotal
-                                                                        .toString()) /
-                                                                    105 *
-                                                                    100))
-                                                            .toStringAsFixed(2),
-                                                    // (5 *
-                                                    //         int.parse(_addToCartModel
-                                                    //             .cartTotal
-                                                    //             .toString()) /
-                                                    //         100)
-                                                    // .toString(),
-                                                    textAlign: TextAlign.right,
-                                                    style: MyGoogleFontStyle(
-                                                      fontFamily: 'Inter',
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: Color(0xff303030),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            if (address.state != 'Maharashtra')
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Text(
-                                                    'Tax Amount',
-                                                    style: MyGoogleFontStyle(
-                                                      fontFamily: 'Urbanist',
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Color(0xff909090),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Text(
-                                                  'RS ${(int.parse(_addToCartModel.cartTotal.toString()) - (int.parse(_addToCartModel.cartTotal.toString()) / 105 * 100)).toStringAsFixed(2)}',
-                                                  textAlign: TextAlign.right,
-                                                  style: MyGoogleFontStyle(
-                                                    fontFamily: 'Inter',
-                                                    fontWeight: FontWeight.w700,
-                                                    color: Color(0xff303030),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                            SizedBox(
-                                              height: 10,
-                                            ),
+                                            // if (address.state == 'Maharashtra')
+                                            //   Row(
+                                            //     children: [
+                                            //       Expanded(
+                                            //         child: Text(
+                                            //           'SGST 2.5%',
+                                            //           style: MyGoogleFontStyle(
+                                            //             fontFamily: 'Urbanist',
+                                            //             fontWeight:
+                                            //                 FontWeight.w500,
+                                            //             color:
+                                            //                 Color(0xff909090),
+                                            //           ),
+                                            //         ),
+                                            //       ),
+                                            //       Text(
+                                            //         'RS' +
+                                            //             ' ' +
+                                            //             ((double.parse((int.parse(_addToCartModel
+                                            //                                 .cartTotal
+                                            //                                 .toString()) -
+                                            //                             (int.parse(_addToCartModel.cartTotal.toString()) /
+                                            //                                 105 *
+                                            //                                 100))
+                                            //                         .toStringAsFixed(
+                                            //                             2)) /
+                                            //                     2)
+                                            //                 .toStringAsFixed(
+                                            //                     2)),
+                                            //         textAlign: TextAlign.right,
+                                            //         style: MyGoogleFontStyle(
+                                            //           fontFamily: 'Inter',
+                                            //           fontWeight:
+                                            //               FontWeight.w700,
+                                            //           color: Color(0xff303030),
+                                            //         ),
+                                            //       )
+                                            //     ],
+                                            //   ),
+                                            // if (address.state == 'Maharashtra')
+                                            //   SizedBox(
+                                            //     height: 10,
+                                            //   ),
+                                            // if (address.state == 'Maharashtra')
+                                            //   Row(
+                                            //     children: [
+                                            //       Expanded(
+                                            //         child: Text(
+                                            //           'CGST 2.5%',
+                                            //           style: MyGoogleFontStyle(
+                                            //             fontFamily: 'Urbanist',
+                                            //             fontWeight:
+                                            //                 FontWeight.w500,
+                                            //             color:
+                                            //                 Color(0xff909090),
+                                            //           ),
+                                            //         ),
+                                            //       ),
+                                            //       Text(
+                                            //         'RS' +
+                                            //             ' ' +
+                                            //             ((double.parse((int.parse(_addToCartModel
+                                            //                                 .cartTotal
+                                            //                                 .toString()) -
+                                            //                             (int.parse(_addToCartModel.cartTotal.toString()) /
+                                            //                                 105 *
+                                            //                                 100))
+                                            //                         .toStringAsFixed(
+                                            //                             2)) /
+                                            //                     2)
+                                            //                 .toStringAsFixed(
+                                            //                     2)),
+                                            //         textAlign: TextAlign.right,
+                                            //         style: MyGoogleFontStyle(
+                                            //           fontFamily: 'Inter',
+                                            //           fontWeight:
+                                            //               FontWeight.w700,
+                                            //           color: Color(0xff303030),
+                                            //         ),
+                                            //       )
+                                            //     ],
+                                            //   ),
+                                            // SizedBox(
+                                            //   height: 10,
+                                            // ),
+                                            // if (address.state != 'Maharashtra')
+                                            //   Row(
+                                            //     children: [
+                                            //       Expanded(
+                                            //         child: Text(
+                                            //           'IGST 5%',
+                                            //           style: MyGoogleFontStyle(
+                                            //             fontFamily: 'Urbanist',
+                                            //             fontWeight:
+                                            //                 FontWeight.w500,
+                                            //             color:
+                                            //                 Color(0xff909090),
+                                            //           ),
+                                            //         ),
+                                            //       ),
+                                            //       Text(
+                                            //         'RS' +
+                                            //             ' ' +
+                                            //             (int.parse(_addToCartModel
+                                            //                         .cartTotal
+                                            //                         .toString()) -
+                                            //                     (int.parse(_addToCartModel
+                                            //                             .cartTotal
+                                            //                             .toString()) /
+                                            //                         105 *
+                                            //                         100))
+                                            //                 .toStringAsFixed(2),
+                                            //         // (5 *
+                                            //         //         int.parse(_addToCartModel
+                                            //         //             .cartTotal
+                                            //         //             .toString()) /
+                                            //         //         100)
+                                            //         // .toString(),
+                                            //         textAlign: TextAlign.right,
+                                            //         style: MyGoogleFontStyle(
+                                            //           fontFamily: 'Inter',
+                                            //           fontWeight:
+                                            //               FontWeight.w700,
+                                            //           color: Color(0xff303030),
+                                            //         ),
+                                            //       )
+                                            //     ],
+                                            //   ),
+                                            // if (address.state != 'Maharashtra')
+                                            //   SizedBox(
+                                            //     height: 10,
+                                            //   ),
+                                            // Row(
+                                            //   children: [
+                                            //     Expanded(
+                                            //       child: Text(
+                                            //         'Tax Amount',
+                                            //         style: MyGoogleFontStyle(
+                                            //           fontFamily: 'Urbanist',
+                                            //           fontWeight:
+                                            //               FontWeight.w500,
+                                            //           color: Color(0xff909090),
+                                            //         ),
+                                            //       ),
+                                            //     ),
+                                            //     Text(
+                                            //       'RS ${(int.parse(_addToCartModel.cartTotal.toString()) - (int.parse(_addToCartModel.cartTotal.toString()) / 105 * 100)).toStringAsFixed(2)}',
+                                            //       textAlign: TextAlign.right,
+                                            //       style: MyGoogleFontStyle(
+                                            //         fontFamily: 'Inter',
+                                            //         fontWeight: FontWeight.w700,
+                                            //         color: Color(0xff303030),
+                                            //       ),
+                                            //     )
+                                            //   ],
+                                            // ),
+                                            // SizedBox(
+                                            //   height: 10,
+                                            // ),
                                             Row(
                                               children: [
                                                 Expanded(

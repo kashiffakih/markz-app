@@ -673,12 +673,8 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
                                       'RS' +
                                           ' ' +
                                           ((widget.arguments['order']
-                                                              ['order_details']
-                                                          [index]
-                                                      ['order_detail_cost'] /
-                                                  105 *
-                                                  100))
-                                              .round()
+                                                      ['order_details'][index]
+                                                  ['order_detail_cost']))
                                               .toString(),
 
                                       // .toString(),,

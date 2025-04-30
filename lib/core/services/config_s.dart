@@ -20,8 +20,7 @@ class ConfigService {
       'responseType': 'json',
       'baseURL': url! + '/api',
       // 'mediaURL': url! + '/storage/',
-      'mediaURL':
-          'https://az-do-bucket-1.blr1.cdn.digitaloceanspaces.com/Aadab/',
+      'mediaURL': 'https://blr1.vultrobjects.com/space-1/Aadab/',
     };
   }
 
