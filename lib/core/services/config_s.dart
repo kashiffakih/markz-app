@@ -51,7 +51,7 @@ class ConfigService {
     _loginMap['email'] = '';
     _loginMap['phone'] = '';
     _loginMap['api_token'] = '';
-    // _loginMap = {};
+    _loginMap = {};
     _prefs.setString('loginData', json.encode(_loginMap));
   }
 }

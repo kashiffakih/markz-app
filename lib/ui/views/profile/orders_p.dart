@@ -25,7 +25,9 @@ class _OrdersPageState extends State<OrdersPage> {
     setState(() {
       _isPageLoading = true;
     });
-    Provider.of<OrderModel>(context, listen: false).getOrder();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Provider.of<OrderModel>(context, listen: false).getOrder();
+    });
     setState(() {
       _isPageLoading = false;
     });
@@ -54,52 +56,42 @@ class _OrdersPageState extends State<OrdersPage> {
                 children: [
                   // Title
                   Container(
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 10),
                     width: double.infinity,
-                    padding: EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
-                      // crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        InkWell(
-                          onTap: () {
-                            if (widget.isProfile['isProfile'] == true) {
+                        IconButton(
+                          icon: const Icon(
+                            Icons.arrow_back_ios,
+                            size: 18,
+                            color: Color(0xffEED056),
+                          ),
+                          onPressed: () {
+                            final isProfile =
+                                widget.isProfile?['isProfile'] ?? false;
+                            if (isProfile) {
                               Navigator.pushNamed(context, '/profilePage');
                             } else {
                               Navigator.pushReplacementNamed(
                                   context, '/homePage');
                             }
                           },
-                          child: Container(
-                            width: 15,
-                            height: 15,
-                            child: Icon(
-                              Icons.arrow_back_ios,
-                              size: 18,
-                              color: Color(0xffEED056),
+                        ),
+                        Expanded(
+                          child: Text(
+                            'Orders',
+                            textAlign: TextAlign.center,
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xff1e232c),
                             ),
                           ),
                         ),
-                        SizedBox(
-                          width: 100,
-                        ),
-                        Center(
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Center(
-                              child: Text(
-                                'Orders',
-                                textAlign: TextAlign.center,
-                                style: MyGoogleFontStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xff1e232c),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                        const SizedBox(width: 48),
                       ],
                     ),
                   ),

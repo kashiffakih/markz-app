@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+// import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 // import 'package:get_ip_address/get_ip_address.dart';
@@ -30,69 +30,6 @@ class _LoginPageState extends State<LoginPage> {
     // initPlatformState();
     fetchLoginData();
   }
-
-  // // Platform messages are asynchronous, so we initialize in an async method.
-  // Future<void> initPlatformState() async {
-  //   // try {
-  //   //   /// Initialize Ip Address
-  //   //   var ipAddress = IpAddress(type: RequestType.json);
-
-  //   //   /// Get the IpAddress based on requestType.
-  //   //   dynamic data = await ipAddress.getIp();
-  //   //   print(data.toString());
-  //   // } on IpAddressException catch (exception) {
-  //   //   /// Handle the exception.
-  //   //   print(exception.message);
-  //   // }
-  //   try {
-  //     if (Platform.isAndroid) {
-  //       _deviceData = _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
-  //     } else if (Platform.isIOS) {
-  //       _deviceData = _readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
-  //     } else if (Platform.isLinux) {
-  //       _deviceData = _readLinuxDeviceInfo(await deviceInfoPlugin.linuxInfo);
-  //     } else if (Platform.isMacOS) {
-  //       _deviceData = _readMacOsDeviceInfo(await deviceInfoPlugin.macOsInfo);
-  //     } else if (Platform.isWindows) {
-  //       _deviceData =
-  //           _readWindowsDeviceInfo(await deviceInfoPlugin.windowsInfo);
-  //     }
-  //   } on PlatformException {
-  //     _deviceData = <String, dynamic>{
-  //       'Error:': 'Failed to get platform version.'
-  //     };
-  //   }
-
-  //   String? identifier =
-  //       _deviceData['manufacturer'] + ' ' + _deviceData['model'];
-
-  //   loginData = Map.of(loginData);
-  //   loginData['imei_no'] = identifier;
-
-  //   print(loginData);
-  // }
-
-  // GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
-
-  // Future<void> _handleSignIn() async {
-  //   try {
-  //     final GoogleSignInAccount? gUser = await _googleSignIn.signIn();
-  //     // print(gUser);
-  //     final GoogleSignInAuthentication gAuth = await gUser!.authentication;
-  //     print(gAuth);
-  //     final credential = GoogleAuthProvider.credential(
-  //       accessToken: gAuth.accessToken,
-  //       idToken: gAuth.idToken,
-  //     );
-  //     // print(credential);
-  //     var user = await FirebaseAuth.instance.signInWithCredential(credential);
-  //     // print(user);
-
-  //     // Handle successful sign-in
-  //   } catch (error) {
-  //     print('Google Sign-In Error: $error');
-  //   }
-  // }
 
   bool _obscurePassword = true;
 
@@ -133,6 +70,7 @@ class _LoginPageState extends State<LoginPage> {
     double ffem = fem * 0.97;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.fromLTRB(6, 36, 6, 80),
@@ -179,9 +117,7 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                 ),
-                SizedBox(
-                  height: 30,
-                ),
+                SizedBox(height: 30),
                 Container(
                   child: Text(
                     'Hello! Welcome Back',
@@ -194,11 +130,8 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 30,
-                ),
+                SizedBox(height: 30),
                 Container(
-                  // enteryouremailinputdtz (318:3047)
                   margin: EdgeInsets.fromLTRB(
                       20 * fem, 0 * fem, 20 * fem, 10 * fem),
                   width: double.infinity,
@@ -240,7 +173,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 Container(
-                  // enteryourpasswordinputSbY (318:3044)
                   margin: EdgeInsets.fromLTRB(
                       20 * fem, 0 * fem, 20 * fem, 10 * fem),
                   width: double.infinity,
@@ -311,7 +243,7 @@ class _LoginPageState extends State<LoginPage> {
                     height: 52 * fem,
                     shape: RoundedRectangleBorder(
                         borderRadius:
-                            new BorderRadius.circular(7.6632652283 * fem)),
+                            BorderRadius.circular(7.6632652283 * fem)),
                     minWidth: MediaQuery.of(context).size.width * .8,
                     color: Color(0xff0f0f0f),
                     onPressed: () async {
@@ -323,10 +255,7 @@ class _LoginPageState extends State<LoginPage> {
                         _loginData['role'] = widget.argument['role'];
                         await authModel.login(loginData: _loginData);
                         if (_configModel.isLoggedIn) {
-                          Navigator.pushReplacementNamed(
-                            context,
-                            '/',
-                          );
+                          Navigator.pushReplacementNamed(context, '/');
                         } else {
                           showDialog(
                             context: context,
@@ -346,7 +275,6 @@ class _LoginPageState extends State<LoginPage> {
                           );
                         }
                       }
-
                       setState(() {
                         _isLoading = false;
                       });
@@ -416,52 +344,191 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                 ),
-                InkWell(
-                  onTap: () {
-                    {
-                      FacebookAuth.instance
-                          .login(
-                              //   permissions: [
-                              //   "public_profile",
-                              //   "email"
-                              // ]
-                              )
-                          .then((value) {
-                        FacebookAuth.instance
-                            .getUserData()
-                            .then((userData) async {
-                          // print(userData);
-                          // print(userData['email']);
+                Container(
+                  margin: EdgeInsets.only(left: 20, right: 20, bottom: 10),
+                  child: Row(
+                    children: [
+                      // Expanded(
+                      //   child: InkWell(
+                      //     onTap: () async {
+                      //       try {
+                      //         setState(() {
+                      //           _isLoading = true;
+                      //         });
+                      //         await FacebookAuth.instance.login();
+                      //         final userData =
+                      //             await FacebookAuth.instance.getUserData();
+                      //         _loginData['email'] = userData['email'];
+                      //         _loginData['password'] = '123456';
+                      //         _loginData['role'] = widget.argument['role'];
 
-                          setState(() {
-                            _isLoading = true;
-                          });
-                          _loginData['email'] = userData['email'];
-                          _loginData['is_social_login'] = true;
-                          _loginData['social_login_name'] = "FACEBOOK";
-                          debugPrint('Gmail Login : ${_loginData}');
-                          var authModel =
-                              Provider.of<AuthModel>(context, listen: false);
-                          await authModel.login(loginData: _loginData);
-                          if (_configModel.isLoggedIn) {
-                            Navigator.pushReplacementNamed(
-                              context,
-                              '/',
-                            );
-                          }
-                        });
-                      });
-                    }
-                  },
-                  child: Container(
-                    margin: EdgeInsets.only(left: 20, right: 20, bottom: 10),
-                    child: Row(
-                      children: [
-                        Expanded(
+                      //         _loginData['is_social_login'] = true;
+                      //         _loginData['social_login_name'] = "FACEBOOK";
+                      //         var authModel = Provider.of<AuthModel>(context,
+                      //             listen: false);
+                      //         await authModel.login(loginData: _loginData);
+                      //         if (_configModel.isLoggedIn) {
+                      //           Navigator.pushReplacementNamed(context, '/');
+                      //         } else {
+                      //           showDialog(
+                      //             context: context,
+                      //             builder: (context) => AlertDialog(
+                      //               shape: RoundedRectangleBorder(
+                      //                 borderRadius: BorderRadius.circular(20),
+                      //               ),
+                      //               title: Text('Facebook Login Failed'),
+                      //               content:
+                      //                   Text(_configModel.loginFailedMessage),
+                      //               actions: [
+                      //                 TextButton(
+                      //                   onPressed: () => Navigator.pop(context),
+                      //                   child: Text('OK'),
+                      //                 ),
+                      //               ],
+                      //             ),
+                      //           );
+                      //         }
+                      //       } catch (e) {
+                      //         print('Facebook Sign-In Error: $e');
+                      //         showDialog(
+                      //           context: context,
+                      //           builder: (context) => AlertDialog(
+                      //             shape: RoundedRectangleBorder(
+                      //               borderRadius: BorderRadius.circular(20),
+                      //             ),
+                      //             title: Text('Facebook Sign-In Failed'),
+                      //             content: Text('An error occurred: $e'),
+                      //             actions: [
+                      //               TextButton(
+                      //                 onPressed: () => Navigator.pop(context),
+                      //                 child: Text('OK'),
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         );
+                      //       } finally {
+                      //         setState(() {
+                      //           _isLoading = false;
+                      //         });
+                      //       }
+                      //     },
+                      //     child: Container(
+                      //       margin: EdgeInsets.all(5),
+                      //       padding: EdgeInsets.fromLTRB(31.47 * fem,
+                      //           15.08 * fem, 36.19 * fem, 15.08 * fem),
+                      //       decoration: BoxDecoration(
+                      //         border: Border.all(color: Color(0xffe8ecf4)),
+                      //         color: Color(0xffffffff),
+                      //         borderRadius:
+                      //             BorderRadius.circular(7.5407857895 * fem),
+                      //       ),
+                      //       child: Center(
+                      //         child: SizedBox(
+                      //           width: 11.31 * fem,
+                      //           height: 22.62 * fem,
+                      //           child: Image.asset(
+                      //             'assets/images/facebookic.png',
+                      //             width: 11.31 * fem,
+                      //             height: 22.62 * fem,
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () async {
+                            try {
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              final googleSignIn =
+                                  GoogleSignIn(scopes: ['email']);
+                              final googleAccount = await googleSignIn.signIn();
+                              if (googleAccount == null) {
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                                return;
+                              }
+                              final googleAuth =
+                                  await googleAccount.authentication;
+                              final credential = GoogleAuthProvider.credential(
+                                accessToken: googleAuth.accessToken,
+                                idToken: googleAuth.idToken,
+                              );
+                              final userCredential = await FirebaseAuth.instance
+                                  .signInWithCredential(credential);
+                              if (userCredential.user != null) {
+                                _loginData['email'] =
+                                    userCredential.user!.email;
+                                _loginData['is_social_login'] = true;
+                                _loginData['password'] = '123456';
+                                _loginData['role'] = widget.argument['role'];
+                                _loginData['social_login_name'] = "GOOGLE";
+                                var authModel = Provider.of<AuthModel>(context,
+                                    listen: false);
+                                await authModel.login(loginData: _loginData);
+                                if (_configModel.isLoggedIn) {
+                                  Navigator.pushReplacementNamed(context, '/');
+                                } else {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      title: Text('Google Login Failed'),
+                                      content:
+                                          Text(_configModel.loginFailedMessage),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: Text('OK'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }
+                              }
+                            } catch (e) {
+                              String errorMessage =
+                                  'An error occurred during Google Sign-In';
+                              if (e is FirebaseAuthException) {
+                                errorMessage =
+                                    'Firebase Auth Error: ${e.code} - ${e.message}';
+                              } else {
+                                errorMessage = 'Error: $e';
+                              }
+                              print(errorMessage);
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  title: Text('Google Sign-In Failed'),
+                                  content: Text(errorMessage),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: Text('OK'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            } finally {
+                              setState(() {
+                                _isLoading = false;
+                              });
+                            }
+                          },
                           child: Container(
                             margin: EdgeInsets.all(5),
-                            padding: EdgeInsets.fromLTRB(31.47 * fem,
-                                15.08 * fem, 36.19 * fem, 15.08 * fem),
+                            padding: EdgeInsets.fromLTRB(30.99 * fem,
+                                15.25 * fem, 35.7 * fem, 15.25 * fem),
                             decoration: BoxDecoration(
                               border: Border.all(color: Color(0xffe8ecf4)),
                               color: Color(0xffffffff),
@@ -470,111 +537,21 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             child: Center(
                               child: SizedBox(
-                                width: 11.31 * fem,
-                                height: 22.62 * fem,
+                                width: 22.28 * fem,
+                                height: 22.28 * fem,
                                 child: Image.asset(
-                                  'assets/images/facebookic.png',
-                                  width: 11.31 * fem,
-                                  height: 52.62 * fem,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: InkWell(
-                            onTap: () async {
-                              // _handleSignIn();
-                              {
-                                final googleAccount =
-                                    await GoogleSignIn().signIn();
-                                final googleAuth =
-                                    await googleAccount?.authentication;
-
-                                final credential =
-                                    GoogleAuthProvider.credential(
-                                  accessToken: googleAuth?.accessToken,
-                                  idToken: googleAuth?.idToken,
-                                );
-
-                                final userCredential = await FirebaseAuth
-                                    .instance
-                                    .signInWithCredential(credential);
-
-                                // print(userCredential.user?.email);
-
-                                setState(() {
-                                  _isLoading = true;
-                                });
-
-                                _loginData['email'] =
-                                    userCredential.user?.email;
-                                _loginData['is_social_login'] = true;
-                                _loginData['social_login_name'] = "GOOGLE";
-
-                                var authModel = Provider.of<AuthModel>(context,
-                                    listen: false);
-                                await authModel.login(loginData: _loginData);
-                                if (_configModel.isLoggedIn) {
-                                  Navigator.pushReplacementNamed(
-                                    context,
-                                    '/',
-                                  );
-                                }
-                              }
-                            },
-                            child: Container(
-                              margin: EdgeInsets.all(5),
-                              padding: EdgeInsets.fromLTRB(30.99 * fem,
-                                  15.25 * fem, 35.7 * fem, 15.25 * fem),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Color(0xffe8ecf4)),
-                                color: Color(0xffffffff),
-                                borderRadius:
-                                    BorderRadius.circular(7.5407857895 * fem),
-                              ),
-                              child: Center(
-                                child: SizedBox(
+                                  'assets/images/googleic-3Lc.png',
                                   width: 22.28 * fem,
                                   height: 22.28 * fem,
-                                  child: Image.asset(
-                                    'assets/images/googleic-3Lc.png',
-                                    width: 22.28 * fem,
-                                    height: 22.28 * fem,
-                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                        // Expanded(
-                        //   child: Container(
-                        //     padding: EdgeInsets.fromLTRB(30.88 * fem,
-                        //         14.14 * fem, 35.59 * fem, 14.14 * fem),
-                        //     decoration: BoxDecoration(
-                        //       border: Border.all(color: Color(0xffe8ecf4)),
-                        //       color: Color(0xffffffff),
-                        //       borderRadius:
-                        //           BorderRadius.circular(7.5407857895 * fem),
-                        //     ),
-                        //     child: Center(
-                        //       child: SizedBox(
-                        //         width: 24.51 * fem,
-                        //         height: 24.51 * fem,
-                        //         child: Image.asset(
-                        //           'assets/images/cib-apple-KaY.png',
-                        //           width: 24.51 * fem,
-                        //           height: 24.51 * fem,
-                        //         ),
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-                // Text(_platformVersion),
                 InkWell(
                   onTap: () {
                     Navigator.pushNamed(context, '/registerPage',
@@ -618,28 +595,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                //  SizedBox(
-                //   height: 30,
-                // ),
-                // InkWell(
-                //   onTap: () {
-
-                //     Navigator.pushNamed(context, '/homePage');
-                //   },
-                //   child: Container(
-                //   child: Text(
-                //     'Skip for now',
-                //     textAlign: TextAlign.center,
-                //     style: MyGoogleFontStyle(
-                //       fontFamily: 'Urbanist',
-                //       fontSize: 16,
-
-                //       fontWeight: FontWeight.bold,
-                //       color: Color(0xff1e232c),
-                //     ),
-                //   ),
-                // ),
-                // ),
               ],
             ),
           ),

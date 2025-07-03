@@ -8,6 +8,8 @@ import 'package:aadab/locator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:image_picker/image_picker.dart';
+
 class AuthService {
   final ConfigModel _configModel = locator<ConfigModel>();
 
@@ -170,6 +172,7 @@ class AuthService {
     required File imageFile,
     required String userId,
   }) async {
+    print(imageFile.path);
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
     // Define the API endpoint for uploading the image
@@ -185,7 +188,7 @@ class AuthService {
 
       // Attach the image file to the request
       request.files.add(await http.MultipartFile.fromPath(
-        'attachment', // The key expected by the server for the file
+        'imagepath', // The key expected by the server for the file
         imageFile.path,
       ));
 
@@ -202,7 +205,7 @@ class AuthService {
         Map<String, dynamic> responseData = json.decode(responseBody.body);
         print('Image upload successful: $responseData');
         print('Image path successful: ${responseData['data']['image_path']}');
-        _configModel.updateProfileImage(responseData['data']['image_path']);
+        // _configModel.updateProfileImage(responseData['data']['image_path']);
         return {
           'success': true,
           'data': responseData,

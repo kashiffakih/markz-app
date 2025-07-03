@@ -237,7 +237,8 @@ class _CartPageState extends State<CartPage> {
                               children: [
                                 InkWell(
                                   onTap: () {
-                                    if (widget.isProfile['isProfile'] == true) {
+                                    if (widget.isProfile != null &&
+                                        widget.isProfile['isProfile'] == true) {
                                       Navigator.pushNamed(
                                           context, '/profilePage');
                                     } else {
@@ -1133,13 +1134,17 @@ class _CartPageState extends State<CartPage> {
                                     builder: (context) => PromocodesPage()),
                               );
                               // setState(() {
-                              await _couponModel.verifyCoupon(result);
+                              // print('isProfile ${result['name']}');
+
+                              await _couponModel.verifyCoupon(result['name']);
                               final firstCoupon = _couponModel.coupons![0];
                               final cartTotal = int.parse(
                                   _addToCartModel.cartTotal.toString());
 
                               setState(() {
                                 usedCoupon = firstCoupon.name.toString();
+                                // widget.isProfile['isProfile'] =
+                                //     result['isProfile'];
                               });
 
                               if (firstCoupon.minOrderValue! < cartTotal) {
@@ -1690,7 +1695,7 @@ class _CartPageState extends State<CartPage> {
                                               children: [
                                                 Expanded(
                                                   child: Text(
-                                                    'Sub Total',
+                                                    'Item total',
                                                     style: MyGoogleFontStyle(
                                                       fontFamily: 'Urbanist',
                                                       fontWeight:
@@ -1702,8 +1707,13 @@ class _CartPageState extends State<CartPage> {
                                                 Text(
                                                   'RS' +
                                                       ' ' +
-                                                      _addToCartModel.cartTotal
-                                                          .toString(),
+                                                      (((int.parse(_addToCartModel
+                                                                  .cartTotal
+                                                                  .toString()) /
+                                                              105 *
+                                                              100))
+                                                          .round()
+                                                          .toStringAsFixed(2)),
                                                   textAlign: TextAlign.right,
                                                   style: MyGoogleFontStyle(
                                                     fontFamily: 'Inter',
@@ -1743,134 +1753,137 @@ class _CartPageState extends State<CartPage> {
                                             SizedBox(
                                               height: 10,
                                             ),
-                                            // if (address.state == 'Maharashtra')
-                                            //   Row(
-                                            //     children: [
-                                            //       Expanded(
-                                            //         child: Text(
-                                            //           'SGST 2.5%',
-                                            //           style: MyGoogleFontStyle(
-                                            //             fontFamily: 'Urbanist',
-                                            //             fontWeight:
-                                            //                 FontWeight.w500,
-                                            //             color:
-                                            //                 Color(0xff909090),
-                                            //           ),
-                                            //         ),
-                                            //       ),
-                                            //       Text(
-                                            //         'RS' +
-                                            //             ' ' +
-                                            //             ((double.parse((int.parse(_addToCartModel
-                                            //                                 .cartTotal
-                                            //                                 .toString()) -
-                                            //                             (int.parse(_addToCartModel.cartTotal.toString()) /
-                                            //                                 105 *
-                                            //                                 100))
-                                            //                         .toStringAsFixed(
-                                            //                             2)) /
-                                            //                     2)
-                                            //                 .toStringAsFixed(
-                                            //                     2)),
-                                            //         textAlign: TextAlign.right,
-                                            //         style: MyGoogleFontStyle(
-                                            //           fontFamily: 'Inter',
-                                            //           fontWeight:
-                                            //               FontWeight.w700,
-                                            //           color: Color(0xff303030),
-                                            //         ),
-                                            //       )
-                                            //     ],
-                                            //   ),
-                                            // if (address.state == 'Maharashtra')
-                                            //   SizedBox(
-                                            //     height: 10,
-                                            //   ),
-                                            // if (address.state == 'Maharashtra')
-                                            //   Row(
-                                            //     children: [
-                                            //       Expanded(
-                                            //         child: Text(
-                                            //           'CGST 2.5%',
-                                            //           style: MyGoogleFontStyle(
-                                            //             fontFamily: 'Urbanist',
-                                            //             fontWeight:
-                                            //                 FontWeight.w500,
-                                            //             color:
-                                            //                 Color(0xff909090),
-                                            //           ),
-                                            //         ),
-                                            //       ),
-                                            //       Text(
-                                            //         'RS' +
-                                            //             ' ' +
-                                            //             ((double.parse((int.parse(_addToCartModel
-                                            //                                 .cartTotal
-                                            //                                 .toString()) -
-                                            //                             (int.parse(_addToCartModel.cartTotal.toString()) /
-                                            //                                 105 *
-                                            //                                 100))
-                                            //                         .toStringAsFixed(
-                                            //                             2)) /
-                                            //                     2)
-                                            //                 .toStringAsFixed(
-                                            //                     2)),
-                                            //         textAlign: TextAlign.right,
-                                            //         style: MyGoogleFontStyle(
-                                            //           fontFamily: 'Inter',
-                                            //           fontWeight:
-                                            //               FontWeight.w700,
-                                            //           color: Color(0xff303030),
-                                            //         ),
-                                            //       )
-                                            //     ],
-                                            //   ),
-                                            // SizedBox(
-                                            //   height: 10,
-                                            // ),
-                                            // if (address.state != 'Maharashtra')
-                                            //   Row(
-                                            //     children: [
-                                            //       Expanded(
-                                            //         child: Text(
-                                            //           'IGST 5%',
-                                            //           style: MyGoogleFontStyle(
-                                            //             fontFamily: 'Urbanist',
-                                            //             fontWeight:
-                                            //                 FontWeight.w500,
-                                            //             color:
-                                            //                 Color(0xff909090),
-                                            //           ),
-                                            //         ),
-                                            //       ),
-                                            //       Text(
-                                            //         'RS' +
-                                            //             ' ' +
-                                            //             (int.parse(_addToCartModel
-                                            //                         .cartTotal
-                                            //                         .toString()) -
-                                            //                     (int.parse(_addToCartModel
-                                            //                             .cartTotal
-                                            //                             .toString()) /
-                                            //                         105 *
-                                            //                         100))
-                                            //                 .toStringAsFixed(2),
-                                            //         // (5 *
-                                            //         //         int.parse(_addToCartModel
-                                            //         //             .cartTotal
-                                            //         //             .toString()) /
-                                            //         //         100)
-                                            //         // .toString(),
-                                            //         textAlign: TextAlign.right,
-                                            //         style: MyGoogleFontStyle(
-                                            //           fontFamily: 'Inter',
-                                            //           fontWeight:
-                                            //               FontWeight.w700,
-                                            //           color: Color(0xff303030),
-                                            //         ),
-                                            //       )
-                                            //     ],
-                                            //   ),
+                                            if (address.state == 'Maharashtra')
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      'SGST 2.5%',
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Urbanist',
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color:
+                                                            Color(0xff909090),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    'RS' +
+                                                        ' ' +
+                                                        ((double.parse((int.parse(_addToCartModel
+                                                                            .cartTotal
+                                                                            .toString()) -
+                                                                        (int.parse(_addToCartModel.cartTotal.toString()) /
+                                                                            105 *
+                                                                            100))
+                                                                    .round()
+                                                                    .toStringAsFixed(
+                                                                        2)) /
+                                                                2)
+                                                            .toStringAsFixed(
+                                                                2)),
+                                                    textAlign: TextAlign.right,
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Inter',
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Color(0xff303030),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            if (address.state == 'Maharashtra')
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                            if (address.state == 'Maharashtra')
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      'CGST 2.5%',
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Urbanist',
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color:
+                                                            Color(0xff909090),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    'RS' +
+                                                        ' ' +
+                                                        ((double.parse((int.parse(_addToCartModel
+                                                                            .cartTotal
+                                                                            .toString()) -
+                                                                        (int.parse(_addToCartModel.cartTotal.toString()) /
+                                                                            105 *
+                                                                            100))
+                                                                    .round()
+                                                                    .toStringAsFixed(
+                                                                        2)) /
+                                                                2)
+                                                            .toStringAsFixed(
+                                                                2)),
+                                                    textAlign: TextAlign.right,
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Inter',
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Color(0xff303030),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            if (address.state != 'Maharashtra')
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      'IGST 5%',
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Urbanist',
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color:
+                                                            Color(0xff909090),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    'RS' +
+                                                        ' ' +
+                                                        (int.parse(_addToCartModel
+                                                                    .cartTotal
+                                                                    .toString()) -
+                                                                (int.parse(_addToCartModel
+                                                                        .cartTotal
+                                                                        .toString()) /
+                                                                    105 *
+                                                                    100))
+                                                            .round()
+                                                            .toStringAsFixed(2),
+                                                    // (5 *
+                                                    //         int.parse(_addToCartModel
+                                                    //             .cartTotal
+                                                    //             .toString()) /
+                                                    //         100)
+                                                    // .toString(),
+                                                    textAlign: TextAlign.right,
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Inter',
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Color(0xff303030),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
                                             // if (address.state != 'Maharashtra')
                                             //   SizedBox(
                                             //     height: 10,
@@ -1928,72 +1941,82 @@ class _CartPageState extends State<CartPage> {
                                                 )
                                               ],
                                             ),
-                                            SizedBox(
-                                              height: 10,
-                                            ),
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Text(
-                                                    'Rewards (-)',
+                                            if (_userWaletModel
+                                                    .totaRemainingPoint !=
+                                                0)
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                            if (_userWaletModel
+                                                    .totaRemainingPoint !=
+                                                0)
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      'Rewards (-)',
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Urbanist',
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color:
+                                                            Color(0xff909090),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  if (_userWaletModel
+                                                          .totaRemainingPoint !=
+                                                      0)
+                                                    InkWell(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          _userWaletModel
+                                                              .totaRemainingPoint = 0;
+                                                        });
+                                                      },
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                right: 8.0),
+                                                        child: Text('(Remove)'),
+                                                      ),
+                                                    ),
+                                                  if (_userWaletModel
+                                                          .totaRemainingPoint !=
+                                                      0)
+                                                    InkWell(
+                                                      onTap: () async {
+                                                        await _userWaletModel
+                                                            .getMyUserWallets();
+                                                        setState(() {
+                                                          // _userWaletModel
+                                                          //         .totaRemainingPoint =
+                                                          //     _userWaletModel
+                                                          //         .totaRemainingPoint; // Not sure what this line is doing
+                                                        });
+                                                      },
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                right: 8.0),
+                                                        child: Text('(Add)'),
+                                                      ),
+                                                    ),
+                                                  Text(
+                                                    'RS ${(_userWaletModel.totaRemainingPoint)}',
+                                                    // Division by 3 directly
+                                                    textAlign: TextAlign.right,
                                                     style: MyGoogleFontStyle(
-                                                      fontFamily: 'Urbanist',
+                                                      fontFamily: 'Inter',
                                                       fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Color(0xff909090),
+                                                          FontWeight.w700,
+                                                      color: Color(0xff303030),
                                                     ),
-                                                  ),
-                                                ),
-                                                if (_userWaletModel
-                                                        .totaRemainingPoint !=
-                                                    0)
-                                                  InkWell(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        _userWaletModel
-                                                            .totaRemainingPoint = 0;
-                                                      });
-                                                    },
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              right: 8.0),
-                                                      child: Text('(Remove)'),
-                                                    ),
-                                                  ),
-                                                if (_userWaletModel
-                                                        .totaRemainingPoint ==
-                                                    0)
-                                                  InkWell(
-                                                    onTap: () async {
-                                                      await _userWaletModel
-                                                          .getMyUserWallets();
-                                                      setState(() {
-                                                        // _userWaletModel
-                                                        //         .totaRemainingPoint =
-                                                        //     _userWaletModel
-                                                        //         .totaRemainingPoint; // Not sure what this line is doing
-                                                      });
-                                                    },
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              right: 8.0),
-                                                      child: Text('(Add)'),
-                                                    ),
-                                                  ),
-                                                Text(
-                                                  'RS ${(_userWaletModel.totaRemainingPoint)}',
-                                                  // Division by 3 directly
-                                                  textAlign: TextAlign.right,
-                                                  style: MyGoogleFontStyle(
-                                                    fontFamily: 'Inter',
-                                                    fontWeight: FontWeight.w700,
-                                                    color: Color(0xff303030),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
+                                                  )
+                                                ],
+                                              ),
                                             SizedBox(
                                               height: 10,
                                             ),

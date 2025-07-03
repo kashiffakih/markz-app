@@ -1,6 +1,7 @@
 import 'package:aadab/ui/root_p.dart';
 import 'package:aadab/ui/views/checkout/cart_p.dart';
 import 'package:aadab/ui/views/profile/orders_p.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -14,7 +15,7 @@ import 'package:aadab/core/providers/user_wallet_pr.dart';
 import 'package:aadab/core/providers/wish_list_pr.dart';
 import 'package:aadab/locator.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
-import 'package:aadab/ui/views/auth/login_p.dart';
+// import 'package:aadab/ui/views/auth/login_p.dart';
 import 'package:aadab/ui/views/profile/address_p.dart';
 import 'package:aadab/ui/views/profile/widgets/photo_picker_w.dart';
 
@@ -76,42 +77,36 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   // Title
                   Container(
-                    margin: EdgeInsets.only(
-                        top: 10, left: 30, bottom: 20, right: 30),
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 10),
                     width: double.infinity,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        InkWell(
-                          onTap: () {
+                        IconButton(
+                          icon: const Icon(
+                            Icons.arrow_back_ios,
+                            size: 18,
+                            color: Color(0xffEED056),
+                          ),
+                          onPressed: () {
                             Navigator.pushReplacementNamed(
                                 context, '/homePage');
                           },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                child: Image.asset(
-                                  'assets/images/vector-GJ4.png',
-                                  height: 15,
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  'Profile',
-                                  textAlign: TextAlign.center,
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xff1e232c),
-                                  ),
-                                ),
-                              ),
-                            ],
+                        ),
+                        Expanded(
+                          child: Text(
+                            'Profile',
+                            textAlign: TextAlign.center,
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xff1e232c),
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 48),
                       ],
                     ),
                   ),
@@ -152,7 +147,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Container(
-                                    // margin: EdgeInsets.fromLTRB(5, 0, 6.34, 0),
                                     child: TextButton(
                                       onPressed: () async {
                                         showDialog(
@@ -160,35 +154,87 @@ class _ProfilePageState extends State<ProfilePage> {
                                           builder: (BuildContext context) =>
                                               AlertDialog(
                                             shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(20)),
-                                            title: Text(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            title: const Text(
                                                 'Are you sure you want to logout?'),
                                             actions: <Widget>[
                                               TextButton(
                                                 onPressed: () {
                                                   Navigator.of(context).pop();
                                                 },
-                                                child: Text('NO'),
+                                                child: const Text('NO'),
                                               ),
                                               TextButton(
                                                 onPressed: () async {
-                                                  await GoogleSignIn()
-                                                      .signOut();
-                                                  await FacebookAuth.instance
-                                                      .logOut();
-                                                  await _configModel
-                                                      .removeLoginData();
-                                                  Navigator.pushAndRemoveUntil(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            RootPage()),
-                                                    (Route<dynamic> route) =>
-                                                        false, // This removes all previous routes
-                                                  );
+                                                  try {
+                                                    // Initialize services if needed
+                                                    final GoogleSignIn
+                                                        googleSignIn =
+                                                        GoogleSignIn();
+                                                    final FacebookAuth
+                                                        facebookAuth =
+                                                        FacebookAuth.instance;
+
+                                                    // Sign out from Firebase
+                                                    await FirebaseAuth.instance
+                                                        .signOut();
+                                                    print(
+                                                        'Firebase sign-out successful');
+
+                                                    // Sign out from Google (if signed in)
+                                                    if (await googleSignIn
+                                                        .isSignedIn()) {
+                                                      await googleSignIn
+                                                          .signOut();
+                                                      print(
+                                                          'Google sign-out successful');
+                                                    }
+
+                                                    // Sign out from Facebook
+                                                    await facebookAuth.logOut();
+                                                    print(
+                                                        'Facebook sign-out successful');
+
+                                                    // Clear local login data (once)
+                                                    if (_configModel != null) {
+                                                      await _configModel
+                                                          .removeLoginData();
+                                                      print(
+                                                          'Local login data cleared');
+                                                    } else {
+                                                      print(
+                                                          'Warning: _configModel is null');
+                                                    }
+
+                                                    // Close dialog before navigation
+                                                    Navigator.of(context).pop();
+
+                                                    // Navigate to RootPage
+                                                    Navigator.of(context)
+                                                        .pushAndRemoveUntil(
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              RootPage()),
+                                                      (Route<dynamic> route) =>
+                                                          false,
+                                                    );
+                                                  } catch (e, stackTrace) {
+                                                    print(
+                                                        'Logout Error: $e\nStackTrace: $stackTrace');
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                          content: Text(
+                                                              'Failed to logout: $e')),
+                                                    );
+                                                    Navigator.of(context)
+                                                        .pop(); // Close dialog
+                                                  }
                                                 },
-                                                child: Text('YES'),
+                                                child: const Text('YES'),
                                               ),
                                             ],
                                           ),
@@ -201,7 +247,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         width: 80,
                                         height: 35,
                                         decoration: BoxDecoration(
-                                          color: Color(0xff1e1e1e),
+                                          color: const Color(0xFF1E1e1e),
                                           borderRadius:
                                               BorderRadius.circular(10),
                                         ),
@@ -209,12 +255,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                           child: Text(
                                             'Logout',
                                             textAlign: TextAlign.center,
-                                            style: MyGoogleFontStyle(
-                                              fontFamily: 'Urbanist',
-                                              fontSize: 15.1428556442,
+                                            style: TextStyle(
+                                              fontFamily: 'Roboto',
+                                              fontSize: 15.267,
                                               fontWeight: FontWeight.w700,
-                                              height: 1.4999999685,
-                                              color: Color(0xffffffff),
+                                              color: const Color(0xffffffff),
                                             ),
                                           ),
                                         ),
@@ -227,73 +272,73 @@ class _ProfilePageState extends State<ProfilePage> {
                           ],
                         ),
                         //wholesale login
-                        Container(
-                          // margin: EdgeInsets.fromLTRB(5, 0, 6.34, 0),
-                          child: TextButton(
-                            onPressed: () async {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) => AlertDialog(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20)),
-                                  title:
-                                      Text('Are you sure you want to logout?'),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text('NO'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () async {
-                                        Navigator.of(context).pop();
-                                        await GoogleSignIn().signOut();
-                                        await FacebookAuth.instance.logOut();
-                                        await _configModel.removeLoginData();
-                                        Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const LoginPage(
-                                              argument: {'role': 'Distributor'},
-                                            ),
-                                          ),
-                                          (Route<dynamic> route) => false,
-                                        );
-                                      },
-                                      child: Text('YES'),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                            ),
-                            child: Container(
-                              width: 200,
-                              height: 35,
-                              decoration: BoxDecoration(
-                                color: Color(0xff1e1e1e),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'Login As Wholesaler',
-                                  textAlign: TextAlign.center,
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 15.1428556442,
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.4999999685,
-                                    color: Color(0xffffffff),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                        // Container(
+                        //   // margin: EdgeInsets.fromLTRB(5, 0, 6.34, 0),
+                        //   child: TextButton(
+                        //     onPressed: () async {
+                        //       showDialog(
+                        //         context: context,
+                        //         builder: (BuildContext context) => AlertDialog(
+                        //           shape: RoundedRectangleBorder(
+                        //               borderRadius: BorderRadius.circular(20)),
+                        //           title:
+                        //               Text('Are you sure you want to logout?'),
+                        //           actions: <Widget>[
+                        //             TextButton(
+                        //               onPressed: () {
+                        //                 Navigator.of(context).pop();
+                        //               },
+                        //               child: Text('NO'),
+                        //             ),
+                        //             TextButton(
+                        //               onPressed: () async {
+                        //                 Navigator.of(context).pop();
+                        //                 await GoogleSignIn().signOut();
+                        //                 await FacebookAuth.instance.logOut();
+                        //                 await _configModel.removeLoginData();
+                        //                 Navigator.pushAndRemoveUntil(
+                        //                   context,
+                        //                   MaterialPageRoute(
+                        //                     builder: (context) =>
+                        //                         const LoginPage(
+                        //                       argument: {'role': 'User'},
+                        //                     ),
+                        //                   ),
+                        //                   (Route<dynamic> route) => false,
+                        //                 );
+                        //               },
+                        //               child: Text('YES'),
+                        //             ),
+                        //           ],
+                        //         ),
+                        //       );
+                        //     },
+                        //     style: TextButton.styleFrom(
+                        //       padding: EdgeInsets.zero,
+                        //     ),
+                        //     child: Container(
+                        //       width: 200,
+                        //       height: 35,
+                        //       decoration: BoxDecoration(
+                        //         color: Color(0xff1e1e1e),
+                        //         borderRadius: BorderRadius.circular(10),
+                        //       ),
+                        //       child: Center(
+                        //         child: Text(
+                        //           'Login As Wholesaler',
+                        //           textAlign: TextAlign.center,
+                        //           style: MyGoogleFontStyle(
+                        //             fontFamily: 'Urbanist',
+                        //             fontSize: 15.1428556442,
+                        //             fontWeight: FontWeight.w700,
+                        //             height: 1.4999999685,
+                        //             color: Color(0xffffffff),
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                         // My Orders
                         InkWell(
                           onTap: () {

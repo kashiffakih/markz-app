@@ -178,19 +178,19 @@ class _Splash2PageState extends State<Splash2Page> {
                 ),
                 const SizedBox(height: 30),
                 // Wholesaler Button
-                _buildButton(
-                  context,
-                  label: 'Wholesaler',
-                  backgroundColor: primaryColor,
-                  textColor: whiteColor,
-                  onPressed: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/loginPage',
-                      arguments: {'role': 'Distributor'},
-                    );
-                  },
-                ),
+                // _buildButton(
+                //   context,
+                //   label: 'Wholesaler',
+                //   backgroundColor: primaryColor,
+                //   textColor: whiteColor,
+                //   onPressed: () {
+                //     Navigator.pushNamed(
+                //       context,
+                //       '/loginPage',
+                //       arguments: {'role': 'Distributor'},
+                //     );
+                //   },
+                // ),
                 const SizedBox(height: 10),
                 // Customer Button
                 _buildOutlinedButton(

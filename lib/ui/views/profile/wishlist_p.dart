@@ -64,77 +64,50 @@ class _WishlistPageState extends State<WishlistPage> {
           child: Column(
             children: [
               Container(
-                margin: EdgeInsets.all(20),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 width: double.infinity,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Container(
-                            width: 15,
-                            height: 15,
-                            child: Icon(
-                              Icons.arrow_back_ios,
-                              size: 18,
-                              color: Color(0xffEED056),
-                            ),
-                          ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.arrow_back_ios,
+                        size: 18,
+                        color: Color(0xffEED056),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    Expanded(
+                      child: Text(
+                        'Wishlist',
+                        textAlign: TextAlign.center,
+                        style: MyGoogleFontStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xff1e232c),
                         ),
-                        const SizedBox(width: 15),
-                        InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Center(
-                            child: Text(
-                              'Wishlist',
-                              textAlign: TextAlign.center,
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Urbanist',
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xff1e232c),
-                              ),
-                            ),
-                          ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/cartPage');
+                      },
+                      child: badges.Badge(
+                        badgeContent: Text(
+                          cartCount.toString(),
+                          style: const TextStyle(color: Colors.white),
                         ),
-                        const SizedBox(width: 10),
-                        InkWell(
-                          onTap: () {
-                            Navigator.pushNamed(context, '/cartPage');
-                          },
-                          child: badges.Badge(
-                            badgeContent: Text(
-                              cartCount.toString(),
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            child: Container(
-                              width: 20,
-                              height: 20,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment
-                                    .center, // Center vertically
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Image.asset(
-                                    'assets/images/shopping_cart.png',
-                                    height: 20,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                        child: Image.asset(
+                          'assets/images/shopping_cart.png',
+                          height: 20,
+                          fit: BoxFit.cover,
                         ),
-                      ],
-                    )
+                      ),
+                    ),
                   ],
                 ),
               ),

@@ -14,11 +14,12 @@ class RootPage extends StatefulWidget {
 
 class _RootPageState extends State<RootPage> {
   authenticateUser(_, AuthModel authModel, ConfigModel configModel) async {
-    // configModel.getApiConfig(domain: 'http://192.168.0.160:8089');
+    // configModel.getApiConfig(domain: 'http://192.168.1.66:8080');
     // configModel.getApiConfig(domain: 'http://172.20.10.2:8089');
-    // configModel.getApiConfig(domain: 'http://192.168.1.46:6060');
-    configModel.getApiConfig(domain: 'http://api.aadab.aaibuzz.com');
-    print(configModel.apiConfig['baseURL']);
+    // configModel.getApiConfig(domain: 'http://192.168.0.103:8080');
+    // configModel.getApiConfig(domain: 'http://api.aadab.aaibuzz.com');
+    configModel.getApiConfig(domain: 'https://api.staging.aadab.online');
+    // print(configModel.apiConfig['baseURL']);
     await configModel.fetchLoginData();
 
     String currentAppVersion = await getPackageDetails();

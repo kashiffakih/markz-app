@@ -451,6 +451,25 @@ class _RegisterPageState extends State<RegisterPage> {
                   ],
                 ),
               ),
+
+              Container(
+                margin:
+                    EdgeInsets.fromLTRB(0 * fem, 0 * fem, 12.36 * fem, 0 * fem),
+                child: Text(
+                  'Or Register with',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 12.792224884 * ffem,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2 * ffem / fem,
+                    color: Color(0xff6a707c),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 25,
+              ),
+
               // Container(
               //   margin: EdgeInsets.only(left: 20, right: 20, bottom: 10),
               //   child: Row(
@@ -617,30 +636,30 @@ class _RegisterPageState extends State<RegisterPage> {
                   margin: EdgeInsets.only(left: 20, right: 20, bottom: 10),
                   child: Row(
                     children: [
-                      Expanded(
-                        child: Container(
-                          margin: EdgeInsets.all(5),
-                          padding: EdgeInsets.fromLTRB(31.47 * fem, 15.08 * fem,
-                              36.19 * fem, 15.08 * fem),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Color(0xffe8ecf4)),
-                            color: Color(0xffffffff),
-                            borderRadius:
-                                BorderRadius.circular(7.5407857895 * fem),
-                          ),
-                          child: Center(
-                            child: SizedBox(
-                              width: 11.31 * fem,
-                              height: 22.62 * fem,
-                              child: Image.asset(
-                                'assets/images/facebookic.png',
-                                width: 11.31 * fem,
-                                height: 52.62 * fem,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                      // Expanded(
+                      //   child: Container(
+                      //     margin: EdgeInsets.all(5),
+                      //     padding: EdgeInsets.fromLTRB(31.47 * fem, 15.08 * fem,
+                      //         36.19 * fem, 15.08 * fem),
+                      //     decoration: BoxDecoration(
+                      //       border: Border.all(color: Color(0xffe8ecf4)),
+                      //       color: Color(0xffffffff),
+                      //       borderRadius:
+                      //           BorderRadius.circular(7.5407857895 * fem),
+                      //     ),
+                      //     child: Center(
+                      //       child: SizedBox(
+                      //         width: 11.31 * fem,
+                      //         height: 22.62 * fem,
+                      //         child: Image.asset(
+                      //           'assets/images/facebookic.png',
+                      //           width: 11.31 * fem,
+                      //           height: 52.62 * fem,
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
                       Expanded(
                         child: InkWell(
                           onTap: () async {

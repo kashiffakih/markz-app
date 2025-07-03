@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:aadab/core/services/auth_s.dart';
 import 'package:aadab/locator.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AuthModel with ChangeNotifier {
   final AuthService _authService = locator<AuthService>();

@@ -26,47 +26,35 @@ class _SettingsPageState extends State<SettingsPage> {
               children: [
                 // Title
                 Container(
-                  margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                   width: double.infinity,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Container(
-                              width: 15,
-                              height: 15,
-                              child: Icon(
-                                Icons.arrow_back_ios,
-                                size: 18,
-                                color: Color(0xffEED056),
-                              ),
-                            ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.arrow_back_ios,
+                          size: 18,
+                          color: Color(0xffEED056),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      Expanded(
+                        child: Text(
+                          'Settings',
+                          textAlign: TextAlign.center,
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xff1e232c),
                           ),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 15.0),
-                              child: Center(
-                                child: Text(
-                                  'Settings',
-                                  textAlign: TextAlign.center,
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xff1e232c),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
+                        ),
+                      ),
+                      const SizedBox(width: 48),
                     ],
                   ),
                 ),

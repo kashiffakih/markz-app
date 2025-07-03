@@ -239,9 +239,9 @@ class ConfigModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateProfileImage(String newPath) {
-    user?.imagepath = newPath; // Update the user's imagePath
-    selectedImage = newPath; // Store the selected image path
-    notifyListeners();
-  }
+  // updateProfileImage(String newPath) {
+  //   user?.imagepath = newPath; // Update the user's imagePath
+  //   selectedImage = newPath; // Store the selected image path
+  //   notifyListeners();
+  // }
 }

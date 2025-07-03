@@ -39,6 +39,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
     var productId = '';
     if (widget.arguments['product'] != null) {
       productId = widget.arguments['product']['id'].toString();
+      print(productId);
     }
     if (_configModel.user != null) {
       Provider.of<AddToCartModel>(context, listen: false)
@@ -136,7 +137,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
         _CartData['kind_of_flower'] = _sizes[0]['value'];
         size = _sizes[0]['value'];
       }
-      print('sizeasd $size ');
+      print('sizeasd ${_sizes[0]['points']} ');
       if (_prices.isEmpty) {
         _prices = widget.arguments['product']['product_prices']
             .where((_price) => _price['product_pack_id'] == _sizes[0]['id'])
@@ -1701,6 +1702,38 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                           ],
                                         ),
                                       ),
+                                      // Earn Points Text
+                                      if (_productpoints != 0 ||
+                                          _productpoints != '')
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width -
+                                              50,
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                'Earn ${_productpoints} points for this product',
+                                                style: MyGoogleFontStyle(
+                                                  fontFamily: 'Urbanist',
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xFFC7B456),
+                                                ),
+                                              ),
+                                              // Divider(
+                                              //   thickness: 2,
+                                              //   color: Colors.black,
+                                              // ),
+                                              // SizedBox(
+                                              //   height: 20,
+                                              // ),
+
+                                              SizedBox(
+                                                height: 10,
+                                              )
+                                            ],
+                                          ),
+                                        ),
                                       Padding(
                                         padding: const EdgeInsets.only(
                                             left: 20.0, top: 10),
@@ -2314,37 +2347,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                     ),
                                   ),
                                 ),
-
-                                // Earn Points Text
-                                if (_productpoints != 0 ||
-                                    _productpoints != null)
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width - 50,
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          'Earn ${_productpoints} points for this product',
-                                          style: MyGoogleFontStyle(
-                                            fontFamily: 'Urbanist',
-                                            fontWeight: FontWeight.w700,
-                                            color: Color(0xff000000),
-                                          ),
-                                        ),
-                                        Divider(
-                                          thickness: 2,
-                                          color: Colors.black,
-                                        ),
-                                        // SizedBox(
-                                        //   height: 20,
-                                        // ),
-
-                                        SizedBox(
-                                          height: 10,
-                                        )
-                                      ],
-                                    ),
-                                  ),
                               ],
                             ),
                           ),

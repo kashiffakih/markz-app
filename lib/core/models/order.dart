@@ -135,7 +135,7 @@ class Order {
     banktxnid = json['banktxnid'];
     bankname = json['bankname'];
     couponAmount = json['coupon_amount'];
-    couponId = json['coupon_id'];
+    couponId = json['coupon_id'].toString();
     taxAmount = json['tax_amount'];
     packagingAmount = json['packaging_amount'];
     deliveryAmount = json['delivery_amount'];

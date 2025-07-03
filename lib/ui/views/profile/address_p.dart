@@ -55,30 +55,35 @@ class _AddressPageState extends State<AddressPage> {
               children: [
                 // Title
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                  width: double.infinity,
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      InkWell(
-                        onTap: () => Navigator.pop(context),
-                        child: const Icon(
+                      IconButton(
+                        icon: const Icon(
                           Icons.arrow_back_ios,
                           size: 18,
                           color: Color(0xffEED056),
                         ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
                       ),
-                      const Spacer(),
-                      const Text(
-                        'Addresses',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'Urbanist',
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xff1e232c),
+                      Expanded(
+                        child: Text(
+                          'Addresses',
+                          textAlign: TextAlign.center,
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xff1e232c),
+                          ),
                         ),
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 48),
                     ],
                   ),
                 ),

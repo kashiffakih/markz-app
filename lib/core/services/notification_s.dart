@@ -24,6 +24,7 @@ class NotificationService {
         _notifications.add(MyNotification.fromJson(data));
       });
     }
+    print('user notification: ${_notifications.first.toJson()}');
     return _notifications;
   }
 }

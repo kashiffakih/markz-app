@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "990776187523",
+    "project_id": "adaab-71d68",
+    "storage_bucket": "adaab-71d68.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:990776187523:android:5e1540d74b8f10a30dd9b6",
+        "android_client_info": {
+          "package_name": "org.pms.Aadab"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMaCJoVMMn5812vHGMUnx0Vsoy7DDn5Rk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

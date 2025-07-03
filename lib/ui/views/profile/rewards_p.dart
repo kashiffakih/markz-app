@@ -30,38 +30,35 @@ class _RewardsPageState extends State<RewardsPage> {
               children: [
                 // Title
                 Container(
-                  margin: EdgeInsets.all(20),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                   width: double.infinity,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      InkWell(
-                        onTap: () {
+                      IconButton(
+                        icon: const Icon(
+                          Icons.arrow_back_ios,
+                          size: 18,
+                          color: Color(0xffEED056),
+                        ),
+                        onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: Row(
-                          children: [
-                            Container(
-                              child: Image.asset(
-                                'assets/images/vector-GJ4.png',
-                                height: 15,
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                'Rewards',
-                                textAlign: TextAlign.center,
-                                style: MyGoogleFontStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xff1e232c),
-                                ),
-                              ),
-                            ),
-                          ],
+                      ),
+                      Expanded(
+                        child: Text(
+                          'Rewards',
+                          textAlign: TextAlign.center,
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xff1e232c),
+                          ),
                         ),
                       ),
+                      const SizedBox(width: 48),
                     ],
                   ),
                 ),

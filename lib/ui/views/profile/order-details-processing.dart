@@ -67,41 +67,35 @@ class OorderDetailsPageState extends State<OrderDetailsPage> {
               child: Column(
                 children: [
                   Container(
-                    margin: EdgeInsets.only(
-                        top: 10, left: 30, bottom: 20, right: 30),
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 10),
                     width: double.infinity,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        InkWell(
-                          onTap: () {
+                        IconButton(
+                          icon: const Icon(
+                            Icons.arrow_back_ios,
+                            size: 18,
+                            color: Color(0xffEED056),
+                          ),
+                          onPressed: () {
                             Navigator.pop(context);
                           },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                child: Image.asset(
-                                  'assets/images/vector-GJ4.png',
-                                  height: 15,
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  'Order Details',
-                                  textAlign: TextAlign.center,
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xff1e232c),
-                                  ),
-                                ),
-                              ),
-                            ],
+                        ),
+                        Expanded(
+                          child: Text(
+                            'Order Details',
+                            textAlign: TextAlign.center,
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xff1e232c),
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 48),
                       ],
                     ),
                   ),

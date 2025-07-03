@@ -8,7 +8,7 @@ class User {
   String? email;
   String? emailVerifiedAt;
   int? active;
-  int? phone;
+  String? phone;
   String? apiToken;
   String? gender;
   String? add1;
