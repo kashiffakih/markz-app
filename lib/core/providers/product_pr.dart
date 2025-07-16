@@ -42,10 +42,10 @@ class ProductModel with ChangeNotifier {
 
   List<Product>? get categoryWiseproducts => _categoryWiseproducts;
 
-  getCategoryWiseProduct(categoryId) async {
+  getCategoryWiseProduct(categoryId, search) async {
     categoryWiseproducts = [];
     categoryWiseproducts =
-        await _productService.getCategoryWiseProducts(categoryId);
+        await _productService.getCategoryWiseProducts(categoryId, search);
   }
 
 // List of products

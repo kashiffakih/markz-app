@@ -20,7 +20,7 @@ class ConfigService {
       'responseType': 'json',
       'baseURL': url! + '/api',
       // 'mediaURL': url! + '/storage/',
-      'mediaURL': 'https://blr1.vultrobjects.com/space-1/Aadab/',
+      'mediaURL': 'https://api.staging.aadab.online/storage/Aadab/',
     };
   }
 

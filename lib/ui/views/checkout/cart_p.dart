@@ -43,7 +43,8 @@ class _CartPageState extends State<CartPage> {
     'kindOfFlower': '',
     'flavour': '',
     'writeOnCake': '',
-    'pack': ''
+    'pack': '',
+    'is_add_to_cart': false
   };
   String usedCoupon = '';
 
@@ -62,7 +63,7 @@ class _CartPageState extends State<CartPage> {
       if (widget.arguments?['product']['category_id'] != null) {
         await Provider.of<ProductModel>(context, listen: false)
             .getCategoryWiseProduct(
-                widget.arguments?['product']['category_id']);
+                widget.arguments?['product']['category_id'], '');
       }
 
       await Provider.of<OrderModel>(context, listen: false).getOrder();
@@ -860,7 +861,9 @@ class _CartPageState extends State<CartPage> {
                                                         TextButton(
                                                           onPressed: () async {
                                                             bool minus = false;
-
+                                                            _cartData[
+                                                                    'is_add_to_cart'] =
+                                                                true;
                                                             await _addToCartModel
                                                                 .getAddToCart(
                                                                     _addToCartModel
@@ -913,7 +916,11 @@ class _CartPageState extends State<CartPage> {
                                                         TextButton(
                                                           onPressed: () async {
                                                             bool type = true;
-
+                                                            //  setState(() {
+                                                            _cartData[
+                                                                    'is_add_to_cart'] =
+                                                                true;
+                                                            //  });
                                                             await _addToCartModel
                                                                 .getAddToCart(
                                                                     _addToCartModel

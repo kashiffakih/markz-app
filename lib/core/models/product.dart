@@ -275,7 +275,7 @@ class ProductPrices {
   int? cashbackPrice;
   int? distributorPrice;
   int? distributorOfferPrice;
-  String? unit;
+  Unit? unit;
   ProductPack? productPack;
 
   ProductPrices(
@@ -311,7 +311,8 @@ class ProductPrices {
     cashbackPrice = json['cashback_price'];
     distributorPrice = json['distributor_price'];
     distributorOfferPrice = json['distributor_offer_price'];
-    unit = json['unit'];
+    unit = json['unit'] != null ? new Unit.fromJson(json['unit']) : null;
+
     productPack = json['product_pack'] != null
         ? new ProductPack.fromJson(json['product_pack'])
         : null;
@@ -333,7 +334,9 @@ class ProductPrices {
     data['cashback_price'] = this.cashbackPrice;
     data['distributor_price'] = this.distributorPrice;
     data['distributor_offer_price'] = this.distributorOfferPrice;
-    data['unit'] = this.unit;
+    if (this.unit != null) {
+      data['unit'] = this.unit!.toJson();
+    }
     if (this.productPack != null) {
       data['product_pack'] = this.productPack!.toJson();
     }

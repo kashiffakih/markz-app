@@ -10,22 +10,26 @@ class AddToCartService {
   Future<Map<String, dynamic>> getAddToCart(productId, type, [cartData]) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
     var userId = _configModel.user!.id;
-    print('Cart Payload: ${cartData!['kind_of_flower']}');
+    // print('type $type');
+
     var kindOfFlower = cartData!['kindOfFlower'] ?? cartData!['kind_of_flower'];
     var flavour = cartData!['flavour'].toString();
     var writeOnCake = cartData!['writeOnCake'].toString();
     var pack = cartData!['pack'].toString();
-    var points = cartData!['points'].toString();
-    var productPrice = cartData!['product_price'].toString();
+    var points = cartData!['points'] ?? 0;
+    var productPrice = cartData!['product_price'] ?? '';
+    var isAddToCart = cartData!['is_add_to_cart'];
+    print('Cart Data $cartData');
     print(
-        'kind_of_flower=$kindOfFlower&flavour=$flavour&write_on_cake=$writeOnCake&pack=$pack&points=$points');
+        'userId=$userId&productId=$productId&type=$type&kind_of_flower=$kindOfFlower&flavour=$flavour&write_on_cake=$writeOnCake&pack=$pack&points=$points&product_price=$productPrice&is_add_to_cart=$isAddToCart');
 
     http.Response _response = await http.get(
       Uri.parse(
-          '${_apiConfig['baseURL']}/add_to_cart?userId=$userId&productId=$productId&type=$type&kind_of_flower=$kindOfFlower&flavour=$flavour&write_on_cake=$writeOnCake&pack=$pack&points=$points&product_price=$productPrice'),
+          '${_apiConfig['baseURL']}/add_to_cart?userId=$userId&productId=$productId&type=$type&kind_of_flower=$kindOfFlower&flavour=$flavour&write_on_cake=$writeOnCake&pack=$pack&points=$points&product_price=$productPrice&is_add_to_cart=$isAddToCart'),
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
+    print('Add to cart $_responseData');
     if (_responseData['success']) {
       _addToCarts = [];
       _responseData['data'].forEach((data) {

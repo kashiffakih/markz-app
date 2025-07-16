@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:aadab/core/services/auth_s.dart';
 import 'package:aadab/locator.dart';
@@ -15,8 +16,13 @@ class AuthModel with ChangeNotifier {
     notifyListeners();
   }
 
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+
   bool get loading => _loading;
   Future<void> login({required Map<String, dynamic> loginData}) async {
+    String? token = await _firebaseMessaging.getToken();
+    loginData['fcm_token'] = token;
+    print(token);
     await _authService.getLoggedInUser(
       loginData: loginData,
     );

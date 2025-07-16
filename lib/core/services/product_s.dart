@@ -16,8 +16,8 @@ class ProductService {
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
-    print('New Arrivals');
-    print(_responseData);
+    // print('New Arrivals');
+    // print(_responseData);
     if (_responseData['success']) {
       _products = [];
       _responseData['data'].forEach((data) {
@@ -45,10 +45,11 @@ class ProductService {
 
   List<Product> _categoryWiseproducts = [];
 
-  getCategoryWiseProducts(categoryId) async {
+  getCategoryWiseProducts(categoryId, search) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
     http.Response _response = await http.get(
-      Uri.parse('${_apiConfig['baseURL']}/products?categoryId=$categoryId'),
+      Uri.parse(
+          '${_apiConfig['baseURL']}/products?categoryId=$categoryId&searchAll=$search'),
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);

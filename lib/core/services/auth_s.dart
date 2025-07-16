@@ -16,8 +16,8 @@ class AuthService {
   Future<void> getLoggedInUser(
       {@required Map<String, dynamic>? loginData}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    print('Login Data');
-    print(loginData);
+    // print('Login Data');
+    // print(loginData);
     http.Response _response = await http.post(
       Uri.parse('${_apiConfig['baseURL']}/login'),
       body: json.encode(loginData),
