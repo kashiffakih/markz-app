@@ -91,4 +91,11 @@ class AuthModel with ChangeNotifier {
     loading = false;
     return response;
   }
+
+  Future<bool> updateUser(
+      {required Map<String, dynamic> updateUserData}) async {
+    return await _authService.updateUser(
+      updateUserData: updateUserData,
+    );
+  }
 }

@@ -172,59 +172,67 @@ class AuthService {
     required File imageFile,
     required String userId,
   }) async {
-    print(imageFile.path);
+    // try {
+    // Get API configuration
+    final Map<String, dynamic> apiConfig = _configModel.apiConfig;
+
+    // Define the API endpoint
+    final String uploadUrl = '${apiConfig['baseURL']}/upload_user_photo';
+
+    // Create multipart request
+    final request = http.MultipartRequest('POST', Uri.parse(uploadUrl));
+
+    // Add userId field
+    request.fields['userid'] = userId;
+
+    // Add image file
+    final multipartFile = await http.MultipartFile.fromPath(
+      'imagepath', // Server-expected key
+      imageFile.path,
+      // contentType: mimeType,
+    );
+    request.files.add(multipartFile);
+
+    // Add headers
+    request.headers.addAll(Map<String, String>.from(apiConfig['headers']));
+
+    // Send request and get response
+    final response = await request.send();
+    final responseBody = await http.Response.fromStream(response);
+
+    final responseData = json.decode(responseBody.body);
+
+    Map<String, dynamic>? data = _configModel.user!.toJson();
+
+    data['password'] = _configModel.loginData['password'];
+    await _configModel.saveLoginData(newLoginData: data);
+    _configModel.saveUserData(responseData: responseData);
+    return {
+      'success': true,
+      'data': responseData,
+    };
+  }
+
+  Future<bool> updateUser(
+      {@required Map<String, dynamic>? updateUserData}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
-    // Define the API endpoint for uploading the image
-    final String uploadUrl =
-        '${_apiConfig['baseURL']}/upload_user_photo'; // Adjust to your actual endpoint
+    var userId = _configModel.user!.id;
+    http.Response _response = await http.patch(
+      Uri.parse('${_apiConfig['baseURL']}/users/$userId'),
+      body: json.encode(updateUserData),
+      headers: _apiConfig['headers'],
+    );
 
-    try {
-      // Create a multipart request for the image upload
-      var request = http.MultipartRequest('POST', Uri.parse(uploadUrl));
-
-      // Add the userId as a form field
-      request.fields['userid'] = userId;
-
-      // Attach the image file to the request
-      request.files.add(await http.MultipartFile.fromPath(
-        'imagepath', // The key expected by the server for the file
-        imageFile.path,
-      ));
-
-      // Add headers
-      request.headers.addAll(_apiConfig['headers']);
-
-      // Send the request
-      var response = await request.send();
-
-      // Handle the response
-      if (response.statusCode == 200) {
-        // Parse the response body
-        var responseBody = await http.Response.fromStream(response);
-        Map<String, dynamic> responseData = json.decode(responseBody.body);
-        print('Image upload successful: $responseData');
-        print('Image path successful: ${responseData['data']['image_path']}');
-        // _configModel.updateProfileImage(responseData['data']['image_path']);
-        return {
-          'success': true,
-          'data': responseData,
-          'image_path': responseData['data']['image_path']
-        };
-      } else {
-        // If the upload fails, return an error message
-        return {
-          'success': false,
-          'message':
-              'Image upload failed with status code: ${response.statusCode}',
-        };
-      }
-    } catch (e) {
-      // Handle any errors
-      return {
-        'success': false,
-        'message': 'Error uploading image API: $e',
-      };
+    Map<String, dynamic> _responseData = json.decode(_response.body);
+    print(_responseData['success']);
+    if (_responseData['success']) {
+      // Map<String, dynamic> data = updateUserData!;
+      updateUserData!['password'] = _configModel.loginData['password'];
+      await _configModel.saveLoginData(newLoginData: updateUserData);
+      _configModel.saveUserData(responseData: _responseData);
     }
+
+    return _responseData['success'];
   }
 }

@@ -47,7 +47,7 @@ class _CartPageState extends State<CartPage> {
     'is_add_to_cart': false
   };
   String usedCoupon = '';
-
+  int useWalletPoint = 0;
   // bool type = true;
   @override
   void initState() {
@@ -59,17 +59,23 @@ class _CartPageState extends State<CartPage> {
       await Provider.of<AddToCartModel>(context, listen: false)
           .getAddToCart('', '', _CartData);
       // }
+      print('Category Id ${widget.arguments?['product']}');
+      // if (widget.arguments?['product']['category_id'] != null) {
+      await Provider.of<ProductModel>(context, listen: false)
+          .getAllProducts('');
+      // }else{
 
-      if (widget.arguments?['product']['category_id'] != null) {
-        await Provider.of<ProductModel>(context, listen: false)
-            .getCategoryWiseProduct(
-                widget.arguments?['product']['category_id'], '');
-      }
+      // }
 
       await Provider.of<OrderModel>(context, listen: false).getOrder();
 
       await Provider.of<UserWalletModel>(context, listen: false)
           .getMyUserWallets();
+
+      // useWalletPoint = (Provider.of<UserWalletModel>(context, listen: false)
+      //             .totaRemainingPoint *
+      //         0.25)
+      //     .round();
 
       await Provider.of<WishListModel>(context, listen: false)
           .getWishLists(productId);
@@ -182,6 +188,7 @@ class _CartPageState extends State<CartPage> {
           address = UserAddress.fromJson(widget.arguments['address']);
         }
       }
+      useWalletPoint = (_userWaletModel.totaRemainingPoint * 0.25).round();
       print(address.add1.toString());
     });
 
@@ -390,7 +397,7 @@ class _CartPageState extends State<CartPage> {
                                                           shrinkWrap: true,
                                                           itemCount:
                                                               _productModel
-                                                                  .products!
+                                                                  .allProducts!
                                                                   .length,
                                                           itemBuilder:
                                                               (context, index) {
@@ -431,8 +438,8 @@ class _CartPageState extends State<CartPage> {
                                                                           MaterialPageRoute(
                                                                             builder: (context) =>
                                                                                 ProductIdPage(arguments: {
-                                                                              'product': _productModel.products![index].toJson(),
-                                                                              'product_images': _productModel.products![index].productImages
+                                                                              'product': _productModel.allProducts![index].toJson(),
+                                                                              'product_images': _productModel.allProducts![index].productImages
                                                                             }),
                                                                           ),
                                                                         );
@@ -466,18 +473,19 @@ class _CartPageState extends State<CartPage> {
                                                                             fit:
                                                                                 BoxFit.contain,
                                                                             image:
-                                                                                NetworkImage(_configModel.apiConfig['mediaURL'] + _productModel.products![index].productImages?.first.imagepath.toString()),
+                                                                                NetworkImage(_configModel.apiConfig['mediaURL'] + _productModel.allProducts![index].productImages?.first.imagepath.toString()),
                                                                           ),
                                                                         ),
                                                                         child:
                                                                             InkWell(
                                                                           onTap:
                                                                               () async {
-                                                                            await _wishListModel.getWishLists(_productModel.products![index].id);
+                                                                            await _wishListModel.getWishLists(_productModel.allProducts![index].id);
+                                                                            setState(() {});
                                                                           },
                                                                           child: _wishListModel.wishListLoader
                                                                               ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
-                                                                              : _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.products![index].id && wishList.userId == _configModel.user!.id).toList().length == 0
+                                                                              : _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.allProducts![index].id && wishList.userId == _configModel.user!.id).toList().length == 0
                                                                                   ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
                                                                                   : Align(
                                                                                       alignment: Alignment.topRight,
@@ -497,8 +505,8 @@ class _CartPageState extends State<CartPage> {
                                                                           () {
                                                                         Navigator.of(context).push(MaterialPageRoute(
                                                                             builder: (context) => ProductIdPage(arguments: {
-                                                                                  'product': _productModel.products![index].toJson(),
-                                                                                  'category': _productModel.products![index].category!.name.toString(),
+                                                                                  'product': _productModel.allProducts![index].toJson(),
+                                                                                  'category': _productModel.allProducts![index].category!.name.toString(),
                                                                                 })));
                                                                       },
                                                                       child:
@@ -506,7 +514,7 @@ class _CartPageState extends State<CartPage> {
                                                                         child:
                                                                             Text(
                                                                           _productModel
-                                                                              .products![index]
+                                                                              .allProducts![index]
                                                                               .name
                                                                               .toString(),
                                                                           textAlign:
@@ -526,23 +534,23 @@ class _CartPageState extends State<CartPage> {
                                                                       ),
                                                                     ),
                                                                     Container(
-                                                                      child: _productModel.products![index].productPrices![0].offerPrice !=
+                                                                      child: _productModel.allProducts![index].productPrices![0].offerPrice !=
                                                                               0
                                                                           ? Text.rich(
                                                                               TextSpan(children: [
                                                                               new TextSpan(
-                                                                                text: 'RS. ${_productModel.products![index].productPrices![0].price.toString()}',
+                                                                                text: 'RS. ${_productModel.allProducts![index].productPrices![0].price.toString()}',
                                                                                 style: new TextStyle(
                                                                                   color: Colors.grey,
                                                                                   decoration: TextDecoration.lineThrough,
                                                                                 ),
                                                                               ),
                                                                               new TextSpan(
-                                                                                text: ' RS.${_productModel.products![index].productPrices![0].offerPrice.toString()}',
+                                                                                text: ' RS.${_productModel.allProducts![index].productPrices![0].offerPrice.toString()}',
                                                                               ),
                                                                             ]))
                                                                           : Text(
-                                                                              _productModel.products![index].productPrices![0].price.toString() + " " + 'RS',
+                                                                              _productModel.allProducts![index].productPrices![0].price.toString() + " " + 'RS',
                                                                               style: MyGoogleFontStyle(
                                                                                 fontFamily: 'Poppins',
                                                                                 fontSize: 13,
@@ -1948,82 +1956,76 @@ class _CartPageState extends State<CartPage> {
                                                 )
                                               ],
                                             ),
-                                            if (_userWaletModel
-                                                    .totaRemainingPoint !=
-                                                0)
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                            if (_userWaletModel
-                                                    .totaRemainingPoint !=
-                                                0)
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                      'Rewards (-)',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Urbanist',
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color:
-                                                            Color(0xff909090),
-                                                      ),
+                                            // if (_userWaletModel
+                                            //         .totaRemainingPoint !=
+                                            //     0)
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            // if (_userWaletModel
+                                            //         .totaRemainingPoint !=
+                                            //     0)
+
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    'Rewards (-)',
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Urbanist',
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Color(0xff909090),
                                                     ),
                                                   ),
-                                                  if (_userWaletModel
-                                                          .totaRemainingPoint !=
-                                                      0)
-                                                    InkWell(
-                                                      onTap: () {
-                                                        setState(() {
-                                                          _userWaletModel
-                                                              .totaRemainingPoint = 0;
-                                                        });
-                                                      },
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                right: 8.0),
-                                                        child: Text('(Remove)'),
-                                                      ),
+                                                ),
+                                                if (useWalletPoint != 0)
+                                                  InkWell(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        _userWaletModel
+                                                            .totaRemainingPoint = 0;
+                                                      });
+                                                    },
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 8.0),
+                                                      child: Text('(Remove)'),
                                                     ),
-                                                  if (_userWaletModel
-                                                          .totaRemainingPoint !=
-                                                      0)
-                                                    InkWell(
-                                                      onTap: () async {
-                                                        await _userWaletModel
-                                                            .getMyUserWallets();
-                                                        setState(() {
-                                                          // _userWaletModel
-                                                          //         .totaRemainingPoint =
-                                                          //     _userWaletModel
-                                                          //         .totaRemainingPoint; // Not sure what this line is doing
-                                                        });
-                                                      },
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                right: 8.0),
-                                                        child: Text('(Add)'),
-                                                      ),
+                                                  ),
+                                                if (useWalletPoint == 0)
+                                                  InkWell(
+                                                    onTap: () async {
+                                                      await _userWaletModel
+                                                          .getMyUserWallets();
+                                                      setState(() {
+                                                        useWalletPoint =
+                                                            (_userWaletModel
+                                                                        .totaRemainingPoint *
+                                                                    0.25)
+                                                                .round();
+                                                      });
+                                                    },
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 8.0),
+                                                      child: Text('(Add)'),
                                                     ),
-                                                  Text(
-                                                    'RS ${(_userWaletModel.totaRemainingPoint)}',
-                                                    // Division by 3 directly
-                                                    textAlign: TextAlign.right,
-                                                    style: MyGoogleFontStyle(
-                                                      fontFamily: 'Inter',
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: Color(0xff303030),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
+                                                  ),
+                                                Text(
+                                                  'RS ${(useWalletPoint)}',
+                                                  // Division by 3 directly
+                                                  textAlign: TextAlign.right,
+                                                  style: MyGoogleFontStyle(
+                                                    fontFamily: 'Inter',
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Color(0xff303030),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
                                             SizedBox(
                                               height: 10,
                                             ),
@@ -2063,7 +2065,7 @@ class _CartPageState extends State<CartPage> {
                                                                       .toString()) ~/
                                                                   100 -
                                                               int.parse(couponValue.toString()) -
-                                                              int.parse(_userWaletModel.totaRemainingPoint.toString()))
+                                                              useWalletPoint)
                                                           .toStringAsFixed(0),
                                                   textAlign: TextAlign.right,
                                                   style: MyGoogleFontStyle(
@@ -2113,62 +2115,69 @@ class _CartPageState extends State<CartPage> {
                                                 );
                                               } else {
                                                 // Safe parsing for all numeric values
-                                                int cartTotal = int.tryParse(
-                                                        _addToCartModel
-                                                            .cartTotal
-                                                            .toString()) ??
-                                                    0;
-                                                int deliveryCharges =
-                                                    int.tryParse(_configModel
-                                                                .user!
-                                                                .companies![0]
-                                                                .deliveryCharges ??
-                                                            '0') ??
-                                                        0;
-                                                int taxPercent = int.tryParse(
-                                                        _configModel
-                                                            .user!
-                                                            .companies![0]
-                                                            .taxPercent
-                                                            .toString()) ??
-                                                    0;
-                                                int couponDiscount =
-                                                    int.tryParse(couponValue
-                                                            .toString()) ??
-                                                        0;
-                                                int deductUserWalletAmount =
-                                                    25 * cartTotal ~/ 100;
-                                                int walletPoints = 0;
-                                                if (deductUserWalletAmount >
-                                                    _userWaletModel
-                                                        .totaRemainingPoint) {
-                                                  setState(() {
-                                                    walletPoints =
-                                                        (deductUserWalletAmount -
-                                                            _userWaletModel
-                                                                .totaRemainingPoint);
-                                                  });
-                                                }
-                                                int.tryParse(_userWaletModel
-                                                        .totaRemainingPoint
-                                                        .toString()) ??
-                                                    0;
+                                                // int cartTotal = int.tryParse(
+                                                //         _addToCartModel
+                                                //             .cartTotal
+                                                //             .toString()) ??
+                                                //     0;
+                                                // int deliveryCharges =
+                                                //     int.tryParse(_configModel
+                                                //                 .user!
+                                                //                 .companies![0]
+                                                //                 .deliveryCharges ??
+                                                //             '0') ??
+                                                //         0;
+                                                // int taxPercent = int.tryParse(
+                                                //         _configModel
+                                                //             .user!
+                                                //             .companies![0]
+                                                //             .taxPercent
+                                                //             .toString()) ??
+                                                //     0;
+                                                // int couponDiscount =
+                                                //     int.tryParse(couponValue
+                                                //             .toString()) ??
+                                                //         0;
+                                                // int deductUserWalletAmount =
+                                                //     _userWaletModel
+                                                //         .totalUsedPoint;
+
+                                                // int.tryParse(_userWaletModel
+                                                //         .totaRemainingPoint
+                                                //         .toString()) ??
+                                                //     0;
 
                                                 // Calculate order cost safely
-                                                var orderCost = (cartTotal +
-                                                        deliveryCharges +
-                                                        (cartTotal /
-                                                            100 *
-                                                            taxPercent) -
-                                                        couponDiscount -
-                                                        (walletPoints) +
-                                                        (5 * cartTotal / 100))
+                                                var orderCost = (int.parse(
+                                                            _addToCartModel
+                                                                .cartTotal
+                                                                .toString()) +
+                                                        (_configModel.user!.companies![0].deliveryCharges == null
+                                                            ? 0
+                                                            : int.parse(_configModel
+                                                                .user!
+                                                                .companies![0]
+                                                                .deliveryCharges
+                                                                .toString())) +
+                                                        int.parse(_addToCartModel.cartTotal.toString()) *
+                                                            int.parse(_configModel
+                                                                .user!
+                                                                .companies![0]
+                                                                .taxPercent
+                                                                .toString()) ~/
+                                                            100 -
+                                                        int.parse(
+                                                            couponValue.toString()) -
+                                                        useWalletPoint)
                                                     .toStringAsFixed(0);
 
-                                                var userWalletUsed =
-                                                    (walletPoints)
-                                                        .toStringAsFixed(0);
+                                                // int userWalletUsed =
+                                                //     (_userWaletModel
+                                                //         .totaRemainingPoint);
                                                 var addressId = address.id;
+
+                                                // print(
+                                                //     'Wallet used ${userWalletUsed}');
 
                                                 bool response =
                                                     await _orderModel
@@ -2179,7 +2188,7 @@ class _CartPageState extends State<CartPage> {
                                                       .toString(),
                                                   addressId,
                                                   isGift,
-                                                  userWalletUsed,
+                                                  useWalletPoint,
                                                   couponId.toString(),
                                                   paymentOption,
                                                   "deliveryMethod",
@@ -2264,7 +2273,7 @@ class _CartPageState extends State<CartPage> {
                                                           Axis.horizontal,
                                                       shrinkWrap: true,
                                                       itemCount: _productModel
-                                                          .products!.length,
+                                                          .allProducts!.length,
                                                       itemBuilder:
                                                           (context, index) {
                                                         return Padding(
@@ -2306,10 +2315,10 @@ class _CartPageState extends State<CartPage> {
                                                                             (context) =>
                                                                                 ProductIdPage(arguments: {
                                                                           'product': _productModel
-                                                                              .products![index]
+                                                                              .allProducts![index]
                                                                               .toJson(),
                                                                           'product_images': _productModel
-                                                                              .products![index]
+                                                                              .allProducts![index]
                                                                               .productImages
                                                                         }),
                                                                       ),
@@ -2349,7 +2358,7 @@ class _CartPageState extends State<CartPage> {
                                                                         fit: BoxFit
                                                                             .contain,
                                                                         image: NetworkImage(_configModel.apiConfig['mediaURL'] +
-                                                                            _productModel.products![index].productImages?.first.imagepath.toString()),
+                                                                            _productModel.allProducts![index].productImages?.first.imagepath.toString()),
                                                                       ),
                                                                     ),
                                                                     child:
@@ -2357,7 +2366,7 @@ class _CartPageState extends State<CartPage> {
                                                                       onTap:
                                                                           () async {
                                                                         await _wishListModel.getWishLists(_productModel
-                                                                            .products![index]
+                                                                            .allProducts![index]
                                                                             .id);
                                                                       },
                                                                       child: _wishListModel
@@ -2365,7 +2374,7 @@ class _CartPageState extends State<CartPage> {
                                                                           ? Align(
                                                                               alignment: Alignment.topRight,
                                                                               child: Icon(Icons.favorite_border_outlined))
-                                                                          : _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.products![index].id && wishList.userId == _configModel.user!.id).toList().length == 0
+                                                                          : _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.allProducts![index].id && wishList.userId == _configModel.user!.id).toList().length == 0
                                                                               ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
                                                                               : Align(
                                                                                   alignment: Alignment.topRight,
@@ -2385,15 +2394,15 @@ class _CartPageState extends State<CartPage> {
                                                                             context)
                                                                         .push(MaterialPageRoute(
                                                                             builder: (context) => ProductIdPage(arguments: {
-                                                                                  'product': _productModel.products![index].toJson(),
-                                                                                  'category': _productModel.products![index].category!.name.toString(),
+                                                                                  'product': _productModel.allProducts![index].toJson(),
+                                                                                  'category': _productModel.allProducts![index].category!.name.toString(),
                                                                                 })));
                                                                   },
                                                                   child:
                                                                       Container(
                                                                     child: Text(
                                                                       _productModel
-                                                                          .products![
+                                                                          .allProducts![
                                                                               index]
                                                                           .name
                                                                           .toString(),
@@ -2416,7 +2425,7 @@ class _CartPageState extends State<CartPage> {
                                                                 ),
                                                                 Container(
                                                                   child: _productModel
-                                                                              .products![
+                                                                              .allProducts![
                                                                                   index]
                                                                               .productPrices![
                                                                                   0]
@@ -2426,14 +2435,14 @@ class _CartPageState extends State<CartPage> {
                                                                           TextSpan(
                                                                               children: [
                                                                               new TextSpan(
-                                                                                text: 'RS. ${_productModel.products![index].productPrices![0].price.toString()}',
+                                                                                text: 'RS. ${_productModel.allProducts![index].productPrices![0].price.toString()}',
                                                                                 style: new TextStyle(
                                                                                   color: Colors.grey,
                                                                                   decoration: TextDecoration.lineThrough,
                                                                                 ),
                                                                               ),
                                                                               new TextSpan(
-                                                                                text: ' RS.${_productModel.products![index].productPrices![0].offerPrice.toString()}',
+                                                                                text: ' RS.${_productModel.allProducts![index].productPrices![0].offerPrice.toString()}',
                                                                               ),
                                                                             ]))
                                                                       : Text(

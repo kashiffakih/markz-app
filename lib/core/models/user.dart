@@ -54,7 +54,7 @@ class User {
   List<Roles>? roles;
   List<Company>? companies;
   String? referralCode;
-  String? referedById;
+  int? referedById;
 
   User(
       {this.id,
@@ -162,7 +162,7 @@ class User {
     referredCode = json['referred_code'];
     referredCodeUser = json['referred_code_user'];
     referralCode = json['referral_code'];
-    referedById = json['refered_by_id'].toString();
+    referedById = json['refered_by_id'];
     imagepath = json['imagepath'];
     location = json['location'] != null
         ? new Location.fromJson(json['location'])

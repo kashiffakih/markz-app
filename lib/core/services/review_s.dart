@@ -9,7 +9,8 @@ class ReviewService {
   final ConfigModel _configModel = locator<ConfigModel>();
   List<Review> _reviews = [];
 
-  Future<List<Review>> getMyReviews([productId, description, rating]) async {
+  Future<List<Review>> getMyReviews(
+      [productId, description, rating, onlyFetch]) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
     var userId = _configModel.user!.id;
     // _configModel.files.forEach((imageFile) async {
@@ -55,9 +56,18 @@ class ReviewService {
     // }
     // });
 
+    print('Review $onlyFetch');
+    String query = '';
+    if (onlyFetch == true) {
+      query = 'productId=$productId';
+    } else {
+      query = 'userId=$userId&productId=$productId';
+    }
+
+    print('query $query');
+
     http.Response _response = await http.post(
-      Uri.parse(
-          '${_apiConfig['baseURL']}/review?userId=$userId&productId=$productId'),
+      Uri.parse('${_apiConfig['baseURL']}/review?$query'),
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);

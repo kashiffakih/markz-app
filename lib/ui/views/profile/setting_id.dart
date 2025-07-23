@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:aadab/core/providers/config_pr.dart';
+import 'package:aadab/locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -35,8 +37,7 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
   @override
   Widget build(BuildContext context) {
     AuthModel _userModel = Provider.of<AuthModel>(context, listen: false);
-    final AddToCartModel _addToCartModel =
-        Provider.of<AddToCartModel>(context, listen: false);
+    final ConfigModel _configModel = locator<ConfigModel>();
 
     return Scaffold(
       body: SafeArea(
@@ -214,8 +215,10 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                                 //     galleryFile.toString() != 'null'
                                 //         ? galleryFile.toString().split('/').last
                                 //         : '';
-                                bool response = await _userModel.register(
-                                    registerData: _user.toJson());
+                                _user.referedById =
+                                    _configModel.user!.referedById ?? 0;
+                                bool response = await _userModel.updateUser(
+                                    updateUserData: _user.toJson());
                                 if (response == true) {
                                   Navigator.pushNamed(context, '/settingsPage');
                                 }
@@ -267,57 +270,6 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
           ),
         ),
       ),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   elevation: 10,
-      //   iconSize: 30,
-      //   type: BottomNavigationBarType.fixed,
-      //   backgroundColor: Colors.white,
-      //   selectedItemColor: Colors.black,
-      //   unselectedItemColor: Colors.black,
-      //   selectedFontSize: 14,
-      //   unselectedFontSize: 14,
-      //   onTap: (value) async {
-      //     if (value == 0) {
-      //       Navigator.pushNamed(context, '/homePage');
-      //     }
-      //     if (value == 1) {
-      //       Navigator.pushNamed(context, '/wishlistPage');
-      //     }
-
-      //     if (value == 2) {
-      //       Map<String, dynamic> _CartData = {
-      //         'kindOfFlower': '',
-      //         'flavour': '',
-      //         'writeOnCake': '',
-      //         'pack': ''
-      //       };
-      //       await _addToCartModel.getAddToCart('', '', _CartData);
-      //       Navigator.pushNamed(context, '/cartPage');
-      //     }
-      //     if (value == 3) {
-      //       Navigator.pushNamed(context, '/profilePage');
-      //     }
-      //   },
-      //   items: const [
-      //     BottomNavigationBarItem(
-      //       label: 'Home',
-      //       icon: Iconoir(Iconoir.home_simple),
-      //       // icon: Icon(DonIcons.wap_home, size: 23),
-      //     ),
-      //     BottomNavigationBarItem(label: 'Saved', icon: Iconoir(Iconoir.heart)),
-      //     BottomNavigationBarItem(
-      //       label: 'Cart',
-      //       icon: Iconoir(Iconoir.shopping_bag),
-      //     ),
-      //     BottomNavigationBarItem(
-      //       label: 'Profile',
-      //       icon: Icon(
-      //         DonIcons.user_o,
-      //         size: 23,
-      //       ),
-      //     ),
-      //   ],
-      // ),
     );
   }
 

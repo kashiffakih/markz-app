@@ -791,6 +791,7 @@ class _HomePageState extends State<HomePage>
               onPressed: () async {
                 final message =
                     'Hello! This is my referral Code ${configModel.user?.referralCode} Redeem them to get instant discounts.';
+                print(message);
                 final whatsappUrl =
                     'whatsapp://send?text=${Uri.encodeComponent(message)}';
                 try {

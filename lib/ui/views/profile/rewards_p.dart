@@ -1,3 +1,285 @@
+// import 'package:flutter/material.dart';
+// import 'package:provider/provider.dart';
+// import 'package:aadab/core/providers/user_wallet_pr.dart';
+// import 'package:aadab/ui/shared/font_sh.dart';
+
+// class RewardsPage extends StatefulWidget {
+//   const RewardsPage({Key? key}) : super(key: key);
+
+//   @override
+//   State<RewardsPage> createState() => _RewardsPageState();
+// }
+
+// class _RewardsPageState extends State<RewardsPage> {
+//   @override
+//   void initState() {
+//     Provider.of<UserWalletModel>(context, listen: false).getMyUserWallets();
+
+//     super.initState();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final UserWalletModel _userWaletModel =
+//         Provider.of<UserWalletModel>(context, listen: false);
+//     return Scaffold(
+//       body: SafeArea(
+//         child: SingleChildScrollView(
+//           child: Container(
+//             child: Column(
+//               children: [
+//                 // Title
+//                 Container(
+//                   margin:
+//                       const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+//                   width: double.infinity,
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                     children: [
+//                       IconButton(
+//                         icon: const Icon(
+//                           Icons.arrow_back_ios,
+//                           size: 18,
+//                           color: Color(0xffEED056),
+//                         ),
+//                         onPressed: () {
+//                           Navigator.pop(context);
+//                         },
+//                       ),
+//                       Expanded(
+//                         child: Text(
+//                           'Rewards',
+//                           textAlign: TextAlign.center,
+//                           style: MyGoogleFontStyle(
+//                             fontFamily: 'Urbanist',
+//                             fontSize: 18,
+//                             fontWeight: FontWeight.bold,
+//                             color: const Color(0xff1e232c),
+//                           ),
+//                         ),
+//                       ),
+//                       const SizedBox(width: 48),
+//                     ],
+//                   ),
+//                 ),
+//                 // Body
+//                 Container(
+//                   height: MediaQuery.of(context).size.height - 150,
+//                   margin: EdgeInsets.all(20),
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.center,
+//                     children: [
+//                       // Photo and Name
+//                       Row(
+//                         mainAxisAlignment: MainAxisAlignment.center,
+//                         children: [
+//                           Container(
+//                             margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+//                             width: 80,
+//                             height: 80,
+//                             decoration: BoxDecoration(
+//                               borderRadius: BorderRadius.circular(40),
+//                               image: DecorationImage(
+//                                 fit: BoxFit.cover,
+//                                 image: AssetImage(
+//                                   'assets/images/gift-removebg-preview-1.png',
+//                                 ),
+//                               ),
+//                             ),
+//                           ),
+//                           Column(
+//                             crossAxisAlignment: CrossAxisAlignment.center,
+//                             children: [
+//                               Text(
+//                                 'Total Earned points',
+//                                 style: MyGoogleFontStyle(
+//                                   fontFamily: 'Urbanist',
+//                                   fontWeight: FontWeight.w700,
+//                                   color: Color(0xff303030),
+//                                 ),
+//                               ),
+//                               Text(
+//                                 _userWaletModel.totalEarnPoint.toString(),
+//                                 style: MyGoogleFontStyle(
+//                                   fontFamily: 'Urbanist',
+//                                   fontSize: 28,
+//                                   fontWeight: FontWeight.w700,
+//                                   color: Color(0xff000000),
+//                                 ),
+//                               ),
+//                             ],
+//                           ),
+//                         ],
+//                       ),
+//                       SizedBox(
+//                         height: 40,
+//                       ),
+
+//                       Row(
+//                         children: [
+//                           Expanded(
+//                             flex: 5,
+//                             child: Column(
+//                               crossAxisAlignment: CrossAxisAlignment.center,
+//                               children: [
+//                                 Text(
+//                                   'Total Used points',
+//                                   style: MyGoogleFontStyle(
+//                                     fontFamily: 'Urbanist',
+//                                     fontWeight: FontWeight.w700,
+//                                     color: Color(0xff303030),
+//                                   ),
+//                                 ),
+//                                 Text(
+//                                   _userWaletModel.totalUsedPoint.toString(),
+//                                   style: MyGoogleFontStyle(
+//                                     fontFamily: 'Urbanist',
+//                                     fontSize: 28,
+//                                     fontWeight: FontWeight.w700,
+//                                     color: Color(0xff000000),
+//                                   ),
+//                                 ),
+//                               ],
+//                             ),
+//                           ),
+//                           Expanded(
+//                             flex: 5,
+//                             child: Column(
+//                               crossAxisAlignment: CrossAxisAlignment.center,
+//                               children: [
+//                                 Text(
+//                                   'Remaining points',
+//                                   style: MyGoogleFontStyle(
+//                                     fontFamily: 'Urbanist',
+//                                     fontWeight: FontWeight.w700,
+//                                     color: Color(0xff303030),
+//                                   ),
+//                                 ),
+//                                 Text(
+//                                   _userWaletModel.totaRemainingPoint.toString(),
+//                                   style: MyGoogleFontStyle(
+//                                     fontFamily: 'Urbanist',
+//                                     fontSize: 28,
+//                                     fontWeight: FontWeight.w700,
+//                                     color: Color(0xff000000),
+//                                   ),
+//                                 ),
+//                               ],
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                       SizedBox(
+//                         height: 20,
+//                       ),
+
+//                       // Rewards
+//                       SizedBox(
+//                         height: MediaQuery.of(context).size.height - 350,
+//                         child: _userWaletModel.userWallets!.length == 0
+//                             ? Padding(
+//                                 padding: const EdgeInsets.all(20.0),
+//                                 child: SizedBox(
+//                                     height: 50, child: Text('No Rewards')),
+//                               )
+//                             : ListView.builder(
+//                                 itemCount: _userWaletModel.userWallets!.length,
+//                                 scrollDirection: Axis.vertical,
+//                                 itemBuilder: (context, index) {
+//                                   return Container(
+//                                     margin: EdgeInsets.only(top: 5, bottom: 5),
+//                                     padding: EdgeInsets.all(10),
+//                                     decoration: BoxDecoration(
+//                                       border:
+//                                           Border.all(color: Color(0xffc7b456)),
+//                                       color: Color(0xffffffff),
+//                                       borderRadius: BorderRadius.all(
+//                                         Radius.circular(5),
+//                                       ),
+//                                       boxShadow: [
+//                                         BoxShadow(
+//                                           color: Color(0x338a959e),
+//                                           offset: Offset(0, 7.6690645218),
+//                                           blurRadius: 19.1726608276,
+//                                         ),
+//                                       ],
+//                                     ),
+//                                     child: Row(
+//                                       children: [
+//                                         Expanded(
+//                                           child: Column(
+//                                             crossAxisAlignment:
+//                                                 CrossAxisAlignment.start,
+//                                             children: [
+//                                               Text(
+//                                                 'Order Reward ' +
+//                                                     _userWaletModel
+//                                                         .userWallets![index]
+//                                                         .source
+//                                                         .toString()
+//                                                         .split(' ')
+//                                                         .last
+//                                                         .toString(),
+//                                                 style: MyGoogleFontStyle(
+//                                                   fontFamily: 'Urbanist',
+//                                                   fontWeight: FontWeight.w700,
+//                                                   color: Color(0xff232323),
+//                                                 ),
+//                                               ),
+//                                               SizedBox(
+//                                                 height: 5,
+//                                               ),
+//                                               Text(
+//                                                 // alreadyhave10orders9Ca (I318:2511;0:1158)
+//                                                 'Order and ${_userWaletModel.userWallets![index].source}',
+//                                                 style: MyGoogleFontStyle(
+//                                                   fontFamily: 'Urbanist',
+//                                                   fontSize: 11,
+//                                                   fontWeight: FontWeight.w400,
+//                                                   color: Color(0xff909090),
+//                                                 ),
+//                                               ),
+//                                             ],
+//                                           ),
+//                                         ),
+//                                         Row(
+//                                           children: [
+//                                             Image.asset(
+//                                               'assets/images/star-9.png',
+//                                               width: 7.18,
+//                                               height: 12.92,
+//                                             ),
+//                                             SizedBox(
+//                                               width: 5,
+//                                             ),
+//                                             Text(
+//                                               '${_userWaletModel.userWallets![index].amount} Points',
+//                                               style: MyGoogleFontStyle(
+//                                                 fontFamily: 'Urbanist',
+//                                                 fontSize: 13,
+//                                                 fontWeight: FontWeight.w600,
+//                                                 color: Color(0xff000000),
+//                                               ),
+//                                             ),
+//                                           ],
+//                                         ),
+//                                       ],
+//                                     ),
+//                                   );
+//                                 }),
+//                       )
+//                     ],
+//                   ),
+//                 )
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/providers/user_wallet_pr.dart';
@@ -13,268 +295,267 @@ class RewardsPage extends StatefulWidget {
 class _RewardsPageState extends State<RewardsPage> {
   @override
   void initState() {
-    Provider.of<UserWalletModel>(context, listen: false).getMyUserWallets();
-
     super.initState();
+    // Fetch wallet data asynchronously
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<UserWalletModel>(context, listen: false).getMyUserWallets();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final UserWalletModel _userWaletModel =
-        Provider.of<UserWalletModel>(context, listen: false);
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Container(
-            child: Column(
+          child: Column(
+            children: [
+              _buildHeader(),
+              _buildBody(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              size: 18,
+              color: Color(0xFFEED056),
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
+          Expanded(
+            child: Text(
+              'Rewards',
+              textAlign: TextAlign.center,
+              style: MyGoogleFontStyle(
+                fontFamily: 'Urbanist',
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF1E232C),
+              ),
+            ),
+          ),
+          const SizedBox(width: 48), // Balance layout
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    return Consumer<UserWalletModel>(
+      builder: (context, userWalletModel, child) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _buildPointsSummary(userWalletModel),
+              const SizedBox(height: 24),
+              _buildRewardsList(userWalletModel),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPointsSummary(UserWalletModel userWalletModel) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(40),
+                image: const DecorationImage(
+                  fit: BoxFit.cover,
+                  image:
+                      AssetImage('assets/images/gift-removebg-preview-1.png'),
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Title
-                Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                  width: double.infinity,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Text(
+                  'Total Earned Points',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF303030),
+                  ),
+                ),
+                Text(
+                  userWalletModel.totalEarnPoint?.toString() ?? '0',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 28,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF000000),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 32),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Expanded(
+              child: Column(
+                children: [
+                  Text(
+                    'Total Used Points',
+                    style: MyGoogleFontStyle(
+                      fontFamily: 'Urbanist',
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF303030),
+                    ),
+                  ),
+                  Text(
+                    userWalletModel.totalUsedPoint?.toString() ?? '0',
+                    style: MyGoogleFontStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 28,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF000000),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Column(
+                children: [
+                  Text(
+                    'Remaining Points',
+                    style: MyGoogleFontStyle(
+                      fontFamily: 'Urbanist',
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF303030),
+                    ),
+                  ),
+                  Text(
+                    userWalletModel.totaRemainingPoint?.toString() ?? '0',
+                    style: MyGoogleFontStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 28,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF000000),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRewardsList(UserWalletModel userWalletModel) {
+    if (userWalletModel.userWallets!.isEmpty) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (userWalletModel.userWallets == null ||
+        userWalletModel.userWallets!.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(20.0),
+        child: Text(
+          'No Rewards Available',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      );
+    }
+
+    return SizedBox(
+      height: MediaQuery.of(context).size.height - 350,
+      child: ListView.builder(
+        itemCount: userWalletModel.userWallets!.length,
+        scrollDirection: Axis.vertical,
+        itemBuilder: (context, index) {
+          final wallet = userWalletModel.userWallets![index];
+          return Container(
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color(0xFFC7B456)),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x338A959E),
+                  offset: Offset(0, 7),
+                  blurRadius: 19,
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.arrow_back_ios,
-                          size: 18,
-                          color: Color(0xffEED056),
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      Expanded(
-                        child: Text(
-                          'Rewards',
-                          textAlign: TextAlign.center,
-                          style: MyGoogleFontStyle(
-                            fontFamily: 'Urbanist',
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xff1e232c),
-                          ),
+                      Text(
+                        'Order Reward ${wallet.source?.split(' ').last ?? ''}',
+                        style: MyGoogleFontStyle(
+                          fontFamily: 'Urbanist',
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF232323),
                         ),
                       ),
-                      const SizedBox(width: 48),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Order and ${wallet.source ?? ''}',
+                        style: MyGoogleFontStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 11,
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xFF909090),
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                // Body
-                Container(
-                  height: MediaQuery.of(context).size.height - 150,
-                  margin: EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Photo and Name
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
-                            width: 80,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(40),
-                              image: DecorationImage(
-                                fit: BoxFit.cover,
-                                image: AssetImage(
-                                  'assets/images/gift-removebg-preview-1.png',
-                                ),
-                              ),
-                            ),
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Total Earned points',
-                                style: MyGoogleFontStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xff303030),
-                                ),
-                              ),
-                              Text(
-                                _userWaletModel.totalEarnPoint.toString(),
-                                style: MyGoogleFontStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xff000000),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                Row(
+                  children: [
+                    Image.asset(
+                      'assets/images/star-9.png',
+                      width: 7.18,
+                      height: 12.92,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${wallet.amount ?? 0} Points',
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF000000),
                       ),
-                      SizedBox(
-                        height: 40,
-                      ),
-
-                      Row(
-                        children: [
-                          Expanded(
-                            flex: 5,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Total Used points',
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xff303030),
-                                  ),
-                                ),
-                                Text(
-                                  _userWaletModel.totalUsedPoint.toString(),
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xff000000),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Remaining points',
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xff303030),
-                                  ),
-                                ),
-                                Text(
-                                  _userWaletModel.totaRemainingPoint.toString(),
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xff000000),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-
-                      // Rewards
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height - 350,
-                        child: _userWaletModel.userWallets!.length == 0
-                            ? Padding(
-                                padding: const EdgeInsets.all(20.0),
-                                child: SizedBox(
-                                    height: 50, child: Text('No Rewards')),
-                              )
-                            : ListView.builder(
-                                itemCount: _userWaletModel.userWallets!.length,
-                                scrollDirection: Axis.vertical,
-                                itemBuilder: (context, index) {
-                                  return Container(
-                                    margin: EdgeInsets.only(top: 5, bottom: 5),
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      border:
-                                          Border.all(color: Color(0xffc7b456)),
-                                      color: Color(0xffffffff),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(5),
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Color(0x338a959e),
-                                          offset: Offset(0, 7.6690645218),
-                                          blurRadius: 19.1726608276,
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Order Reward ' +
-                                                    _userWaletModel
-                                                        .userWallets![index]
-                                                        .source
-                                                        .toString()
-                                                        .split(' ')
-                                                        .last
-                                                        .toString(),
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Urbanist',
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color(0xff232323),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 5,
-                                              ),
-                                              Text(
-                                                // alreadyhave10orders9Ca (I318:2511;0:1158)
-                                                'Order and ${_userWaletModel.userWallets![index].source}',
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Urbanist',
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w400,
-                                                  color: Color(0xff909090),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Row(
-                                          children: [
-                                            Image.asset(
-                                              'assets/images/star-9.png',
-                                              width: 7.18,
-                                              height: 12.92,
-                                            ),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text(
-                                              '${_userWaletModel.userWallets![index].amount} Points',
-                                              style: MyGoogleFontStyle(
-                                                fontFamily: 'Urbanist',
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w600,
-                                                color: Color(0xff000000),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }),
-                      )
-                    ],
-                  ),
-                )
+                    ),
+                  ],
+                ),
               ],
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

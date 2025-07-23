@@ -20,4 +20,10 @@ class ReviewModel with ChangeNotifier {
   getMyReviews(productId, description, rating) async {
     reviews = await _reviewService.getMyReviews(productId, description, rating);
   }
+
+  getReviews(productId) async {
+    print('ha bhai');
+    bool onlyFetch = true;
+    reviews = await _reviewService.getMyReviews(productId, '', '', onlyFetch);
+  }
 }
