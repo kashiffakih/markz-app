@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:aadab/core/providers/config_pr.dart';
-import 'package:aadab/locator.dart';
 
 class LoginRequiredPopupWidget extends StatelessWidget {
-  final ConfigModel _configModel = locator<ConfigModel>();
-
   @override
   Widget build(BuildContext context) {
     return AlertDialog(

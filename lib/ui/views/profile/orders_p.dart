@@ -1143,14 +1143,16 @@ class _OrdersPageState extends State<OrdersPage> {
     final double ffem = fem * 0.97;
 
     return Scaffold(
-      body: WillPopScope(
-        onWillPop: () async {
-          final isProfile = widget.isProfile?['isProfile'] ?? false;
-          Navigator.pushReplacementNamed(
-            context,
-            isProfile ? '/profilePage' : '/homePage',
-          );
-          return false;
+      body: PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
+          if (!didPop) {
+            final isProfile = widget.isProfile?['isProfile'] ?? false;
+            Navigator.pushReplacementNamed(
+              context,
+              isProfile ? '/profilePage' : '/homePage',
+            );
+          }
         },
         child: SafeArea(
           child: SingleChildScrollView(

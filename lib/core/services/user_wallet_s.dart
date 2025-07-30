@@ -11,6 +11,11 @@ class UserWalletService {
 
   getMyUserWallets() async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    
+    if (_configModel.user == null) {
+      return null;
+    }
+    
     var userId = _configModel.user!.id;
 
     http.Response _response = await http.get(
@@ -32,6 +37,11 @@ class UserWalletService {
 
   mapRedeemReferralCode(referralCode) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    
+    if (_configModel.user == null) {
+      return null;
+    }
+    
     var userId = _configModel.user!.id;
 
     http.Response _response = await http.get(

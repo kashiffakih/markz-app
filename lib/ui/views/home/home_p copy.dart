@@ -30,7 +30,6 @@ class _HomeCopyPageState extends State<HomeCopyPage> {
   @override
   void initState() {
     super.initState();
-    var productId = '';
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await Provider.of<ProductModel>(context, listen: false).getProduct();
       await Provider.of<ProductModel>(context, listen: false).getBanners();

@@ -13,6 +13,11 @@ class UserAddressService {
 
   getUserAddresses() async {
     Map<String, dynamic> apiConfig = _configModel.apiConfig;
+    
+    if (_configModel.user == null) {
+      return <UserAddress>[];
+    }
+    
     var userId = _configModel.user!.id;
     http.Response _response = await http.get(
       Uri.parse(apiConfig['baseURL'] + '/user_addresses?userId=$userId'),
@@ -31,6 +36,11 @@ class UserAddressService {
 
   Future<bool> saveUserAddress({@required UserAddress? userAddress}) async {
     Map<String, dynamic> apiConfig = _configModel.apiConfig;
+    
+    if (_configModel.user == null) {
+      return false;
+    }
+    
     userAddress!.userId = _configModel.user!.id;
     userAddress.isDeleted = 0;
     http.Response _response = await http.post(

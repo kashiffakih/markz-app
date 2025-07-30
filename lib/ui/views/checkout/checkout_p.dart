@@ -751,24 +751,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           margin: EdgeInsets.fromLTRB(0.89, 0, 0, 0),
                           child: TextButton(
                             onPressed: () async {
-                              var orderCost = (int.parse(widget
-                                          .arguments['cartTotal']
-                                          .toString()) +
-                                      int.parse(_configModel
-                                          .user!.companies![0].deliveryCharges
-                                          .toString()) +
-                                      (int.parse(widget.arguments['cartTotal'].toString()) /
-                                          100 *
-                                          int.parse(_configModel
-                                              .user!.companies![0].taxPercent
-                                              .toString())) +
-                                      -(int.parse(widget
-                                          .arguments['couponValue']
-                                          .toString())) -
-                                      (int.parse(_userWaletModel.totaRemainingPoint.toString()) /
-                                          1))
-                                  .toStringAsFixed(0);
-
                               var userWalletUsed = (int.parse(_userWaletModel
                                           .totaRemainingPoint
                                           .toString()) *

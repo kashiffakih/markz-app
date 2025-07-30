@@ -9,16 +9,27 @@ class AddToCartService {
   List<AddToCart> _addToCarts = [];
   Future<Map<String, dynamic>> getAddToCart(productId, type, [cartData]) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    
+    // Check if user is logged in before proceeding
+    if (_configModel.user == null) {
+      return {'addToCarts': <AddToCart>[], 'cart_total': '0'};
+    }
+    
     var userId = _configModel.user!.id;
     // print('type $type');
 
-    var kindOfFlower = cartData!['kindOfFlower'] ?? cartData!['kind_of_flower'];
-    var flavour = cartData!['flavour'].toString();
-    var writeOnCake = cartData!['writeOnCake'].toString();
-    var pack = cartData!['pack'].toString();
-    var points = cartData!['points'] ?? 0;
-    var productPrice = cartData!['product_price'] ?? '';
-    var isAddToCart = cartData!['is_add_to_cart'];
+    // Handle cart data safely
+    if (cartData == null) {
+      return {'addToCarts': <AddToCart>[], 'cart_total': '0'};
+    }
+    
+    var kindOfFlower = cartData['kindOfFlower'] ?? cartData['kind_of_flower'] ?? '';
+    var flavour = (cartData['flavour'] ?? '').toString();
+    var writeOnCake = (cartData['writeOnCake'] ?? '').toString();
+    var pack = (cartData['pack'] ?? '').toString();
+    var points = cartData['points'] ?? 0;
+    var productPrice = cartData['product_price'] ?? '';
+    var isAddToCart = cartData['is_add_to_cart'] ?? false;
     print('Cart Data $cartData');
     print(
         'userId=$userId&productId=$productId&type=$type&kind_of_flower=$kindOfFlower&flavour=$flavour&write_on_cake=$writeOnCake&pack=$pack&points=$points&product_price=$productPrice&is_add_to_cart=$isAddToCart');

@@ -8,7 +8,6 @@ import 'package:aadab/locator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:image_picker/image_picker.dart';
 
 class AuthService {
   final ConfigModel _configModel = locator<ConfigModel>();
@@ -56,7 +55,7 @@ class AuthService {
         'role_id': roleId,
         'user_id': _responseData['data']['id'],
       };
-      http.Response _responseUserRole = await http.post(
+      await http.post(
         Uri.parse('${_apiConfig['baseURL']}/role_user'),
         body: json.encode(userRole),
         headers: _apiConfig['headers'],
@@ -70,9 +69,6 @@ class AuthService {
         body: json.encode(userCompany),
         headers: _apiConfig['headers'],
       );
-
-      Map<String, dynamic> _responseUserRoleData =
-          json.decode(_responseUserRole.body);
     }
     // if (registerData!['imagepath'] != null ||
     //     registerData!['imagepath'] != 'null' ||

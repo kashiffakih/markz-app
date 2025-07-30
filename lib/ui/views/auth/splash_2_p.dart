@@ -150,7 +150,6 @@ class Splash2Page extends StatefulWidget {
 
 class _Splash2PageState extends State<Splash2Page> {
   // Define colors as constants for better maintainability
-  static const Color primaryColor = Color(0xff0f0f0f);
   static const Color borderColor = Color(0xff000000);
   static const Color whiteColor = Color(0xffffffff);
 
@@ -222,35 +221,6 @@ class _Splash2PageState extends State<Splash2Page> {
     );
   }
 
-  // Helper method for creating filled buttons
-  Widget _buildButton(BuildContext context,
-      {required String label,
-      required Color backgroundColor,
-      required Color textColor,
-      required VoidCallback onPressed}) {
-    return InkWell(
-      onTap: onPressed,
-      child: Container(
-        width: double.infinity,
-        height: 55,
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: MyGoogleFontStyle(
-              fontFamily: 'Urbanist',
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: textColor,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   // Helper method for creating outlined buttons
   Widget _buildOutlinedButton(BuildContext context,

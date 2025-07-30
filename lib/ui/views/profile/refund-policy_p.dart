@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:aadab/core/providers/add_to_cart_pr.dart';
-import 'package:aadab/core/providers/config_pr.dart';
-import 'package:aadab/locator.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 
 class RefundPolicyPage extends StatefulWidget {
@@ -15,10 +11,6 @@ class RefundPolicyPage extends StatefulWidget {
 class _RefundPolicyPageState extends State<RefundPolicyPage> {
   @override
   Widget build(BuildContext context) {
-    final ConfigModel _configModel = locator<ConfigModel>();
-    final AddToCartModel _addToCartModel =
-        Provider.of<AddToCartModel>(context, listen: false);
-
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(

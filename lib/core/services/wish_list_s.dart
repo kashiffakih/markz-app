@@ -10,7 +10,13 @@ class WishListService {
   List<WishList> _wishLists = [];
   Future<List<WishList>> getWishLists(productId) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    var userId = _configModel.user?.id;
+    
+    // Return empty list if user is not logged in
+    if (_configModel.user == null) {
+      return <WishList>[];
+    }
+    
+    var userId = _configModel.user!.id;
 
     http.Response _response = await http.get(
       Uri.parse(
@@ -29,6 +35,10 @@ class WishListService {
 
   Future<bool> addAllToCart() async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    
+    if (_configModel.user == null) {
+      return false;
+    }
     var userId = _configModel.user!.id;
 
     bool type = true;

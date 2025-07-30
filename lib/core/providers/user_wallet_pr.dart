@@ -34,7 +34,6 @@ class UserWalletModel with ChangeNotifier {
   }
 
   mapRedeemReferralCode(referralCode) async {
-    Map<String, dynamic> _response =
-        await _userWalletService.mapRedeemReferralCode(referralCode);
+    await _userWalletService.mapRedeemReferralCode(referralCode);
   }
 }

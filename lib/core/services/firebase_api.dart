@@ -1,5 +1,4 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -59,11 +58,10 @@ class FirebaseApi {
         sound: true,
       );
 
-      // Get FCM token
-      String? fcmToken;
+      // Get FCM token for potential future use
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        fcmToken = await _firebaseMessaging.getToken();
-        //print('FCM Token: $fcmToken');
+        await _firebaseMessaging.getToken();
+        //print('FCM Token obtained');
       } else {
         //print('User declined notification permissions');
       }

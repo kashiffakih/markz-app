@@ -997,10 +997,12 @@ class _ProfilePageState extends State<ProfilePage> {
     final double ffem = fem * 0.97;
 
     return Scaffold(
-      body: WillPopScope(
-        onWillPop: () async {
-          Navigator.pushReplacementNamed(context, '/homePage');
-          return false;
+      body: PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
+          if (!didPop) {
+            Navigator.pushReplacementNamed(context, '/homePage');
+          }
         },
         child: SafeArea(
           child: _isLoading
@@ -1022,8 +1024,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildHeader(
       BuildContext context, ConfigModel configModel, double fem, double ffem) {
-    final initials = getInitials(configModel.user?.firstName?.toString() ?? '');
-
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 30 * fem, vertical: 10 * fem),
       width: double.infinity,
@@ -1149,7 +1149,7 @@ class _ProfilePageState extends State<ProfilePage> {
             context: context,
             title: 'Rewards',
             subtitle:
-                'Total earn ${userWalletModel.totalEarnPoint?.toString() ?? '0'} points',
+                'Total earn ${userWalletModel.totalEarnPoint.toString()} points',
             onTap: () => Navigator.pushNamed(context, '/rewardsPage'),
             fem: fem,
             ffem: ffem,

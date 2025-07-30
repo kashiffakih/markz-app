@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/models/user_address.dart';
-import 'package:aadab/core/providers/add_to_cart_pr.dart';
 import 'package:aadab/core/providers/user_address_pr.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 import 'package:aadab/ui/views/profile/address_p.dart';
@@ -67,8 +66,6 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
   Widget build(BuildContext context) {
     final UserAddressModel _userAddressModel =
         Provider.of<UserAddressModel>(context, listen: false);
-    final AddToCartModel _addToCartModel =
-        Provider.of<AddToCartModel>(context, listen: false);
 
     var cartItems = [];
     var cartTotal = '';

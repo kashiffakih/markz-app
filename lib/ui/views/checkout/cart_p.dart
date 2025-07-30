@@ -196,18 +196,18 @@ class _CartPageState extends State<CartPage> {
 
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
-    double ffem = fem * 0.97;
 
     return Scaffold(
-      body: WillPopScope(
-        onWillPop: () async {
-          if (widget.isProfile['isProfile'] == true) {
-            Navigator.pushNamed(context, '/profilePage');
-          } else {
-            Navigator.pop(context);
+      body: PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
+          if (!didPop) {
+            if (widget.isProfile['isProfile'] == true) {
+              Navigator.pushNamed(context, '/profilePage');
+            } else {
+              Navigator.pop(context);
+            }
           }
-
-          return false;
         },
         child: SafeArea(
           child: SingleChildScrollView(
@@ -2147,29 +2147,6 @@ class _CartPageState extends State<CartPage> {
                                                 //         .toString()) ??
                                                 //     0;
 
-                                                // Calculate order cost safely
-                                                var orderCost = (int.parse(
-                                                            _addToCartModel
-                                                                .cartTotal
-                                                                .toString()) +
-                                                        (_configModel.user!.companies![0].deliveryCharges == null
-                                                            ? 0
-                                                            : int.parse(_configModel
-                                                                .user!
-                                                                .companies![0]
-                                                                .deliveryCharges
-                                                                .toString())) +
-                                                        int.parse(_addToCartModel.cartTotal.toString()) *
-                                                            int.parse(_configModel
-                                                                .user!
-                                                                .companies![0]
-                                                                .taxPercent
-                                                                .toString()) ~/
-                                                            100 -
-                                                        int.parse(
-                                                            couponValue.toString()) -
-                                                        useWalletPoint)
-                                                    .toStringAsFixed(0);
 
                                                 // int userWalletUsed =
                                                 //     (_userWaletModel

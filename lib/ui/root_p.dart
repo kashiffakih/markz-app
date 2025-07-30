@@ -62,9 +62,10 @@ class _RootPageState extends State<RootPage> {
     return version;
   }
 
-  launchUrl(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
+  launchUrlMethod(String url) async {
+    Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
     } else {
       throw 'Could not launch $url';
     }

@@ -234,7 +234,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                         onPressed: () {
                                           Navigator.pop(context);
                                           setState(() {
-                                            bool _enterCode = true;
+                                            _enterCode = true;
                                           });
                                         },
                                         child: Text('Ok'),

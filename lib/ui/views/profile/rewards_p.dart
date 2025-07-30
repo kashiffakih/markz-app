@@ -398,7 +398,7 @@ class _RewardsPageState extends State<RewardsPage> {
                   ),
                 ),
                 Text(
-                  userWalletModel.totalEarnPoint?.toString() ?? '0',
+                  userWalletModel.totalEarnPoint.toString(),
                   style: MyGoogleFontStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 28,
@@ -426,7 +426,7 @@ class _RewardsPageState extends State<RewardsPage> {
                     ),
                   ),
                   Text(
-                    userWalletModel.totalUsedPoint?.toString() ?? '0',
+                    userWalletModel.totalUsedPoint.toString(),
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 28,
@@ -449,7 +449,7 @@ class _RewardsPageState extends State<RewardsPage> {
                     ),
                   ),
                   Text(
-                    userWalletModel.totaRemainingPoint?.toString() ?? '0',
+                    userWalletModel.totaRemainingPoint.toString(),
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 28,

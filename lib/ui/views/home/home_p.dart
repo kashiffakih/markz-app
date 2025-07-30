@@ -120,10 +120,12 @@ class _HomePageState extends State<HomePage>
     return Scaffold(
       key: _key,
       drawer: DrawerWidget(),
-      body: WillPopScope(
-        onWillPop: () async {
-          SystemNavigator.pop();
-          return false;
+      body: PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
+          if (!didPop) {
+            SystemNavigator.pop();
+          }
         },
         child: SafeArea(
           child: _isLoading

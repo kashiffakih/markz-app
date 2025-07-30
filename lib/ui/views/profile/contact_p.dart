@@ -406,9 +406,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:aadab/core/providers/config_pr.dart';
 import 'package:aadab/core/providers/product_pr.dart';
-import 'package:aadab/locator.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -445,7 +443,6 @@ class _ContactPageState extends State<ContactPage> {
 
   @override
   Widget build(BuildContext context) {
-    final configModel = locator<ConfigModel>();
     final productModel = Provider.of<ProductModel>(context, listen: false);
     final double fem = MediaQuery.of(context).size.width / 360;
     final double ffem = fem * 0.97;

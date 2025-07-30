@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:aadab/core/providers/add_to_cart_pr.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 
 class TermsAndConditionsPage extends StatefulWidget {
@@ -13,9 +11,6 @@ class TermsAndConditionsPage extends StatefulWidget {
 class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
   @override
   Widget build(BuildContext context) {
-    final AddToCartModel _addToCartModel =
-        Provider.of<AddToCartModel>(context, listen: false);
-
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(

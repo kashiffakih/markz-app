@@ -22,6 +22,11 @@ class OrderService {
     couponValue,
   ) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    
+    if (_configModel.user == null) {
+      return false;
+    }
+    
     if (couponId.toString() == 'null' || couponId == null || couponId == '') {
       couponId = '';
     }
@@ -189,6 +194,11 @@ class OrderService {
 
   getOrders() async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    
+    if (_configModel.user == null) {
+      return <Order>[];
+    }
+    
     var userId = _configModel.user!.id;
     http.Response _response = await http.get(
       Uri.parse('${_apiConfig['baseURL']}/orders?userId=$userId'),

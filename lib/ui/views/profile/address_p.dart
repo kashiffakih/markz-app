@@ -884,11 +884,13 @@ class _AddressPageState extends State<AddressPage> {
     final couponValue =
         int.tryParse(widget.arguments?['couponValue']?.toString() ?? '0') ?? 0;
 
-    return WillPopScope(
-      onWillPop: () async {
-        // Navigator.pop(context);
-        Navigator.pushReplacementNamed(context, '/profilePage');
-        return false;
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (!didPop) {
+          // Navigator.pop(context);
+          Navigator.pushReplacementNamed(context, '/profilePage');
+        }
       },
       child: Scaffold(
         body: SafeArea(

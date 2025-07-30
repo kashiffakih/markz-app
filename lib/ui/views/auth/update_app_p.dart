@@ -5,9 +5,10 @@ import 'package:aadab/ui/shared/images_sh.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UpdateAppPage extends StatelessWidget {
-  launchUrl(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
+  launchUrlMethod(String url) async {
+    Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
     } else {
       throw 'Could not launch $url';
     }
@@ -57,8 +58,8 @@ class UpdateAppPage extends StatelessWidget {
                         child: ElevatedButton(
                           // color: Colors.blue,
                           onPressed: () {
-                            launch(
-                                'https://play.google.com/store/apps/details?id=org.pms.mamaearth');
+                            launchUrl(Uri.parse(
+                                'https://play.google.com/store/apps/details?id=org.pms.mamaearth'));
                           },
                           child: Text(
                             'Visit Store',
@@ -82,8 +83,8 @@ class UpdateAppPage extends StatelessWidget {
                         child: ElevatedButton(
                           // color: Colors.green,
                           onPressed: () {
-                            launch(
-                                'https://apps.apple.com/us/app/ba-channel/id1586774436');
+                            launchUrl(Uri.parse(
+                                'https://apps.apple.com/us/app/ba-channel/id1586774436'));
                           },
                           child: Text(
                             'Visit Store',

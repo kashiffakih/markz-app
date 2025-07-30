@@ -12,6 +12,11 @@ class ReviewService {
   Future<List<Review>> getMyReviews(
       [productId, description, rating, onlyFetch]) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    
+    if (_configModel.user == null) {
+      return <Review>[];
+    }
+    
     var userId = _configModel.user!.id;
     // _configModel.files.forEach((imageFile) async {
     // if (imageFile.file != null) {

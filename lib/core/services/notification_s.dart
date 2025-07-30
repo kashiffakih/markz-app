@@ -11,6 +11,11 @@ class NotificationService {
 
   getMyNotifications() async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    
+    if (_configModel.user == null) {
+      return <MyNotification>[];
+    }
+    
     var userId = _configModel.user!.id;
 
     http.Response _response = await http.get(

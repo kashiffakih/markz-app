@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:aadab/core/providers/add_to_cart_pr.dart';
 import 'package:aadab/core/providers/review_pr.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 import 'package:aadab/ui/widgets/multi_image_w.dart';
@@ -26,7 +25,6 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final addToCartModel = Provider.of<AddToCartModel>(context, listen: false);
     final configModel = locator<ConfigModel>();
     final reviewModel = Provider.of<ReviewModel>(context, listen: false);
 

@@ -102,7 +102,7 @@
 //       activeIndex = 0; // Pre-select the first size
 //     }
 //     _prices = widget.arguments?['product']?['product_prices']
-//             ?.where((price) => price['product_pack_id'] == _sizes[0]?['id'])
+//             ?.where((price) => price['product_pack_id'] == _sizes[0]['id'])
 //             ?.toList() ??
 //         [];
 //     if (_prices.isNotEmpty) {
@@ -536,7 +536,7 @@
 //                                                   ?.where((price) =>
 //                                                       price[
 //                                                           'product_pack_id'] ==
-//                                                       _sizes[0]?['id'])
+//                                                       _sizes[0]['id'])
 //                                                   ?.toList() ??
 //                                               [];
 //                                           _productPoints = _sizes.isNotEmpty
@@ -621,7 +621,7 @@
 //                                                       ?.where((price) =>
 //                                                           price[
 //                                                               'product_pack_id'] ==
-//                                                           _sizes[0]?['id'])
+//                                                           _sizes[0]['id'])
 //                                                       ?.toList() ??
 //                                                   [];
 //                                               _productPoints = _sizes.isNotEmpty
@@ -738,7 +738,7 @@
 //                                                   ?.where((price) =>
 //                                                       price[
 //                                                           'product_pack_id'] ==
-//                                                       _sizes[0]?['id'])
+//                                                       _sizes[0]['id'])
 //                                                   ?.toList() ??
 //                                               [];
 //                                           _productPoints = _sizes.isNotEmpty
@@ -2223,7 +2223,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
       activeIndex = 0; // Pre-select the first size
     }
     _prices = widget.arguments?['product']?['product_prices']
-            ?.where((price) => price['product_pack_id'] == _sizes[0]?['id'])
+            ?.where((price) => price['product_pack_id'] == _sizes[0]['id'])
             ?.toList() ??
         [];
     if (_prices.isNotEmpty) {
@@ -2657,7 +2657,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   ?.where((price) =>
                                                       price[
                                                           'product_pack_id'] ==
-                                                      _sizes[0]?['id'])
+                                                      _sizes[0]['id'])
                                                   ?.toList() ??
                                               [];
                                           _productPoints = _sizes.isNotEmpty
@@ -2742,7 +2742,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       ?.where((price) =>
                                                           price[
                                                               'product_pack_id'] ==
-                                                          _sizes[0]?['id'])
+                                                          _sizes[0]['id'])
                                                       ?.toList() ??
                                                   [];
                                               _productPoints = _sizes.isNotEmpty
@@ -2859,7 +2859,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   ?.where((price) =>
                                                       price[
                                                           'product_pack_id'] ==
-                                                      _sizes[0]?['id'])
+                                                      _sizes[0]['id'])
                                                   ?.toList() ??
                                               [];
                                           _productPoints = _sizes.isNotEmpty
@@ -3203,7 +3203,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                     .addToCarts!
                                                                     .first,
                                                           )
-                                                          ?.qty
+                                                          .qty
                                                           ?.toString() ??
                                                       '0',
                                                   style: MyGoogleFontStyle(
@@ -4173,7 +4173,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
                               _formKey.currentState!.save();
-                              bool type = true;
 
                               // await _addToCartModel
                               //     .getAddToCart(

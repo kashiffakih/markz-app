@@ -61,13 +61,23 @@ class ShopsPageState extends State<ShopsPage> {
       final productModel = context.read<ProductModel>();
       final wishListModel = context.read<WishListModel>();
       final addToCartModel = context.read<AddToCartModel>();
+      final configModel = context.read<ConfigModel>();
 
-      await Future.wait<void>([
+      // Create list of futures based on user authentication status
+      List<Future<void>> futures = [
         productModel.getAllProducts(widget.initialText ?? '') as Future<void>,
-        productModel.getCategories() as Future<void>,
-        wishListModel.getWishLists('') as Future<void>,
-        addToCartModel.getAddToCart('', '', _cartData) as Future<void>,
-      ]);
+        // productModel.getCategories() as Future<void>,
+      ];
+
+      // Only fetch user-specific data if user is logged in
+      if (configModel.user != null) {
+        futures.addAll([
+          wishListModel.getWishLists('') as Future<void>,
+          addToCartModel.getAddToCart('', '', _cartData) as Future<void>,
+        ]);
+      }
+
+      await Future.wait<void>(futures);
 
       setState(() {
         filteredProducts = productModel.allProducts?.toList();

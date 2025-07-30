@@ -20,7 +20,7 @@ class _DeepLinkListenerState extends State<DeepLinkListener> {
     final appLinks = AppLinks(); // AppLinks is singleton
 
 // Subscribe to all events (initial link and further)
-    final sub = appLinks.uriLinkStream.listen((uri) {
+    appLinks.uriLinkStream.listen((uri) {
       log('URI: ${uri.toString()}');
       if (uri.pathSegments.isNotEmpty) {
         Navigator.of(context)
