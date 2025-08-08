@@ -6,6 +6,7 @@ import 'package:aadab/core/providers/user_wallet_pr.dart';
 import 'package:aadab/locator.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 import 'package:aadab/ui/views/profile/address_p.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class CheckoutPage extends StatefulWidget {
   final arguments;
@@ -28,6 +29,57 @@ var paymentOption = '';
 var deliveryMethod = '';
 
 class _CheckoutPageState extends State<CheckoutPage> {
+  late Razorpay _razorpay;
+
+  @override
+  void initState() {
+    super.initState();
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+  }
+
+  @override
+  void dispose() {
+    _razorpay.clear();
+    super.dispose();
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    print('✅ Payment successful: \${response.paymentId}');
+    // TODO: Place order here
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    print('❌ Payment failed: \${response.message}');
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    print('💳 External wallet selected: \${response.walletName}');
+  }
+
+  void _openCheckout(double amountToPay, String contact, String email) {
+    var options = {
+      'key': 'rzp_test_1234567890abcdef', // Replace with your Razorpay Key
+      'amount': (amountToPay * 100).toInt(),
+      'name': 'Aadab',
+      'description': 'Checkout Payment',
+      'prefill': {
+        'contact': contact,
+        'email': email,
+      },
+      'external': {
+        'wallets': ['paytm']
+      }
+    };
+    try {
+      _razorpay.open(options);
+    } catch (e) {
+      debugPrint('⚠️ Razorpay error: \$e');
+    }
+  }
+
   bool isGift = false;
   @override
   Widget build(BuildContext context) {
