@@ -38,6 +38,8 @@ import 'package:aadab/ui/views/profile/wishlist_p.dart';
 import 'package:aadab/ui/views/promocodes/promocodes_p.dart';
 import 'package:aadab/ui/widgets/menu-drawer.dart';
 import 'package:aadab/ui/widgets/multi_image_w.dart';
+import 'package:aadab/ui/views/network/no_network_page.dart';
+import 'package:aadab/ui/views/permissions/permissions_page.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
@@ -211,6 +213,14 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case promocodes:
       return MaterialPageRoute(builder: (BuildContext context) {
         return PromocodesPage();
+      });
+    case noNetworkPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return NoNetworkPage();
+      });
+    case permissionsPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return PermissionsPage();
       });
     default:
       return MaterialPageRoute(builder: (BuildContext context) {

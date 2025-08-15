@@ -1233,7 +1233,7 @@ class _OrdersPageState extends State<OrdersPage> {
                 : TabBarView(
                     children: [
                       _buildOrderTab(orderModel, 'Order Placed', fem, ffem),
-                      _buildOrderTab(orderModel, 'Order Processing', fem, ffem),
+                      _buildOrderTab(orderModel, 'Processing', fem, ffem),
                       _buildOrderTab(orderModel, 'Delivered', fem, ffem),
                       _buildOrderTab(orderModel, 'Cancelled', fem, ffem),
                     ],
@@ -1261,15 +1261,7 @@ class _OrdersPageState extends State<OrdersPage> {
 
   Widget _buildOrderTab(
       OrderModel orderModel, String status, double fem, double ffem) {
-    final filteredOrders = status == 'Order Placed'
-        ? orderModel.orders
-            .where((order) => order.orderStatuses?.isEmpty ?? true)
-            .toList()
-        : orderModel.orders
-            .where((order) =>
-                order.orderStatuses?.any((s) => s.status?.name == status) ??
-                false)
-            .toList();
+    final filteredOrders = _getFilteredOrders(orderModel.orders, status);
 
     if (filteredOrders.isEmpty) {
       return const SizedBox(
@@ -1289,17 +1281,8 @@ class _OrdersPageState extends State<OrdersPage> {
 
   Widget _buildOrderCard(
       dynamic order, String status, double fem, double ffem) {
-    final productImages = order.orderDetails?.isNotEmpty == true
-        ? order.orderDetails?.first.product?.productImages ?? []
-        : [];
-    final firstImage =
-        productImages.isNotEmpty ? productImages.first.imagepath : null;
-    final productId = order.orderDetails?.isNotEmpty == true
-        ? order.orderDetails?.first.product?.id
-        : null;
-
     return Container(
-      height: 150 * fem,
+      height: 120 * fem,
       margin: EdgeInsets.all(10 * fem),
       padding: EdgeInsets.all(10 * fem),
       decoration: BoxDecoration(
@@ -1319,27 +1302,6 @@ class _OrdersPageState extends State<OrdersPage> {
         children: [
           Row(
             children: [
-              if (firstImage != null && productId != null)
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/productPage',
-                      arguments: {'productId': productId},
-                    );
-                  },
-                  child: Container(
-                    width: 40 * fem,
-                    height: 40 * fem,
-                    margin: EdgeInsets.only(right: 10 * fem),
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(firstImage),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
               Expanded(
                 child: Text(
                   'Order No: ${order.id?.toString() ?? 'N/A'}',
@@ -1440,7 +1402,7 @@ class _OrdersPageState extends State<OrdersPage> {
                         arguments: {
                           'order': order.toJson(),
                           'product_images': filteredImages,
-                          'status': status,
+                          'status': _getOrderStatus(order),
                         },
                       ),
                     ),
@@ -1468,17 +1430,17 @@ class _OrdersPageState extends State<OrdersPage> {
               ),
               Expanded(
                 child: Text(
-                  status,
+                  _getOrderStatus(order),
                   textAlign: TextAlign.right,
                   style: MyGoogleFontStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14 * ffem,
                     fontWeight: FontWeight.w400,
-                    color: status == 'Delivered'
+                    color: _getOrderStatus(order) == 'Delivered'
                         ? Colors.green
-                        : status == 'Order Processing'
+                        : _getOrderStatus(order) == 'Order Processing'
                             ? Colors.orange
-                            : status == 'Cancelled'
+                            : _getOrderStatus(order) == 'Cancelled'
                                 ? Colors.red
                                 : Colors.black,
                   ),
@@ -1489,5 +1451,41 @@ class _OrdersPageState extends State<OrdersPage> {
         ],
       ),
     );
+  }
+
+  List<dynamic> _getFilteredOrders(List<dynamic> orders, String status) {
+    return orders.where((order) {
+      // Get the current order status based on orderStatuses array
+      String orderStatus = _getOrderStatus(order);
+
+      // Match the status with the tab
+      if (status == 'Order Placed' && orderStatus == 'Order Placed')
+        return true;
+      if (status == 'Processing' && orderStatus == 'Order Processing')
+        return true;
+      if (status == 'Delivered' && orderStatus == 'Delivered') return true;
+      if (status == 'Cancelled' && orderStatus == 'Cancelled') return true;
+
+      return false;
+    }).toList();
+  }
+
+  String _getOrderStatus(dynamic order) {
+    // If orderStatuses is empty or null, it's "Order Placed"
+    if (order.orderStatuses == null || order.orderStatuses!.isEmpty) {
+      return 'Order Placed';
+    }
+
+    // Get the latest status (last item in the array)
+    var latestStatus = order.orderStatuses!.last;
+    String? statusName = latestStatus.status?.name;
+
+    // Return the status name if it matches our expected statuses
+    if (statusName == 'Cancelled') return 'Cancelled';
+    if (statusName == 'Delivered') return 'Delivered';
+    if (statusName == 'Order Processing') return 'Order Processing';
+
+    // Default to Order Placed if no specific status found
+    return 'Order Placed';
   }
 }

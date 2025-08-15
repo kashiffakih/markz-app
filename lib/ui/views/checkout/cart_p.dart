@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 // import 'package:get_ip_address/get_ip_address.dart';
 import 'package:provider/provider.dart';
@@ -48,39 +49,91 @@ class _CartPageState extends State<CartPage> {
   };
   String usedCoupon = '';
   int useWalletPoint = 0;
+  bool _isLoading = true;
   // bool type = true;
+
+  // Razorpay instance
+  late Razorpay _razorpay;
+
   @override
   void initState() {
     super.initState();
+    _loadData();
+    initPlatformState();
 
-    var productId = '';
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // if (_CartData.isNotEmpty || _CartData != null) {
+    // Initialize Razorpay
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _razorpay.clear(); // Removes all listeners
+  }
+
+  Future<void> _loadData() async {
+    try {
+      var productId = '';
+
+      // Load all required data
       await Provider.of<AddToCartModel>(context, listen: false)
           .getAddToCart('', '', _CartData);
-      // }
-      print('Category Id ${widget.arguments?['product']}');
-      // if (widget.arguments?['product']['category_id'] != null) {
+
+      debugPrint('Category Id ${widget.arguments?['product']}');
+
       await Provider.of<ProductModel>(context, listen: false)
           .getAllProducts('');
-      // }else{
-
-      // }
 
       await Provider.of<OrderModel>(context, listen: false).getOrder();
 
       await Provider.of<UserWalletModel>(context, listen: false)
           .getMyUserWallets();
 
-      // useWalletPoint = (Provider.of<UserWalletModel>(context, listen: false)
-      //             .totaRemainingPoint *
-      //         0.25)
-      //     .round();
-
       await Provider.of<WishListModel>(context, listen: false)
           .getWishLists(productId);
-    });
-    initPlatformState();
+
+      // Update calculations after data is loaded
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          useWalletPoint = (Provider.of<UserWalletModel>(context, listen: false)
+                      .totaRemainingPoint *
+                  0.25)
+              .round();
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading cart data: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        // Show error message if it's a network error
+        if (e.toString().contains('SocketException') ||
+            e.toString().contains('Connection') ||
+            e.toString().contains('Failed host lookup')) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content:
+                  Text('No internet connection. Please check your network.'),
+              action: SnackBarAction(
+                label: 'Retry',
+                onPressed: () {
+                  setState(() {
+                    _isLoading = true;
+                  });
+                  _loadData();
+                },
+              ),
+            ),
+          );
+        }
+      }
+    }
   }
 
   static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
@@ -145,17 +198,12 @@ class _CartPageState extends State<CartPage> {
   TextEditingController _controller = TextEditingController();
   List<Map<String, dynamic>> paymentOptions = [
     {
-      "name": 'CoD (Not available)',
+      "name": 'Cash on Delivery',
       "icon": "assets/images/cash-on-delivery-logo-free-png.webp",
     },
     {
-      "name": "Google Pay",
-      "icon":
-          "assets/images/pngtree-google-pay-payment-software-vector-png-image_12256718.png",
-    },
-    {
-      "name": "PhonePe",
-      "icon": "assets/images/PhonePe-Logo.wine.png",
+      "name": "Online Payment",
+      "icon": "assets/images/razor_pay_icon.png",
     }
   ];
 
@@ -163,8 +211,112 @@ class _CartPageState extends State<CartPage> {
 
   bool isGift = false;
 
+  // Store order details for Razorpay
+  Map<String, dynamic> _orderDetails = {};
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    // Payment success, now place the order
+    debugPrint('Payment Success: ${response.paymentId}');
+    debugPrint('Payment Order ID: ${response.orderId}');
+    debugPrint('Payment Signature: ${response.signature}');
+
+    final AddToCartModel _addToCartModel =
+        Provider.of<AddToCartModel>(context, listen: false);
+    final OrderModel _orderModel =
+        Provider.of<OrderModel>(context, listen: false);
+
+    // Create payment details string with transaction info
+    String paymentDetails =
+        'Online Payment - Transaction ID: ${response.paymentId}';
+    if (response.orderId != null) {
+      paymentDetails += ', Order ID: ${response.orderId}';
+    }
+
+    bool orderResponse = await _orderModel.placedOrder(
+      _addToCartModel.addToCarts!.toList(),
+      _orderDetails['cartTotal'],
+      _orderDetails['addressId'],
+      _orderDetails['isGift'],
+      _orderDetails['useWalletPoint'],
+      _orderDetails['couponId'],
+      paymentDetails,
+      _orderDetails['deliveryMethod'],
+      _orderDetails['couponValue'],
+    );
+
+    if (orderResponse == true) {
+      Navigator.pushNamed(context, '/successPage');
+    }
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    debugPrint('Payment Error: ${response.code} - ${response.message}');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Payment failed: ${response.message}'),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    debugPrint('External Wallet: ${response.walletName}');
+  }
+
+  void _openRazorpay(int amount) {
+    final ConfigModel _configModel = locator<ConfigModel>();
+
+    var options = {
+      'key': 'rzp_test_R5Yw49cWX8rwN1', // Replace with your Razorpay API key
+      'amount': amount * 100, // Amount in paise
+      'name': 'Aadab',
+      'description': 'Order Payment',
+      'prefill': {
+        'contact': _configModel.user?.phone ?? '',
+        'email': _configModel.user?.email ?? identifier,
+      },
+      'external': {
+        'wallets': ['paytm', 'gpay', 'phonepe']
+      }
+    };
+
+    try {
+      _razorpay.open(options);
+    } catch (e) {
+      debugPrint('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error opening payment gateway'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Show loading indicator while data is being loaded
+    if (_isLoading) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text(
+                'Loading cart data...',
+                style: MyGoogleFontStyle(
+                  fontFamily: 'Urbanist',
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     final AddToCartModel _addToCartModel =
         Provider.of<AddToCartModel>(context, listen: false);
     final ConfigModel _configModel = locator<ConfigModel>();
@@ -179,18 +331,13 @@ class _CartPageState extends State<CartPage> {
     final WishListModel _wishListModel =
         Provider.of<WishListModel>(context, listen: false);
 
-    setState(() {
-      if (_orderModel.orders.length > 0) {
-        address = _orderModel.orders[0].address!;
-      }
-      if (widget.arguments != null) {
-        if (widget.arguments['address'] != null) {
-          address = UserAddress.fromJson(widget.arguments['address']);
-        }
-      }
-      useWalletPoint = (_userWaletModel.totaRemainingPoint * 0.25).round();
-      print(address.add1.toString());
-    });
+    // Initialize address data after loading is complete
+    if (_orderModel.orders.isNotEmpty && address.add1 == null) {
+      address = _orderModel.orders[0].address ?? UserAddress();
+    }
+    if (widget.arguments != null && widget.arguments['address'] != null) {
+      address = UserAddress.fromJson(widget.arguments['address']);
+    }
 
     double discountPrice = 0.0;
 
@@ -198,16 +345,14 @@ class _CartPageState extends State<CartPage> {
     double fem = MediaQuery.of(context).size.width / baseWidth;
 
     return Scaffold(
-      body: PopScope(
-        canPop: false,
-        onPopInvoked: (didPop) {
-          if (!didPop) {
-            if (widget.isProfile['isProfile'] == true) {
-              Navigator.pushNamed(context, '/profilePage');
-            } else {
-              Navigator.pop(context);
-            }
+      body: WillPopScope(
+        onWillPop: () async {
+          if (widget.isProfile['isProfile'] == true) {
+            Navigator.pushNamed(context, '/profilePage');
+          } else {
+            Navigator.pop(context);
           }
+          return false;
         },
         child: SafeArea(
           child: SingleChildScrollView(
@@ -389,203 +534,193 @@ class _CartPageState extends State<CartPage> {
                                                       ? Center(
                                                           child:
                                                               LinearProgressIndicator())
-                                                      : ListView.builder(
-                                                          // padding:
-                                                          //     const EdgeInsets.only(left: 5, right: 8),
-                                                          scrollDirection:
-                                                              Axis.horizontal,
-                                                          shrinkWrap: true,
-                                                          itemCount:
+                                                      : (_productModel.allProducts ==
+                                                                  null ||
                                                               _productModel
                                                                   .allProducts!
-                                                                  .length,
-                                                          itemBuilder:
-                                                              (context, index) {
-                                                            return Padding(
-                                                              padding:
-                                                                  const EdgeInsets
+                                                                  .isEmpty)
+                                                          ? Center(
+                                                              child: Text(
+                                                                'No products available',
+                                                                style:
+                                                                    MyGoogleFontStyle(
+                                                                  fontFamily:
+                                                                      'Urbanist',
+                                                                  fontSize: 14,
+                                                                  color: Colors
+                                                                      .grey,
+                                                                ),
+                                                              ),
+                                                            )
+                                                          : ListView.builder(
+                                                              // padding:
+                                                              //     const EdgeInsets.only(left: 5, right: 8),
+                                                              scrollDirection:
+                                                                  Axis.horizontal,
+                                                              shrinkWrap: true,
+                                                              itemCount: _productModel
+                                                                      .allProducts
+                                                                      ?.length ??
+                                                                  0,
+                                                              itemBuilder:
+                                                                  (context,
+                                                                      index) {
+                                                                return Padding(
+                                                                  padding: const EdgeInsets
                                                                       .symmetric(
                                                                       horizontal:
                                                                           10),
-                                                              child: Container(
-                                                                width: MediaQuery.of(
-                                                                            context)
-                                                                        .size
-                                                                        .width *
-                                                                    0.4,
-                                                                height: MediaQuery.of(
-                                                                            context)
-                                                                        .size
-                                                                        .height *
-                                                                    0.45,
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
+                                                                  child:
+                                                                      Container(
+                                                                    width: MediaQuery.of(context)
+                                                                            .size
+                                                                            .width *
+                                                                        0.4,
+                                                                    height: MediaQuery.of(context)
+                                                                            .size
+                                                                            .height *
+                                                                        0.45,
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
                                                                               15),
-                                                                ),
-                                                                child: Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .center,
-                                                                  children: [
-                                                                    InkWell(
-                                                                      onTap:
-                                                                          () {
-                                                                        Navigator.of(context)
-                                                                            .push(
-                                                                          MaterialPageRoute(
-                                                                            builder: (context) =>
-                                                                                ProductIdPage(arguments: {
-                                                                              'product': _productModel.allProducts![index].toJson(),
-                                                                              'product_images': _productModel.allProducts![index].productImages
-                                                                            }),
-                                                                          ),
-                                                                        );
-                                                                      },
-                                                                      child:
-                                                                          Container(
-                                                                        margin: EdgeInsets.fromLTRB(
-                                                                            0 * fem,
-                                                                            0 * fem,
-                                                                            0 * fem,
-                                                                            5 * fem),
-                                                                        padding: EdgeInsets.fromLTRB(
-                                                                            106 *
-                                                                                fem,
-                                                                            13 *
-                                                                                fem,
-                                                                            14 *
-                                                                                fem,
-                                                                            15 *
-                                                                                fem),
-                                                                        width: MediaQuery.of(context).size.width *
-                                                                            0.4,
-                                                                        height: MediaQuery.of(context).size.height *
-                                                                            0.26,
-                                                                        decoration:
-                                                                            BoxDecoration(
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(15),
-                                                                          image:
-                                                                              DecorationImage(
-                                                                            fit:
-                                                                                BoxFit.contain,
-                                                                            image:
-                                                                                NetworkImage(_configModel.apiConfig['mediaURL'] + _productModel.allProducts![index].productImages?.first.imagepath.toString()),
-                                                                          ),
-                                                                        ),
-                                                                        child:
-                                                                            InkWell(
+                                                                    ),
+                                                                    child:
+                                                                        Column(
+                                                                      crossAxisAlignment:
+                                                                          CrossAxisAlignment
+                                                                              .center,
+                                                                      children: [
+                                                                        InkWell(
                                                                           onTap:
-                                                                              () async {
-                                                                            await _wishListModel.getWishLists(_productModel.allProducts![index].id);
-                                                                            setState(() {});
+                                                                              () {
+                                                                            Navigator.of(context).push(
+                                                                              MaterialPageRoute(
+                                                                                builder: (context) => ProductIdPage(arguments: {
+                                                                                  'product': _productModel.allProducts?[index].toJson(),
+                                                                                  'product_images': _productModel.allProducts?[index].productImages
+                                                                                }),
+                                                                              ),
+                                                                            );
                                                                           },
-                                                                          child: _wishListModel.wishListLoader
-                                                                              ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
-                                                                              : _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.allProducts![index].id && wishList.userId == _configModel.user!.id).toList().length == 0
+                                                                          child:
+                                                                              Container(
+                                                                            margin: EdgeInsets.fromLTRB(
+                                                                                0 * fem,
+                                                                                0 * fem,
+                                                                                0 * fem,
+                                                                                5 * fem),
+                                                                            padding: EdgeInsets.fromLTRB(
+                                                                                106 * fem,
+                                                                                13 * fem,
+                                                                                14 * fem,
+                                                                                15 * fem),
+                                                                            width:
+                                                                                MediaQuery.of(context).size.width * 0.4,
+                                                                            height:
+                                                                                MediaQuery.of(context).size.height * 0.26,
+                                                                            decoration:
+                                                                                BoxDecoration(
+                                                                              borderRadius: BorderRadius.circular(15),
+                                                                              image: DecorationImage(
+                                                                                fit: BoxFit.contain,
+                                                                                image: NetworkImage(_configModel.apiConfig['mediaURL'] + (_productModel.allProducts?[index].productImages?.first.imagepath?.toString() ?? '')),
+                                                                              ),
+                                                                            ),
+                                                                            child:
+                                                                                InkWell(
+                                                                              onTap: () async {
+                                                                                await _wishListModel.getWishLists(_productModel.allProducts?[index].id);
+                                                                                setState(() {});
+                                                                              },
+                                                                              child: _wishListModel.wishListLoader
                                                                                   ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
-                                                                                  : Align(
-                                                                                      alignment: Alignment.topRight,
-                                                                                      child: Icon(
-                                                                                        Icons.favorite_outlined,
-                                                                                        color: Colors.red,
-                                                                                      )),
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                    SizedBox(
-                                                                      height:
-                                                                          10,
-                                                                    ),
-                                                                    InkWell(
-                                                                      onTap:
-                                                                          () {
-                                                                        Navigator.of(context).push(MaterialPageRoute(
-                                                                            builder: (context) => ProductIdPage(arguments: {
-                                                                                  'product': _productModel.allProducts![index].toJson(),
-                                                                                  'category': _productModel.allProducts![index].category!.name.toString(),
-                                                                                })));
-                                                                      },
-                                                                      child:
-                                                                          Container(
-                                                                        child:
-                                                                            Text(
-                                                                          _productModel
-                                                                              .allProducts![index]
-                                                                              .name
-                                                                              .toString(),
-                                                                          textAlign:
-                                                                              TextAlign.center,
-                                                                          style:
-                                                                              MyGoogleFontStyle(
-                                                                            fontFamily:
-                                                                                'Urbanist',
-                                                                            fontSize:
-                                                                                15,
-                                                                            fontWeight:
-                                                                                FontWeight.w700,
-                                                                            color:
-                                                                                Color(0xff000000),
+                                                                                  : _wishListModel.wishLists?.where((wishList) => wishList.productId == _productModel.allProducts?[index].id && wishList.userId == _configModel.user?.id).toList().length == 0
+                                                                                      ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
+                                                                                      : Align(
+                                                                                          alignment: Alignment.topRight,
+                                                                                          child: Icon(
+                                                                                            Icons.favorite_outlined,
+                                                                                            color: Colors.red,
+                                                                                          )),
+                                                                            ),
                                                                           ),
                                                                         ),
-                                                                      ),
-                                                                    ),
-                                                                    Container(
-                                                                      child: _productModel.allProducts![index].productPrices![0].offerPrice !=
-                                                                              0
-                                                                          ? Text.rich(
-                                                                              TextSpan(children: [
-                                                                              new TextSpan(
-                                                                                text: 'RS. ${_productModel.allProducts![index].productPrices![0].price.toString()}',
-                                                                                style: new TextStyle(
-                                                                                  color: Colors.grey,
-                                                                                  decoration: TextDecoration.lineThrough,
+                                                                        SizedBox(
+                                                                          height:
+                                                                              10,
+                                                                        ),
+                                                                        InkWell(
+                                                                          onTap:
+                                                                              () {
+                                                                            Navigator.of(context).push(MaterialPageRoute(
+                                                                                builder: (context) => ProductIdPage(arguments: {
+                                                                                      'product': _productModel.allProducts?[index].toJson(),
+                                                                                      'category': _productModel.allProducts?[index].category?.name?.toString() ?? '',
+                                                                                    })));
+                                                                          },
+                                                                          child:
+                                                                              Container(
+                                                                            child:
+                                                                                Text(
+                                                                              _productModel.allProducts?[index].name ?? ''.toString(),
+                                                                              textAlign: TextAlign.center,
+                                                                              style: MyGoogleFontStyle(
+                                                                                fontFamily: 'Urbanist',
+                                                                                fontSize: 15,
+                                                                                fontWeight: FontWeight.w700,
+                                                                                color: Color(0xff000000),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                        Container(
+                                                                          child: (_productModel.allProducts?[index].productPrices?[0].offerPrice ?? 0) != 0
+                                                                              ? Text.rich(TextSpan(children: [
+                                                                                  new TextSpan(
+                                                                                    text: 'RS. ${_productModel.allProducts?[index].productPrices?[0].price?.toString() ?? '0'}',
+                                                                                    style: new TextStyle(
+                                                                                      color: Colors.grey,
+                                                                                      decoration: TextDecoration.lineThrough,
+                                                                                    ),
+                                                                                  ),
+                                                                                  new TextSpan(
+                                                                                    text: ' RS.${_productModel.allProducts?[index].productPrices?[0].offerPrice?.toString() ?? '0'}',
+                                                                                  ),
+                                                                                ]))
+                                                                              : Text(
+                                                                                  (_productModel.allProducts?[index].productPrices?[0].price?.toString() ?? '0') + " " + 'RS',
+                                                                                  style: MyGoogleFontStyle(
+                                                                                    fontFamily: 'Poppins',
+                                                                                    fontSize: 13,
+                                                                                    fontWeight: FontWeight.w500,
+                                                                                    height: 1.5,
+                                                                                    letterSpacing: -0.2190869331,
+                                                                                    color: Color(0x99000000),
+                                                                                  ),
                                                                                 ),
-                                                                              ),
-                                                                              new TextSpan(
-                                                                                text: ' RS.${_productModel.allProducts![index].productPrices![0].offerPrice.toString()}',
-                                                                              ),
-                                                                            ]))
-                                                                          : Text(
-                                                                              _productModel.allProducts![index].productPrices![0].price.toString() + " " + 'RS',
+                                                                        ),
+                                                                        if (discountPrice !=
+                                                                            0.0)
+                                                                          Center(
+                                                                            child:
+                                                                                Text(
+                                                                              '( ${discountPrice.round()}% Off)',
                                                                               style: MyGoogleFontStyle(
                                                                                 fontFamily: 'Poppins',
-                                                                                fontSize: 13,
-                                                                                fontWeight: FontWeight.w500,
-                                                                                height: 1.5,
-                                                                                letterSpacing: -0.2190869331,
+                                                                                fontSize: 12,
+                                                                                fontWeight: FontWeight.bold,
                                                                                 color: Color(0x99000000),
                                                                               ),
                                                                             ),
-                                                                    ),
-                                                                    if (discountPrice !=
-                                                                        0.0)
-                                                                      Center(
-                                                                        child:
-                                                                            Text(
-                                                                          '( ${discountPrice.round()}% Off)',
-                                                                          style:
-                                                                              MyGoogleFontStyle(
-                                                                            fontFamily:
-                                                                                'Poppins',
-                                                                            fontSize:
-                                                                                12,
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                            color:
-                                                                                Color(0x99000000),
                                                                           ),
-                                                                        ),
-                                                                      ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            );
-                                                          },
-                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ),
                                                 )
                                               ],
                                             ),
@@ -1983,8 +2118,7 @@ class _CartPageState extends State<CartPage> {
                                                   InkWell(
                                                     onTap: () {
                                                       setState(() {
-                                                        _userWaletModel
-                                                            .totaRemainingPoint = 0;
+                                                        useWalletPoint = 0;
                                                       });
                                                     },
                                                     child: Padding(
@@ -2114,67 +2248,79 @@ class _CartPageState extends State<CartPage> {
                                                   ),
                                                 );
                                               } else {
-                                                // Safe parsing for all numeric values
-                                                // int cartTotal = int.tryParse(
-                                                //         _addToCartModel
-                                                //             .cartTotal
-                                                //             .toString()) ??
-                                                //     0;
-                                                // int deliveryCharges =
-                                                //     int.tryParse(_configModel
-                                                //                 .user!
-                                                //                 .companies![0]
-                                                //                 .deliveryCharges ??
-                                                //             '0') ??
-                                                //         0;
-                                                // int taxPercent = int.tryParse(
-                                                //         _configModel
-                                                //             .user!
-                                                //             .companies![0]
-                                                //             .taxPercent
-                                                //             .toString()) ??
-                                                //     0;
-                                                // int couponDiscount =
-                                                //     int.tryParse(couponValue
-                                                //             .toString()) ??
-                                                //         0;
-                                                // int deductUserWalletAmount =
-                                                //     _userWaletModel
-                                                //         .totalUsedPoint;
-
-                                                // int.tryParse(_userWaletModel
-                                                //         .totaRemainingPoint
-                                                //         .toString()) ??
-                                                //     0;
-
-
-                                                // int userWalletUsed =
-                                                //     (_userWaletModel
-                                                //         .totaRemainingPoint);
                                                 var addressId = address.id;
 
-                                                // print(
-                                                //     'Wallet used ${userWalletUsed}');
+                                                // Calculate total amount
+                                                int cartTotal = int.parse(
+                                                    _addToCartModel.cartTotal
+                                                        .toString());
+                                                int deliveryCharges = _configModel
+                                                            .user!
+                                                            .companies![0]
+                                                            .deliveryCharges ==
+                                                        null
+                                                    ? 0
+                                                    : int.parse(_configModel
+                                                        .user!
+                                                        .companies![0]
+                                                        .deliveryCharges
+                                                        .toString());
+                                                int taxAmount = cartTotal *
+                                                    int.parse(_configModel
+                                                        .user!
+                                                        .companies![0]
+                                                        .taxPercent
+                                                        .toString()) ~/
+                                                    100;
+                                                int totalAmount = cartTotal +
+                                                    deliveryCharges +
+                                                    taxAmount -
+                                                    couponValue -
+                                                    useWalletPoint;
 
-                                                bool response =
-                                                    await _orderModel
-                                                        .placedOrder(
-                                                  _addToCartModel.addToCarts!
-                                                      .toList(),
-                                                  _addToCartModel.cartTotal
-                                                      .toString(),
-                                                  addressId,
-                                                  isGift,
-                                                  useWalletPoint,
-                                                  couponId.toString(),
-                                                  paymentOption,
-                                                  "deliveryMethod",
-                                                  couponValue.toString(),
-                                                );
+                                                if (paymentOption ==
+                                                    'Online Payment') {
+                                                  // Store order details for later use in payment success handler
+                                                  _orderDetails = {
+                                                    'cartTotal': _addToCartModel
+                                                        .cartTotal
+                                                        .toString(),
+                                                    'addressId': addressId,
+                                                    'isGift': isGift,
+                                                    'useWalletPoint':
+                                                        useWalletPoint,
+                                                    'couponId':
+                                                        couponId.toString(),
+                                                    'deliveryMethod':
+                                                        "deliveryMethod",
+                                                    'couponValue':
+                                                        couponValue.toString(),
+                                                  };
 
-                                                if (response == true) {
-                                                  Navigator.pushNamed(
-                                                      context, '/successPage');
+                                                  // Open Razorpay
+                                                  _openRazorpay(totalAmount);
+                                                } else {
+                                                  // Cash on Delivery
+                                                  bool response =
+                                                      await _orderModel
+                                                          .placedOrder(
+                                                    _addToCartModel.addToCarts!
+                                                        .toList(),
+                                                    _addToCartModel.cartTotal
+                                                        .toString(),
+                                                    addressId,
+                                                    isGift,
+                                                    useWalletPoint,
+                                                    couponId.toString(),
+                                                    'Cash on Delivery',
+                                                    "deliveryMethod",
+                                                    couponValue.toString(),
+                                                  );
+
+                                                  if (response == true) {
+                                                    Navigator.pushNamed(context,
+                                                        '/successPage');
+                                                  }
                                                 }
                                               }
                                             },
@@ -2243,230 +2389,220 @@ class _CartPageState extends State<CartPage> {
                                                   ? Center(
                                                       child:
                                                           LinearProgressIndicator())
-                                                  : ListView.builder(
-                                                      // padding:
-                                                      //     const EdgeInsets.only(left: 5, right: 8),
-                                                      scrollDirection:
-                                                          Axis.horizontal,
-                                                      shrinkWrap: true,
-                                                      itemCount: _productModel
-                                                          .allProducts!.length,
-                                                      itemBuilder:
-                                                          (context, index) {
-                                                        return Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  horizontal:
-                                                                      10),
-                                                          child: Container(
-                                                            width: MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width *
-                                                                0.4,
-                                                            height: MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .height *
-                                                                0.45,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          15),
+                                                  : (_productModel.allProducts ==
+                                                              null ||
+                                                          _productModel
+                                                              .allProducts!
+                                                              .isEmpty)
+                                                      ? Center(
+                                                          child: Text(
+                                                            'No products available',
+                                                            style:
+                                                                MyGoogleFontStyle(
+                                                              fontFamily:
+                                                                  'Urbanist',
+                                                              fontSize: 14,
+                                                              color:
+                                                                  Colors.grey,
                                                             ),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                InkWell(
-                                                                  onTap: () {
-                                                                    Navigator.of(
+                                                          ),
+                                                        )
+                                                      : ListView.builder(
+                                                          // padding:
+                                                          //     const EdgeInsets.only(left: 5, right: 8),
+                                                          scrollDirection:
+                                                              Axis.horizontal,
+                                                          shrinkWrap: true,
+                                                          itemCount: _productModel
+                                                                  .allProducts
+                                                                  ?.length ??
+                                                              0,
+                                                          itemBuilder:
+                                                              (context, index) {
+                                                            return Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          10),
+                                                              child: Container(
+                                                                width: MediaQuery.of(
                                                                             context)
-                                                                        .push(
-                                                                      MaterialPageRoute(
-                                                                        builder:
-                                                                            (context) =>
-                                                                                ProductIdPage(arguments: {
-                                                                          'product': _productModel
-                                                                              .allProducts![index]
-                                                                              .toJson(),
-                                                                          'product_images': _productModel
-                                                                              .allProducts![index]
-                                                                              .productImages
-                                                                        }),
-                                                                      ),
-                                                                    );
-                                                                  },
-                                                                  child:
-                                                                      Container(
-                                                                    margin: EdgeInsets.fromLTRB(
-                                                                        0 * fem,
-                                                                        0 * fem,
-                                                                        0 * fem,
-                                                                        5 * fem),
-                                                                    padding: EdgeInsets.fromLTRB(
-                                                                        106 *
-                                                                            fem,
-                                                                        13 *
-                                                                            fem,
-                                                                        14 *
-                                                                            fem,
-                                                                        15 *
-                                                                            fem),
-                                                                    width: MediaQuery.of(context)
-                                                                            .size
-                                                                            .width *
-                                                                        0.4,
-                                                                    height: MediaQuery.of(context)
-                                                                            .size
-                                                                            .height *
-                                                                        0.26,
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
+                                                                        .size
+                                                                        .width *
+                                                                    0.4,
+                                                                height: MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .height *
+                                                                    0.45,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
                                                                               15),
-                                                                      image:
-                                                                          DecorationImage(
-                                                                        fit: BoxFit
-                                                                            .contain,
-                                                                        image: NetworkImage(_configModel.apiConfig['mediaURL'] +
-                                                                            _productModel.allProducts![index].productImages?.first.imagepath.toString()),
-                                                                      ),
-                                                                    ),
-                                                                    child:
-                                                                        InkWell(
+                                                                ),
+                                                                child: Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    InkWell(
                                                                       onTap:
-                                                                          () async {
-                                                                        await _wishListModel.getWishLists(_productModel
-                                                                            .allProducts![index]
-                                                                            .id);
+                                                                          () {
+                                                                        Navigator.of(context)
+                                                                            .push(
+                                                                          MaterialPageRoute(
+                                                                            builder: (context) =>
+                                                                                ProductIdPage(arguments: {
+                                                                              'product': _productModel.allProducts?[index].toJson(),
+                                                                              'product_images': _productModel.allProducts?[index].productImages
+                                                                            }),
+                                                                          ),
+                                                                        );
                                                                       },
-                                                                      child: _wishListModel
-                                                                              .wishListLoader
-                                                                          ? Align(
-                                                                              alignment: Alignment.topRight,
-                                                                              child: Icon(Icons.favorite_border_outlined))
-                                                                          : _wishListModel.wishLists!.where((wishList) => wishList.productId == _productModel.allProducts![index].id && wishList.userId == _configModel.user!.id).toList().length == 0
+                                                                      child:
+                                                                          Container(
+                                                                        margin: EdgeInsets.fromLTRB(
+                                                                            0 * fem,
+                                                                            0 * fem,
+                                                                            0 * fem,
+                                                                            5 * fem),
+                                                                        padding: EdgeInsets.fromLTRB(
+                                                                            106 *
+                                                                                fem,
+                                                                            13 *
+                                                                                fem,
+                                                                            14 *
+                                                                                fem,
+                                                                            15 *
+                                                                                fem),
+                                                                        width: MediaQuery.of(context).size.width *
+                                                                            0.4,
+                                                                        height: MediaQuery.of(context).size.height *
+                                                                            0.26,
+                                                                        decoration:
+                                                                            BoxDecoration(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(15),
+                                                                          image:
+                                                                              DecorationImage(
+                                                                            fit:
+                                                                                BoxFit.contain,
+                                                                            image:
+                                                                                NetworkImage(_configModel.apiConfig['mediaURL'] + (_productModel.allProducts?[index].productImages?.first.imagepath?.toString() ?? '')),
+                                                                          ),
+                                                                        ),
+                                                                        child:
+                                                                            InkWell(
+                                                                          onTap:
+                                                                              () async {
+                                                                            await _wishListModel.getWishLists(_productModel.allProducts?[index].id);
+                                                                          },
+                                                                          child: _wishListModel.wishListLoader
                                                                               ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
-                                                                              : Align(
-                                                                                  alignment: Alignment.topRight,
-                                                                                  child: Icon(
-                                                                                    Icons.favorite_outlined,
-                                                                                    color: Colors.red,
-                                                                                  )),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
-                                                                  height: 10,
-                                                                ),
-                                                                InkWell(
-                                                                  onTap: () {
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .push(MaterialPageRoute(
-                                                                            builder: (context) => ProductIdPage(arguments: {
-                                                                                  'product': _productModel.allProducts![index].toJson(),
-                                                                                  'category': _productModel.allProducts![index].category!.name.toString(),
-                                                                                })));
-                                                                  },
-                                                                  child:
-                                                                      Container(
-                                                                    child: Text(
-                                                                      _productModel
-                                                                          .allProducts![
-                                                                              index]
-                                                                          .name
-                                                                          .toString(),
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                      style:
-                                                                          MyGoogleFontStyle(
-                                                                        fontFamily:
-                                                                            'Urbanist',
-                                                                        fontSize:
-                                                                            15,
-                                                                        fontWeight:
-                                                                            FontWeight.w700,
-                                                                        color: Color(
-                                                                            0xff000000),
+                                                                              : _wishListModel.wishLists?.where((wishList) => wishList.productId == _productModel.allProducts?[index].id && wishList.userId == _configModel.user?.id).toList().length == 0
+                                                                                  ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
+                                                                                  : Align(
+                                                                                      alignment: Alignment.topRight,
+                                                                                      child: Icon(
+                                                                                        Icons.favorite_outlined,
+                                                                                        color: Colors.red,
+                                                                                      )),
+                                                                        ),
                                                                       ),
                                                                     ),
-                                                                  ),
-                                                                ),
-                                                                Container(
-                                                                  child: _productModel
-                                                                              .allProducts![
-                                                                                  index]
-                                                                              .productPrices![
-                                                                                  0]
-                                                                              .offerPrice !=
-                                                                          0
-                                                                      ? Text.rich(
-                                                                          TextSpan(
-                                                                              children: [
+                                                                    SizedBox(
+                                                                      height:
+                                                                          10,
+                                                                    ),
+                                                                    InkWell(
+                                                                      onTap:
+                                                                          () {
+                                                                        Navigator.of(context).push(MaterialPageRoute(
+                                                                            builder: (context) => ProductIdPage(arguments: {
+                                                                                  'product': _productModel.allProducts?[index].toJson(),
+                                                                                  'category': _productModel.allProducts?[index].category?.name?.toString() ?? '',
+                                                                                })));
+                                                                      },
+                                                                      child:
+                                                                          Container(
+                                                                        child:
+                                                                            Text(
+                                                                          _productModel
+                                                                              .allProducts![index]
+                                                                              .name
+                                                                              .toString(),
+                                                                          textAlign:
+                                                                              TextAlign.center,
+                                                                          style:
+                                                                              MyGoogleFontStyle(
+                                                                            fontFamily:
+                                                                                'Urbanist',
+                                                                            fontSize:
+                                                                                15,
+                                                                            fontWeight:
+                                                                                FontWeight.w700,
+                                                                            color:
+                                                                                Color(0xff000000),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    Container(
+                                                                      child: (_productModel.allProducts?[index]?.productPrices?[0]?.offerPrice ?? 0) !=
+                                                                              0
+                                                                          ? Text.rich(
+                                                                              TextSpan(children: [
                                                                               new TextSpan(
-                                                                                text: 'RS. ${_productModel.allProducts![index].productPrices![0].price.toString()}',
+                                                                                text: 'RS. ${_productModel.allProducts?[index].productPrices?[0].price?.toString() ?? '0'}',
                                                                                 style: new TextStyle(
                                                                                   color: Colors.grey,
                                                                                   decoration: TextDecoration.lineThrough,
                                                                                 ),
                                                                               ),
                                                                               new TextSpan(
-                                                                                text: ' RS.${_productModel.allProducts![index].productPrices![0].offerPrice.toString()}',
+                                                                                text: ' RS.${_productModel.allProducts?[index].productPrices?[0].offerPrice?.toString() ?? '0'}',
                                                                               ),
                                                                             ]))
-                                                                      : Text(
-                                                                          _productModel.products![index].productPrices![0].price.toString() +
-                                                                              " " +
-                                                                              'RS',
+                                                                          : Text(
+                                                                              _productModel.products![index].productPrices![0].price.toString() + " " + 'RS',
+                                                                              style: MyGoogleFontStyle(
+                                                                                fontFamily: 'Poppins',
+                                                                                fontSize: 13,
+                                                                                fontWeight: FontWeight.w500,
+                                                                                height: 1.5,
+                                                                                letterSpacing: -0.2190869331,
+                                                                                color: Color(0x99000000),
+                                                                              ),
+                                                                            ),
+                                                                    ),
+                                                                    if (discountPrice !=
+                                                                        0.0)
+                                                                      Center(
+                                                                        child:
+                                                                            Text(
+                                                                          '( ${discountPrice.round()}% Off)',
                                                                           style:
                                                                               MyGoogleFontStyle(
                                                                             fontFamily:
                                                                                 'Poppins',
                                                                             fontSize:
-                                                                                13,
+                                                                                12,
                                                                             fontWeight:
-                                                                                FontWeight.w500,
-                                                                            height:
-                                                                                1.5,
-                                                                            letterSpacing:
-                                                                                -0.2190869331,
+                                                                                FontWeight.bold,
                                                                             color:
                                                                                 Color(0x99000000),
                                                                           ),
                                                                         ),
-                                                                ),
-                                                                if (discountPrice !=
-                                                                    0.0)
-                                                                  Center(
-                                                                    child: Text(
-                                                                      '( ${discountPrice.round()}% Off)',
-                                                                      style:
-                                                                          MyGoogleFontStyle(
-                                                                        fontFamily:
-                                                                            'Poppins',
-                                                                        fontSize:
-                                                                            12,
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                        color: Color(
-                                                                            0x99000000),
                                                                       ),
-                                                                    ),
-                                                                  ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        );
-                                                      },
-                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            );
+                                                          },
+                                                        ),
                                             )
                                           ],
                                         ),

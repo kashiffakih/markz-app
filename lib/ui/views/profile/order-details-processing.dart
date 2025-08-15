@@ -502,6 +502,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             order['delivery_amount']?.toString() ?? '0', fem, ffem),
         _buildCostRow('Packing charge',
             order['packaging_amount']?.toString() ?? '0', fem, ffem),
+        _buildCostRow('Reward', order['wallet_amount_used']?.toString() ?? '0',
+            fem, ffem),
         Divider(color: Colors.black, indent: 20 * fem, endIndent: 20 * fem),
         _buildCostRow(
             'Grand Total', order['order_cost']?.toString() ?? '0', fem, ffem,
@@ -559,7 +561,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             ),
           ),
           Text(
-            'Paid: Cash on Delivery',
+            'Paid: ${widget.arguments?['order']['paymentmode']?.toString()}',
             style: MyGoogleFontStyle(
               fontFamily: 'Urbanist',
               fontSize: 13 * ffem,

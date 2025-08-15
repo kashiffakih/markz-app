@@ -123,7 +123,7 @@ class ConfigModel with ChangeNotifier {
   final ConfigService _configService = locator<ConfigService>();
 
   // File Management
-  late List<File> _files = [];
+  List<File> _files = [];
 
   set files(List<File> newFiles) {
     _files = newFiles;
@@ -138,7 +138,7 @@ class ConfigModel with ChangeNotifier {
   }
 
   // API Configuration
-  late Map<String, dynamic> _apiConfig;
+  Map<String, dynamic> _apiConfig = {};
 
   set apiConfig(Map<String, dynamic> newApiConfig) {
     _apiConfig = newApiConfig;
@@ -219,10 +219,12 @@ class ConfigModel with ChangeNotifier {
     } else if (responseData['success'] == true) {
       isLoggedIn = true;
       user = User.fromJson(responseData['data']);
+      final currentUser = user;
       apiConfig = _configService.getApiConfig(
-        token: user?.apiToken,
-        companyId:
-            user?.companies?.isNotEmpty == true ? user!.companies![0].id : 1,
+        token: currentUser?.apiToken,
+        companyId: (currentUser != null && currentUser.companies != null && currentUser.companies!.isNotEmpty)
+            ? currentUser.companies![0].id
+            : 1,
       );
       currentAndroidVersionFromApi =
           responseData['currentAndroidVersionFromApi'];

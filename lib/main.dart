@@ -19,12 +19,26 @@ import 'package:aadab/ui/root_p.dart';
 import 'package:aadab/ui/routing/router.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 import 'package:aadab/ui/views/deeplink/deep_link_listener.dart';
+import 'package:aadab/core/services/connectivity_service.dart';
+import 'package:aadab/ui/widgets/network_aware_widget.dart';
+import 'package:aadab/ui/widgets/network_status_overlay.dart';
 
 Future<void> main() async {
   setupLocator();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await FirebaseApi(); // Initialize FirebaseApi for notifications
+  
+  // Initialize Firebase notifications
+  final firebaseApi = FirebaseApi();
+  await firebaseApi.initNotifications();
+  
+  // Initialize connectivity service before running the app
+  final connectivityService = ConnectivityService();
+  await connectivityService.initialize();
+  
+  // Small delay to ensure service is ready
+  await Future.delayed(Duration(milliseconds: 100));
+  
   runApp(const MyApp());
 }
 
@@ -41,6 +55,9 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    
+    // Set up notification tap callback
+    FirebaseApi.onNotificationTap = _handleNotificationData;
 
     // Handle notifications when app is opened from terminated state
     FirebaseMessaging.instance
@@ -60,7 +77,42 @@ class _MyAppState extends State<MyApp> {
   void _handleNotificationNavigation(RemoteMessage message) {
     final data = message.data;
     debugPrint('Handle notification navigation: ${message.data}');
-    if (data['route'] != null && _navigatorKey.currentState != null) {
+    _handleNotificationData(data);
+  }
+  
+  void _handleNotificationData(Map<String, dynamic> data) {
+    if (_navigatorKey.currentState == null) return;
+    
+    // Handle different notification types
+    if (data['type'] != null) {
+      switch (data['type']) {
+        case 'order':
+          if (data['orderId'] != null) {
+            _navigatorKey.currentState!.pushNamed(
+              '/orderDetailsPage',
+              arguments: data['orderId'],
+            );
+          }
+          break;
+        case 'promotion':
+          _navigatorKey.currentState!.pushNamed('/promocodes');
+          break;
+        case 'product':
+          if (data['productId'] != null) {
+            _navigatorKey.currentState!.pushNamed(
+              '/productIdPage',
+              arguments: data['productId'],
+            );
+          }
+          break;
+        default:
+          // Default route handling
+          if (data['route'] != null) {
+            _navigatorKey.currentState!.pushNamed(data['route']);
+          }
+      }
+    } else if (data['route'] != null) {
+      // Fallback to route if no type specified
       _navigatorKey.currentState!.pushNamed(data['route']);
     }
   }
@@ -98,8 +150,12 @@ class _MyAppState extends State<MyApp> {
                 bodySmall: MyGoogleFontStyle(),
               ),
         ),
-        home: DeepLinkListener(
-          child: RootPage(),
+        home: NetworkAwareWidget(
+          child: NetworkStatusOverlay(
+            child: DeepLinkListener(
+              child: RootPage(),
+            ),
+          ),
         ),
       ),
     );

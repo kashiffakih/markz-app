@@ -6,6 +6,7 @@ import 'package:aadab/core/providers/config_pr.dart';
 import 'package:aadab/locator.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:aadab/core/services/permission_service.dart';
 
 class RootPage extends StatefulWidget {
   @override
@@ -13,8 +14,10 @@ class RootPage extends StatefulWidget {
 }
 
 class _RootPageState extends State<RootPage> {
+  final PermissionService _permissionService = PermissionService();
+
   authenticateUser(_, AuthModel authModel, ConfigModel configModel) async {
-    // configModel.getApiConfig(domain: 'http://192.168.0.104:8080');
+    // configModel.getApiConfig(domain: 'http://192.168.0.103:8080');
     // configModel.getApiConfig(domain: 'http://172.20.10.2:8089');
     // configModel.getApiConfig(domain: 'http://192.168.0.103:7070');
     // configModel.getApiConfig(domain: 'http://localhost:7070');
@@ -24,7 +27,7 @@ class _RootPageState extends State<RootPage> {
 
     String currentAppVersion = await getPackageDetails();
 
-    if (configModel.loginData.length == 0) {
+    if (configModel.loginData.isEmpty) {
       // Future.delayed(
       //   Duration.zero,
       //   () => Navigator.pushReplacementNamed(context, '/allPages'),
@@ -35,17 +38,40 @@ class _RootPageState extends State<RootPage> {
       );
     } else {
       await authModel.login(loginData: configModel.loginData);
-      print('APP: ' + currentAppVersion);
-      print('API: ' + configModel.currentAndroidVersionFromApi);
+      debugPrint('APP: $currentAppVersion');
+      debugPrint('API: ${configModel.currentAndroidVersionFromApi}');
 
       if (configModel.isLoggedIn) {
         // if (currentAppVersion != configModel.currentAndroidVersionFromApi) {
         //   Navigator.pushReplacementNamed(context, '/updateApp');
         // } else {
-        Future.delayed(
-          Duration.zero,
-          () => Navigator.pushReplacementNamed(context, '/homePage'),
-        );
+
+        // Check if all permissions are granted
+        bool allPermissionsGranted =
+            await _permissionService.areAllPermissionsGranted();
+
+        if (!allPermissionsGranted) {
+          // Navigate to permissions page
+          Future.delayed(
+            Duration.zero,
+            () async {
+              final result = await Navigator.pushNamed(context, '/permissions');
+              if (result == true) {
+                // Permissions granted, navigate to home
+                Navigator.pushReplacementNamed(context, '/homePage');
+              } else {
+                // Permissions not granted, stay on permissions page or show message
+                Navigator.pushReplacementNamed(context, '/permissions');
+              }
+            },
+          );
+        } else {
+          // All permissions granted, navigate to home
+          Future.delayed(
+            Duration.zero,
+            () => Navigator.pushReplacementNamed(context, '/homePage'),
+          );
+        }
         // }
       } else {
         Future.delayed(

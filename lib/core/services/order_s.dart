@@ -22,11 +22,11 @@ class OrderService {
     couponValue,
   ) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    
+
     if (_configModel.user == null) {
       return false;
     }
-    
+
     if (couponId.toString() == 'null' || couponId == null || couponId == '') {
       couponId = '';
     }
@@ -48,29 +48,30 @@ class OrderService {
     Order order = Order(
         couponAmount: int.parse(couponValue),
         couponId: couponId,
-        deliveryAmount: double.tryParse(
-                _configModel.user?.companies?[0].deliveryCharges?.toString() ??
-                    '0') ??
-            0.0,
+        deliveryAmount:
+            double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ?? '0') ??
+                0.0,
         details: '-',
         isApprovedByHotelier: 0,
-        orderCost: int.parse(cartTotal.toString()),
-        packagingAmount: _configModel.user!.companies![0].packagingCharges,
+        orderCost: (int.parse(cartTotal.toString()) -
+            double.parse(userWalletUsed.toString()).toInt()),
+        packagingAmount: _configModel.user?.companies?[0].packagingCharges ?? 0,
         taxAmount: double.parse(cartTotal) /
             100 *
-            double.parse(
-                _configModel.user!.companies![0].taxPercent.toString()),
-        taxPercent: _configModel.user!.companies![0].taxPercent.toString(),
+            (double.tryParse(_configModel.user?.companies?[0].taxPercent?.toString() ?? '0') ??
+                0.0),
+        taxPercent:
+            _configModel.user?.companies?[0].taxPercent?.toString() ?? '0',
         tipAmount: 0,
         totalAmount: double.parse(((double.parse(cartTotal)) +
                 (double.parse(cartTotal) /
                     100 *
-                    double.parse(_configModel.user!.companies![0].taxPercent
-                        .toString())))
+                    (double.tryParse(_configModel.user?.companies?[0].taxPercent?.toString() ?? '0') ??
+                        0.0)))
             .toString()),
         totalCashback: 0,
         walletAmountUsed: double.parse(userWalletUsed.toString()).toInt(),
-        userId: _configModel.user!.id,
+        userId: _configModel.user?.id ?? 0,
         isDelivered: 0,
         isDeliveryBoyAccepted: 0,
         isDinein: 0,
@@ -85,16 +86,40 @@ class OrderService {
     _orderJson['order_details'] = orderDetails;
 
     print('Order $_orderJson');
-    http.Response _response = await http.post(
-      Uri.parse('${_apiConfig['baseURL']}/orders'),
-      body: json.encode(_orderJson),
-      headers: _apiConfig['headers'],
-    );
-    Map<String, dynamic> _responseData = json.decode(_response.body);
-    print('Place order: $_responseData');
-    print(_responseData['success']);
-    // return true;
-    return _responseData['success'];
+    try {
+      http.Response _response = await http.post(
+        Uri.parse('${_apiConfig['baseURL']}/orders'),
+        body: json.encode(_orderJson),
+        headers: _apiConfig['headers'],
+      );
+      
+      print('Response status: ${_response.statusCode}');
+      print('Response body: ${_response.body}');
+      
+      if (_response.statusCode == 200 || _response.statusCode == 201) {
+        Map<String, dynamic> _responseData = json.decode(_response.body);
+        print('Place order: $_responseData');
+        
+        // Check if success field exists and return it, otherwise check status code
+        if (_responseData.containsKey('success')) {
+          return _responseData['success'] == true;
+        } else if (_responseData.containsKey('status')) {
+          return _responseData['status'] == 'success' || _responseData['status'] == true;
+        } else if (_responseData.containsKey('data')) {
+          // Sometimes the API returns data object on success
+          return _responseData['data'] != null;
+        }
+        
+        // If response is 200/201 but no explicit success field, assume success
+        return true;
+      } else {
+        print('Order placement failed with status: ${_response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Error placing order: $e');
+      return false;
+    }
   }
 
   // Future<bool> placedOrder(
@@ -194,11 +219,11 @@ class OrderService {
 
   getOrders() async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    
+
     if (_configModel.user == null) {
       return <Order>[];
     }
-    
+
     var userId = _configModel.user!.id;
     http.Response _response = await http.get(
       Uri.parse('${_apiConfig['baseURL']}/orders?userId=$userId'),

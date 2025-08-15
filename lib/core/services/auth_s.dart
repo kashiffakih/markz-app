@@ -17,20 +17,44 @@ class AuthService {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
     // print('Login Data');
     // print(loginData);
-    http.Response _response = await http.post(
-      Uri.parse('${_apiConfig['baseURL']}/login'),
-      body: json.encode(loginData),
-      headers: _apiConfig['headers'],
-    );
+    
+    try {
+      http.Response _response = await http.post(
+        Uri.parse('${_apiConfig['baseURL']}/login'),
+        body: json.encode(loginData),
+        headers: _apiConfig['headers'],
+      );
 
-    Map<String, dynamic> _responseData = json.decode(_response.body);
-    print(_responseData);
+      // Check if response is JSON
+      if (_response.headers['content-type']?.contains('application/json') ?? false) {
+        Map<String, dynamic> _responseData = json.decode(_response.body);
+        print(_responseData);
 
-    if (_responseData['success'] == null) {
-    } else if (_responseData['success']) {
-      await _configModel.saveLoginData(newLoginData: loginData);
+        if (_responseData['success'] == null) {
+        } else if (_responseData['success']) {
+          await _configModel.saveLoginData(newLoginData: loginData);
+        }
+        _configModel.saveUserData(responseData: _responseData);
+      } else {
+        // Handle non-JSON response
+        print('Error: Server returned non-JSON response');
+        print('Status Code: ${_response.statusCode}');
+        print('Response: ${_response.body.substring(0, _response.body.length > 200 ? 200 : _response.body.length)}...');
+        
+        // Save empty user data to indicate login failure
+        _configModel.saveUserData(responseData: {
+          'success': false,
+          'message': 'Server error: Invalid response format'
+        });
+      }
+    } catch (e) {
+      print('Error during login: $e');
+      // Save empty user data to indicate login failure
+      _configModel.saveUserData(responseData: {
+        'success': false,
+        'message': 'Network error: ${e.toString()}'
+      });
     }
-    _configModel.saveUserData(responseData: _responseData);
   }
 
   Future<bool> registerUser(
@@ -198,9 +222,11 @@ class AuthService {
 
     final responseData = json.decode(responseBody.body);
 
-    Map<String, dynamic>? data = _configModel.user!.toJson();
+    Map<String, dynamic>? data = _configModel.user?.toJson();
 
-    data['password'] = _configModel.loginData['password'];
+    if (data != null) {
+      data['password'] = _configModel.loginData['password'];
+    }
     await _configModel.saveLoginData(newLoginData: data);
     _configModel.saveUserData(responseData: responseData);
     return {
