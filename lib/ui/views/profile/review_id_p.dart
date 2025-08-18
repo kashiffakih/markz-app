@@ -224,6 +224,7 @@ class _ReviewsPageState extends State<ReviewUpdatePage> {
   String _reviewDescription = '';
   double _currentRating = 0.0;
   bool _isLoading = false;
+  List<String> _selectedImages = [];
 
   @override
   void initState() {
@@ -397,7 +398,13 @@ class _ReviewsPageState extends State<ReviewUpdatePage> {
             SizedBox(height: 10 * fem),
             SizedBox(
               height: 120 * fem,
-              child: MultipleImageUploadPage(),
+              child: MultipleImageUploadPage(
+                onImagesSelected: (images) {
+                  setState(() {
+                    _selectedImages = images;
+                  });
+                },
+              ),
             ),
             Container(
               margin: EdgeInsets.symmetric(horizontal: 5 * fem),
@@ -406,13 +413,21 @@ class _ReviewsPageState extends State<ReviewUpdatePage> {
                     ? null
                     : () async {
                         if (_formKey.currentState!.validate()) {
+                          if (_currentRating == 0) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Please select a rating')),
+                            );
+                            return;
+                          }
                           _formKey.currentState!.save();
                           setState(() => _isLoading = true);
                           try {
                             await reviewModel.getMyReviews(
                               _review.product?.id?.toString() ?? '',
+                              _review.productPackId?.toString() ?? '',
                               _reviewDescription,
                               _currentRating,
+                              _selectedImages,
                             );
                             if (mounted) Navigator.pop(context);
                           } catch (e) {

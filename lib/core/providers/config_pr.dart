@@ -172,6 +172,20 @@ class ConfigModel with ChangeNotifier {
 
   Future<void> removeLoginData() async {
     await _configService.removeLoginData();
+    // Clear user data from memory
+    clearUserData();
+  }
+  
+  void clearUserData() {
+    // Clear all user-related data from memory
+    _user = null;
+    _isLoggedIn = false;
+    _loginFailedMessage = "";
+    _loginData = {};
+    _selectedImage = '';
+    // Reset API config to default (without token)
+    _apiConfig = _configService.getApiConfig(domain: '');
+    notifyListeners();
   }
 
   // User Management

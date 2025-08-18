@@ -54,7 +54,8 @@ class OrderService {
         details: '-',
         isApprovedByHotelier: 0,
         orderCost: (int.parse(cartTotal.toString()) -
-            double.parse(userWalletUsed.toString()).toInt()),
+            double.parse(userWalletUsed.toString()).toInt() -
+            int.parse(couponValue)),
         packagingAmount: _configModel.user?.companies?[0].packagingCharges ?? 0,
         taxAmount: double.parse(cartTotal) /
             100 *
@@ -92,24 +93,25 @@ class OrderService {
         body: json.encode(_orderJson),
         headers: _apiConfig['headers'],
       );
-      
+
       print('Response status: ${_response.statusCode}');
       print('Response body: ${_response.body}');
-      
+
       if (_response.statusCode == 200 || _response.statusCode == 201) {
         Map<String, dynamic> _responseData = json.decode(_response.body);
         print('Place order: $_responseData');
-        
+
         // Check if success field exists and return it, otherwise check status code
         if (_responseData.containsKey('success')) {
           return _responseData['success'] == true;
         } else if (_responseData.containsKey('status')) {
-          return _responseData['status'] == 'success' || _responseData['status'] == true;
+          return _responseData['status'] == 'success' ||
+              _responseData['status'] == true;
         } else if (_responseData.containsKey('data')) {
           // Sometimes the API returns data object on success
           return _responseData['data'] != null;
         }
-        
+
         // If response is 200/201 but no explicit success field, assume success
         return true;
       } else {
@@ -242,5 +244,41 @@ class OrderService {
     debugPrint(
         "gt orders----------${_orders.first.orderDetails?.first.product?.productImages?.first.imagepath}");
     return _orders;
+  }
+
+  // Check coupon usage count for current user
+  Future<int> getCouponUsageCount(String couponId) async {
+    try {
+      Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+
+      if (_configModel.user == null || couponId.isEmpty) {
+        return 0;
+      }
+
+      var userId = _configModel.user!.id;
+      http.Response _response = await http.get(
+        Uri.parse(
+            '${_apiConfig['baseURL']}/orders/coupon-usage?userId=$userId&couponId=$couponId'),
+        headers: _apiConfig['headers'],
+      );
+
+      if (_response.statusCode == 200) {
+        Map<String, dynamic> _responseData = json.decode(_response.body);
+        return _responseData['count'] ?? 0;
+      }
+
+      // If API endpoint doesn't exist, count from local orders
+      await getOrders();
+      int count = 0;
+      for (var order in _orders) {
+        if (order.couponId == couponId) {
+          count++;
+        }
+      }
+      return count;
+    } catch (e) {
+      debugPrint('Error getting coupon usage count: $e');
+      return 0;
+    }
   }
 }

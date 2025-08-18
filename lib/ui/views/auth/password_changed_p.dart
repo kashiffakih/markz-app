@@ -77,7 +77,7 @@ class PasswordChangesPage extends StatelessWidget {
               TextButton(
                 // backtologinbuttonUCn (318:2095)
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/loginPage');
+                  Navigator.pushReplacementNamed(context, '/');
                 },
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,

@@ -252,7 +252,9 @@ class _LoginPageState extends State<LoginPage> {
                       });
                       if (_loginKey.currentState!.validate()) {
                         _loginKey.currentState!.save();
-                        _loginData['role'] = widget.argument['role'];
+                        _loginData['role'] = widget.argument != null
+                            ? widget.argument['role']
+                            : 'Customer';
                         await authModel.login(loginData: _loginData);
                         if (_configModel.isLoggedIn) {
                           Navigator.pushReplacementNamed(context, '/');

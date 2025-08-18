@@ -54,4 +54,9 @@ class OrderModel with ChangeNotifier {
   getOrder() async {
     orders = await _orderService.getOrders();
   }
+
+  // Check coupon usage count
+  Future<int> getCouponUsageCount(String couponId) async {
+    return await _orderService.getCouponUsageCount(couponId);
+  }
 }

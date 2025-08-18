@@ -771,17 +771,39 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
     final userAddressModel =
         Provider.of<UserAddressModel>(context, listen: false);
 
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(),
-              const SizedBox(height: 16),
-              _buildForm(userAddressModel),
-            ],
+    return WillPopScope(
+      onWillPop: () async {
+        if (widget.arguments['isAddress'] == true) {
+          Navigator.pop(context);
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddressPage(
+                arguments: {
+                  'cartItems': widget.arguments['cartItems'] ?? [],
+                  'cartTotal': widget.arguments['cartTotal'] ?? '',
+                  'couponValue': widget.arguments['couponValue'] ?? 0,
+                  'isAddress': widget.arguments['isAddress'] ?? false,
+                },
+              ),
+            ),
+          );
+        }
+        return false;
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(),
+                const SizedBox(height: 16),
+                _buildForm(userAddressModel),
+              ],
+            ),
           ),
         ),
       ),
@@ -796,7 +818,25 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
             'assets/images/vector-GJ4.png',
             height: 15,
           ),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            if (widget.arguments['isAddress'] == true) {
+              Navigator.pop(context);
+            } else {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddressPage(
+                    arguments: {
+                      'cartItems': widget.arguments['cartItems'] ?? [],
+                      'cartTotal': widget.arguments['cartTotal'] ?? '',
+                      'couponValue': widget.arguments['couponValue'] ?? 0,
+                      'isAddress': widget.arguments['isAddress'] ?? false,
+                    },
+                  ),
+                ),
+              );
+            }
+          },
         ),
         Expanded(
           child: Text(
@@ -1138,19 +1178,29 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                     final success = await userAddressModel.updateUserAddress(
                         userAddress: _userAddress);
                     if (success && mounted) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddressPage(
-                            arguments: {
-                              'cartItems': [],
-                              'cartTotal': '',
-                              'couponValue': 0,
-                              'isAddress': false,
-                            },
+                      // Refresh the addresses list
+                      await userAddressModel.getUserAddresses();
+                      
+                      // Navigate back based on where we came from
+                      if (widget.arguments['isAddress'] == true) {
+                        // If coming from checkout flow, go back to address selection
+                        Navigator.pop(context);
+                      } else {
+                        // If coming from profile, replace with AddressPage
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddressPage(
+                              arguments: {
+                                'cartItems': widget.arguments['cartItems'] ?? [],
+                                'cartTotal': widget.arguments['cartTotal'] ?? '',
+                                'couponValue': widget.arguments['couponValue'] ?? 0,
+                                'isAddress': widget.arguments['isAddress'] ?? false,
+                              },
+                            ),
                           ),
-                        ),
-                      );
+                        );
+                      }
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(

@@ -701,19 +701,29 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                                       await _userAddressModel.saveUserAddress(
                                           userAddress: _userAddress);
                                   if (response == true) {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                AddressPage(arguments: {
-                                                  'cartItems': cartItems,
-                                                  'cartTotal': cartTotal,
-                                                  'couponValue': couponValue,
-                                                  'address': [],
-                                                  'isAddress': widget.arguments[
-                                                          'isShipping'] ??
-                                                      false
-                                                })));
-                                    // Navigator.pop(context);
+                                    // Refresh the addresses list
+                                    await _userAddressModel.getUserAddresses();
+                                    
+                                    // Navigate back
+                                    if (widget.arguments['isShipping'] == true) {
+                                      // If coming from checkout flow, just pop back
+                                      Navigator.pop(context);
+                                    } else {
+                                      // If coming from profile, replace with AddressPage
+                                      Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  AddressPage(arguments: {
+                                                    'cartItems': cartItems,
+                                                    'cartTotal': cartTotal,
+                                                    'couponValue': couponValue,
+                                                    'address': [],
+                                                    'isAddress': widget.arguments[
+                                                            'isShipping'] ??
+                                                        false
+                                                  })));
+                                    }
                                   }
                                   setState(() {
                                     _loading = false;

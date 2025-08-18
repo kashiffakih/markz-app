@@ -536,7 +536,7 @@ class _HomePageState extends State<HomePage>
                   Padding(
                     padding: EdgeInsets.only(left: 4 * fem),
                     child: Text(
-                      '(${product.reviews?.length ?? 0} Review${product.reviews?.length == 1 ? '' : 's'})',
+                      '(${product.totalReviews ?? 0} Review${(product.totalReviews ?? 0) == 1 ? '' : 's'})',
                       style: TextStyle(fontSize: 10 * ffem),
                     ),
                   ),

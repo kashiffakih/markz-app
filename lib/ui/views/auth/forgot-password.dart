@@ -213,13 +213,15 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           onPressed: () async {
                             setState(() {
                               _isLoading = true;
-                              _enterCode = true;
                             });
                             if (_loginKey.currentState!.validate()) {
                               _loginKey.currentState!.save();
                               bool response = await authModel
                                   .sendCodeForResetPassword(email: _loginData);
                               if (response == true) {
+                                setState(() {
+                                  _enterCode = true;
+                                });
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) =>
@@ -228,14 +230,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                         borderRadius:
                                             BorderRadius.circular(20)),
                                     title: Text(
-                                        'Mail send to provided email address'),
+                                        'Reset code has been sent to your email'),
                                     actions: <Widget>[
                                       TextButton(
                                         onPressed: () {
                                           Navigator.pop(context);
-                                          setState(() {
-                                            _enterCode = true;
-                                          });
                                         },
                                         child: Text('Ok'),
                                       ),

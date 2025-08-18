@@ -22,6 +22,58 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   String _reviewDescription = '';
   bool _isLoading = false;
   double _currentRating = 0;
+  List<String> _selectedImages = [];
+  Set<int> _reviewedProducts = {};
+  bool _isLoadingReviews = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadExistingReviews();
+  }
+
+  Future<void> _loadExistingReviews() async {
+    final configModel = locator<ConfigModel>();
+    final reviewModel = Provider.of<ReviewModel>(context, listen: false);
+
+    if (configModel.user != null) {
+      final orderDetails =
+          widget.arguments?['order']['order_details'] as List<dynamic>? ?? [];
+      for (var detail in orderDetails) {
+        // final productId = detail['product_id'];
+        final productPackId = detail['product_pack'];
+        // Convert to int if it's a string
+        final productPackIdInt = productPackId is String
+            ? int.tryParse(productPackId) ?? productPackId
+            : productPackId;
+        // print('Checking reviews for product pack: $productPackIdInt');
+        // Check if this product has been reviewed by the user
+        // Use getReviewsByProductPack to check existing reviews for this pack
+        await reviewModel.getReviewsByProductPack(
+            detail['product_id'], productPackIdInt);
+        print('Reviews found: ${reviewModel.reviews?.length ?? 0}');
+        if (reviewModel.reviews != null) {
+          for (var review in reviewModel.reviews!) {
+            print(
+                'Review - UserId: ${review.userId}, ProductPackId: ${review.productPackId}, CurrentUserId: ${configModel.user!.id}, CheckingPackId: $productPackIdInt');
+            // Check if user has reviewed this product pack
+            if (review.userId == configModel.user!.id &&
+                review.productPackId == productPackIdInt) {
+              setState(() {
+                _reviewedProducts.add(productPackIdInt);
+              });
+              print(
+                  'User has already reviewed product pack: $productPackIdInt');
+              break;
+            }
+          }
+        }
+      }
+    }
+    setState(() {
+      _isLoadingReviews = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -208,7 +260,23 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   ),
                   if (widget.arguments?['status'] == 'Delivered') ...[
                     const Spacer(),
-                    _buildReviewButton(context, fem, ffem, reviewModel, detail),
+                    if (_isLoadingReviews)
+                      SizedBox(
+                        width: 20 * fem,
+                        height: 20 * fem,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Color(0xffEED056)),
+                        ),
+                      )
+                    else if (!_reviewedProducts.contains(
+                        detail['product_pack'] is String
+                            ? int.tryParse(detail['product_pack']) ??
+                                detail['product_pack']
+                            : detail['product_pack']))
+                      _buildReviewButton(
+                          context, fem, ffem, reviewModel, detail),
                   ],
                 ],
               ),
@@ -223,9 +291,15 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
 
   Widget _buildReviewButton(BuildContext context, double fem, double ffem,
       ReviewModel reviewModel, dynamic detail) {
+    final productId = detail['product_id'];
+    final productPackId = detail['product_pack'];
+    final productPackIdInt = productPackId is String
+        ? int.tryParse(productPackId) ?? productPackId
+        : productPackId;
+
     return InkWell(
       onTap: () =>
-          _showReviewDialog(context, reviewModel, detail['product']['id']),
+          _showReviewDialog(context, reviewModel, productPackIdInt, productId),
       child: Container(
         width: 74.5 * fem,
         height: 30 * fem,
@@ -248,126 +322,167 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     );
   }
 
-  void _showReviewDialog(
-      BuildContext context, ReviewModel reviewModel, int productId) {
+  void _showReviewDialog(BuildContext context, ReviewModel reviewModel,
+      int productPackId, int productId) {
+    _selectedImages = [];
+    _currentRating = 0;
+    _reviewDescription = '';
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Add your review'),
-        content: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.5,
-          width: 400,
-          child: SingleChildScrollView(
-            child: Form(
-              key: _reviewFormKey,
-              child: Column(
-                children: [
-                  RatingBar.builder(
-                    itemSize: 30,
-                    initialRating: _currentRating,
-                    minRating: 0.5,
-                    direction: Axis.horizontal,
-                    allowHalfRating: true,
-                    itemCount: 5,
-                    itemPadding: const EdgeInsets.symmetric(horizontal: 4),
-                    itemBuilder: (context, _) =>
-                        const Icon(Icons.star, color: Colors.amber),
-                    onRatingUpdate: (rating) =>
-                        setState(() => _currentRating = rating),
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: const Color(0xffdadada)),
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text('Add your review'),
+          content: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.5,
+            width: 400,
+            child: SingleChildScrollView(
+              child: Form(
+                key: _reviewFormKey,
+                child: Column(
+                  children: [
+                    RatingBar.builder(
+                      itemSize: 30,
+                      initialRating: _currentRating,
+                      minRating: 0.5,
+                      direction: Axis.horizontal,
+                      allowHalfRating: true,
+                      itemCount: 5,
+                      itemPadding: const EdgeInsets.symmetric(horizontal: 4),
+                      itemBuilder: (context, _) =>
+                          const Icon(Icons.star, color: Colors.amber),
+                      onRatingUpdate: (rating) {
+                        setDialogState(() => _currentRating = rating);
+                      },
                     ),
-                    child: TextFormField(
-                      maxLines: 5,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.all(10),
-                        hintText: 'Write your review here.',
-                        hintStyle: TextStyle(color: Color(0xff8390a1)),
+                    SizedBox(height: 10),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xffdadada)),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      initialValue: _reviewDescription,
-                      onSaved: (value) => _reviewDescription = value ?? '',
-                      validator: (value) => value?.isEmpty ?? true
-                          ? 'Please write some review.'
-                          : null,
+                      child: TextFormField(
+                        maxLines: 5,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.all(10),
+                          hintText: 'Write your review here.',
+                          hintStyle: TextStyle(color: Color(0xff8390a1)),
+                        ),
+                        initialValue: _reviewDescription,
+                        onSaved: (value) => _reviewDescription = value ?? '',
+                        validator: (value) => value?.isEmpty ?? true
+                            ? 'Please write some review.'
+                            : null,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  SizedBox(height: 120, child: MultipleImageUploadPage()),
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 5),
-                    child: TextButton(
-                      onPressed: _isLoading
-                          ? null
-                          : () async {
-                              if (_reviewFormKey.currentState!.validate()) {
-                                _reviewFormKey.currentState!.save();
-                                setState(() => _isLoading = true);
-                                try {
-                                  await reviewModel.getMyReviews(productId,
-                                      _reviewDescription, _currentRating);
-                                  if (mounted) Navigator.pop(context);
-                                } catch (e) {
-                                  if (mounted) {
+                    SizedBox(height: 10),
+                    SizedBox(
+                      height: 120,
+                      child: MultipleImageUploadPage(
+                        onImagesSelected: (images) {
+                          setDialogState(() {
+                            _selectedImages = images;
+                          });
+                        },
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 5),
+                      child: TextButton(
+                        onPressed: _isLoading
+                            ? null
+                            : () async {
+                                if (_reviewFormKey.currentState!.validate()) {
+                                  if (_currentRating == 0) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                          content: Text(
-                                              'Failed to submit review: $e')),
+                                          content:
+                                              Text('Please select a rating')),
                                     );
+                                    return;
                                   }
-                                } finally {
-                                  if (mounted)
-                                    setState(() => _isLoading = false);
+                                  _reviewFormKey.currentState!.save();
+                                  print(
+                                      'Submitting review - ProductId: $productId, Description: $_reviewDescription, Rating: $_currentRating, Images: ${_selectedImages.length}');
+                                  setDialogState(() => _isLoading = true);
+                                  try {
+                                    await reviewModel.getMyReviews(
+                                        productId,
+                                        productPackId,
+                                        _reviewDescription,
+                                        _currentRating,
+                                        _selectedImages);
+                                    if (mounted) {
+                                      Navigator.pop(context);
+                                      // Update the parent widget's state after dialog is closed
+                                      setState(() {
+                                        _reviewedProducts.add(productPackId);
+                                      });
+                                      print(
+                                          'Review submitted for product: $productId');
+                                      print(
+                                          'Reviewed products: $_reviewedProducts');
+                                    }
+                                  } catch (e) {
+                                    if (mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                'Failed to submit review: $e')),
+                                      );
+                                    }
+                                  } finally {
+                                    if (mounted)
+                                      setDialogState(() => _isLoading = false);
+                                  }
                                 }
-                              }
-                            },
-                      style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                      child: Container(
-                        width: double.infinity,
-                        height: 53,
-                        decoration: BoxDecoration(
-                          color: const Color(0xff1e1e1e),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Center(
-                          child: _isLoading
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                      color: Colors.white),
-                                )
-                              : Text(
-                                  'Post Review',
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white,
+                              },
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                        child: Container(
+                          width: double.infinity,
+                          height: 53,
+                          decoration: BoxDecoration(
+                            color: const Color(0xff1e1e1e),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Center(
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                        color: Colors.white),
+                                  )
+                                : Text(
+                                    'Post Review',
+                                    style: MyGoogleFontStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
                                   ),
-                                ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel',
+                  style: TextStyle(color: Colors.black, fontSize: 16)),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel',
-                style: TextStyle(color: Colors.black, fontSize: 16)),
-          ),
-        ],
       ),
     );
   }
@@ -502,6 +617,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             order['delivery_amount']?.toString() ?? '0', fem, ffem),
         _buildCostRow('Packing charge',
             order['packaging_amount']?.toString() ?? '0', fem, ffem),
+        _buildCostRow('Coupon Value', order['coupon_amount']?.toString() ?? '0',
+            fem, ffem),
         _buildCostRow('Reward', order['wallet_amount_used']?.toString() ?? '0',
             fem, ffem),
         Divider(color: Colors.black, indent: 20 * fem, endIndent: 20 * fem),
@@ -625,7 +742,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             ),
           ),
           Text(
-            widget.arguments?['order']['address']['phone'].toString() ?? 'N/A',
+            widget.arguments?['order']['address']?['phone'].toString() ?? 'N/A',
             style: MyGoogleFontStyle(
               fontFamily: 'Urbanist',
               fontSize: 13 * ffem,

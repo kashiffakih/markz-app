@@ -292,6 +292,8 @@ class _RegisterPageState extends State<RegisterPage> {
                         // initialValue: _registerData['phone'],
                         validator: (value) {
                           if (value!.isEmpty) return 'Phone cannot be empty';
+                          if (value.length == 10)
+                            return "Phone number can't be less or greater than 10 digit";
                           return null;
                         },
                         onSaved: (value) {

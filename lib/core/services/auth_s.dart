@@ -8,7 +8,6 @@ import 'package:aadab/locator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-
 class AuthService {
   final ConfigModel _configModel = locator<ConfigModel>();
 
@@ -17,7 +16,7 @@ class AuthService {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
     // print('Login Data');
     // print(loginData);
-    
+
     try {
       http.Response _response = await http.post(
         Uri.parse('${_apiConfig['baseURL']}/login'),
@@ -26,7 +25,8 @@ class AuthService {
       );
 
       // Check if response is JSON
-      if (_response.headers['content-type']?.contains('application/json') ?? false) {
+      if (_response.headers['content-type']?.contains('application/json') ??
+          false) {
         Map<String, dynamic> _responseData = json.decode(_response.body);
         print(_responseData);
 
@@ -39,8 +39,9 @@ class AuthService {
         // Handle non-JSON response
         print('Error: Server returned non-JSON response');
         print('Status Code: ${_response.statusCode}');
-        print('Response: ${_response.body.substring(0, _response.body.length > 200 ? 200 : _response.body.length)}...');
-        
+        print(
+            'Response: ${_response.body.substring(0, _response.body.length > 200 ? 200 : _response.body.length)}...');
+
         // Save empty user data to indicate login failure
         _configModel.saveUserData(responseData: {
           'success': false,
@@ -126,47 +127,50 @@ class AuthService {
   Future<bool> sendCodeForResetPassword(
       {@required Map<String, dynamic>? email}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    var sendMail = email!['email'];
-    http.Response _response = await http.get(
-      Uri.parse(
-          '${_apiConfig['baseURL']}/emails/reset_password/users/$sendMail'),
-      // body: json.encode(email),
+
+    http.Response _response = await http.post(
+      Uri.parse('${_apiConfig['baseURL']}/forgot_password'),
+      body: json.encode({'email': email!['email']}),
       headers: _apiConfig['headers'],
     );
 
     Map<String, dynamic> _responseData = json.decode(_response.body);
-    return _responseData['success'];
+    print('tstt $_responseData');
+    return _response.statusCode == 200;
   }
 
   Future<bool> verifyCode({@required Map<String, dynamic>? data}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    var email = data!["email"];
-    var code = data["code"];
-    http.Response _response = await http.get(
-      Uri.parse(
-          '${_apiConfig['baseURL']}/verify_code/users?email=$email&code=$code'),
-      // body: json.encode(data),
+
+    http.Response _response = await http.post(
+      Uri.parse('${_apiConfig['baseURL']}/verify_code'),
+      body: json.encode({
+        'email': data!['email'],
+        'code': data['code'],
+      }),
       headers: _apiConfig['headers'],
     );
 
     Map<String, dynamic> _responseData = json.decode(_response.body);
-    return _responseData['success'];
+    return _response.statusCode == 200;
   }
 
   Future<bool> changePassword({@required Map<String, dynamic>? data}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    var email = data!["email"];
-    var password = data["password"];
-    http.Response _response = await http.get(
-      Uri.parse(
-          '${_apiConfig['baseURL']}/change_password/users?email=$email&password=$password'),
-      // body: json.encode(data),
+
+    http.Response _response = await http.post(
+      Uri.parse('${_apiConfig['baseURL']}/reset_password'),
+      body: json.encode({
+        'email': data!['email'],
+        'code': data['code'],
+        'password': data['password'],
+        'password_confirmation': data['confirm_password'],
+      }),
       headers: _apiConfig['headers'],
     );
 
     Map<String, dynamic> _responseData = json.decode(_response.body);
-
-    return _responseData['success'];
+    return _response.statusCode == 200;
   }
 
   Future<dynamic> signInWithGoogle() async {

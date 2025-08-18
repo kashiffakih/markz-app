@@ -349,12 +349,14 @@ class _ReviewsPageState extends State<ReviewsPage> {
   Future<void> _loadReviews() async {
     final reviewModel = Provider.of<ReviewModel>(context, listen: false);
     final productId = widget.arguments?['productId']?.toString() ?? '';
+    final productPackId = widget.arguments?['productPackId']?.toString() ?? '';
     setState(() => _isLoading = true);
     try {
       if (widget.arguments?['is_edit'] == false) {
-        await reviewModel.getReviews(productId);
+        // Use guest-friendly method for viewing reviews
+        await reviewModel.fetchReviewsForGuests(productId, productPackId);
       } else {
-        await reviewModel.getMyReviews(productId, '', '');
+        await reviewModel.getMyReviews('', productId, '', '', []);
       }
     } catch (e) {
       if (mounted) {
@@ -420,7 +422,8 @@ class _ReviewsPageState extends State<ReviewsPage> {
                           final daysDifference = createdAt != null
                               ? DateTime.now().difference(createdAt).inDays
                               : 31;
-                          if (daysDifference <= 30) {
+                          if (daysDifference <= 30 ||
+                              widget.arguments['is_edit'] == false) {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => ReviewUpdatePage(
@@ -517,6 +520,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
                         ),
                       ),
                       SizedBox(height: 5 * fem),
+                      // Text(review.toJson().toString()),
                       double.tryParse(review.rating?.toString() ?? '') == null
                           ? Text(
                               'No Rating',

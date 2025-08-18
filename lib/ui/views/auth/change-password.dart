@@ -222,6 +222,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                         _changePasswordKey.currentState!.save();
                         _changePasswordData['email'] =
                             widget.arguments['email'].toString();
+                        _changePasswordData['code'] =
+                            widget.arguments['code'].toString();
                         bool response = await authModel.changePassword(
                             data: _changePasswordData);
                         if (response == true) {

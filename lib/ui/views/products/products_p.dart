@@ -641,7 +641,7 @@ class _ProductsPageState extends State<ProductsPage> {
                   Padding(
                     padding: EdgeInsets.only(left: 4 * fem),
                     child: Text(
-                      '(${product.reviews?.length ?? 0} Review${product.reviews?.length == 1 ? '' : 's'})',
+                      '(${product.totalReviews} Review${product.totalReviews == 1 ? '' : 's'})',
                       style: TextStyle(fontSize: 10 * ffem),
                     ),
                   ),

@@ -363,32 +363,94 @@ class _PromocodesPageState extends State<PromocodesPage> {
       );
     }
 
+    // Filter active coupons
+    final activeCoupons = <Widget>[];
+    final currentDate = DateTime.now();
+
+    for (var coupon in couponModel.coupons!) {
+      try {
+        // Parse dates safely
+        DateTime? startDate;
+        DateTime? endDate;
+
+        if (coupon.startDate != null && coupon.startDate!.isNotEmpty) {
+          startDate = DateFormat('dd-MM-yyyy').parse(coupon.startDate!);
+        }
+
+        if (coupon.endDate != null && coupon.endDate!.isNotEmpty) {
+          endDate = DateFormat('dd-MM-yyyy').parse(coupon.endDate!);
+        }
+
+        // Check if coupon is active (current date is between start and end dates)
+        bool isActive = true;
+
+        if (startDate != null && currentDate.isBefore(startDate)) {
+          isActive = false;
+          print(
+              'Coupon ${coupon.name} not yet active. Starts on ${coupon.startDate}');
+        }
+
+        if (endDate != null && currentDate.isAfter(endDate)) {
+          isActive = false;
+          print('Coupon ${coupon.name} expired on ${coupon.endDate}');
+        }
+
+        // Only add active coupons
+        if (isActive) {
+          activeCoupons.add(
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: _buildActiveCoupon(context, coupon),
+            ),
+          );
+        }
+      } catch (e) {
+        print('Error parsing coupon dates for ${coupon.name}: $e');
+      }
+    }
+
+    // Show message if no active coupons
+    if (activeCoupons.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              Icon(
+                Icons.local_offer_outlined,
+                size: 64,
+                color: Colors.grey[400],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No active coupons available',
+                style: MyGoogleFontStyle(
+                  fontFamily: 'Urbanist',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xff232323),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Check back later for new offers!',
+                style: MyGoogleFontStyle(
+                  fontFamily: 'Urbanist',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Container(
       margin: const EdgeInsets.all(10),
       child: Column(
-        children: couponModel.coupons!.map((coupon) {
-          final endDate = DateFormat('dd-MM-yyyy').parse(coupon.endDate ?? '');
-          final isExpired = endDate.isBefore(DateTime.now());
-
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: isExpired
-                ? _buildExpiredCoupon()
-                : _buildActiveCoupon(context, coupon),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildExpiredCoupon() {
-    return Text(
-      'Expired',
-      style: MyGoogleFontStyle(
-        fontFamily: 'Urbanist',
-        fontSize: 15,
-        fontWeight: FontWeight.w400,
-        color: const Color(0xff232323),
+        children: activeCoupons,
       ),
     );
   }
@@ -436,14 +498,28 @@ class _PromocodesPageState extends State<PromocodesPage> {
               ),
             ),
             const SizedBox(height: 5),
-            Text(
-              'Expires on: ${coupon.endDate ?? 'N/A'}',
-              style: MyGoogleFontStyle(
-                fontFamily: 'Urbanist',
-                fontSize: 15,
-                fontWeight: FontWeight.w400,
-                color: const Color(0xff232323),
-              ),
+            Row(
+              children: [
+                if (coupon.startDate != null)
+                  Text(
+                    'Valid from: ${coupon.startDate} | ',
+                    style: MyGoogleFontStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xff666666),
+                    ),
+                  ),
+                Text(
+                  'Expires on: ${coupon.endDate ?? 'N/A'}',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xff666666),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

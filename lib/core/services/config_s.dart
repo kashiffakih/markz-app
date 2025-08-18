@@ -45,13 +45,19 @@ class ConfigService {
 
   removeLoginData() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
-    String _loginData = _prefs.get('loginData').toString();
-    Map<String, dynamic> _loginMap = json.decode(_loginData);
-    _loginMap['password'] = '';
-    _loginMap['email'] = '';
-    _loginMap['phone'] = '';
-    _loginMap['api_token'] = '';
-    _loginMap = {};
-    _prefs.setString('loginData', json.encode(_loginMap));
+    // Completely remove the loginData key from SharedPreferences
+    await _prefs.remove('loginData');
+
+    // Optional: Clear all SharedPreferences data if needed
+    // await _prefs.clear();
+
+    print('Login data completely removed from device storage');
+  }
+
+  // Method to clear all SharedPreferences data
+  clearAllStoredData() async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    await _prefs.clear();
+    print('All stored data cleared from device');
   }
 }

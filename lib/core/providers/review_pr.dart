@@ -17,13 +17,29 @@ class ReviewModel with ChangeNotifier {
   }
 
   List<Review>? get reviews => _reviews;
-  getMyReviews(productId, description, rating) async {
-    reviews = await _reviewService.getMyReviews(productId, description, rating);
+  getMyReviews(productId, productPackId, description, rating,
+      [List<String>? images]) async {
+    reviews = await _reviewService.getMyReviews(
+        productId, productPackId, description, rating, images ?? [], false);
   }
 
   getReviews(productId) async {
     print('ha bhai');
     bool onlyFetch = true;
-    reviews = await _reviewService.getMyReviews(productId, '', '', onlyFetch);
+    reviews = await _reviewService.getMyReviews(
+        productId, '', '', '', null, onlyFetch);
+  }
+
+  getReviewsByProductPack(productId, productPackId) async {
+    print('Fetching reviews for product pack: $productPackId');
+    bool onlyFetch = true;
+    reviews = await _reviewService.getMyReviews(
+        productId, productPackId, '', '', null, onlyFetch);
+  }
+
+  // Method for fetching reviews that works for both logged in and guest users
+  fetchReviewsForGuests(productId, [productPackId]) async {
+    print('Fetching reviews for guests - productId: $productId, packId: $productPackId');
+    reviews = await _reviewService.fetchProductReviews(productId, productPackId);
   }
 }

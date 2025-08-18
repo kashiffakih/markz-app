@@ -33,8 +33,8 @@ class Product {
   List<ProductImages>? productImages;
   List<Tags>? tags;
   Company? company;
-  List<Review>? reviews;
   String? rating;
+  int? totalReviews;
 
   Product(
       {this.id,
@@ -70,7 +70,7 @@ class Product {
       this.tags,
       this.rating,
       this.company,
-      this.reviews});
+      this.totalReviews});
 
   Product.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -99,6 +99,7 @@ class Product {
     vegNonveg = json['veg_nonveg'];
     inventory = json['inventory'];
     rating = json['rating'].toString();
+    totalReviews = json['total_reviews'];
     category = json['category'] != null
         ? new Category.fromJson(json['category'])
         : null;
@@ -131,12 +132,6 @@ class Product {
     }
     company =
         json['company'] != null ? new Company.fromJson(json['company']) : null;
-    if (json['reviews'] != null) {
-      reviews = <Review>[];
-      json['reviews'].forEach((v) {
-        reviews!.add(new Review.fromJson(v));
-      });
-    }
   }
 
   Map<String, dynamic> toJson() {
@@ -167,6 +162,7 @@ class Product {
     data['veg_nonveg'] = this.vegNonveg;
     data['inventory'] = this.inventory;
     data['rating'] = this.rating;
+    data['total_reviews'] = this.totalReviews;
     if (this.category != null) {
       data['category'] = this.category!.toJson();
     }
@@ -186,9 +182,6 @@ class Product {
     }
     if (this.company != null) {
       data['company'] = this.company!.toJson();
-    }
-    if (this.reviews != null) {
-      data['reviews'] = this.reviews!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -353,6 +346,7 @@ class ProductPack {
   String? updatedAt;
   Unit? unit;
   String? points;
+  List<Review>? reviews;
 
   ProductPack(
       {this.id,
@@ -362,7 +356,8 @@ class ProductPack {
       this.createdAt,
       this.updatedAt,
       this.unit,
-      this.points});
+      this.points,
+      this.reviews});
 
   ProductPack.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -373,6 +368,12 @@ class ProductPack {
     updatedAt = json['updated_at'];
     unit = json['unit'] != null ? new Unit.fromJson(json['unit']) : null;
     points = json['points'].toString();
+    if (json['reviews'] != null) {
+      reviews = <Review>[];
+      json['reviews'].forEach((v) {
+        reviews!.add(new Review.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -387,6 +388,9 @@ class ProductPack {
       data['unit'] = this.unit!.toJson();
     }
     data['points'] = this.points;
+    if (this.reviews != null) {
+      data['reviews'] = this.reviews!.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 }

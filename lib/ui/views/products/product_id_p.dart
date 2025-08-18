@@ -2124,6 +2124,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/models/product.dart';
+import 'package:aadab/core/models/add_to_cart.dart';
 import 'package:aadab/core/providers/add_to_cart_pr.dart';
 import 'package:aadab/core/providers/config_pr.dart';
 import 'package:aadab/core/providers/product_pr.dart';
@@ -2235,6 +2236,58 @@ class _ProductIdPageState extends State<ProductIdPage> {
           : 0.0;
     }
     cartCount = context.read<AddToCartModel>().addToCarts?.length ?? 0;
+  }
+
+  int _getTotalReviewsCount(Product? product) {
+    if (product == null) return 0;
+
+    // Count reviews from product packs only
+    int packReviews = 0;
+    if (product.productPacks != null) {
+      for (var pack in product.productPacks!) {
+        packReviews += pack.reviews?.length ?? 0;
+      }
+    }
+
+    // Use totalReviews if available from API, otherwise calculate
+    return product.totalReviews ?? packReviews;
+  }
+
+  int _getPackReviewsCount(Product? product, int packId) {
+    if (product == null || product.productPacks == null) return 0;
+
+    // Find the specific pack and return its review count
+    for (var pack in product.productPacks!) {
+      if (pack.id == packId) {
+        return pack.reviews?.length ?? 0;
+      }
+    }
+    return 0;
+  }
+
+  double _getPackRating(Product? product, int packId) {
+    if (product == null || product.productPacks == null) return 0.0;
+
+    // Find the specific pack and calculate its average rating
+    for (var pack in product.productPacks!) {
+      if (pack.id == packId) {
+        if (pack.reviews == null || pack.reviews!.isEmpty) return 0.0;
+
+        double totalRating = 0;
+        int validReviews = 0;
+
+        for (var review in pack.reviews!) {
+          double? rating = double.tryParse(review.rating ?? '0');
+          if (rating != null && rating > 0) {
+            totalRating += rating;
+            validReviews++;
+          }
+        }
+
+        return validReviews > 0 ? totalRating / validReviews : 0.0;
+      }
+    }
+    return 0.0;
   }
 
   @override
@@ -2931,7 +2984,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       (double value) {},
                                                 ),
                                               Text(
-                                                '(${product.reviews?.length ?? 0} Review${(product.reviews?.length ?? 0) == 1 ? '' : 's'})',
+                                                '(${_getTotalReviewsCount(product)} Review${_getTotalReviewsCount(product) == 1 ? '' : 's'})',
                                                 style: MyGoogleFontStyle(
                                                   fontFamily: 'Urbanist',
                                                   fontSize: 10 * ffem,
@@ -3639,57 +3692,91 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                           color: const Color(0x99000000),
                                         ),
                                       ),
-                                      if (product.rating != null &&
-                                          product.rating != '0')
-                                        Row(
-                                          children: [
-                                            Text(
-                                              product.rating.toString(),
-                                              style: MyGoogleFontStyle(
-                                                fontFamily: 'Poppins',
-                                                fontSize: 14 * ffem,
-                                                fontWeight: FontWeight.bold,
-                                                color: const Color(0x99000000),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 3 * fem),
-                                              child: const Icon(Icons.star,
-                                                  color: Colors.amber,
-                                                  size: 16),
-                                            ),
-                                            Text(
-                                              '(${product.reviews?.length ?? 0} ratings)',
-                                              style: TextStyle(
-                                                  fontSize: 12 * ffem),
-                                            ),
-                                            const Spacer(),
-                                            InkWell(
-                                              onTap: () {
-                                                Navigator.pushNamed(
-                                                  context,
-                                                  '/reviewsPage',
-                                                  arguments: {
-                                                    'productId':
-                                                        widget.arguments![
-                                                            'product']['id']
-                                                  },
-                                                );
-                                              },
-                                              child: Text(
-                                                'View Reviews & Ratings',
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Poppins',
-                                                  fontSize: 12 * ffem,
-                                                  fontWeight: FontWeight.bold,
-                                                  color:
-                                                      const Color(0x99000000),
+                                      Builder(
+                                        builder: (context) {
+                                          // Get current selected pack ID
+                                          int? currentPackId;
+                                          if (activeIndex >= 0 &&
+                                              activeIndex < _sizes.length) {
+                                            currentPackId =
+                                                _sizes[activeIndex]['id'];
+                                          }
+
+                                          // Get pack-specific rating and reviews
+                                          double packRating =
+                                              currentPackId != null
+                                                  ? _getPackRating(
+                                                      product, currentPackId)
+                                                  : 0.0;
+                                          int packReviewCount = currentPackId !=
+                                                  null
+                                              ? _getPackReviewsCount(
+                                                  product, currentPackId)
+                                              : _getTotalReviewsCount(product);
+
+                                          if (packRating > 0 ||
+                                              product.rating != '0')
+                                            return Row(
+                                              children: [
+                                                Text(
+                                                  packRating > 0
+                                                      ? packRating
+                                                          .toStringAsFixed(1)
+                                                      : product.rating
+                                                          .toString(),
+                                                  style: MyGoogleFontStyle(
+                                                    fontFamily: 'Poppins',
+                                                    fontSize: 14 * ffem,
+                                                    fontWeight: FontWeight.bold,
+                                                    color:
+                                                        const Color(0x99000000),
+                                                  ),
                                                 ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                                Padding(
+                                                  padding: EdgeInsets.only(
+                                                      left: 3 * fem),
+                                                  child: const Icon(Icons.star,
+                                                      color: Colors.amber,
+                                                      size: 16),
+                                                ),
+                                                Text(
+                                                  '($packReviewCount ratings)',
+                                                  style: TextStyle(
+                                                      fontSize: 12 * ffem),
+                                                ),
+                                                const Spacer(),
+                                                InkWell(
+                                                  onTap: () {
+                                                    Navigator.pushNamed(
+                                                      context,
+                                                      '/reviewsPage',
+                                                      arguments: {
+                                                        'productId': widget
+                                                                .arguments![
+                                                            'product']['id'],
+                                                        'productPackId':
+                                                            currentPackId,
+                                                        'is_edit': false
+                                                      },
+                                                    );
+                                                  },
+                                                  child: Text(
+                                                    'View Reviews & Ratings',
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Poppins',
+                                                      fontSize: 12 * ffem,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: const Color(
+                                                          0x99000000),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          return SizedBox.shrink();
+                                        },
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -4052,6 +4139,61 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                         0x99000000),
                                                                   ),
                                                                 ),
+                                                              // Rating and Reviews
+                                                              Padding(
+                                                                padding: EdgeInsets
+                                                                    .only(
+                                                                        top: 4 *
+                                                                            fem),
+                                                                child: Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    relatedProduct.rating ==
+                                                                                null ||
+                                                                            relatedProduct.rating ==
+                                                                                '0'
+                                                                        ? Text(
+                                                                            "No Rating",
+                                                                            style:
+                                                                                TextStyle(fontSize: 10 * ffem),
+                                                                          )
+                                                                        : RatingBar
+                                                                            .builder(
+                                                                            itemSize:
+                                                                                15 * ffem,
+                                                                            initialRating:
+                                                                                double.tryParse(relatedProduct.rating ?? '0.0') ?? 0.0,
+                                                                            direction:
+                                                                                Axis.horizontal,
+                                                                            itemCount:
+                                                                                5,
+                                                                            allowHalfRating:
+                                                                                true,
+                                                                            ignoreGestures:
+                                                                                true,
+                                                                            itemBuilder: (context, _) =>
+                                                                                const Icon(Icons.star, color: Colors.amber),
+                                                                            onRatingUpdate:
+                                                                                (double value) {},
+                                                                          ),
+                                                                    if (relatedProduct
+                                                                            .rating !=
+                                                                        '0')
+                                                                      Padding(
+                                                                        padding:
+                                                                            EdgeInsets.only(left: 4 * fem),
+                                                                        child:
+                                                                            Text(
+                                                                          '(${relatedProduct.totalReviews ?? 0})',
+                                                                          style:
+                                                                              TextStyle(fontSize: 10 * ffem),
+                                                                        ),
+                                                                      ),
+                                                                  ],
+                                                                ),
+                                                              ),
                                                             ],
                                                           ),
                                                         ),
@@ -4180,7 +4322,13 @@ class _ProductIdPageState extends State<ProductIdPage> {
                               //             'product']['id'],
                               //         type,
                               //         _CartData);
-                              Navigator.pushNamed(context, '/cartPage');
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      CartPage(isProfile: {'isProfile': false}),
+                                ),
+                              );
                             }
                           },
                           style: TextButton.styleFrom(
@@ -4255,22 +4403,178 @@ class _ProductIdPageState extends State<ProductIdPage> {
                             ),
                           );
                         } else {
-                          _cartData['points'] = _productPoints;
-                          _cartData['product_price'] = _prices.isNotEmpty &&
-                                  _prices[0]['offer_price'] != 0
-                              ? _prices[0]['offer_price'].toString()
-                              : _prices[0]['price'].toString();
-                          await addToCartModel.getAddToCart(
-                              widget.arguments!['product']['id'],
-                              true,
-                              _cartData);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  CartPage(isProfile: {'isProfile': false}),
-                            ),
-                          );
+                          // Check if the selected item is already in cart
+                          AddToCart? existingCartItem;
+                          try {
+                            existingCartItem =
+                                addToCartModel.addToCarts?.firstWhere(
+                              (cart) =>
+                                  cart.productId ==
+                                      widget.arguments!['product']['id'] &&
+                                  cart.flavour == _cartData['flavour'] &&
+                                  cart.kindOfFlower ==
+                                      _cartData['kindOfFlower'],
+                            );
+                          } catch (e) {
+                            existingCartItem = null;
+                          }
+
+                          if (existingCartItem == null) {
+                            // Item not in cart, show dialog to add
+                            int tempQuantity = 1;
+                            final BuildContext parentContext = context;
+                            showDialog(
+                              context: context,
+                              builder: (dialogContext) => StatefulBuilder(
+                                builder: (dialogContext, setDialogState) =>
+                                    AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(20 * fem)),
+                                  title: Text('Add to Cart'),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                          'This item is not in your cart. Please select quantity:'),
+                                      SizedBox(height: 20),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          IconButton(
+                                            onPressed: () {
+                                              if (tempQuantity > 1) {
+                                                setDialogState(() {
+                                                  tempQuantity--;
+                                                });
+                                              }
+                                            },
+                                            icon: Container(
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    color: Colors.grey),
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                              ),
+                                              child:
+                                                  Icon(Icons.remove, size: 20),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 20),
+                                            child: Text(
+                                              tempQuantity.toString(),
+                                              style: TextStyle(
+                                                fontSize: 18 * ffem,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            onPressed: () {
+                                              setDialogState(() {
+                                                tempQuantity++;
+                                              });
+                                            },
+                                            icon: Container(
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    color: Colors.grey),
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                              ),
+                                              child: Icon(Icons.add, size: 20),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(dialogContext),
+                                      child: Text(
+                                        'Cancel',
+                                        style: TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 16 * ffem),
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        Navigator.pop(
+                                            dialogContext); // Close dialog
+
+                                        // Add to cart with selected quantity
+                                        _cartData['points'] = _productPoints;
+                                        _cartData['product_price'] = _prices
+                                                    .isNotEmpty &&
+                                                _prices[0]['offer_price'] != 0
+                                            ? _prices[0]['offer_price']
+                                                .toString()
+                                            : _prices[0]['price'].toString();
+                                        _cartData['is_add_to_cart'] = true;
+
+                                        // Add item to cart with quantity
+                                        // First add the item to cart
+                                        await addToCartModel.getAddToCart(
+                                            widget.arguments!['product']['id'],
+                                            true,
+                                            _cartData);
+
+                                        // If user selected more than 1, add additional quantities
+                                        if (tempQuantity > 1) {
+                                          // Add the remaining quantity by calling the API multiple times
+                                          // The API increments by 1 each time when type=true
+                                          for (int i = 1;
+                                              i < tempQuantity;
+                                              i++) {
+                                            await addToCartModel.getAddToCart(
+                                                widget.arguments!['product']
+                                                    ['id'],
+                                                true,
+                                                _cartData);
+                                          }
+                                        }
+
+                                        // Navigate to cart using the parent context
+                                        if (mounted) {
+                                          Navigator.push(
+                                            parentContext,
+                                            MaterialPageRoute(
+                                              builder: (context) => CartPage(
+                                                  isProfile: {
+                                                    'isProfile': false
+                                                  }),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      child: Text(
+                                        'Add & Proceed',
+                                        style: TextStyle(
+                                            color: Color(0xFFC7B456),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16 * ffem),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          } else {
+                            // Item already in cart, navigate directly
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    CartPage(isProfile: {'isProfile': false}),
+                              ),
+                            );
+                          }
                         }
                       },
                       style: TextButton.styleFrom(padding: EdgeInsets.zero),

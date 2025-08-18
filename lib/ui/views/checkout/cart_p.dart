@@ -344,17 +344,17 @@ class _CartPageState extends State<CartPage> {
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
 
-    return Scaffold(
-      body: WillPopScope(
-        onWillPop: () async {
-          if (widget.isProfile['isProfile'] == true) {
-            Navigator.pushNamed(context, '/profilePage');
-          } else {
-            Navigator.pop(context);
-          }
-          return false;
-        },
-        child: SafeArea(
+    return WillPopScope(
+      onWillPop: () async {
+        if (widget.isProfile != null && widget.isProfile['isProfile'] == true) {
+          Navigator.pushReplacementNamed(context, '/profilePage');
+        } else {
+          Navigator.pop(context);
+        }
+        return false;
+      },
+      child: Scaffold(
+        body: SafeArea(
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -392,7 +392,7 @@ class _CartPageState extends State<CartPage> {
                                   onTap: () {
                                     if (widget.isProfile != null &&
                                         widget.isProfile['isProfile'] == true) {
-                                      Navigator.pushNamed(
+                                      Navigator.pushReplacementNamed(
                                           context, '/profilePage');
                                     } else {
                                       Navigator.pop(context);
@@ -1136,192 +1136,313 @@ class _CartPageState extends State<CartPage> {
                       child: Column(
                         children: [
                           // if (couponValue == '')
-                          usedCoupon == ''
-                              ? Form(
-                                  key: _formKey,
-                                  child: Row(children: [
-                                    Expanded(
-                                      flex: 8,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          border: Border.all(
-                                              color: Color(0xffe3e3e3)),
-                                          color: Color(0xfffbfbfb),
+                          // Show applied coupon if exists
+                          if (usedCoupon.isNotEmpty)
+                            Container(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'Coupon Applied: $usedCoupon (RS $couponValue)',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xff1e1e1e),
+                                      ),
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        usedCoupon = '';
+                                        couponValue = 0;
+                                        couponId = '';
+                                        coupon = '';
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 5),
+                                      decoration: BoxDecoration(
+                                        color: Color(0xffe3e3e3),
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      child: Text(
+                                        'Remove',
+                                        style: MyGoogleFontStyle(
+                                          fontFamily: 'Urbanist',
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(0xff000000),
                                         ),
-                                        child: TextFormField(
-                                          decoration: InputDecoration(
-                                            border: InputBorder.none,
-                                            focusedBorder: InputBorder.none,
-                                            enabledBorder: InputBorder.none,
-                                            errorBorder: InputBorder.none,
-                                            disabledBorder: InputBorder.none,
-                                            contentPadding:
-                                                EdgeInsets.fromLTRB(9, 6, 1, 5),
-                                            hintText: 'Enter your promocode',
-                                            hintStyle: TextStyle(
-                                                color: Color(0x3f000000)),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          // Show form if no coupon
+                          if (usedCoupon.isEmpty)
+                            Form(
+                              key: _formKey,
+                              child: Row(children: [
+                                Expanded(
+                                  flex: 8,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      border:
+                                          Border.all(color: Color(0xffe3e3e3)),
+                                      color: Color(0xfffbfbfb),
+                                    ),
+                                    child: TextFormField(
+                                      decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        focusedBorder: InputBorder.none,
+                                        enabledBorder: InputBorder.none,
+                                        errorBorder: InputBorder.none,
+                                        disabledBorder: InputBorder.none,
+                                        contentPadding:
+                                            EdgeInsets.fromLTRB(9, 6, 1, 5),
+                                        hintText: 'Enter your promocode',
+                                        hintStyle:
+                                            TextStyle(color: Color(0x3f000000)),
+                                      ),
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xff000000),
+                                      ),
+                                      onSaved: (value) {
+                                        coupon = value.toString();
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Expanded(
+                                  flex: 3,
+                                  child: InkWell(
+                                    onTap: () async {
+                                      _formKey.currentState!.save();
+
+                                      await _couponModel.verifyCoupon(coupon);
+                                      // print(_couponModel.coupons![0].minOrderValue);
+                                      if (_couponModel.coupons != null &&
+                                          _couponModel.coupons!.isNotEmpty) {
+                                        final firstCoupon =
+                                            _couponModel.coupons![0];
+                                        final cartTotal = int.parse(
+                                            _addToCartModel.cartTotal
+                                                .toString());
+
+                                        // Check coupon usage count
+                                        final orderModel = Provider.of<OrderModel>(
+                                            context, listen: false);
+                                        final usageCount = await orderModel
+                                            .getCouponUsageCount(firstCoupon.id.toString());
+                                        
+                                        if (firstCoupon.noPerUser != null && 
+                                            firstCoupon.noPerUser! > 0 && 
+                                            usageCount >= firstCoupon.noPerUser!) {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) =>
+                                                AlertDialog(
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20)),
+                                              title: Text("Coupon Usage Limit Reached"),
+                                              content: Text(
+                                                  "You have already used this coupon ${firstCoupon.noPerUser} time${firstCoupon.noPerUser! > 1 ? 's' : ''}. This is the maximum allowed per user."),
+                                              actions: <Widget>[
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Text('Ok'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        } else if (firstCoupon.minOrderValue! <
+                                            cartTotal) {
+                                          setState(() {
+                                            couponValue = double.parse(
+                                                    firstCoupon.value
+                                                        .toString())
+                                                .toInt();
+                                            couponId =
+                                                firstCoupon.id.toString();
+                                            usedCoupon =
+                                                firstCoupon.name.toString();
+                                          });
+                                        } else {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) =>
+                                                AlertDialog(
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          20)),
+                                              title: Text(
+                                                  "The Product amount should be greater than ${firstCoupon.minOrderValue.toString()}"),
+                                              actions: <Widget>[
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Text('Ok'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }
+                                      } else {
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) =>
+                                              AlertDialog(
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(20)),
+                                            title: Text("Invalid coupon."),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text('Ok'),
+                                              ),
+                                            ],
                                           ),
+                                        );
+                                      }
+                                    },
+                                    child: Container(
+                                      width: 50,
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xff1e1e1e),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'Apply',
                                           style: MyGoogleFontStyle(
                                             fontFamily: 'Urbanist',
-                                            fontWeight: FontWeight.w500,
-                                            color: Color(0xff000000),
-                                          ),
-                                          onSaved: (value) {
-                                            coupon = value.toString();
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 5,
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: InkWell(
-                                        onTap: () async {
-                                          _formKey.currentState!.save();
-
-                                          await _couponModel
-                                              .verifyCoupon(coupon);
-                                          // print(_couponModel.coupons![0].minOrderValue);
-                                          if (_couponModel.coupons != null &&
-                                              _couponModel
-                                                  .coupons!.isNotEmpty) {
-                                            final firstCoupon =
-                                                _couponModel.coupons![0];
-                                            final cartTotal = int.parse(
-                                                _addToCartModel.cartTotal
-                                                    .toString());
-
-                                            if (firstCoupon.minOrderValue! <
-                                                cartTotal) {
-                                              setState(() {
-                                                couponValue = double.parse(
-                                                        firstCoupon.value
-                                                            .toString())
-                                                    .toInt();
-                                                couponId =
-                                                    firstCoupon.id.toString();
-                                              });
-                                            } else {
-                                              showDialog(
-                                                context: context,
-                                                builder:
-                                                    (BuildContext context) =>
-                                                        AlertDialog(
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              20)),
-                                                  title: Text(
-                                                      "The Product amount should be greater than ${firstCoupon.minOrderValue.toString()}"),
-                                                  actions: <Widget>[
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        Navigator.pop(context);
-                                                      },
-                                                      child: Text('Ok'),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            }
-                                          } else {
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) =>
-                                                  AlertDialog(
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20)),
-                                                title: Text("Invalid coupon."),
-                                                actions: <Widget>[
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: Text('Ok'),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          }
-                                        },
-                                        child: Container(
-                                          width: 50,
-                                          height: 50,
-                                          decoration: BoxDecoration(
-                                            color: Color(0xff1e1e1e),
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              'Apply',
-                                              style: MyGoogleFontStyle(
-                                                fontFamily: 'Urbanist',
-                                                fontWeight: FontWeight.w700,
-                                                color: Color(0xffffffff),
-                                              ),
-                                            ),
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xffffffff),
                                           ),
                                         ),
                                       ),
-                                    )
-                                  ]),
+                                    ),
+                                  ),
                                 )
-                              : Text('Coupon Applied: ${usedCoupon}'),
+                              ]),
+                            ),
 
                           // Promo Code
                           InkWell(
                             onTap: () async {
-                              final result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => PromocodesPage()),
-                              );
-                              // setState(() {
-                              // print('isProfile ${result['name']}');
+                              try {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => PromocodesPage()),
+                                );
 
-                              await _couponModel.verifyCoupon(result['name']);
-                              final firstCoupon = _couponModel.coupons![0];
-                              final cartTotal = int.parse(
-                                  _addToCartModel.cartTotal.toString());
+                                if (result != null && result['name'] != null) {
+                                  await _couponModel
+                                      .verifyCoupon(result['name']);
 
-                              setState(() {
-                                usedCoupon = firstCoupon.name.toString();
-                                // widget.isProfile['isProfile'] =
-                                //     result['isProfile'];
-                              });
+                                  if (_couponModel.coupons != null &&
+                                      _couponModel.coupons!.isNotEmpty) {
+                                    final firstCoupon =
+                                        _couponModel.coupons![0];
+                                    final cartTotal = int.parse(
+                                        _addToCartModel.cartTotal.toString());
 
-                              if (firstCoupon.minOrderValue! < cartTotal) {
-                                setState(() {
-                                  couponValue =
-                                      double.parse(firstCoupon.value.toString())
-                                          .toInt();
-                                  couponId = firstCoupon.id.toString();
-                                });
-                              } else {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) =>
-                                      AlertDialog(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(20)),
-                                    title: Text(
-                                        "The Product amount should be greater than ${firstCoupon.minOrderValue.toString()}"),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text('Ok'),
+                                    // Check coupon usage count
+                                    final orderModel = Provider.of<OrderModel>(
+                                        context, listen: false);
+                                    final usageCount = await orderModel
+                                        .getCouponUsageCount(firstCoupon.id.toString());
+                                    
+                                    if (firstCoupon.noPerUser != null && 
+                                        firstCoupon.noPerUser! > 0 && 
+                                        usageCount >= firstCoupon.noPerUser!) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) =>
+                                            AlertDialog(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20)),
+                                          title: Text("Coupon Usage Limit Reached"),
+                                          content: Text(
+                                              "You have already used this coupon ${firstCoupon.noPerUser} time${firstCoupon.noPerUser! > 1 ? 's' : ''}. This is the maximum allowed per user."),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text('Ok'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    } else if (firstCoupon.minOrderValue! <
+                                        cartTotal) {
+                                      // Combine all setState calls into one
+                                      setState(() {
+                                        usedCoupon =
+                                            firstCoupon.name.toString();
+                                        couponValue = double.parse(
+                                                firstCoupon.value.toString())
+                                            .toInt();
+                                        couponId = firstCoupon.id.toString();
+                                      });
+                                    } else {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) =>
+                                            AlertDialog(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20)),
+                                          title: Text(
+                                              "The Product amount should be greater than ${firstCoupon.minOrderValue.toString()}"),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text('Ok'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('No valid coupon found'),
+                                        backgroundColor: Colors.orange,
                                       ),
-                                    ],
+                                    );
+                                  }
+                                }
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Error applying coupon: $e'),
+                                    backgroundColor: Colors.red,
                                   ),
                                 );
                               }
@@ -1449,35 +1570,49 @@ class _CartPageState extends State<CartPage> {
                                             ),
                                           ),
                                           InkWell(
-                                            onTap: () {
-                                              Navigator.of(context).push(
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          AddressPage(
-                                                              arguments: {
-                                                                'cartTotal':
-                                                                    _addToCartModel
-                                                                        .cartTotal
-                                                                        .toString(),
-                                                                'cartItems':
-                                                                    _addToCartModel
-                                                                        .addToCarts,
+                                            onTap: () async {
+                                              final result =
+                                                  await Navigator.of(context)
+                                                      .push(MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              AddressPage(
+                                                                  arguments: {
+                                                                    'cartTotal':
+                                                                        _addToCartModel
+                                                                            .cartTotal
+                                                                            .toString(),
+                                                                    'cartItems':
+                                                                        _addToCartModel
+                                                                            .addToCarts,
 
-                                                                'couponValue':
-                                                                    couponValue,
+                                                                    'couponValue':
+                                                                        couponValue,
 
-                                                                // 'cartItems':
-                                                                //     widget
-                                                                //         .arguments['cartItems'],
-                                                                // 'cartTotal':
-                                                                //     widget
-                                                                //         .arguments['cartTotal'],
-                                                                // 'couponValue':
-                                                                //     widget
-                                                                //         .arguments['couponValue'],
-                                                                'isAddress':
-                                                                    true
-                                                              })));
+                                                                    // 'cartItems':
+                                                                    //     widget
+                                                                    //         .arguments['cartItems'],
+                                                                    // 'cartTotal':
+                                                                    //     widget
+                                                                    //         .arguments['cartTotal'],
+                                                                    // 'couponValue':
+                                                                    //     widget
+                                                                    //         .arguments['couponValue'],
+                                                                    'isAddress':
+                                                                        true
+                                                                  })));
+
+                                              if (result != null &&
+                                                  result['address'] != null) {
+                                                print(
+                                                    'Received address from selection: ${result['address']}');
+                                                setState(() {
+                                                  address =
+                                                      UserAddress.fromJson(
+                                                          result['address']);
+                                                });
+                                                print(
+                                                    'Address ID after setting: ${address.id}');
+                                              }
                                             },
                                             child: Image.asset(
                                               'assets/images/edit-2-mP4.png',
@@ -1591,11 +1726,12 @@ class _CartPageState extends State<CartPage> {
                                             margin: EdgeInsets.fromLTRB(
                                                 0.89, 10, 0, 0),
                                             child: TextButton(
-                                              onPressed: () {
+                                              onPressed: () async {
                                                 // _addToCartModel
                                                 // .cartTotal
-                                                Navigator.of(context).push(
-                                                    MaterialPageRoute(
+                                                final result = await Navigator
+                                                        .of(context)
+                                                    .push(MaterialPageRoute(
                                                         builder: (context) =>
                                                             AddressPage(
                                                                 arguments: {
@@ -1611,6 +1747,19 @@ class _CartPageState extends State<CartPage> {
                                                                   'isAddress':
                                                                       true
                                                                 })));
+
+                                                if (result != null &&
+                                                    result['address'] != null) {
+                                                  print(
+                                                      'Received address from selection: ${result['address']}');
+                                                  setState(() {
+                                                    address =
+                                                        UserAddress.fromJson(
+                                                            result['address']);
+                                                  });
+                                                  print(
+                                                      'Address ID after setting: ${address.id}');
+                                                }
                                                 // Navigator.pushNamed(
                                                 //     context, '/addressPage');
                                               },
@@ -1783,8 +1932,11 @@ class _CartPageState extends State<CartPage> {
                                                         ),
                                                       ),
                                                       TextButton(
-                                                        onPressed: () {
-                                                          Navigator.of(context).push(
+                                                        onPressed: () async {
+                                                          Navigator.pop(
+                                                              context); // Close the dialog first
+
+                                                          final result = await Navigator.of(context).push(
                                                               MaterialPageRoute(
                                                                   builder: (context) =>
                                                                       AddressPage(
@@ -1798,6 +1950,20 @@ class _CartPageState extends State<CartPage> {
                                                                             'isAddress':
                                                                                 true
                                                                           })));
+
+                                                          if (result != null &&
+                                                              result['address'] !=
+                                                                  null) {
+                                                            print(
+                                                                'Received address from selection: ${result['address']}');
+                                                            setState(() {
+                                                              address = UserAddress
+                                                                  .fromJson(result[
+                                                                      'address']);
+                                                            });
+                                                            print(
+                                                                'Address ID after setting: ${address.id}');
+                                                          }
                                                         },
                                                         child: Text(
                                                           'No',

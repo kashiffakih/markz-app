@@ -6,6 +6,7 @@ class Review {
   int? id;
   int? userId;
   int? productId;
+  int? productPackId;
   String? description;
   String? rating;
   String? createdAt;
@@ -18,6 +19,7 @@ class Review {
       {this.id,
       this.userId,
       this.productId,
+      this.productPackId,
       this.description,
       this.rating,
       this.createdAt,
@@ -30,6 +32,10 @@ class Review {
     id = json['id'];
     userId = json['user_id'];
     productId = json['product_id'];
+    // Handle productPackId as int, convert from string if needed
+    productPackId = json['product_pack_id'] is String 
+        ? int.tryParse(json['product_pack_id']) 
+        : json['product_pack_id'];
     description = json['description'];
     rating = json['rating'].toString();
     createdAt = json['created_at'];
@@ -50,6 +56,7 @@ class Review {
     data['id'] = this.id;
     data['user_id'] = this.userId;
     data['product_id'] = this.productId;
+    data['product_pack_id'] = this.productPackId;
     data['description'] = this.description;
     data['rating'] = this.rating;
     data['created_at'] = this.createdAt;
