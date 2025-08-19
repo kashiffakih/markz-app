@@ -58,9 +58,9 @@ class _ProfilePageState extends State<ProfilePage> {
       ]);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load data: $e')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('Failed to load data: $e')),
+        // );
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -389,19 +389,19 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       // Clear cart data
       Provider.of<AddToCartModel>(context, listen: false).addToCarts = [];
-      
+
       // Clear wishlist data
       Provider.of<WishListModel>(context, listen: false).wishLists = [];
-      
+
       // Clear order data
       Provider.of<OrderModel>(context, listen: false).orders = [];
-      
+
       // Clear review data
       Provider.of<ReviewModel>(context, listen: false).reviews = [];
-      
+
       // Clear user address data
       Provider.of<UserAddressModel>(context, listen: false).userAddresses = [];
-      
+
       // Clear wallet data
       Provider.of<UserWalletModel>(context, listen: false).userWallets = [];
     } catch (e) {
@@ -452,7 +452,7 @@ class _ProfilePageState extends State<ProfilePage> {
               try {
                 // Clear all provider states
                 _clearAllProviderStates();
-                
+
                 // Sign out from all auth services and clear login data
                 await Future.wait([
                   FirebaseAuth.instance.signOut(),
@@ -460,7 +460,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   FacebookAuth.instance.logOut(),
                   configModel.removeLoginData(),
                 ]);
-                
+
                 if (mounted) {
                   Navigator.pop(context);
                   Navigator.pushAndRemoveUntil(

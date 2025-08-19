@@ -316,6 +316,7 @@
 //   }
 // }
 
+import 'package:aadab/core/models/review.dart';
 import 'package:aadab/ui/views/profile/review_id_p.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -410,6 +411,8 @@ class _ReviewsPageState extends State<ReviewsPage> {
                     itemCount: reviewModel.reviews!.length,
                     itemBuilder: (context, index) {
                       final review = reviewModel.reviews![index];
+                      // print(
+                      //     'check review product image ${review.product!.imagepath1}');
                       return _buildReviewCard(
                         review: review,
                         configModel: configModel,
@@ -443,16 +446,16 @@ class _ReviewsPageState extends State<ReviewsPage> {
   }
 
   Widget _buildReviewCard({
-    required dynamic review,
+    required Review review,
     required ConfigModel configModel,
     required DateFormat dateFormat,
     required double fem,
     required double ffem,
     required VoidCallback onTap,
   }) {
-    final productImages = review.product?.productImages ?? [];
-    final firstImage =
-        productImages.isNotEmpty ? productImages.first.imagepath : null;
+    // final productImages = review.product?.productImages ?? [];
+    final firstImage = review.product!.imagepath1;
+    // print('imaage $productImages');
 
     return GestureDetector(
       onTap: onTap,
@@ -592,9 +595,9 @@ class _ReviewsPageState extends State<ReviewsPage> {
                 height: 100 * fem,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: review.reviewImages.length,
+                  itemCount: review.reviewImages!.length,
                   itemBuilder: (context, index) {
-                    final image = review.reviewImages[index];
+                    final image = review.reviewImages![index];
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(

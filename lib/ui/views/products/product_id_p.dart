@@ -2173,6 +2173,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
     'is_add_to_cart': false
   };
 
+  // Global keys for description sections to maintain state
+  final _smallDescKey = GlobalKey();
+  final _descKey = GlobalKey();
+  final _desc1Key = GlobalKey();
+  final _desc2Key = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -2211,7 +2217,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
     if (productDisplayImages.isNotEmpty) {
       unitName = productDisplayImages[0].unit?.name ?? '';
       _cartData['flavour'] = unitName;
-      _cartData['pack'] = productDisplayImages[0].id?.toString() ?? '';
     }
     _sizes = widget.arguments?['product']?['product_packs']
             ?.where((pack) => pack['unit']?['name'] == unitName)
@@ -2219,6 +2224,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
         [];
     if (_sizes.isNotEmpty) {
       _cartData['kindOfFlower'] = _sizes[0]['value']?.toString() ?? '';
+      _cartData['pack'] = _sizes[0]['id']?.toString() ?? '';
       size = _sizes[0]['value']?.toString() ?? '';
       _productPoints = _sizes[0]['points'];
       activeIndex = 0; // Pre-select the first size
@@ -2678,11 +2684,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       ?.toString() ??
                                                   '';
                                           _cartData['flavour'] = unitName;
-                                          _cartData['pack'] =
-                                              productDisplayImages[newIndex]
-                                                      .id
-                                                      ?.toString() ??
-                                                  '';
                                           updateProductDisplayImages = widget
                                                   .arguments?['product_images']
                                                   ?.where((image) =>
@@ -2705,6 +2706,10 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                           ?.toString() ??
                                                       ''
                                                   : '';
+                                          _cartData['pack'] = _sizes.isNotEmpty
+                                              ? _sizes[0]['id']?.toString() ??
+                                                  ''
+                                              : '';
                                           _prices = widget.arguments?['product']
                                                       ?['product_prices']
                                                   ?.where((price) =>
@@ -2758,11 +2763,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                           ?.toString() ??
                                                       '';
                                               _cartData['flavour'] = unitName;
-                                              _cartData['pack'] =
-                                                  productDisplayImages[index]
-                                                          .id
-                                                          ?.toString() ??
-                                                      '';
                                               updateProductDisplayImages =
                                                   widget.arguments?[
                                                               'product_images']
@@ -2786,6 +2786,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                               _cartData['kindOfFlower'] =
                                                   _sizes.isNotEmpty
                                                       ? _sizes[0]['value']
+                                                              ?.toString() ??
+                                                          ''
+                                                      : '';
+                                              _cartData['pack'] =
+                                                  _sizes.isNotEmpty
+                                                      ? _sizes[0]['id']
                                                               ?.toString() ??
                                                           ''
                                                       : '';
@@ -2880,11 +2886,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       ?.toString() ??
                                                   '';
                                           _cartData['flavour'] = unitName;
-                                          _cartData['pack'] =
-                                              productDisplayImages[newIndex]
-                                                      .id
-                                                      ?.toString() ??
-                                                  '';
                                           updateProductDisplayImages = widget
                                                   .arguments?['product_images']
                                                   ?.where((image) =>
@@ -2907,6 +2908,10 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                           ?.toString() ??
                                                       ''
                                                   : '';
+                                          _cartData['pack'] = _sizes.isNotEmpty
+                                              ? _sizes[0]['id']?.toString() ??
+                                                  ''
+                                              : '';
                                           _prices = widget.arguments?['product']
                                                       ?['product_prices']
                                                   ?.where((price) =>
@@ -3094,6 +3099,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                         .toString();
                                                 _cartData['is_add_to_cart'] =
                                                     true;
+
+                                                // print(
+                                                //     'Check Add cart $_cartData');
                                                 await addToCartModel
                                                     .getAddToCart(
                                                         widget.arguments![
@@ -3486,6 +3494,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                       ['value']
                                                                   ?.toString() ??
                                                               '';
+                                                          _cartData[
+                                                              'pack'] = _sizes[
+                                                                          index]
+                                                                      ['id']
+                                                                  ?.toString() ??
+                                                              '';
                                                           size = _sizes[index]
                                                                       ['value']
                                                                   ?.toString() ??
@@ -3694,36 +3708,16 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                       ),
                                       Builder(
                                         builder: (context) {
-                                          // Get current selected pack ID
-                                          int? currentPackId;
-                                          if (activeIndex >= 0 &&
-                                              activeIndex < _sizes.length) {
-                                            currentPackId =
-                                                _sizes[activeIndex]['id'];
-                                          }
+                                          // Use product-level ratings instead of pack-specific
+                                          int totalReviewCount =
+                                              _getTotalReviewsCount(product);
 
-                                          // Get pack-specific rating and reviews
-                                          double packRating =
-                                              currentPackId != null
-                                                  ? _getPackRating(
-                                                      product, currentPackId)
-                                                  : 0.0;
-                                          int packReviewCount = currentPackId !=
-                                                  null
-                                              ? _getPackReviewsCount(
-                                                  product, currentPackId)
-                                              : _getTotalReviewsCount(product);
-
-                                          if (packRating > 0 ||
-                                              product.rating != '0')
+                                          if (product.rating != '0' &&
+                                              product.rating != null)
                                             return Row(
                                               children: [
                                                 Text(
-                                                  packRating > 0
-                                                      ? packRating
-                                                          .toStringAsFixed(1)
-                                                      : product.rating
-                                                          .toString(),
+                                                  product.rating.toString(),
                                                   style: MyGoogleFontStyle(
                                                     fontFamily: 'Poppins',
                                                     fontSize: 14 * ffem,
@@ -3740,7 +3734,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       size: 16),
                                                 ),
                                                 Text(
-                                                  '($packReviewCount ratings)',
+                                                  '($totalReviewCount ratings)',
                                                   style: TextStyle(
                                                       fontSize: 12 * ffem),
                                                 ),
@@ -3754,8 +3748,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                         'productId': widget
                                                                 .arguments![
                                                             'product']['id'],
-                                                        'productPackId':
-                                                            currentPackId,
                                                         'is_edit': false
                                                       },
                                                     );
@@ -3780,83 +3772,15 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                     ],
                                   ),
                                 ),
-                                // Descriptions
-                                if (product.smallDescription != null)
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 10 * fem),
-                                    child: Card(
-                                      elevation: 4,
-                                      color: Colors.white,
-                                      margin: EdgeInsets.zero,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12 * fem)),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(16 * fem),
-                                        child: Html(
-                                            data: product.smallDescription
-                                                .toString()),
-                                      ),
-                                    ),
-                                  ),
-                                if (product.description != null)
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 10 * fem),
-                                    child: Card(
-                                      elevation: 4,
-                                      color: Colors.white,
-                                      margin: EdgeInsets.zero,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12 * fem)),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(16 * fem),
-                                        child: Html(
-                                            data:
-                                                product.description.toString()),
-                                      ),
-                                    ),
-                                  ),
-                                if (product.description1 != null)
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 10 * fem),
-                                    child: Card(
-                                      elevation: 4,
-                                      color: Colors.white,
-                                      margin: EdgeInsets.zero,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12 * fem)),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(16 * fem),
-                                        child: Html(
-                                            data: product.description1
-                                                .toString()),
-                                      ),
-                                    ),
-                                  ),
-                                if (product.description2 != null)
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 10 * fem),
-                                    child: Card(
-                                      elevation: 4,
-                                      color: Colors.white,
-                                      margin: EdgeInsets.zero,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12 * fem)),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(16 * fem),
-                                        child: Html(
-                                            data: product.description2
-                                                .toString()),
-                                      ),
-                                    ),
-                                  ),
+                                // Descriptions - Isolated widget to prevent rebuilds
+                                ProductDescriptionSection(
+                                  product: product,
+                                  fem: fem,
+                                  smallDescKey: _smallDescKey,
+                                  descKey: _descKey,
+                                  desc1Key: _desc1Key,
+                                  desc2Key: _desc2Key,
+                                ),
                                 // Add More Items
                                 Padding(
                                   padding: EdgeInsets.only(top: 20 * fem),
@@ -4221,89 +4145,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
               padding: EdgeInsets.all(8 * fem),
               child: Row(
                 children: [
-                  // Expanded(
-                  //   child: TextButton(
-                  //     onPressed: () async {
-                  //       if (_cartData['kindOfFlower'] == '' ||
-                  //           _cartData['flavour'] == '') {
-                  //         showDialog(
-                  //           context: context,
-                  //           builder: (context) => AlertDialog(
-                  //             shape: RoundedRectangleBorder(
-                  //                 borderRadius:
-                  //                     BorderRadius.circular(20 * fem)),
-                  //             title: Text(
-                  //               _cartData['kindOfFlower'] == '' &&
-                  //                       _cartData['flavour'] != ''
-                  //                   ? 'Kindly choose size.'
-                  //                   : _cartData['flavour'] == '' &&
-                  //                           _cartData['kindOfFlower'] != ''
-                  //                       ? 'Kindly choose colour.'
-                  //                       : 'Kindly choose colour and size.',
-                  //             ),
-                  //             actions: [
-                  //               TextButton(
-                  //                 onPressed: () => Navigator.pop(context),
-                  //                 child: Text(
-                  //                   'Ok',
-                  //                   style: TextStyle(
-                  //                       color: Colors.black,
-                  //                       fontSize: 16 * ffem),
-                  //                 ),
-                  //               ),
-                  //             ],
-                  //           ),
-                  //         );
-                  //       } else {
-                  //         _cartData['points'] = _productPoints;
-                  //         _cartData['product_price'] = _prices.isNotEmpty &&
-                  //                 _prices[0]['offer_price'] != 0
-                  //             ? _prices[0]['offer_price'].toString()
-                  //             : _prices[0]['price'].toString();
-                  //         await addToCartModel.getAddToCart(
-                  //             widget.arguments!['product']['id'],
-                  //             true,
-                  //             _cartData);
-                  //         Navigator.push(
-                  //           context,
-                  //           MaterialPageRoute(
-                  //             builder: (context) =>
-                  //                 CartPage(isProfile: {'isProfile': false}),
-                  //           ),
-                  //         );
-                  //       }
-                  //     },
-                  //     style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                  //     child: Container(
-                  //       padding: EdgeInsets.symmetric(
-                  //           horizontal: 20 * fem, vertical: 10 * fem),
-                  //       decoration: BoxDecoration(
-                  //         color: const Color(0xff1e1e1e),
-                  //         borderRadius: BorderRadius.circular(10 * fem),
-                  //       ),
-                  //       child: Row(
-                  //         mainAxisAlignment: MainAxisAlignment.center,
-                  //         children: [
-                  //           Image.asset(
-                  //             'assets/images/shopping-bag-03.png',
-                  //             width: 18 * fem,
-                  //             height: 17 * fem,
-                  //           ),
-                  //           SizedBox(width: 10 * fem),
-                  //           Text(
-                  //             'Go To Cart',
-                  //             style: MyGoogleFontStyle(
-                  //               fontFamily: 'Urbanist',
-                  //               fontSize: 14 * ffem,
-                  //               fontWeight: FontWeight.w700,
-                  //               color: Colors.white,
-                  //             ),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
                   Expanded(
                     // flex: 6,
                     child: Padding(
@@ -4612,5 +4453,168 @@ class _ProductIdPageState extends State<ProductIdPage> {
               ),
             ),
     );
+  }
+}
+
+// Isolated widget for product descriptions that won't rebuild on parent state changes
+class ProductDescriptionSection extends StatelessWidget {
+  final Product product;
+  final double fem;
+  final GlobalKey smallDescKey;
+  final GlobalKey descKey;
+  final GlobalKey desc1Key;
+  final GlobalKey desc2Key;
+
+  const ProductDescriptionSection({
+    Key? key,
+    required this.product,
+    required this.fem,
+    required this.smallDescKey,
+    required this.descKey,
+    required this.desc1Key,
+    required this.desc2Key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        if (product.smallDescription != null)
+          RepaintBoundary(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 10 * fem),
+              child: Card(
+                elevation: 4,
+                color: Colors.white,
+                margin: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12 * fem),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(16 * fem),
+                  child: PreservedHtmlWidget(
+                    key: smallDescKey,
+                    uniqueKey: 'small_desc_${product.id}',
+                    data: product.smallDescription.toString(),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        if (product.description != null)
+          RepaintBoundary(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 10 * fem),
+              child: Card(
+                elevation: 4,
+                color: Colors.white,
+                margin: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12 * fem),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(16 * fem),
+                  child: PreservedHtmlWidget(
+                    key: descKey,
+                    uniqueKey: 'desc_${product.id}',
+                    data: product.description.toString(),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        if (product.description1 != null)
+          RepaintBoundary(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 10 * fem),
+              child: Card(
+                elevation: 4,
+                color: Colors.white,
+                margin: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12 * fem),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(16 * fem),
+                  child: PreservedHtmlWidget(
+                    key: desc1Key,
+                    uniqueKey: 'desc1_${product.id}',
+                    data: product.description1.toString(),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        if (product.description2 != null)
+          RepaintBoundary(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 10 * fem),
+              child: Card(
+                elevation: 4,
+                color: Colors.white,
+                margin: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12 * fem),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(16 * fem),
+                  child: PreservedHtmlWidget(
+                    key: desc2Key,
+                    uniqueKey: 'desc2_${product.id}',
+                    data: product.description2.toString(),
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+// Custom widget to preserve HTML content state and prevent image re-fetching
+class PreservedHtmlWidget extends StatefulWidget {
+  final String data;
+  final String uniqueKey;
+
+  const PreservedHtmlWidget({
+    Key? key,
+    required this.data,
+    required this.uniqueKey,
+  }) : super(key: key);
+
+  @override
+  _PreservedHtmlWidgetState createState() => _PreservedHtmlWidgetState();
+}
+
+class _PreservedHtmlWidgetState extends State<PreservedHtmlWidget>
+    with AutomaticKeepAliveClientMixin {
+  late Widget _cachedHtmlWidget;
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Create the HTML widget ONCE during initialization
+    _cachedHtmlWidget = Html(
+      key: ValueKey(widget.uniqueKey),
+      data: widget.data,
+      style: {
+        // Ensure images are displayed properly
+        "img": Style(
+          display: Display.block,
+          margin: Margins.symmetric(vertical: 8),
+        ),
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
+    // Always return the same cached widget instance
+    return _cachedHtmlWidget;
   }
 }

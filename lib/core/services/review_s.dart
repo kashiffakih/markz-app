@@ -26,13 +26,13 @@ class ReviewService {
     var userId = _configModel.user?.id;
 
     // Handle review submission (with or without images)
-    if (onlyFetch != true || onlyFetch != 'true') {
+    if (onlyFetch != true) {
       // Can't submit reviews without being logged in
       if (userId == null) {
         print('User must be logged in to submit reviews');
         return <Review>[];
       }
-      
+
       print('chutiaa');
       var request = http.MultipartRequest(
         'POST',
@@ -151,9 +151,9 @@ class ReviewService {
   // Method specifically for fetching reviews (guests allowed)
   Future<List<Review>> fetchProductReviews(productId, [productPackId]) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    
+
     print('Fetching reviews for product: $productId, pack: $productPackId');
-    
+
     try {
       var request = http.MultipartRequest(
         'POST',
@@ -166,13 +166,14 @@ class ReviewService {
         request.fields['product_pack_id'] = productPackId.toString();
       }
       request.fields['isOnlyFetch'] = '1';
-      
+
       // Add userId if user is logged in
       if (_configModel.user != null) {
         request.fields['userId'] = _configModel.user!.id.toString();
       }
 
-      Map<String, String> headers = Map<String, String>.from(_apiConfig['headers']);
+      Map<String, String> headers =
+          Map<String, String>.from(_apiConfig['headers']);
       headers.remove('Content-Type');
       request.headers.addAll(headers);
 
@@ -192,14 +193,15 @@ class ReviewService {
         }
         print('Reviews fetched successfully: ${_reviews.length} reviews');
       } else {
-        print('Failed to fetch reviews: ${submitResponse['message'] ?? 'Unknown error'}');
+        print(
+            'Failed to fetch reviews: ${submitResponse['message'] ?? 'Unknown error'}');
         _reviews = [];
       }
     } catch (e) {
       print('Error fetching reviews: $e');
       _reviews = [];
     }
-    
+
     return _reviews;
   }
 }

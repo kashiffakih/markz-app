@@ -631,8 +631,25 @@ class _CartPageState extends State<CartPage> {
                                                                             child:
                                                                                 InkWell(
                                                                               onTap: () async {
-                                                                                await _wishListModel.getWishLists(_productModel.allProducts?[index].id);
-                                                                                setState(() {});
+                                                                                if (_configModel.user != null) {
+                                                                                  await _wishListModel.getWishLists(_productModel.allProducts?[index].id);
+                                                                                  setState(() {});
+                                                                                } else {
+                                                                                  // Show login required dialog
+                                                                                  showDialog(
+                                                                                    context: context,
+                                                                                    builder: (context) => AlertDialog(
+                                                                                      title: Text('Login Required'),
+                                                                                      content: Text('Please login to add items to wishlist'),
+                                                                                      actions: [
+                                                                                        TextButton(
+                                                                                          onPressed: () => Navigator.pop(context),
+                                                                                          child: Text('OK'),
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  );
+                                                                                }
                                                                               },
                                                                               child: _wishListModel.wishListLoader
                                                                                   ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
@@ -1241,22 +1258,27 @@ class _CartPageState extends State<CartPage> {
                                                 .toString());
 
                                         // Check coupon usage count
-                                        final orderModel = Provider.of<OrderModel>(
-                                            context, listen: false);
+                                        final orderModel =
+                                            Provider.of<OrderModel>(context,
+                                                listen: false);
                                         final usageCount = await orderModel
-                                            .getCouponUsageCount(firstCoupon.id.toString());
-                                        
-                                        if (firstCoupon.noPerUser != null && 
-                                            firstCoupon.noPerUser! > 0 && 
-                                            usageCount >= firstCoupon.noPerUser!) {
+                                            .getCouponUsageCount(
+                                                firstCoupon.id.toString());
+
+                                        if (firstCoupon.noPerUser != null &&
+                                            firstCoupon.noPerUser! > 0 &&
+                                            usageCount >=
+                                                firstCoupon.noPerUser!) {
                                           showDialog(
                                             context: context,
                                             builder: (BuildContext context) =>
                                                 AlertDialog(
                                               shape: RoundedRectangleBorder(
                                                   borderRadius:
-                                                      BorderRadius.circular(20)),
-                                              title: Text("Coupon Usage Limit Reached"),
+                                                      BorderRadius.circular(
+                                                          20)),
+                                              title: Text(
+                                                  "Coupon Usage Limit Reached"),
                                               content: Text(
                                                   "You have already used this coupon ${firstCoupon.noPerUser} time${firstCoupon.noPerUser! > 1 ? 's' : ''}. This is the maximum allowed per user."),
                                               actions: <Widget>[
@@ -1370,12 +1392,14 @@ class _CartPageState extends State<CartPage> {
 
                                     // Check coupon usage count
                                     final orderModel = Provider.of<OrderModel>(
-                                        context, listen: false);
-                                    final usageCount = await orderModel
-                                        .getCouponUsageCount(firstCoupon.id.toString());
-                                    
-                                    if (firstCoupon.noPerUser != null && 
-                                        firstCoupon.noPerUser! > 0 && 
+                                        context,
+                                        listen: false);
+                                    final usageCount =
+                                        await orderModel.getCouponUsageCount(
+                                            firstCoupon.id.toString());
+
+                                    if (firstCoupon.noPerUser != null &&
+                                        firstCoupon.noPerUser! > 0 &&
                                         usageCount >= firstCoupon.noPerUser!) {
                                       showDialog(
                                         context: context,
@@ -1384,7 +1408,8 @@ class _CartPageState extends State<CartPage> {
                                           shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(20)),
-                                          title: Text("Coupon Usage Limit Reached"),
+                                          title: Text(
+                                              "Coupon Usage Limit Reached"),
                                           content: Text(
                                               "You have already used this coupon ${firstCoupon.noPerUser} time${firstCoupon.noPerUser! > 1 ? 's' : ''}. This is the maximum allowed per user."),
                                           actions: <Widget>[
@@ -2664,7 +2689,26 @@ class _CartPageState extends State<CartPage> {
                                                                             InkWell(
                                                                           onTap:
                                                                               () async {
-                                                                            await _wishListModel.getWishLists(_productModel.allProducts?[index].id);
+                                                                            if (_configModel.user !=
+                                                                                null) {
+                                                                              await _wishListModel.getWishLists(_productModel.allProducts?[index].id);
+                                                                              setState(() {});
+                                                                            } else {
+                                                                              // Show login required dialog
+                                                                              showDialog(
+                                                                                context: context,
+                                                                                builder: (context) => AlertDialog(
+                                                                                  title: Text('Login Required'),
+                                                                                  content: Text('Please login to add items to wishlist'),
+                                                                                  actions: [
+                                                                                    TextButton(
+                                                                                      onPressed: () => Navigator.pop(context),
+                                                                                      child: Text('OK'),
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
+                                                                              );
+                                                                            }
                                                                           },
                                                                           child: _wishListModel.wishListLoader
                                                                               ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))

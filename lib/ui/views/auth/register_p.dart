@@ -231,6 +231,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         borderRadius: BorderRadius.circular(7.6632652283),
                       ),
                       child: TextFormField(
+                        keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           focusedBorder: InputBorder.none,
@@ -271,6 +272,8 @@ class _RegisterPageState extends State<RegisterPage> {
                         borderRadius: BorderRadius.circular(7.6632652283),
                       ),
                       child: TextFormField(
+                        keyboardType: TextInputType.number,
+                        maxLength: 10,
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           focusedBorder: InputBorder.none,
@@ -281,6 +284,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               16.34 * fem, 17.94 * fem, 17.66 * fem),
                           hintText: 'Phone',
                           hintStyle: TextStyle(color: Color(0xff8390a1)),
+                          counterText: '', // Hide the counter text
                         ),
                         style: MyGoogleFontStyle(
                           fontFamily: 'Urbanist',
@@ -292,8 +296,11 @@ class _RegisterPageState extends State<RegisterPage> {
                         // initialValue: _registerData['phone'],
                         validator: (value) {
                           if (value!.isEmpty) return 'Phone cannot be empty';
-                          if (value.length == 10)
-                            return "Phone number can't be less or greater than 10 digit";
+                          if (value.length != 10)
+                            return "Phone number must be exactly 10 digits";
+                          // Check if the value contains only digits
+                          if (!RegExp(r'^[0-9]+$').hasMatch(value))
+                            return "Phone number must contain only digits";
                           return null;
                         },
                         onSaved: (value) {
