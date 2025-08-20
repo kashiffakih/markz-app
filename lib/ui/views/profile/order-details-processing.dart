@@ -1,8 +1,10 @@
+import 'package:aadab/ui/views/profile/orders_p.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:aadab/core/providers/review_pr.dart';
+import 'package:aadab/core/providers/order_pr.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 import 'package:aadab/ui/widgets/multi_image_w.dart';
 import 'package:aadab/core/providers/config_pr.dart';
@@ -114,6 +116,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 _buildDateInfo(fem, ffem),
                 _buildPhoneInfo(fem, ffem),
                 _buildAddressInfo(fem, ffem),
+                _buildCancelButton(context, fem, ffem),
               ],
             ),
           ),
@@ -778,5 +781,192 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         ],
       ),
     );
+  }
+
+  Widget _buildCancelButton(BuildContext context, double fem, double ffem) {
+    final status = widget.arguments?['status']?.toString().toLowerCase() ?? '';
+    final orderId = widget.arguments?['order']['id'];
+
+    // Only show cancel button for "Order placed" and "Order in processing" statuses
+    // Handle various status name variations
+    final canCancel = status.contains('place') ||
+        status.contains('placed') ||
+        status.contains('processing');
+
+    if (!canCancel) {
+      return SizedBox.shrink();
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 20 * fem, vertical: 20 * fem),
+      child: ElevatedButton(
+        onPressed:
+            _isLoading ? null : () => _showCancelConfirmation(context, orderId),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: _isLoading ? Colors.grey : Colors.red,
+          padding: EdgeInsets.symmetric(vertical: 15 * fem),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10 * fem),
+          ),
+        ),
+        child: _isLoading
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(width: 10 * fem),
+                  Text(
+                    'Cancelling...',
+                    style: MyGoogleFontStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 16 * ffem,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              )
+            : Text(
+                'Cancel Order',
+                style: MyGoogleFontStyle(
+                  fontFamily: 'Urbanist',
+                  fontSize: 16 * ffem,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+      ),
+    );
+  }
+
+  void _showCancelConfirmation(BuildContext context, int? orderId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
+            'Cancel Order',
+            style: MyGoogleFontStyle(
+              fontFamily: 'Urbanist',
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xff1e1e1e),
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to cancel this order? This action cannot be undone.',
+            style: MyGoogleFontStyle(
+              fontFamily: 'Urbanist',
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: const Color(0xff666666),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'No',
+                style: MyGoogleFontStyle(
+                  fontFamily: 'Urbanist',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xff666666),
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _cancelOrder(context, orderId);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        OrdersPage(isProfile: {'isProfile': true}),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'Yes, Cancel',
+                style: MyGoogleFontStyle(
+                  fontFamily: 'Urbanist',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _cancelOrder(BuildContext context, int? orderId) async {
+    if (orderId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Invalid order ID'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final orderModel = Provider.of<OrderModel>(context, listen: false);
+      bool success = await orderModel.cancelOrder(orderId);
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Order cancelled successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Navigate back to refresh the previous screen
+        Navigator.of(context).pop(true);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to cancel order. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error cancelling order: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 }

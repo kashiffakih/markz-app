@@ -59,4 +59,9 @@ class OrderModel with ChangeNotifier {
   Future<int> getCouponUsageCount(String couponId) async {
     return await _orderService.getCouponUsageCount(couponId);
   }
+
+  // Cancel order
+  Future<bool> cancelOrder(int orderId) async {
+    return await _orderService.cancelOrder(orderId);
+  }
 }

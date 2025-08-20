@@ -306,4 +306,28 @@ class OrderService {
       return 0;
     }
   }
+
+  // Cancel order
+  Future<bool> cancelOrder(int orderId) async {
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+
+    if (_configModel.user == null) {
+      return false;
+    }
+
+    final response = await http.post(
+      Uri.parse('${_apiConfig['baseURL']}/orders/$orderId/order_statuses'),
+      headers: _apiConfig['headers'],
+      body: jsonEncode({
+        // 'id': orderId,
+        'status_id': '8', // Assuming 8 is the cancelled status ID
+        'date': DateTime.now().toIso8601String(),
+      }),
+    );
+
+    debugPrint('Cancel order response: ${response.statusCode}');
+    debugPrint('Cancel order body: ${response.body}');
+
+    return true;
+  }
 }
