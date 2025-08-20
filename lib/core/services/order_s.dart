@@ -33,6 +33,30 @@ class OrderService {
     var orderDetails = [];
     cartItems.forEach((item) {
       debugPrint("Item pack order s :${userWalletUsed}");
+
+      // Get the product image path based on selected flavour
+      String? productImagePath;
+      if (item.product != null &&
+          item.product!.productImages != null &&
+          item.flavour != null) {
+        try {
+          var matchingImage = item.product!.productImages!
+              .where((image) => image.unit?.name == item.flavour)
+              .toList();
+          if (matchingImage.isNotEmpty) {
+            productImagePath = matchingImage.first.imagepath;
+          }
+        } catch (e) {
+          debugPrint("Error getting product image: $e");
+        }
+      }
+
+      // Fallback to primary image if flavour-specific image not found
+      if (productImagePath == null && item.product != null) {
+        productImagePath = item.product!.imagepath1 ??
+            item.product!.productImages?.first.imagepath;
+      }
+
       orderDetails.add({
         'cashback': item.points,
         'order_detail_cost': item.productPrice,
@@ -42,6 +66,7 @@ class OrderService {
         'kind_of_flower': item.kindOfFlower,
         'flavour': item.flavour,
         'write_on_cake': item.writeOnCake,
+        'product_image_path': productImagePath,
       });
     });
 

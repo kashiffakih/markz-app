@@ -207,21 +207,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         itemCount: orderDetails.length,
         itemBuilder: (context, index) {
           final detail = orderDetails[index];
-          final productImages =
-              widget.arguments?['product_images'] as List<dynamic>? ?? [];
-          final newImageDisplay = productImages
-                  .where((element) =>
-                      element.id.toString() ==
-                      detail['product_pack'].toString())
-                  .toList()
-                  .isNotEmpty
-              ? productImages
-                  .where((element) =>
-                      element.id.toString() ==
-                      detail['product_pack'].toString())
-                  .toList()[0]
-                  .imagepath
-              : null;
+          // final productImages =
+          //     widget.arguments?['product_images'] as List<dynamic>? ?? [];
+          final newImageDisplay = detail['product_image_path'];
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,

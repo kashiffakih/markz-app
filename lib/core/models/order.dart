@@ -285,6 +285,7 @@ class OrderDetails {
   String? writeOnCake;
   Product? product;
   String? unit;
+  String? productImagePath;
 
   OrderDetails(
       {this.id,
@@ -300,7 +301,8 @@ class OrderDetails {
       this.flavour,
       this.writeOnCake,
       this.product,
-      this.unit});
+      this.unit,
+      this.productImagePath});
 
   OrderDetails.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -318,6 +320,7 @@ class OrderDetails {
     product =
         json['product'] != null ? new Product.fromJson(json['product']) : null;
     unit = json['unit'];
+    productImagePath = json['product_image_path'];
   }
 
   Map<String, dynamic> toJson() {
@@ -338,6 +341,7 @@ class OrderDetails {
       data['product'] = this.product!.toJson();
     }
     data['unit'] = this.unit;
+    data['product_image_path'] = this.productImagePath;
     return data;
   }
 }
