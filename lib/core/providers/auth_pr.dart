@@ -27,10 +27,24 @@ class AuthModel with ChangeNotifier {
     );
   }
 
-  Future<bool> register({required Map<String, dynamic> registerData}) async {
-    return await _authService.registerUser(
-      registerData: registerData,
-    );
+  Future<Map<String, dynamic>> register({required Map<String, dynamic> registerData}) async {
+    try {
+      bool success = await _authService.registerUser(registerData: registerData);
+      if (success) {
+        return {'success': true, 'message': 'Registration successful'};
+      } else {
+        return {'success': false, 'message': 'Registration failed', 'error': 'GENERAL_ERROR'};
+      }
+    } catch (e) {
+      // Check if it's a duplicate user error
+      String errorMessage = e.toString().toLowerCase();
+      if (errorMessage.contains('already exists') || 
+          errorMessage.contains('duplicate') || 
+          errorMessage.contains('already registered')) {
+        return {'success': false, 'message': 'User already registered', 'error': 'USER_EXISTS'};
+      }
+      return {'success': false, 'message': 'Registration failed', 'error': 'GENERAL_ERROR'};
+    }
   }
 
   Future<bool> sendCodeForResetPassword(

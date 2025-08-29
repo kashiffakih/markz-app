@@ -33,7 +33,7 @@ class UserWalletModel with ChangeNotifier {
     totaRemainingPoint = _response['remaining_points'];
   }
 
-  mapRedeemReferralCode(referralCode) async {
-    await _userWalletService.mapRedeemReferralCode(referralCode);
+  Future<Map<String, dynamic>> mapRedeemReferralCode(String referralCode) async {
+    return await _userWalletService.mapRedeemReferralCode(referralCode);
   }
 }

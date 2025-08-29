@@ -348,210 +348,114 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 Container(
                   margin: EdgeInsets.only(left: 20, right: 20, bottom: 10),
-                  child: Row(
-                    children: [
-                      // Expanded(
-                      //   child: InkWell(
-                      //     onTap: () async {
-                      //       try {
-                      //         setState(() {
-                      //           _isLoading = true;
-                      //         });
-                      //         await FacebookAuth.instance.login();
-                      //         final userData =
-                      //             await FacebookAuth.instance.getUserData();
-                      //         _loginData['email'] = userData['email'];
-                      //         _loginData['password'] = '123456';
-                      //         _loginData['role'] = widget.argument['role'];
-
-                      //         _loginData['is_social_login'] = true;
-                      //         _loginData['social_login_name'] = "FACEBOOK";
-                      //         var authModel = Provider.of<AuthModel>(context,
-                      //             listen: false);
-                      //         await authModel.login(loginData: _loginData);
-                      //         if (_configModel.isLoggedIn) {
-                      //           Navigator.pushReplacementNamed(context, '/');
-                      //         } else {
-                      //           showDialog(
-                      //             context: context,
-                      //             builder: (context) => AlertDialog(
-                      //               shape: RoundedRectangleBorder(
-                      //                 borderRadius: BorderRadius.circular(20),
-                      //               ),
-                      //               title: Text('Facebook Login Failed'),
-                      //               content:
-                      //                   Text(_configModel.loginFailedMessage),
-                      //               actions: [
-                      //                 TextButton(
-                      //                   onPressed: () => Navigator.pop(context),
-                      //                   child: Text('OK'),
-                      //                 ),
-                      //               ],
-                      //             ),
-                      //           );
-                      //         }
-                      //       } catch (e) {
-                      //         print('Facebook Sign-In Error: $e');
-                      //         showDialog(
-                      //           context: context,
-                      //           builder: (context) => AlertDialog(
-                      //             shape: RoundedRectangleBorder(
-                      //               borderRadius: BorderRadius.circular(20),
-                      //             ),
-                      //             title: Text('Facebook Sign-In Failed'),
-                      //             content: Text('An error occurred: $e'),
-                      //             actions: [
-                      //               TextButton(
-                      //                 onPressed: () => Navigator.pop(context),
-                      //                 child: Text('OK'),
-                      //               ),
-                      //             ],
-                      //           ),
-                      //         );
-                      //       } finally {
-                      //         setState(() {
-                      //           _isLoading = false;
-                      //         });
-                      //       }
-                      //     },
-                      //     child: Container(
-                      //       margin: EdgeInsets.all(5),
-                      //       padding: EdgeInsets.fromLTRB(31.47 * fem,
-                      //           15.08 * fem, 36.19 * fem, 15.08 * fem),
-                      //       decoration: BoxDecoration(
-                      //         border: Border.all(color: Color(0xffe8ecf4)),
-                      //         color: Color(0xffffffff),
-                      //         borderRadius:
-                      //             BorderRadius.circular(7.5407857895 * fem),
-                      //       ),
-                      //       child: Center(
-                      //         child: SizedBox(
-                      //           width: 11.31 * fem,
-                      //           height: 22.62 * fem,
-                      //           child: Image.asset(
-                      //             'assets/images/facebookic.png',
-                      //             width: 11.31 * fem,
-                      //             height: 22.62 * fem,
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
-                      Expanded(
-                        child: InkWell(
-                          onTap: () async {
-                            try {
-                              setState(() {
-                                _isLoading = true;
-                              });
-                              final googleSignIn =
-                                  GoogleSignIn(scopes: ['email']);
-                              final googleAccount = await googleSignIn.signIn();
-                              if (googleAccount == null) {
-                                setState(() {
-                                  _isLoading = false;
-                                });
-                                return;
-                              }
-                              final googleAuth =
-                                  await googleAccount.authentication;
-                              final credential = GoogleAuthProvider.credential(
-                                accessToken: googleAuth.accessToken,
-                                idToken: googleAuth.idToken,
-                              );
-                              final userCredential = await FirebaseAuth.instance
-                                  .signInWithCredential(credential);
-                              if (userCredential.user != null) {
-                                _loginData['email'] =
-                                    userCredential.user!.email;
-                                _loginData['is_social_login'] = true;
-                                _loginData['password'] = '123456';
-                                _loginData['role'] = widget.argument['role'];
-                                _loginData['social_login_name'] = "GOOGLE";
-                                var authModel = Provider.of<AuthModel>(context,
-                                    listen: false);
-                                await authModel.login(loginData: _loginData);
-                                if (_configModel.isLoggedIn) {
-                                  Navigator.pushReplacementNamed(context, '/');
-                                } else {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      title: Text('Google Login Failed'),
-                                      content:
-                                          Text(_configModel.loginFailedMessage),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                          child: Text('OK'),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }
-                              }
-                            } catch (e) {
-                              String errorMessage =
-                                  'An error occurred during Google Sign-In';
-                              if (e is FirebaseAuthException) {
-                                errorMessage =
-                                    'Firebase Auth Error: ${e.code} - ${e.message}';
-                              } else {
-                                errorMessage = 'Error: $e';
-                              }
-                              print(errorMessage);
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
+                  child: InkWell(
+                    onTap: () async {
+                      try {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        final googleSignIn = GoogleSignIn(scopes: ['email']);
+                        final googleAccount = await googleSignIn.signIn();
+                        if (googleAccount == null) {
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          return;
+                        }
+                        final googleAuth = await googleAccount.authentication;
+                        final credential = GoogleAuthProvider.credential(
+                          accessToken: googleAuth.accessToken,
+                          idToken: googleAuth.idToken,
+                        );
+                        final userCredential = await FirebaseAuth.instance
+                            .signInWithCredential(credential);
+                        if (userCredential.user != null) {
+                          _loginData['email'] = userCredential.user!.email;
+                          _loginData['phone'] =
+                              userCredential.user!.phoneNumber;
+                          _loginData['first_name'] =
+                              userCredential.user!.displayName;
+                          _loginData['is_social_login'] = true;
+                          _loginData['password'] = '123456';
+                          _loginData['role'] = widget.argument['role'];
+                          _loginData['social_login_name'] = "GOOGLE";
+                          var authModel =
+                              Provider.of<AuthModel>(context, listen: false);
+                          await authModel.login(loginData: _loginData);
+                          if (_configModel.isLoggedIn) {
+                            Navigator.pushReplacementNamed(context, '/');
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                title: Text('Google Login Failed'),
+                                content: Text(_configModel.loginFailedMessage),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: Text('OK'),
                                   ),
-                                  title: Text('Google Sign-In Failed'),
-                                  content: Text(errorMessage),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: Text('OK'),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            } finally {
-                              setState(() {
-                                _isLoading = false;
-                              });
-                            }
-                          },
-                          child: Container(
-                            margin: EdgeInsets.all(5),
-                            padding: EdgeInsets.fromLTRB(30.99 * fem,
-                                15.25 * fem, 35.7 * fem, 15.25 * fem),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Color(0xffe8ecf4)),
-                              color: Color(0xffffffff),
-                              borderRadius:
-                                  BorderRadius.circular(7.5407857895 * fem),
-                            ),
-                            child: Center(
-                              child: SizedBox(
-                                width: 22.28 * fem,
-                                height: 22.28 * fem,
-                                child: Image.asset(
-                                  'assets/images/googleic-3Lc.png',
-                                  width: 22.28 * fem,
-                                  height: 22.28 * fem,
-                                ),
+                                ],
                               ),
+                            );
+                          }
+                        }
+                      } catch (e) {
+                        String errorMessage =
+                            'An error occurred during Google Sign-In';
+                        if (e is FirebaseAuthException) {
+                          errorMessage =
+                              'Firebase Auth Error: ${e.code} - ${e.message}';
+                        } else {
+                          errorMessage = 'Error: $e';
+                        }
+                        print(errorMessage);
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
                             ),
+                            title: Text('Google Sign-In Failed'),
+                            content: Text(errorMessage),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text('OK'),
+                              ),
+                            ],
+                          ),
+                        );
+                      } finally {
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      }
+                    },
+                    child: Container(
+                      margin: EdgeInsets.all(5),
+                      padding: EdgeInsets.fromLTRB(
+                          30.99 * fem, 15.25 * fem, 35.7 * fem, 15.25 * fem),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Color(0xffe8ecf4)),
+                        color: Color(0xffffffff),
+                        borderRadius: BorderRadius.circular(7.5407857895 * fem),
+                      ),
+                      child: Center(
+                        child: SizedBox(
+                          width: 22.28 * fem,
+                          height: 22.28 * fem,
+                          child: Image.asset(
+                            'assets/images/googleic-3Lc.png',
+                            width: 22.28 * fem,
+                            height: 22.28 * fem,
                           ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
                 InkWell(

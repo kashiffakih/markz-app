@@ -72,7 +72,32 @@ class AuthService {
     );
 
     Map<String, dynamic> _responseData = json.decode(_response.body);
-    print(_response.body);
+    print('Registration response: ${_response.body}');
+    print('Status code: ${_response.statusCode}');
+    
+    // Handle different HTTP status codes
+    if (_response.statusCode == 409) {
+      // Conflict - User already exists
+      throw Exception('User already registered');
+    } else if (_response.statusCode == 422) {
+      // Validation error
+      throw Exception('Validation failed: ${_responseData['message']}');
+    } else if (_response.statusCode >= 400) {
+      // Other client/server errors
+      throw Exception(_responseData['message'] ?? 'Registration failed');
+    }
+    
+    // Additional check for error in response body (fallback)
+    if (!_responseData['success'] && _responseData['message'] != null) {
+      String errorMessage = _responseData['message'].toString().toLowerCase();
+      if (errorMessage.contains('already exists') || 
+          errorMessage.contains('duplicate') || 
+          _responseData['error'] == 'USER_ALREADY_EXISTS') {
+        throw Exception('User already registered');
+      }
+      throw Exception(_responseData['message']);
+    }
+    
     if (_responseData['success']) {
       var roleId;
       roleId = registerData!['role'] == 'Distributor' ? 3 : 6;
@@ -121,7 +146,7 @@ class AuthService {
     //   http.Response response = await http.Response.fromStream(_responseImage);
     //   print(response.body);
     // }
-    return true;
+    return _responseData['success'] ?? false;
   }
 
   Future<bool> sendCodeForResetPassword(

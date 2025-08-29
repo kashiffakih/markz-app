@@ -385,51 +385,15 @@ class _RegisterPageState extends State<RegisterPage> {
                               _registerData['role'] = widget.argument['role'];
 
                               print(_registerData);
-                              bool response = await authModel.register(
-                                  registerData: _registerData);
-                              if (response == true) {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) =>
-                                      AlertDialog(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(20)),
-                                    title: Text(
-                                        'Registeration successfully done.'),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pushReplacementNamed(
-                                              context, '/loginPage',
-                                              arguments: {
-                                                'role': widget.argument['role']
-                                              });
-                                        },
-                                        child: Text('Ok'),
-                                      ),
-                                    ],
-                                  ),
-                                );
+                              Map<String, dynamic> response = await authModel
+                                  .register(registerData: _registerData);
+                              if (response['success'] == true) {
+                                _showSuccessDialog();
+                              } else if (response['error'] == 'USER_EXISTS') {
+                                _showAlreadyRegisteredDialog();
                               } else {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) =>
-                                      AlertDialog(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(20)),
-                                    title: Text('Registration failed!'),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text('Ok'),
-                                      ),
-                                    ],
-                                  ),
-                                );
+                                _showErrorDialog(response['message'] ??
+                                    'Registration failed! Please try again.');
                               }
                             }
 
@@ -460,7 +424,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   ],
                 ),
               ),
-
               Container(
                 margin:
                     EdgeInsets.fromLTRB(0 * fem, 0 * fem, 12.36 * fem, 0 * fem),
@@ -478,284 +441,67 @@ class _RegisterPageState extends State<RegisterPage> {
               SizedBox(
                 height: 25,
               ),
+              Container(
+                margin: EdgeInsets.only(left: 20, right: 20, bottom: 10),
+                child: InkWell(
+                  onTap: () async {
+                    // _handleSignIn();
+                    {
+                      final googleAccount = await GoogleSignIn().signIn();
+                      final googleAuth = await googleAccount?.authentication;
 
-              // Container(
-              //   margin: EdgeInsets.only(left: 20, right: 20, bottom: 10),
-              //   child: Row(
-              //     crossAxisAlignment: CrossAxisAlignment.center,
-              //     children: [
-              //       Expanded(
-              //         child: Container(
-              //           margin: EdgeInsets.fromLTRB(
-              //               0 * fem, 1.91 * fem, 12.44 * fem, 0 * fem),
-              //           width: 105.57 * fem,
-              //           height: 0.94 * fem,
-              //           decoration: BoxDecoration(
-              //             color: Color(0xffe8ecf4),
-              //           ),
-              //         ),
-              //       ),
-              //       Expanded(
-              //         child: Container(
-              //           margin: EdgeInsets.fromLTRB(
-              //               0 * fem, 0 * fem, 12.36 * fem, 0 * fem),
-              //           child: Text(
-              //             'Or Register with',
-              //             style: MyGoogleFontStyle(
-              //               fontFamily: 'Urbanist',
-              //               fontSize: 12.792224884 * ffem,
-              //               fontWeight: FontWeight.w600,
-              //               height: 1.2 * ffem / fem,
-              //               color: Color(0xff6a707c),
-              //             ),
-              //           ),
-              //         ),
-              //       ),
-              //       Expanded(
-              //         child: Container(
-              //           margin: EdgeInsets.fromLTRB(
-              //               0 * fem, 1.91 * fem, 0 * fem, 0 * fem),
-              //           width: 104.63 * fem,
-              //           height: 0.94 * fem,
-              //           decoration: BoxDecoration(
-              //             color: Color(0xffe8ecf4),
-              //           ),
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
-              // Container(
-              //   margin: EdgeInsets.only(left: 20, right: 20, bottom: 10),
-              //   child: Row(
-              //     children: [
-              //       Expanded(
-              //         child: Container(
-              //           margin: EdgeInsets.all(5),
-              //           padding: EdgeInsets.fromLTRB(
-              //               31.47 * fem, 15.08 * fem, 36.19 * fem, 15.08 * fem),
-              //           decoration: BoxDecoration(
-              //             border: Border.all(color: Color(0xffe8ecf4)),
-              //             color: Color(0xffffffff),
-              //             borderRadius:
-              //                 BorderRadius.circular(7.5407857895 * fem),
-              //           ),
-              //           child: Center(
-              //             child: SizedBox(
-              //               width: 11.31 * fem,
-              //               height: 22.62 * fem,
-              //               child: Image.asset(
-              //                 'assets/images/facebookic.png',
-              //                 width: 11.31 * fem,
-              //                 height: 52.62 * fem,
-              //               ),
-              //             ),
-              //           ),
-              //         ),
-              //       ),
-              //       Expanded(
-              //         child: Container(
-              //           margin: EdgeInsets.all(5),
-              //           padding: EdgeInsets.fromLTRB(
-              //               30.99 * fem, 15.25 * fem, 35.7 * fem, 15.25 * fem),
-              //           decoration: BoxDecoration(
-              //             border: Border.all(color: Color(0xffe8ecf4)),
-              //             color: Color(0xffffffff),
-              //             borderRadius:
-              //                 BorderRadius.circular(7.5407857895 * fem),
-              //           ),
-              //           child: Center(
-              //             child: SizedBox(
-              //               width: 22.28 * fem,
-              //               height: 22.28 * fem,
-              //               child: Image.asset(
-              //                 'assets/images/googleic-3Lc.png',
-              //                 width: 22.28 * fem,
-              //                 height: 22.28 * fem,
-              //               ),
-              //             ),
-              //           ),
-              //         ),
-              //       ),
-              //       Expanded(
-              //         child: Container(
-              //           padding: EdgeInsets.fromLTRB(
-              //               30.88 * fem, 14.14 * fem, 35.59 * fem, 14.14 * fem),
-              //           decoration: BoxDecoration(
-              //             border: Border.all(color: Color(0xffe8ecf4)),
-              //             color: Color(0xffffffff),
-              //             borderRadius:
-              //                 BorderRadius.circular(7.5407857895 * fem),
-              //           ),
-              //           child: Center(
-              //             child: SizedBox(
-              //               width: 24.51 * fem,
-              //               height: 24.51 * fem,
-              //               child: Image.asset(
-              //                 'assets/images/cib-apple-KaY.png',
-              //                 width: 24.51 * fem,
-              //                 height: 24.51 * fem,
-              //               ),
-              //             ),
-              //           ),
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
+                      final credential = GoogleAuthProvider.credential(
+                        accessToken: googleAuth?.accessToken,
+                        idToken: googleAuth?.idToken,
+                      );
 
-              InkWell(
-                onTap: () {
-                  {
-                    FacebookAuth.instance
-                        .login(
-                            //   permissions: [
-                            //   "public_profile",
-                            //   "email"
-                            // ]
-                            )
-                        .then((value) {
-                      FacebookAuth.instance
-                          .getUserData()
-                          .then((userData) async {
-                        print(userData);
-                        print(userData['email']);
+                      final userCredential = await FirebaseAuth.instance
+                          .signInWithCredential(credential);
 
-                        setState(() {
-                          _isLoading = true;
-                        });
-                        _loginData['email'] = userData['email'];
-                        _loginData['is_social_login'] = true;
-                        _loginData['social_login_name'] = "FACEBOOK";
+                      print(userCredential.user?.email);
 
-                        var authModel =
-                            Provider.of<AuthModel>(context, listen: false);
-                        await authModel.login(loginData: _loginData);
-                        if (_configModel.isLoggedIn) {
-                          Navigator.pushReplacementNamed(
-                            context,
-                            '/',
-                          );
-                        }
+                      setState(() {
+                        _isLoading = true;
                       });
-                    });
-                  }
-                },
-                child: Container(
-                  margin: EdgeInsets.only(left: 20, right: 20, bottom: 10),
-                  child: Row(
-                    children: [
-                      // Expanded(
-                      //   child: Container(
-                      //     margin: EdgeInsets.all(5),
-                      //     padding: EdgeInsets.fromLTRB(31.47 * fem, 15.08 * fem,
-                      //         36.19 * fem, 15.08 * fem),
-                      //     decoration: BoxDecoration(
-                      //       border: Border.all(color: Color(0xffe8ecf4)),
-                      //       color: Color(0xffffffff),
-                      //       borderRadius:
-                      //           BorderRadius.circular(7.5407857895 * fem),
-                      //     ),
-                      //     child: Center(
-                      //       child: SizedBox(
-                      //         width: 11.31 * fem,
-                      //         height: 22.62 * fem,
-                      //         child: Image.asset(
-                      //           'assets/images/facebookic.png',
-                      //           width: 11.31 * fem,
-                      //           height: 52.62 * fem,
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
-                      Expanded(
-                        child: InkWell(
-                          onTap: () async {
-                            // _handleSignIn();
-                            {
-                              final googleAccount =
-                                  await GoogleSignIn().signIn();
-                              final googleAuth =
-                                  await googleAccount?.authentication;
 
-                              final credential = GoogleAuthProvider.credential(
-                                accessToken: googleAuth?.accessToken,
-                                idToken: googleAuth?.idToken,
-                              );
-
-                              final userCredential = await FirebaseAuth.instance
-                                  .signInWithCredential(credential);
-
-                              print(userCredential.user?.email);
-
-                              setState(() {
-                                _isLoading = true;
-                              });
-
-                              _loginData['email'] = userCredential.user?.email;
-                              _loginData['is_social_login'] = true;
-                              _loginData['social_login_name'] = "GOOGLE";
-
-                              var authModel = Provider.of<AuthModel>(context,
-                                  listen: false);
-                              await authModel.login(loginData: _loginData);
-                              if (_configModel.isLoggedIn) {
-                                Navigator.pushReplacementNamed(
-                                  context,
-                                  '/',
-                                );
-                              }
-                            }
-                          },
-                          child: Container(
-                            margin: EdgeInsets.all(5),
-                            padding: EdgeInsets.fromLTRB(30.99 * fem,
-                                15.25 * fem, 35.7 * fem, 15.25 * fem),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Color(0xffe8ecf4)),
-                              color: Color(0xffffffff),
-                              borderRadius:
-                                  BorderRadius.circular(7.5407857895 * fem),
-                            ),
-                            child: Center(
-                              child: SizedBox(
-                                width: 22.28 * fem,
-                                height: 22.28 * fem,
-                                child: Image.asset(
-                                  'assets/images/googleic-3Lc.png',
-                                  width: 22.28 * fem,
-                                  height: 22.28 * fem,
-                                ),
-                              ),
-                            ),
-                          ),
+                      _loginData['email'] = userCredential.user?.email;
+                      _loginData['phone'] = userCredential.user?.phoneNumber;
+                      _loginData['first_name'] =
+                          userCredential.user?.displayName;
+                      _loginData['is_social_login'] = true;
+                      _loginData['social_login_name'] = "GOOGLE";
+                      print('Google Login Data ${_loginData}');
+                      var authModel =
+                          Provider.of<AuthModel>(context, listen: false);
+                      await authModel.login(loginData: _loginData);
+                      if (_configModel.isLoggedIn) {
+                        Navigator.pushReplacementNamed(
+                          context,
+                          '/',
+                        );
+                      }
+                    }
+                  },
+                  child: Container(
+                    margin: EdgeInsets.all(5),
+                    padding: EdgeInsets.fromLTRB(
+                        30.99 * fem, 15.25 * fem, 35.7 * fem, 15.25 * fem),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Color(0xffe8ecf4)),
+                      color: Color(0xffffffff),
+                      borderRadius: BorderRadius.circular(7.5407857895 * fem),
+                    ),
+                    child: Center(
+                      child: SizedBox(
+                        width: 22.28 * fem,
+                        height: 22.28 * fem,
+                        child: Image.asset(
+                          'assets/images/googleic-3Lc.png',
+                          width: 22.28 * fem,
+                          height: 22.28 * fem,
                         ),
                       ),
-                      // Expanded(
-                      //   child: Container(
-                      //     padding: EdgeInsets.fromLTRB(30.88 * fem,
-                      //         14.14 * fem, 35.59 * fem, 14.14 * fem),
-                      //     decoration: BoxDecoration(
-                      //       border: Border.all(color: Color(0xffe8ecf4)),
-                      //       color: Color(0xffffffff),
-                      //       borderRadius:
-                      //           BorderRadius.circular(7.5407857895 * fem),
-                      //     ),
-                      //     child: Center(
-                      //       child: SizedBox(
-                      //         width: 24.51 * fem,
-                      //         height: 24.51 * fem,
-                      //         child: Image.asset(
-                      //           'assets/images/cib-apple-KaY.png',
-                      //           width: 24.51 * fem,
-                      //           height: 24.51 * fem,
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -805,6 +551,346 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         ),
       ),
+    );
+  }
+
+  // Show beautiful success dialog
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Success Icon
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF4CAF50),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check,
+                    color: Colors.white,
+                    size: 50,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Success Title
+                Text(
+                  'Registration Successful!',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xff1e1e1e),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                // Success Message
+                Text(
+                  'Your account has been created successfully. You can now login with your credentials.',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xff666666),
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+                // Continue Button
+                Container(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(context, '/loginPage',
+                          arguments: {'role': widget.argument['role']});
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xffc9b758),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'Continue to Login',
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Show beautiful error dialog
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Error Icon
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFF5252),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.close,
+                    color: Colors.white,
+                    size: 50,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Error Title
+                Text(
+                  'Registration Failed',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xff1e1e1e),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                // Error Message
+                Text(
+                  message,
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xff666666),
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+                // Try Again Button
+                Container(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF5252),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'Try Again',
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Show dialog for already registered user
+  void _showAlreadyRegisteredDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Warning Icon
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFF9800),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.person,
+                    color: Colors.white,
+                    size: 50,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Warning Title
+                Text(
+                  'Already Registered!',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xff1e1e1e),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                // Warning Message
+                Text(
+                  'An account with this email or phone number already exists. Please use different credentials or try logging in instead.',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xff666666),
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+                // Action Buttons
+                Row(
+                  children: [
+                    // Try Again Button
+                    Expanded(
+                      child: Container(
+                        height: 45,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Color(0xFFFF9800)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(22),
+                            ),
+                          ),
+                          child: Text(
+                            'Try Again',
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFFFF9800),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Go to Login Button
+                    Expanded(
+                      child: Container(
+                        height: 45,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushReplacementNamed(
+                                context, '/loginPage',
+                                arguments: {'role': widget.argument['role']});
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xffc9b758),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(22),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            'Go to Login',
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

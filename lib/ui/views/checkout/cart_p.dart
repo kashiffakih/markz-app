@@ -149,10 +149,28 @@ class _CartPageState extends State<CartPage> {
       if (mounted) {
         setState(() {
           _isLoading = false;
-          useWalletPoint = (Provider.of<UserWalletModel>(context, listen: false)
-                      .totaRemainingPoint *
-                  0.25)
-              .round();
+          // Calculate 25% of item total after coupon discount
+          final addToCartModel =
+              Provider.of<AddToCartModel>(context, listen: false);
+          final cartTotal = int.parse(addToCartModel.cartTotal.toString());
+          // Calculate GST on cart total after applying coupon discount
+          final cartTotalAfterCoupon = cartTotal - couponValue;
+          // Calculate using new method: item total = cartTotalAfterCoupon / 105 * 100
+          final itemTotal = (cartTotalAfterCoupon / 105) * 100;
+          // GST = Cart Total After Coupon - Item Total
+          final gstAmount = cartTotalAfterCoupon - itemTotal;
+          final sgstAmount = gstAmount / 2;
+          final cgstAmount = gstAmount / 2;
+          // Item total is already calculated after coupon discount
+          final cartAfterCoupon = itemTotal;
+
+          final calculatedPoints = (cartAfterCoupon * 0.25).round();
+          final availablePoints =
+              Provider.of<UserWalletModel>(context, listen: false)
+                  .totaRemainingPoint;
+          useWalletPoint = calculatedPoints > availablePoints
+              ? availablePoints
+              : calculatedPoints;
         });
       }
     } catch (e) {
@@ -2238,7 +2256,6 @@ class _CartPageState extends State<CartPage> {
                                                                   .toString()) /
                                                               105 *
                                                               100))
-                                                          .round()
                                                           .toStringAsFixed(2)),
                                                   textAlign: TextAlign.right,
                                                   style: MyGoogleFontStyle(
@@ -2297,18 +2314,35 @@ class _CartPageState extends State<CartPage> {
                                                   Text(
                                                     'RS' +
                                                         ' ' +
-                                                        ((double.parse((int.parse(_addToCartModel
-                                                                            .cartTotal
-                                                                            .toString()) -
-                                                                        (int.parse(_addToCartModel.cartTotal.toString()) /
-                                                                            105 *
-                                                                            100))
-                                                                    .round()
-                                                                    .toStringAsFixed(
-                                                                        2)) /
-                                                                2)
-                                                            .toStringAsFixed(
-                                                                2)),
+                                                        (() {
+                                                          // Calculate SGST using reverse calculation (2.5%)
+                                                          int cartTotal = int.parse(
+                                                              _addToCartModel
+                                                                  .cartTotal
+                                                                  .toString());
+                                                          // Calculate GST on cart total after applying discounts
+                                                          int cartTotalAfterDiscounts =
+                                                              cartTotal -
+                                                                  couponValue -
+                                                                  useWalletPoint;
+                                                          // Calculate using new method: item total = cartTotalAfterDiscounts / 105 * 100
+                                                          double itemTotal =
+                                                              (cartTotalAfterDiscounts /
+                                                                      105) *
+                                                                  100;
+                                                          // GST = Cart Total After Discounts - Item Total
+                                                          double gstAmount =
+                                                              cartTotalAfterDiscounts -
+                                                                  itemTotal;
+                                                          double sgstAmount =
+                                                              gstAmount / 2;
+                                                          double cgstAmount =
+                                                              gstAmount / 2;
+                                                          // SGST fixed at 2.5% of original cart total
+                                                          return sgstAmount
+                                                              .toStringAsFixed(
+                                                                  2);
+                                                        }()),
                                                     textAlign: TextAlign.right,
                                                     style: MyGoogleFontStyle(
                                                       fontFamily: 'Inter',
@@ -2341,18 +2375,35 @@ class _CartPageState extends State<CartPage> {
                                                   Text(
                                                     'RS' +
                                                         ' ' +
-                                                        ((double.parse((int.parse(_addToCartModel
-                                                                            .cartTotal
-                                                                            .toString()) -
-                                                                        (int.parse(_addToCartModel.cartTotal.toString()) /
-                                                                            105 *
-                                                                            100))
-                                                                    .round()
-                                                                    .toStringAsFixed(
-                                                                        2)) /
-                                                                2)
-                                                            .toStringAsFixed(
-                                                                2)),
+                                                        (() {
+                                                          // Calculate CGST using reverse calculation (2.5%)
+                                                          int cartTotal = int.parse(
+                                                              _addToCartModel
+                                                                  .cartTotal
+                                                                  .toString());
+                                                          // Calculate GST on cart total after applying discounts
+                                                          int cartTotalAfterDiscounts =
+                                                              cartTotal -
+                                                                  couponValue -
+                                                                  useWalletPoint;
+                                                          // Calculate using new method: item total = cartTotalAfterDiscounts / 105 * 100
+                                                          double itemTotal =
+                                                              (cartTotalAfterDiscounts /
+                                                                      105) *
+                                                                  100;
+                                                          // GST = Cart Total After Discounts - Item Total
+                                                          double gstAmount =
+                                                              cartTotalAfterDiscounts -
+                                                                  itemTotal;
+                                                          double sgstAmount =
+                                                              gstAmount / 2;
+                                                          double cgstAmount =
+                                                              gstAmount / 2;
+                                                          // CGST fixed at 2.5% of original cart total
+                                                          return cgstAmount
+                                                              .toStringAsFixed(
+                                                                  2);
+                                                        }()),
                                                     textAlign: TextAlign.right,
                                                     style: MyGoogleFontStyle(
                                                       fontFamily: 'Inter',
@@ -2384,16 +2435,27 @@ class _CartPageState extends State<CartPage> {
                                                   Text(
                                                     'RS' +
                                                         ' ' +
-                                                        (int.parse(_addToCartModel
-                                                                    .cartTotal
-                                                                    .toString()) -
-                                                                (int.parse(_addToCartModel
-                                                                        .cartTotal
-                                                                        .toString()) /
-                                                                    105 *
-                                                                    100))
-                                                            .round()
-                                                            .toStringAsFixed(2),
+                                                        (() {
+                                                          // Calculate IGST using reverse calculation (5%)
+                                                          int cartTotal = int.parse(
+                                                              _addToCartModel
+                                                                  .cartTotal
+                                                                  .toString());
+                                                          // Calculate using new method: item total = cartTotal / 105 * 100
+                                                          double itemTotalCalc =
+                                                              (cartTotal /
+                                                                      105) *
+                                                                  100;
+                                                          // GST = Cart Total - Item Total
+                                                          double gstAmount =
+                                                              cartTotal -
+                                                                  itemTotalCalc;
+                                                          double igstAmount =
+                                                              gstAmount; // For IGST states, IGST = full GST
+                                                          return igstAmount
+                                                              .toStringAsFixed(
+                                                                  2);
+                                                        }()),
                                                     // (5 *
                                                     //         int.parse(_addToCartModel
                                                     //             .cartTotal
@@ -2510,11 +2572,45 @@ class _CartPageState extends State<CartPage> {
                                                       await _userWaletModel
                                                           .getMyUserWallets();
                                                       setState(() {
-                                                        useWalletPoint =
-                                                            (_userWaletModel
-                                                                        .totaRemainingPoint *
+                                                        // Calculate 25% of item total after coupon discount
+                                                        final addToCartModel =
+                                                            Provider.of<
+                                                                    AddToCartModel>(
+                                                                context,
+                                                                listen: false);
+                                                        final cartTotal =
+                                                            int.parse(
+                                                                addToCartModel
+                                                                    .cartTotal
+                                                                    .toString());
+                                                        // Calculate using new method: item total = cartTotal / 105 * 100
+                                                        final itemTotal =
+                                                            (cartTotal / 105) *
+                                                                100;
+                                                        // GST = Cart Total - Item Total
+                                                        final gstAmount =
+                                                            cartTotal -
+                                                                itemTotal;
+                                                        final sgstAmount =
+                                                            gstAmount / 2;
+                                                        final cgstAmount =
+                                                            gstAmount / 2;
+                                                        // Item total is already calculated after discounts, so use it directly
+                                                        final cartAfterCoupon =
+                                                            itemTotal;
+
+                                                        final calculatedPoints =
+                                                            (cartAfterCoupon *
                                                                     0.25)
                                                                 .round();
+                                                        final availablePoints =
+                                                            _userWaletModel
+                                                                .totaRemainingPoint;
+                                                        useWalletPoint =
+                                                            calculatedPoints >
+                                                                    availablePoints
+                                                                ? availablePoints
+                                                                : calculatedPoints;
                                                       });
                                                     },
                                                     child: Padding(
@@ -2555,27 +2651,57 @@ class _CartPageState extends State<CartPage> {
                                                 Text(
                                                   'RS' +
                                                       ' ' +
-                                                      (int.parse(_addToCartModel
-                                                                  .cartTotal
-                                                                  .toString()) +
-                                                              (_configModel.user!.companies![0].deliveryCharges ==
-                                                                      null
-                                                                  ? 0
-                                                                  : int.parse(_configModel
-                                                                      .user!
-                                                                      .companies![
-                                                                          0]
-                                                                      .deliveryCharges
-                                                                      .toString())) +
-                                                              int.parse(_addToCartModel.cartTotal.toString()) *
-                                                                  int.parse(_configModel
-                                                                      .user!
-                                                                      .companies![0]
-                                                                      .taxPercent
-                                                                      .toString()) ~/
-                                                                  100 -
-                                                              int.parse(couponValue.toString()) -
-                                                              useWalletPoint)
+                                                      (() {
+                                                        // GST calculation: Item Total = Cart Total - SGST - CGST
+                                                        int cartTotal =
+                                                            int.parse(
+                                                                _addToCartModel
+                                                                    .cartTotal
+                                                                    .toString());
+                                                        // Calculate GST on cart total after applying discounts
+                                                        int cartTotalAfterDiscounts =
+                                                            cartTotal -
+                                                                int.parse(
+                                                                    couponValue
+                                                                        .toString()) -
+                                                                useWalletPoint;
+                                                        // Calculate using new method: item total = cartTotalAfterDiscounts / 105 * 100
+                                                        double itemTotal =
+                                                            (cartTotalAfterDiscounts /
+                                                                    105) *
+                                                                100;
+                                                        // GST = Cart Total After Discounts - Item Total
+                                                        double gstAmount =
+                                                            cartTotalAfterDiscounts -
+                                                                itemTotal;
+                                                        double sgstAmount =
+                                                            gstAmount / 2;
+                                                        double cgstAmount =
+                                                            gstAmount / 2;
+                                                        // Item total is already calculated after discounts
+                                                        int amountAfterDiscounts =
+                                                            itemTotal.round();
+                                                        int deliveryCharges = _configModel
+                                                                    .user!
+                                                                    .companies![
+                                                                        0]
+                                                                    .deliveryCharges ==
+                                                                null
+                                                            ? 0
+                                                            : int.parse(_configModel
+                                                                .user!
+                                                                .companies![0]
+                                                                .deliveryCharges
+                                                                .toString());
+                                                        // Use fixed GST amounts calculated on original cart total
+                                                        int taxAmount =
+                                                            sgstAmount.round() +
+                                                                cgstAmount
+                                                                    .round();
+                                                        return amountAfterDiscounts +
+                                                            deliveryCharges +
+                                                            taxAmount;
+                                                      }())
                                                           .toStringAsFixed(0),
                                                   textAlign: TextAlign.right,
                                                   style: MyGoogleFontStyle(
@@ -2626,10 +2752,29 @@ class _CartPageState extends State<CartPage> {
                                               } else {
                                                 var addressId = address.id;
 
-                                                // Calculate total amount
+                                                // GST calculation: Item Total = Cart Total - SGST - CGST
                                                 int cartTotal = int.parse(
                                                     _addToCartModel.cartTotal
                                                         .toString());
+                                                // Calculate GST on cart total after applying discounts
+                                                int cartTotalAfterDiscounts =
+                                                    cartTotal -
+                                                        couponValue -
+                                                        useWalletPoint;
+                                                // Calculate using new method: item total = cartTotalAfterDiscounts / 105 * 100
+                                                double itemTotal =
+                                                    (cartTotalAfterDiscounts /
+                                                            105) *
+                                                        100;
+                                                // GST = Cart Total After Discounts - Item Total
+                                                double gstAmount =
+                                                    cartTotalAfterDiscounts -
+                                                        itemTotal;
+                                                double sgstAmount =
+                                                    gstAmount / 2;
+                                                double cgstAmount =
+                                                    gstAmount / 2;
+
                                                 int deliveryCharges = _configModel
                                                             .user!
                                                             .companies![0]
@@ -2641,18 +2786,17 @@ class _CartPageState extends State<CartPage> {
                                                         .companies![0]
                                                         .deliveryCharges
                                                         .toString());
-                                                int taxAmount = cartTotal *
-                                                    int.parse(_configModel
-                                                        .user!
-                                                        .companies![0]
-                                                        .taxPercent
-                                                        .toString()) ~/
-                                                    100;
-                                                int totalAmount = cartTotal +
-                                                    deliveryCharges +
-                                                    taxAmount -
-                                                    couponValue -
-                                                    useWalletPoint;
+                                                // Item total is already calculated after discounts
+                                                int amountAfterDiscounts =
+                                                    itemTotal.round();
+                                                // Use GST amounts calculated on discounted cart total
+                                                int taxAmount =
+                                                    sgstAmount.round() +
+                                                        cgstAmount.round();
+                                                int totalAmount =
+                                                    amountAfterDiscounts +
+                                                        deliveryCharges +
+                                                        taxAmount;
 
                                                 if (paymentOption ==
                                                     'Online Payment') {

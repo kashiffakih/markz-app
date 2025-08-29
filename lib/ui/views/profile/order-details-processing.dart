@@ -556,7 +556,17 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     ),
                   ),
                   TextSpan(
-                    text: detail['quantity']?.toString() ?? '0',
+                    text: '${detail['quantity']?.toString()} X ' ?? '0',
+                    style: MyGoogleFontStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 12 * ffem,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: -0.24 * fem,
+                      color: const Color(0xff1e1e1e),
+                    ),
+                  ),
+                  TextSpan(
+                    text: detail['order_detail_cost'].toString() ?? '0',
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 12 * ffem,
@@ -570,7 +580,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             ),
             const Spacer(),
             Text(
-              'RS ${detail['order_detail_cost']?.toString() ?? '0'}',
+              'RS ${(int.parse(detail['quantity'].toString()) * int.parse(detail['order_detail_cost'].toString())).toString() ?? '0'}',
               style: MyGoogleFontStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 12 * ffem,
@@ -590,18 +600,17 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     final order = widget.arguments?['order'] ?? {};
     final isMaharashtra =
         order['address']?['state']?.toString() == 'Maharashtra';
-    String abc = (order['order_cost'] -
-            int.parse((order['order_cost'] / 105 * 100).round().toString()))
-        .toString();
+    String abc = (order['order_cost'] - (order['order_cost'] / 105 * 100))
+        .toStringAsFixed(2);
     return Column(
       children: [
         _buildCostRow('Item total',
-            (order['order_cost'] / 105 * 100).round().toString(), fem, ffem),
+            (order['order_cost'] / 105 * 100).toStringAsFixed(2), fem, ffem),
         if (isMaharashtra) ...[
-          _buildCostRow(
-              'CGST 2.5%', (int.parse(abc) ~/ 2).toString(), fem, ffem),
-          _buildCostRow(
-              'SGST 2.5%', (int.parse(abc) ~/ 2).toString(), fem, ffem),
+          _buildCostRow('CGST 2.5%', (double.parse(abc) / 2).toStringAsFixed(2),
+              fem, ffem),
+          _buildCostRow('SGST 2.5%', (double.parse(abc) / 2).toStringAsFixed(2),
+              fem, ffem),
         ] else
           _buildCostRow('IGST 5%', abc, fem, ffem),
         _buildCostRow('Delivery charge',

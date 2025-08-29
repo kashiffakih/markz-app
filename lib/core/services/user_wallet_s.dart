@@ -35,23 +35,46 @@ class UserWalletService {
     return null;
   }
 
-  mapRedeemReferralCode(referralCode) async {
-    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    
-    if (_configModel.user == null) {
-      return null;
+  Future<Map<String, dynamic>> mapRedeemReferralCode(String referralCode) async {
+    try {
+      Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+      
+      if (_configModel.user == null) {
+        return {
+          'success': false,
+          'message': 'User not logged in',
+          'error': 'USER_NOT_LOGGED_IN'
+        };
+      }
+      
+      var userId = _configModel.user!.id;
+
+      http.Response _response = await http.get(
+        Uri.parse(
+            '${_apiConfig['baseURL']}/map_referrer?referral_code=$referralCode&user_id=$userId'),
+        headers: _apiConfig['headers'],
+      );
+      
+      Map<String, dynamic> _responseData = json.decode(_response.body);
+      print('Referral response: ${_response.body}');
+      print('Status code: ${_response.statusCode}');
+
+      // Return the complete response for proper error handling
+      return {
+        'success': _responseData['success'] ?? false,
+        'message': _responseData['message'] ?? 'Unknown error occurred',
+        'error': _responseData['error'],
+        'data': _responseData['data'],
+        'statusCode': _response.statusCode
+      };
+      
+    } catch (e) {
+      print('Error in mapRedeemReferralCode: $e');
+      return {
+        'success': false,
+        'message': 'Network error. Please check your connection and try again.',
+        'error': 'NETWORK_ERROR'
+      };
     }
-    
-    var userId = _configModel.user!.id;
-
-    http.Response _response = await http.get(
-      Uri.parse(
-          '${_apiConfig['baseURL']}/map_referrer?referral_code=$referralCode&user_id=$userId'),
-      headers: _apiConfig['headers'],
-    );
-    Map<String, dynamic> _responseData = json.decode(_response.body);
-
-    // print(_responseData);
-    return _responseData['data'];
   }
 }

@@ -362,27 +362,65 @@ class _SettingsPageState extends State<SettingsPage> {
                                                           const Text('Cancel'),
                                                     ),
                                                     ElevatedButton(
-                                                      onPressed: () {
+                                                      onPressed: () async {
                                                         String referralCode =
                                                             referralCodeController
                                                                 .text;
                                                         if (referralCode
                                                             .isNotEmpty) {
-                                                          Provider.of<UserWalletModel>(
-                                                                  context,
-                                                                  listen: false)
-                                                              .mapRedeemReferralCode(
-                                                                  referralCode);
-
-                                                          Navigator.pop(
-                                                              context); // Close the dialog
-                                                          ScaffoldMessenger.of(
-                                                                  context)
-                                                              .showSnackBar(
-                                                            SnackBar(
-                                                                content: Text(
-                                                                    'Referral Code Redeemed: $referralCode')),
+                                                          // Show loading indicator
+                                                          showDialog(
+                                                            context: context,
+                                                            barrierDismissible:
+                                                                false,
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return const Center(
+                                                                child:
+                                                                    CircularProgressIndicator(),
+                                                              );
+                                                            },
                                                           );
+
+                                                          try {
+                                                            Map<String, dynamic>
+                                                                response =
+                                                                await Provider.of<
+                                                                            UserWalletModel>(
+                                                                        context,
+                                                                        listen:
+                                                                            false)
+                                                                    .mapRedeemReferralCode(
+                                                                        referralCode);
+
+                                                            // Close loading indicator
+                                                            Navigator.pop(
+                                                                context);
+                                                            // Close the referral dialog
+                                                            Navigator.pop(
+                                                                context);
+
+                                                            // Show appropriate message based on response
+                                                            _showReferralResponseDialog(
+                                                                context,
+                                                                response);
+                                                          } catch (e) {
+                                                            // Close loading indicator
+                                                            Navigator.pop(
+                                                                context);
+                                                            // Show error message
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
+                                                              const SnackBar(
+                                                                content: Text(
+                                                                    'An error occurred. Please try again.'),
+                                                                backgroundColor:
+                                                                    Colors.red,
+                                                              ),
+                                                            );
+                                                          }
                                                         } else {
                                                           ScaffoldMessenger.of(
                                                                   context)
@@ -535,6 +573,141 @@ class _SettingsPageState extends State<SettingsPage> {
         //   ],
         // ),
       ),
+    );
+  }
+
+  // Show referral response dialog with appropriate styling
+  void _showReferralResponseDialog(
+      BuildContext context, Map<String, dynamic> response) {
+    bool isSuccess = response['success'] == true;
+    String errorType = response['error'] ?? '';
+
+    Color backgroundColor;
+    IconData iconData;
+    String title;
+    String message = response['message'] ?? 'Unknown error occurred';
+
+    // Determine dialog style based on response type
+    if (isSuccess) {
+      backgroundColor = const Color(0xFF4CAF50);
+      iconData = Icons.check_circle;
+      title = 'Success!';
+    } else if (errorType == 'SELF_REFERRAL_NOT_ALLOWED') {
+      backgroundColor = const Color(0xFFFF9800);
+      iconData = Icons.warning;
+      title = 'Cannot Use Own Code';
+    } else if (errorType == 'REFERRAL_ALREADY_USED') {
+      backgroundColor = const Color(0xFFFF9800);
+      iconData = Icons.info;
+      title = 'Already Used';
+    } else if (errorType == 'INVALID_REFERRAL_CODE') {
+      backgroundColor = const Color(0xFFFF5252);
+      iconData = Icons.error;
+      title = 'Invalid Code';
+    } else {
+      backgroundColor = const Color(0xFFFF5252);
+      iconData = Icons.error;
+      title = 'Error';
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Status Icon
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: backgroundColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    iconData,
+                    color: Colors.white,
+                    size: 50,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Title
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xff1e1e1e),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                // Message
+                Text(
+                  message,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xff666666),
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+                // Action Button
+                Container(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      // If successful, refresh the wallet data
+                      if (isSuccess) {
+                        Provider.of<UserWalletModel>(context, listen: false)
+                            .getMyUserWallets();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: backgroundColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      isSuccess ? 'Great!' : 'OK',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
