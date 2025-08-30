@@ -216,10 +216,17 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                                 //         : '';
                                 _user.referedById =
                                     _configModel.user!.referedById ?? 0;
-                                bool response = await _userModel.updateUser(
+                                Map<String, dynamic> response = await _userModel.updateUser(
                                     updateUserData: _user.toJson());
-                                if (response == true) {
+                                if (response['success'] == true) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(response['message'] ?? 'Profile updated successfully')),
+                                  );
                                   Navigator.pushNamed(context, '/settingsPage');
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(response['message'] ?? 'Failed to update profile')),
+                                  );
                                 }
                                 setState(() {
                                   _loading = false;

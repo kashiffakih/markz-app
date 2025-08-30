@@ -248,6 +248,16 @@ class _RewardsPageState extends State<RewardsPage> {
                           color: const Color(0xFF909090),
                         ),
                       ),
+                      const SizedBox(height: 4),
+                      Text(
+                        wallet.getFormattedCreatedAt(),
+                        style: MyGoogleFontStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 11,
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xFF909090),
+                        ),
+                      ),
                     ],
                   ),
                 ),

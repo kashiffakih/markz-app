@@ -387,9 +387,11 @@ class _RegisterPageState extends State<RegisterPage> {
                               print(_registerData);
                               Map<String, dynamic> response = await authModel
                                   .register(registerData: _registerData);
+                              print('Registration response: $response');
                               if (response['success'] == true) {
                                 _showSuccessDialog();
-                              } else if (response['error'] == 'USER_EXISTS') {
+                              } else if (response['error'] ==
+                                  'EMAIL_ALREADY_EXISTS') {
                                 _showAlreadyRegisteredDialog();
                               } else {
                                 _showErrorDialog(response['message'] ??
@@ -445,14 +447,18 @@ class _RegisterPageState extends State<RegisterPage> {
                 margin: EdgeInsets.only(left: 20, right: 20, bottom: 10),
                 child: InkWell(
                   onTap: () async {
-                    // _handleSignIn();
-                    {
+                    try {
                       final googleAccount = await GoogleSignIn().signIn();
-                      final googleAuth = await googleAccount?.authentication;
+                      if (googleAccount == null) {
+                        // User canceled the sign-in
+                        return;
+                      }
+
+                      final googleAuth = await googleAccount.authentication;
 
                       final credential = GoogleAuthProvider.credential(
-                        accessToken: googleAuth?.accessToken,
-                        idToken: googleAuth?.idToken,
+                        accessToken: googleAuth.accessToken,
+                        idToken: googleAuth.idToken,
                       );
 
                       final userCredential = await FirebaseAuth.instance
@@ -469,17 +475,46 @@ class _RegisterPageState extends State<RegisterPage> {
                       _loginData['first_name'] =
                           userCredential.user?.displayName;
                       _loginData['is_social_login'] = true;
+                      _loginData['is_social_register'] = true;
                       _loginData['social_login_name'] = "GOOGLE";
                       print('Google Login Data ${_loginData}');
                       var authModel =
                           Provider.of<AuthModel>(context, listen: false);
-                      await authModel.login(loginData: _loginData);
+
+                      // Handle the login response to check for existing users
+                      Map<String, dynamic> loginResponse =
+                          await authModel.login(loginData: _loginData);
                       if (_configModel.isLoggedIn) {
                         Navigator.pushReplacementNamed(
                           context,
                           '/',
                         );
+                      } else {
+                        // Check if it's an existing user error
+                        String errorMessage =
+                            loginResponse['message'] ?? 'Login failed';
+                        if (loginResponse['error'] == 'EMAIL_ALREADY_EXISTS' ||
+                            errorMessage
+                                .toLowerCase()
+                                .contains('already exists') ||
+                            errorMessage
+                                .toLowerCase()
+                                .contains('already registered')) {
+                          // Show existing user dialog with appropriate message for social login
+                          _showSocialLoginExistingUserDialog();
+                        } else {
+                          // Show generic error dialog
+                          _showErrorDialog(errorMessage);
+                        }
                       }
+                    } catch (e) {
+                      print('Social login error: $e');
+                      _showErrorDialog(
+                          'Failed to sign in with Google. Please try again.');
+                    } finally {
+                      setState(() {
+                        _isLoading = false;
+                      });
                     }
                   },
                   child: Container(
@@ -855,6 +890,115 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                     const SizedBox(width: 12),
+                    // Go to Login Button
+                    Expanded(
+                      child: Container(
+                        height: 45,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushReplacementNamed(
+                                context, '/loginPage',
+                                arguments: {'role': widget.argument['role']});
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xffc9b758),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(22),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            'Go to Login',
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Show dialog for existing user during social login
+  void _showSocialLoginExistingUserDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Warning Icon
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFF9800),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.person,
+                    color: Colors.white,
+                    size: 50,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Warning Title
+                Text(
+                  'Account Already Exists!',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xff1e1e1e),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                // Warning Message
+                Text(
+                  'An account with this email already exists. Please login with your existing credentials or use a different Google account.',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xff666666),
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+                // Action Buttons
+                Row(
+                  children: [
                     // Go to Login Button
                     Expanded(
                       child: Container(

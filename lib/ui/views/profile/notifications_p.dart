@@ -30,7 +30,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
     });
 
     try {
-      await context.read<NotificationModel>().getMyNotifications();
+      await Provider.of<NotificationModel>(context, listen: false)
+          .getMyNotifications();
       setState(() {
         _isLoading = false;
       });
@@ -128,9 +129,40 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                     notifications.isEmpty) {
                                   return SizedBox(
                                     height: screenHeight * 0.5,
-                                    child: const Center(
-                                        child:
-                                            Text('No notifications available')),
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.notifications_off,
+                                            size: 48 * fem,
+                                            color: const Color(0xff909090),
+                                          ),
+                                          SizedBox(height: 16 * fem),
+                                          Text(
+                                            'No notifications found',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontSize: 16 * ffem,
+                                              fontWeight: FontWeight.w500,
+                                              color: const Color(0xff909090),
+                                            ),
+                                          ),
+                                          SizedBox(height: 8 * fem),
+                                          Text(
+                                            'You\'ll see notifications here when there\'s an update',
+                                            textAlign: TextAlign.center,
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontSize: 12 * ffem,
+                                              fontWeight: FontWeight.w400,
+                                              color: const Color(0xffB0B0B0),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   );
                                 }
                                 return ListView.separated(

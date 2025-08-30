@@ -11,7 +11,7 @@ import 'dart:convert';
 class AuthService {
   final ConfigModel _configModel = locator<ConfigModel>();
 
-  Future<void> getLoggedInUser(
+  Future<Map<String, dynamic>> getLoggedInUser(
       {@required Map<String, dynamic>? loginData}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
     // print('Login Data');
@@ -31,10 +31,21 @@ class AuthService {
         print(_responseData);
 
         if (_responseData['success'] == null) {
+          return {'success': false, 'message': 'Invalid response from server'};
         } else if (_responseData['success']) {
           await _configModel.saveLoginData(newLoginData: loginData);
+          _configModel.saveUserData(responseData: _responseData);
+          return {
+            'success': true,
+            'message': _responseData['message'] ?? 'Login successful'
+          };
+        } else {
+          _configModel.saveUserData(responseData: _responseData);
+          return {
+            'success': false,
+            'message': _responseData['message'] ?? 'Login failed'
+          };
         }
-        _configModel.saveUserData(responseData: _responseData);
       } else {
         // Handle non-JSON response
         print('Error: Server returned non-JSON response');
@@ -47,14 +58,20 @@ class AuthService {
           'success': false,
           'message': 'Server error: Invalid response format'
         });
+
+        return {
+          'success': false,
+          'message': 'Server error: Invalid response format'
+        };
       }
     } catch (e) {
       print('Error during login: $e');
       // Save empty user data to indicate login failure
-      _configModel.saveUserData(responseData: {
-        'success': false,
-        'message': 'Network error: ${e.toString()}'
-      });
+      String errorMessage = 'Network error: ${e.toString()}';
+      _configModel.saveUserData(
+          responseData: {'success': false, 'message': errorMessage});
+
+      return {'success': false, 'message': errorMessage};
     }
   }
 
@@ -74,7 +91,7 @@ class AuthService {
     Map<String, dynamic> _responseData = json.decode(_response.body);
     print('Registration response: ${_response.body}');
     print('Status code: ${_response.statusCode}');
-    
+
     // Handle different HTTP status codes
     if (_response.statusCode == 409) {
       // Conflict - User already exists
@@ -86,18 +103,19 @@ class AuthService {
       // Other client/server errors
       throw Exception(_responseData['message'] ?? 'Registration failed');
     }
-    
+
     // Additional check for error in response body (fallback)
     if (!_responseData['success'] && _responseData['message'] != null) {
       String errorMessage = _responseData['message'].toString().toLowerCase();
-      if (errorMessage.contains('already exists') || 
-          errorMessage.contains('duplicate') || 
-          _responseData['error'] == 'USER_ALREADY_EXISTS') {
+      if (errorMessage.contains('already exists') ||
+          errorMessage.contains('duplicate') ||
+          _responseData['error'] == 'USER_ALREADY_EXISTS' ||
+          _responseData['error'] == 'EMAIL_ALREADY_EXISTS') {
         throw Exception('User already registered');
       }
       throw Exception(_responseData['message']);
     }
-    
+
     if (_responseData['success']) {
       var roleId;
       roleId = registerData!['role'] == 'Distributor' ? 3 : 6;
@@ -264,10 +282,11 @@ class AuthService {
     };
   }
 
-  Future<bool> updateUser(
+  Future<Map<String, dynamic>> updateUser(
       {@required Map<String, dynamic>? updateUserData}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
+    // try {
     var userId = _configModel.user!.id;
     http.Response _response = await http.patch(
       Uri.parse('${_apiConfig['baseURL']}/users/$userId'),
@@ -276,14 +295,33 @@ class AuthService {
     );
 
     Map<String, dynamic> _responseData = json.decode(_response.body);
-    print(_responseData['success']);
+    print(_responseData);
+
     if (_responseData['success']) {
       // Map<String, dynamic> data = updateUserData!;
       updateUserData!['password'] = _configModel.loginData['password'];
       await _configModel.saveLoginData(newLoginData: updateUserData);
       _configModel.saveUserData(responseData: _responseData);
-    }
 
-    return _responseData['success'];
+      // Return success with message
+      return {
+        'success': true,
+        'message': _responseData['message'] ?? 'Profile updated successfully',
+      };
+    } else {
+      // Return failure with error message
+      return {
+        'success': false,
+        'message': _responseData['message'] ?? 'Failed to update profile',
+      };
+    }
+    // } catch (e) {
+    //   print('Error updating user: $e');
+    //   // Return failure with error message
+    //   return {
+    //     'success': false,
+    //     'message': 'Network error: Failed to update profile',
+    //   };
+    // }
   }
 }

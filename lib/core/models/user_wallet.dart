@@ -1,4 +1,5 @@
 import 'package:aadab/core/models/order.dart';
+import 'package:intl/intl.dart';
 
 class UserWallet {
   int? id;
@@ -48,5 +49,21 @@ class UserWallet {
       data['order'] = this.order!.toJson();
     }
     return data;
+  }
+  
+  String getFormattedCreatedAt() {
+    if (createdAt == null || createdAt!.isEmpty) {
+      return 'Unknown date';
+    }
+    
+    try {
+      // Parse the date string (assuming it's in a standard format)
+      DateTime date = DateTime.parse(createdAt!);
+      // Format it in a human-readable way
+      return DateFormat('MMM dd, yyyy').format(date);
+    } catch (e) {
+      // If parsing fails, return the original string or a default message
+      return createdAt!;
+    }
   }
 }

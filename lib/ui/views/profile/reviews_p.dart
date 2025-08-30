@@ -317,6 +317,7 @@
 // }
 
 import 'package:aadab/core/models/review.dart';
+import 'package:aadab/ui/views/products/product_id_p.dart';
 import 'package:aadab/ui/views/profile/review_id_p.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -483,11 +484,19 @@ class _ReviewsPageState extends State<ReviewsPage> {
                 if (firstImage != null)
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        '/productPage',
-                        arguments: {'productId': review.product?.id},
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ProductIdPage(arguments: {
+                            'product': review.product!.toJson(),
+                            'product_images': review.product?.productImages
+                          }),
+                        ),
                       );
+                      // Navigator.pushNamed(
+                      //   context,
+                      //   '/productPage',
+                      //   arguments: {'productId': review.product?.id},
+                      // );
                     },
                     child: Container(
                       width: 80 * fem,

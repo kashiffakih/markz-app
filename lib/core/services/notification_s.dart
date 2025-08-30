@@ -11,11 +11,11 @@ class NotificationService {
 
   getMyNotifications() async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    
+
     if (_configModel.user == null) {
       return <MyNotification>[];
     }
-    
+
     var userId = _configModel.user!.id;
 
     http.Response _response = await http.get(
@@ -29,7 +29,7 @@ class NotificationService {
         _notifications.add(MyNotification.fromJson(data));
       });
     }
-    print('user notification: ${_notifications.first.toJson()}');
+    // print('user notification: ${_notifications.first.toJson()}');
     return _notifications;
   }
 }

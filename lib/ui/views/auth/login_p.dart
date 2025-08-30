@@ -61,6 +61,352 @@ class _LoginPageState extends State<LoginPage> {
 
   //  GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
 
+  // Show beautiful login error dialog
+  void _showLoginErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Error Icon
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFF5252),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.error_outline,
+                    color: Colors.white,
+                    size: 50,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Error Title
+                Text(
+                  'Login Failed',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xff1e1e1e),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                // Error Message
+                Text(
+                  message,
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xff666666),
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+                // OK Button
+                Container(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF5252),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'OK',
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Show dialog for existing user
+  void _showExistingUserDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Warning Icon
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFF9800),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.person,
+                    color: Colors.white,
+                    size: 50,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Warning Title
+                Text(
+                  'Existing User!',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xff1e1e1e),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                // Warning Message
+                Text(
+                  'An account with this email already exists. Please login with your existing credentials.',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xff666666),
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+                // Action Buttons
+                Row(
+                  children: [
+                    // Go to Login Button
+                    Expanded(
+                      child: Container(
+                        height: 45,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushReplacementNamed(
+                                context, '/loginPage',
+                                arguments: {'role': widget.argument['role']});
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xffc9b758),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(22),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            'Go to Login',
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Show generic error dialog
+  void _showGenericErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Warning Icon
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFF9800),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.warning,
+                    color: Colors.white,
+                    size: 50,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Warning Title
+                Text(
+                  'Login Issue',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xff1e1e1e),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                // Warning Message
+                Text(
+                  message,
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xff666666),
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+                // Action Buttons
+                Row(
+                  children: [
+                    // Try Again Button
+                    Expanded(
+                      child: Container(
+                        height: 45,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Color(0xFFFF9800)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(22),
+                            ),
+                          ),
+                          child: Text(
+                            'Try Again',
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFFFF9800),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Go to Register Button
+                    Expanded(
+                      child: Container(
+                        height: 45,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushReplacementNamed(
+                                context, '/registerPage',
+                                arguments: {'role': widget.argument['role']});
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xffc9b758),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(22),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            'Register',
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // print(widget.argument['role']);
@@ -255,26 +601,36 @@ class _LoginPageState extends State<LoginPage> {
                         _loginData['role'] = widget.argument != null
                             ? widget.argument['role']
                             : 'Customer';
-                        await authModel.login(loginData: _loginData);
+                        Map<String, dynamic> loginResult =
+                            await authModel.login(loginData: _loginData);
                         if (_configModel.isLoggedIn) {
                           Navigator.pushReplacementNamed(context, '/');
                         } else {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) => AlertDialog(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20)),
-                              title: Text(_configModel.loginFailedMessage),
-                              actions: <Widget>[
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: Text('Ok'),
-                                ),
-                              ],
-                            ),
-                          );
+                          // Use the message from the login result or fall back to config message
+                          String errorMessage = loginResult['message'] ??
+                              _configModel.loginFailedMessage;
+                          if (errorMessage
+                                  .toLowerCase()
+                                  .contains('already exists') ||
+                              errorMessage
+                                  .toLowerCase()
+                                  .contains('already registered') ||
+                              errorMessage
+                                  .toLowerCase()
+                                  .contains('user exists') ||
+                              loginResult['error'] == 'EMAIL_ALREADY_EXISTS') {
+                            _showExistingUserDialog();
+                          } else if (errorMessage
+                                  .toLowerCase()
+                                  .contains('not found') ||
+                              errorMessage.toLowerCase().contains('invalid') ||
+                              errorMessage
+                                  .toLowerCase()
+                                  .contains('incorrect')) {
+                            _showLoginErrorDialog(errorMessage);
+                          } else {
+                            _showGenericErrorDialog(errorMessage);
+                          }
                         }
                       }
                       setState(() {
@@ -385,22 +741,21 @@ class _LoginPageState extends State<LoginPage> {
                           if (_configModel.isLoggedIn) {
                             Navigator.pushReplacementNamed(context, '/');
                           } else {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                title: Text('Google Login Failed'),
-                                content: Text(_configModel.loginFailedMessage),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: Text('OK'),
-                                  ),
-                                ],
-                              ),
-                            );
+                            String errorMessage =
+                                _configModel.loginFailedMessage;
+                            if (errorMessage
+                                    .toLowerCase()
+                                    .contains('already exists') ||
+                                errorMessage
+                                    .toLowerCase()
+                                    .contains('already registered') ||
+                                errorMessage
+                                    .toLowerCase()
+                                    .contains('user exists')) {
+                              _showExistingUserDialog();
+                            } else {
+                              _showGenericErrorDialog(errorMessage);
+                            }
                           }
                         }
                       } catch (e) {
@@ -413,22 +768,7 @@ class _LoginPageState extends State<LoginPage> {
                           errorMessage = 'Error: $e';
                         }
                         print(errorMessage);
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            title: Text('Google Sign-In Failed'),
-                            content: Text(errorMessage),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: Text('OK'),
-                              ),
-                            ],
-                          ),
-                        );
+                        _showGenericErrorDialog(errorMessage);
                       } finally {
                         setState(() {
                           _isLoading = false;

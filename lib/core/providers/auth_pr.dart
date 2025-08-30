@@ -18,32 +18,47 @@ class AuthModel with ChangeNotifier {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   bool get loading => _loading;
-  Future<void> login({required Map<String, dynamic> loginData}) async {
+  Future<Map<String, dynamic>> login(
+      {required Map<String, dynamic> loginData}) async {
     String? token = await _firebaseMessaging.getToken();
     loginData['fcm_token'] = token;
     print(token);
-    await _authService.getLoggedInUser(
+    return await _authService.getLoggedInUser(
       loginData: loginData,
     );
   }
 
-  Future<Map<String, dynamic>> register({required Map<String, dynamic> registerData}) async {
+  Future<Map<String, dynamic>> register(
+      {required Map<String, dynamic> registerData}) async {
     try {
-      bool success = await _authService.registerUser(registerData: registerData);
+      bool success =
+          await _authService.registerUser(registerData: registerData);
       if (success) {
         return {'success': true, 'message': 'Registration successful'};
       } else {
-        return {'success': false, 'message': 'Registration failed', 'error': 'GENERAL_ERROR'};
+        return {
+          'success': false,
+          'message': 'Registration failed',
+          'error': 'GENERAL_ERROR'
+        };
       }
     } catch (e) {
       // Check if it's a duplicate user error
       String errorMessage = e.toString().toLowerCase();
-      if (errorMessage.contains('already exists') || 
-          errorMessage.contains('duplicate') || 
+      if (errorMessage.contains('already exists') ||
+          errorMessage.contains('duplicate') ||
           errorMessage.contains('already registered')) {
-        return {'success': false, 'message': 'User already registered', 'error': 'USER_EXISTS'};
+        return {
+          'success': false,
+          'message': 'User already registered',
+          'error': 'EMAIL_ALREADY_EXISTS'
+        };
       }
-      return {'success': false, 'message': 'Registration failed', 'error': 'GENERAL_ERROR'};
+      return {
+        'success': false,
+        'message': 'Registration failed',
+        'error': 'GENERAL_ERROR'
+      };
     }
   }
 
@@ -105,7 +120,7 @@ class AuthModel with ChangeNotifier {
     return response;
   }
 
-  Future<bool> updateUser(
+  Future<Map<String, dynamic>> updateUser(
       {required Map<String, dynamic> updateUserData}) async {
     return await _authService.updateUser(
       updateUserData: updateUserData,
