@@ -100,6 +100,32 @@ class _CartPageState extends State<CartPage> {
       });
     }
   }
+
+  // Method to recalculate rewards points based on current cart total
+  Future<void> _recalculateRewards() async {
+    final AddToCartModel _addToCartModel =
+        Provider.of<AddToCartModel>(context, listen: false);
+    final UserWalletModel _userWalletModel =
+        Provider.of<UserWalletModel>(context, listen: false);
+
+    // Only recalculate if rewards are currently being used
+    if (useWalletPoint > 0) {
+      setState(() {
+        // Calculate 25% of item total after coupon discount
+        final cartTotal = int.parse(_addToCartModel.cartTotal.toString());
+        // Calculate using new method: item total = cartTotal / 105 * 100
+        final itemTotal = (cartTotal / 105) * 100;
+        // Item total is already calculated after coupon discount
+        final cartAfterCoupon = itemTotal;
+
+        final calculatedPoints = (cartAfterCoupon * 0.25).round();
+        final availablePoints = _userWalletModel.totaRemainingPoint;
+        useWalletPoint = calculatedPoints > availablePoints
+            ? availablePoints
+            : calculatedPoints;
+      });
+    }
+  }
   // bool type = true;
 
   // Razorpay instance
@@ -1114,6 +1140,8 @@ class _CartPageState extends State<CartPage> {
                                                                           () {});
                                                                       // Validate coupon after quantity decrease
                                                                       await _validateAppliedCoupon();
+                                                                      // Recalculate rewards after quantity change
+                                                                      await _recalculateRewards();
 
                                                                       setState(
                                                                           () {
@@ -1205,6 +1233,8 @@ class _CartPageState extends State<CartPage> {
                                                                           () {});
                                                                       // Validate coupon after quantity increase
                                                                       await _validateAppliedCoupon();
+                                                                      // Recalculate rewards after quantity change
+                                                                      await _recalculateRewards();
 
                                                                       setState(
                                                                           () {

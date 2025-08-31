@@ -58,15 +58,15 @@ class OrderService {
       }
 
       orderDetails.add({
-        'cashback': item.points,
-        'order_detail_cost': item.productPrice,
+        'cashback': (item.points ?? 0) * (item.qty ?? 0),
+        'order_detail_cost': item.productPrice ?? 0.0,
         'product_id': item.productId,
-        'quantity': item.qty,
+        'quantity': item.qty ?? 0,
         'product_pack': item.pack,
         'kind_of_flower': item.kindOfFlower,
         'flavour': item.flavour,
         'write_on_cake': item.writeOnCake,
-        'product_image_path': productImagePath,
+        'product_image_path': productImagePath ?? '',
       });
     });
 

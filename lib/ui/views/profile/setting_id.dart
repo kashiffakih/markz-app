@@ -156,6 +156,9 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                               if (value!.isEmpty) {
                                 return "Phone Cannot be empty.";
                               }
+                              if (value.length != 10) {
+                                return "Phone number must be exactly 10 digits.";
+                              }
                               return null;
                             },
                             onSaved: (value) {
@@ -216,16 +219,20 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                                 //         : '';
                                 _user.referedById =
                                     _configModel.user!.referedById ?? 0;
-                                Map<String, dynamic> response = await _userModel.updateUser(
-                                    updateUserData: _user.toJson());
+                                Map<String, dynamic> response = await _userModel
+                                    .updateUser(updateUserData: _user.toJson());
                                 if (response['success'] == true) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(response['message'] ?? 'Profile updated successfully')),
+                                    SnackBar(
+                                        content: Text(response['message'] ??
+                                            'Profile updated successfully')),
                                   );
                                   Navigator.pushNamed(context, '/settingsPage');
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(response['message'] ?? 'Failed to update profile')),
+                                    SnackBar(
+                                        content: Text(response['message'] ??
+                                            'Failed to update profile')),
                                   );
                                 }
                                 setState(() {
@@ -278,7 +285,6 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
       ),
     );
   }
-
 
   Future getImage(
     ImageSource img,
