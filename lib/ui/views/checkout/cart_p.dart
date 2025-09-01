@@ -183,10 +183,6 @@ class _CartPageState extends State<CartPage> {
           final cartTotalAfterCoupon = cartTotal - couponValue;
           // Calculate using new method: item total = cartTotalAfterCoupon / 105 * 100
           final itemTotal = (cartTotalAfterCoupon / 105) * 100;
-          // GST = Cart Total After Coupon - Item Total
-          final gstAmount = cartTotalAfterCoupon - itemTotal;
-          final sgstAmount = gstAmount / 2;
-          final cgstAmount = gstAmount / 2;
           // Item total is already calculated after coupon discount
           final cartAfterCoupon = itemTotal;
 
@@ -295,10 +291,10 @@ class _CartPageState extends State<CartPage> {
       "name": 'Cash on Delivery',
       "icon": "assets/images/cash-on-delivery-logo-free-png.webp",
     },
-    {
-      "name": "Online Payment",
-      "icon": "assets/images/razor_pay_icon.png",
-    }
+    // {
+    //   "name": "Online Payment",
+    //   "icon": "assets/images/razor_pay_icon.png",
+    // }
   ];
 
   var paymentOption = '';
@@ -2366,8 +2362,6 @@ class _CartPageState extends State<CartPage> {
                                                                   itemTotal;
                                                           double sgstAmount =
                                                               gstAmount / 2;
-                                                          double cgstAmount =
-                                                              gstAmount / 2;
                                                           // SGST fixed at 2.5% of original cart total
                                                           return sgstAmount
                                                               .toStringAsFixed(
@@ -2425,8 +2419,6 @@ class _CartPageState extends State<CartPage> {
                                                           double gstAmount =
                                                               cartTotalAfterDiscounts -
                                                                   itemTotal;
-                                                          double sgstAmount =
-                                                              gstAmount / 2;
                                                           double cgstAmount =
                                                               gstAmount / 2;
                                                           // CGST fixed at 2.5% of original cart total
@@ -2502,37 +2494,38 @@ class _CartPageState extends State<CartPage> {
                                                   )
                                                 ],
                                               ),
-                                            // if (address.state != 'Maharashtra')
-                                            //   SizedBox(
-                                            //     height: 10,
-                                            //   ),
-                                            // Row(
-                                            //   children: [
-                                            //     Expanded(
-                                            //       child: Text(
-                                            //         'Tax Amount',
-                                            //         style: MyGoogleFontStyle(
-                                            //           fontFamily: 'Urbanist',
-                                            //           fontWeight:
-                                            //               FontWeight.w500,
-                                            //           color: Color(0xff909090),
-                                            //         ),
-                                            //       ),
-                                            //     ),
-                                            //     Text(
-                                            //       'RS ${(int.parse(_addToCartModel.cartTotal.toString()) - (int.parse(_addToCartModel.cartTotal.toString()) / 105 * 100)).toStringAsFixed(2)}',
-                                            //       textAlign: TextAlign.right,
-                                            //       style: MyGoogleFontStyle(
-                                            //         fontFamily: 'Inter',
-                                            //         fontWeight: FontWeight.w700,
-                                            //         color: Color(0xff303030),
-                                            //       ),
-                                            //     )
-                                            //   ],
-                                            // ),
-                                            // SizedBox(
-                                            //   height: 10,
-                                            // ),
+                                            if (_configModel.user?.companies?[0]
+                                                    .packagingCharges !=
+                                                null)
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      'Packaging Charges',
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Urbanist',
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color:
+                                                            Color(0xff909090),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    'RS ${_configModel.user?.companies?[0].packagingCharges!.toStringAsFixed(2)}',
+                                                    textAlign: TextAlign.right,
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Inter',
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Color(0xff303030),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
                                             Row(
                                               children: [
                                                 Expanded(
@@ -2549,7 +2542,8 @@ class _CartPageState extends State<CartPage> {
                                                 Text(
                                                   'RS' +
                                                       ' ' +
-                                                      couponValue.toString(),
+                                                      couponValue
+                                                          .toStringAsFixed(2),
                                                   textAlign: TextAlign.right,
                                                   style: MyGoogleFontStyle(
                                                     fontFamily: 'Inter',
@@ -2617,14 +2611,6 @@ class _CartPageState extends State<CartPage> {
                                                         final itemTotal =
                                                             (cartTotal / 105) *
                                                                 100;
-                                                        // GST = Cart Total - Item Total
-                                                        final gstAmount =
-                                                            cartTotal -
-                                                                itemTotal;
-                                                        final sgstAmount =
-                                                            gstAmount / 2;
-                                                        final cgstAmount =
-                                                            gstAmount / 2;
                                                         // Item total is already calculated after discounts, so use it directly
                                                         final cartAfterCoupon =
                                                             itemTotal;
@@ -2651,7 +2637,7 @@ class _CartPageState extends State<CartPage> {
                                                     ),
                                                   ),
                                                 Text(
-                                                  'RS ${(useWalletPoint)}',
+                                                  'RS ${(useWalletPoint).toStringAsFixed(2)}',
                                                   // Division by 3 directly
                                                   textAlign: TextAlign.right,
                                                   style: MyGoogleFontStyle(
@@ -2709,8 +2695,9 @@ class _CartPageState extends State<CartPage> {
                                                         double cgstAmount =
                                                             gstAmount / 2;
                                                         // Item total is already calculated after discounts
-                                                        int amountAfterDiscounts =
-                                                            itemTotal.round();
+                                                        double
+                                                            amountAfterDiscounts =
+                                                            itemTotal;
                                                         int deliveryCharges = _configModel
                                                                     .user!
                                                                     .companies![
@@ -2723,16 +2710,31 @@ class _CartPageState extends State<CartPage> {
                                                                 .companies![0]
                                                                 .deliveryCharges
                                                                 .toString());
+                                                        int packagingCharges = _configModel
+                                                                    .user!
+                                                                    .companies![
+                                                                        0]
+                                                                    .packagingCharges ==
+                                                                null
+                                                            ? 0
+                                                            : int.parse(_configModel
+                                                                .user!
+                                                                .companies![0]
+                                                                .packagingCharges
+                                                                .toString());
+
                                                         // Use fixed GST amounts calculated on original cart total
-                                                        int taxAmount =
-                                                            sgstAmount.round() +
-                                                                cgstAmount
-                                                                    .round();
-                                                        return amountAfterDiscounts +
-                                                            deliveryCharges +
-                                                            taxAmount;
-                                                      }())
-                                                          .toStringAsFixed(0),
+                                                        double taxAmount =
+                                                            sgstAmount +
+                                                                cgstAmount;
+                                                        double total =
+                                                            amountAfterDiscounts +
+                                                                deliveryCharges +
+                                                                packagingCharges +
+                                                                taxAmount;
+                                                        return total
+                                                            .toStringAsFixed(2);
+                                                      }()),
                                                   textAlign: TextAlign.right,
                                                   style: MyGoogleFontStyle(
                                                     fontFamily: 'Inter',
@@ -2817,13 +2819,12 @@ class _CartPageState extends State<CartPage> {
                                                         .deliveryCharges
                                                         .toString());
                                                 // Item total is already calculated after discounts
-                                                int amountAfterDiscounts =
-                                                    itemTotal.round();
+                                                double amountAfterDiscounts =
+                                                    itemTotal;
                                                 // Use GST amounts calculated on discounted cart total
-                                                int taxAmount =
-                                                    sgstAmount.round() +
-                                                        cgstAmount.round();
-                                                int totalAmount =
+                                                double taxAmount =
+                                                    sgstAmount + cgstAmount;
+                                                double totalAmount =
                                                     amountAfterDiscounts +
                                                         deliveryCharges +
                                                         taxAmount;
@@ -2848,7 +2849,8 @@ class _CartPageState extends State<CartPage> {
                                                   };
 
                                                   // Open Razorpay
-                                                  _openRazorpay(totalAmount);
+                                                  _openRazorpay(
+                                                      totalAmount.round());
                                                 } else {
                                                   // Cash on Delivery
                                                   bool response =
