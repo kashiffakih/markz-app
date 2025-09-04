@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:471438233864:android:e2973c344494691a26dcbd",
         "android_client_info": {
-          "package_name": "org.pms.Aadab"
+          "package_name": "com.crazzycode.aadab"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "471438233864-p88lcdacae5ac714nva5r344ho88k947.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "org.pms.Aadab",
+            "package_name": "com.crazzycode.aadab",
             "certificate_hash": "b745215032a061297dc160062f5a02a1fd2ab633"
           }
         },

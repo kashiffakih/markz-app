@@ -1,4 +1,4 @@
-package org.pms.Aadab
+package com.crazzycode.aadab
 
 import io.flutter.embedding.android.FlutterActivity
 
