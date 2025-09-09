@@ -292,6 +292,8 @@ By accessing and using this website, you accept and agree to be bound by the ter
 • We offer high-quality clothing and fashion accessories through our online platform
 • Product descriptions, images, and prices are subject to change without notice
 • We reserve the right to limit quantities and refuse service to anyone
+• Images' colors which shown in application may be differ from actual
+• Reward point calculated based on 25% on purchase amount or available whichever more. and it is our sole proprietary can change percentage level any time
 
 3. ORDERING AND PAYMENT
 • All orders are subject to acceptance and product availability
@@ -304,11 +306,12 @@ By accessing and using this website, you accept and agree to be bound by the ter
 • Delivery times are estimates and may vary based on location and product availability
 • Shipping charges will be calculated at checkout
 • Risk of loss transfers to you upon delivery
+• We will deliver our product within 7-10 days, depending on the local area
 
-5. RETURNS AND EXCHANGES
+5. RETURNS AND REFUNDS
 • Items may be returned within 7 days of delivery in original condition
 • Return shipping costs may apply unless the item was defective or incorrectly shipped
-• Refunds will be processed to the original payment method within 7-10 business days
+• Refund will be PROCESS AND CREDITED INTO ACCOUNT 7-10 DAYS after we receive the returned item
 
 6. USER ACCOUNTS
 • You are responsible for maintaining the confidentiality of your account information
@@ -423,9 +426,11 @@ We may update this Privacy Policy periodically. We will notify you of significan
 
 13. CONTACT INFORMATION
 For questions about this Privacy Policy or your personal information, please contact:
-• Email: privacy@aadab.com
-• Phone: [Customer Service Number]
-• Address: RAZA TRADING CO - [Business Address]
+• Email: adaab.treder@gmail.com
+• Phone: +91 86001 75751
+• Address: RAZA TRADING CO - House number 607 Khadan Road, Laxmi Sizing,
+Land Mark Prime Hospital, Kalyan road
+Bhiwandi Dist Thane Maharashtra 421302
 
 By using our services, you consent to the collection and use of your information as outlined in this Privacy Policy.
 
