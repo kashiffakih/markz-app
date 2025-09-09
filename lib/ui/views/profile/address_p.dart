@@ -32,9 +32,9 @@ class _AddressPageState extends State<AddressPage> {
           .getUserAddresses();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load addresses: $e')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('Failed to load addresses: $e')),
+        // );
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

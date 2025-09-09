@@ -1603,7 +1603,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                         'productId': widget
                                                                 .arguments![
                                                             'product']['id'],
-                                                        'is_edit': false
+                                                        'is_edit': false,
+                                                        'is_popup': false,
                                                       },
                                                     );
                                                   },

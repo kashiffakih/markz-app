@@ -274,7 +274,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     (reviewModel.reviews?.isEmpty ?? true)
                 ? 'My review is empty'
                 : 'Already have ${reviewModel.reviews!.length} reviews',
-            onTap: () => Navigator.pushNamed(context, '/reviewsPage'),
+            onTap: () =>
+                Navigator.pushNamed(context, '/reviewsPage', arguments: {
+              'is_edit': true,
+              'is_popup': true,
+            }),
             fem: fem,
             ffem: ffem,
           ),

@@ -432,9 +432,9 @@ class _ContactPageState extends State<ContactPage> {
       await Provider.of<ProductModel>(context, listen: false).getBanners();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load contact information: $e')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('Failed to load contact information: $e')),
+        // );
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

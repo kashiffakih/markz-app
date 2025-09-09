@@ -345,6 +345,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
   @override
   void initState() {
     super.initState();
+    print('arguments: ${widget.arguments}');
     _loadReviews();
   }
 
@@ -362,9 +363,9 @@ class _ReviewsPageState extends State<ReviewsPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load reviews: $e')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('Failed to load reviews: $e')),
+        // );
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -426,8 +427,8 @@ class _ReviewsPageState extends State<ReviewsPage> {
                           final daysDifference = createdAt != null
                               ? DateTime.now().difference(createdAt).inDays
                               : 31;
-                          if (daysDifference <= 30 ||
-                              widget.arguments['is_edit'] == false) {
+                          if (daysDifference <= 30 &&
+                              widget.arguments['is_edit'] == true) {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => ReviewUpdatePage(
@@ -435,7 +436,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
                                 ),
                               ),
                             );
-                          } else {
+                          } else if (widget.arguments['is_popup'] != false) {
                             _showReviewUpdatePopup(context, fem, ffem);
                           }
                         },
