@@ -94,5 +94,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.facebook.android:facebook-android-sdk:latest.release'
     implementation "com.google.firebase:firebase-auth:21.0.1"
+    implementation 'phonepe.intentsdk.android.release:IntentSDK:2.4.3'
 
 }

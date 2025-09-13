@@ -1,9 +1,14 @@
 import 'dart:io';
+import 'dart:convert';
+import 'dart:math';
 
+import 'package:aadab/core/models/payment_response.dart';
+import 'package:aadab/core/services/phonepe_s.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:crypto/crypto.dart';
 
 // import 'package:get_ip_address/get_ip_address.dart';
 import 'package:provider/provider.dart';
@@ -52,6 +57,9 @@ class _CartPageState extends State<CartPage> {
   String usedCoupon = '';
   int useWalletPoint = 0;
   bool _isLoading = true;
+
+  final PhonePeService _phonePeService = PhonePeService();
+  String result = "";
 
   // Method to validate coupon against current cart total
   Future<void> _validateAppliedCoupon() async {
@@ -128,8 +136,7 @@ class _CartPageState extends State<CartPage> {
   }
   // bool type = true;
 
-  // Razorpay instance
-  late Razorpay _razorpay;
+  Payment? payment;
 
   @override
   void initState() {
@@ -137,17 +144,196 @@ class _CartPageState extends State<CartPage> {
     _loadData();
     initPlatformState();
 
-    // Initialize Razorpay
-    _razorpay = Razorpay();
-    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    initializePhonePe();
+  }
+
+  // Initialize the PhonePe SDK
+  void initializePhonePe() async {
+    try {
+      await _phonePeService.initializePhonePe();
+      setState(() {
+        result = "PhonePe SDK Initialized";
+      });
+    } catch (error) {
+      setState(() {
+        result = "Error Initializing SDK: $error";
+      });
+    }
+  }
+
+  Future<void> _startTransaction(int amount, String mobileNumber,
+      Map<String, dynamic> payload, BuildContext context) async {
+    debugPrint("Transaction initiated");
+    final ConfigModel _configModel = locator<ConfigModel>();
+    final OrderModel _orderModel =
+        Provider.of<OrderModel>(context, listen: false);
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Generate unique transaction ID
+      String merchantTransactionId =
+          "txn_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(1000)}";
+
+      // Prepare request data
+      final requestData = {
+        "merchantId": _phonePeService.merchantId,
+        "merchantTransactionId": merchantTransactionId,
+        "merchantUserId": "MUID123",
+        "amount": amount * 100, // Amount in paise
+        "callbackUrl": _phonePeService.callback,
+        "mobileNumber": mobileNumber,
+        "paymentInstrument": {"type": "PAY_PAGE"}
+      };
+
+      // Encode request and generate checksum
+      String requestBody = jsonEncode(requestData);
+      String base64body = base64.encode(utf8.encode(requestBody));
+      String checksum =
+          '${sha256.convert(utf8.encode(base64body + _phonePeService.apiEndPoint + _phonePeService.saltKey)).toString()}###${_phonePeService.saltIndex}';
+
+      debugPrint("Request body: $requestBody");
+      debugPrint("Encoded body: $base64body");
+      debugPrint("Checksum: $checksum");
+
+      // Start the transaction
+      payment = await _phonePeService.startTransaction(
+          base64body, _phonePeService.callback, checksum, context);
+
+      if (payment?.state == 'COMPLETED') {
+        // Add transaction details to payload
+        payload['transaction_id'] = payment?.transactionId?.toString();
+        payload['payment_type'] = payment?.paymentInstrument?.type?.toString();
+        payload['account_type'] =
+            payment?.paymentInstrument?.accountType?.toString();
+        payload['merchant_transaction_id'] =
+            payment?.merchantTransactionId?.toString();
+        payload['merchant_id'] = payment?.merchantId?.toString();
+        payload['utr'] = payment?.paymentInstrument?.utr?.toString();
+
+        // Place order with payment details
+        bool orderResponse = await _orderModel.placedOrder(
+          payload['cartItems'],
+          payload['cartTotal'].toString(),
+          payload['addressId'].toString(),
+          payload['isGift'],
+          payload['useWalletPoint'].toString(),
+          payload['couponId'].toString(),
+          'PhonePe Payment - Transaction ID: ${payment?.transactionId}',
+          payload['deliveryMethod'].toString(),
+          payload['couponValue'].toString(),
+        );
+
+        setState(() {
+          _isLoading = false;
+        });
+
+        if (orderResponse) {
+          // Navigate to success page
+          Navigator.pushNamed(context, '/successPage');
+        } else {
+          // Show error dialog
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Order Failed"),
+                content: Text("Failed to place order. Please try again."),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      } else if (payment?.state == 'FAILED' || payment?.state == 'FAILURE') {
+        setState(() {
+          _isLoading = false;
+        });
+
+        // Show failure dialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Payment Failed"),
+              content:
+                  Text("Transaction failed due to an error. Please try again."),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+
+        // Handle other states
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Payment Incomplete"),
+              content:
+                  Text("Payment process was not completed. Please try again."),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (error) {
+      setState(() {
+        _isLoading = false;
+      });
+
+      debugPrint("Error during transaction: $error");
+
+      // Show error dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Transaction Error"),
+            content: Text(
+                "An error occurred during the transaction. Please try again."),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override
   void dispose() {
     super.dispose();
-    _razorpay.clear(); // Removes all listeners
   }
 
   Future<void> _loadData() async {
@@ -291,10 +477,10 @@ class _CartPageState extends State<CartPage> {
       "name": 'Cash on Delivery',
       "icon": "assets/images/cash-on-delivery-logo-free-png.webp",
     },
-    // {
-    //   "name": "Online Payment",
-    //   "icon": "assets/images/razor_pay_icon.png",
-    // }
+    {
+      "name": "PhonePe",
+      "icon": "assets/images/PhonePe-Logo.wine.png",
+    }
   ];
 
   var paymentOption = '';
@@ -336,50 +522,6 @@ class _CartPageState extends State<CartPage> {
 
     if (orderResponse == true) {
       Navigator.pushNamed(context, '/successPage');
-    }
-  }
-
-  void _handlePaymentError(PaymentFailureResponse response) {
-    debugPrint('Payment Error: ${response.code} - ${response.message}');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Payment failed: ${response.message}'),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-
-  void _handleExternalWallet(ExternalWalletResponse response) {
-    debugPrint('External Wallet: ${response.walletName}');
-  }
-
-  void _openRazorpay(int amount) {
-    final ConfigModel _configModel = locator<ConfigModel>();
-
-    var options = {
-      'key': 'rzp_test_R5Yw49cWX8rwN1', // Replace with your Razorpay API key
-      'amount': amount * 100, // Amount in paise
-      'name': 'Aadab',
-      'description': 'Order Payment',
-      'prefill': {
-        'contact': _configModel.user?.phone ?? '',
-        'email': _configModel.user?.email ?? identifier,
-      },
-      'external': {
-        'wallets': ['paytm', 'gpay', 'phonepe']
-      }
-    };
-
-    try {
-      _razorpay.open(options);
-    } catch (e) {
-      debugPrint('Error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error opening payment gateway'),
-          backgroundColor: Colors.red,
-        ),
-      );
     }
   }
 
@@ -2108,16 +2250,16 @@ class _CartPageState extends State<CartPage> {
                                                                     'name'],
                                                               ),
                                                             ),
-                                                            SizedBox(
-                                                              height: 50,
-                                                              child:
-                                                                  Image.asset(
-                                                                _payment[
-                                                                    'icon'],
-                                                                height: 50,
-                                                                width: 50,
-                                                              ),
-                                                            ),
+                                                            // SizedBox(
+                                                            //   height: 50,
+                                                            //   child:
+                                                            //       Image.asset(
+                                                            //     _payment[
+                                                            //         'icon'],
+                                                            //     height: 50,
+                                                            //     width: 50,
+                                                            //   ),
+                                                            // ),
                                                           ],
                                                         ),
                                                       ),
@@ -2830,9 +2972,13 @@ class _CartPageState extends State<CartPage> {
                                                         taxAmount;
 
                                                 if (paymentOption ==
-                                                    'Online Payment') {
-                                                  // Store order details for later use in payment success handler
-                                                  _orderDetails = {
+                                                    'PhonePe') {
+                                                  // Prepare payload data for the transaction
+                                                  Map<String, dynamic>
+                                                      payloadData = {
+                                                    'cartItems': _addToCartModel
+                                                        .addToCarts!
+                                                        .toList(),
                                                     'cartTotal': _addToCartModel
                                                         .cartTotal
                                                         .toString(),
@@ -2848,9 +2994,74 @@ class _CartPageState extends State<CartPage> {
                                                         couponValue.toString(),
                                                   };
 
-                                                  // Open Razorpay
-                                                  _openRazorpay(
-                                                      totalAmount.round());
+                                                  // Calculate the amount to be paid
+                                                  int cartTotal = int.parse(
+                                                      _addToCartModel.cartTotal
+                                                          .toString());
+                                                  int cartTotalAfterDiscounts =
+                                                      cartTotal -
+                                                          couponValue -
+                                                          useWalletPoint;
+                                                  // Calculate using new method: item total = cartTotalAfterDiscounts / 105 * 100
+                                                  double itemTotal =
+                                                      (cartTotalAfterDiscounts /
+                                                              105) *
+                                                          100;
+                                                  // GST = Cart Total After Discounts - Item Total
+                                                  double gstAmount =
+                                                      cartTotalAfterDiscounts -
+                                                          itemTotal;
+                                                  double sgstAmount =
+                                                      gstAmount / 2;
+                                                  double cgstAmount =
+                                                      gstAmount / 2;
+
+                                                  int deliveryCharges = _configModel
+                                                              .user!
+                                                              .companies![0]
+                                                              .deliveryCharges ==
+                                                          null
+                                                      ? 0
+                                                      : int.parse(_configModel
+                                                          .user!
+                                                          .companies![0]
+                                                          .deliveryCharges
+                                                          .toString());
+                                                  int packagingCharges = _configModel
+                                                              .user!
+                                                              .companies![0]
+                                                              .packagingCharges ==
+                                                          null
+                                                      ? 0
+                                                      : int.parse(_configModel
+                                                          .user!
+                                                          .companies![0]
+                                                          .packagingCharges
+                                                          .toString());
+
+                                                  // Calculate total amount
+                                                  double amountAfterDiscounts =
+                                                      itemTotal;
+                                                  double taxAmount =
+                                                      sgstAmount + cgstAmount;
+                                                  double totalAmount =
+                                                      amountAfterDiscounts +
+                                                          deliveryCharges +
+                                                          packagingCharges +
+                                                          taxAmount;
+
+                                                  int minumumPayable =
+                                                      totalAmount.round();
+                                                  String mobileNumber =
+                                                      _configModel.user!.phone
+                                                          .toString();
+
+                                                  // Start PhonePe transaction
+                                                  _startTransaction(
+                                                      minumumPayable,
+                                                      mobileNumber,
+                                                      payloadData,
+                                                      context);
                                                 } else {
                                                   // Cash on Delivery
                                                   bool response =
