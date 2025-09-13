@@ -173,17 +173,19 @@ class _CartPageState extends State<CartPage> {
     });
 
     try {
-      // Generate unique transaction ID
+      // Generate unique transaction ID with proper format (alphanumeric only)
       String merchantTransactionId =
-          "txn_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(1000)}";
+          "MTX${DateTime.now().millisecondsSinceEpoch}${Random().nextInt(1000)}";
 
       // Prepare request data
       final requestData = {
         "merchantId": _phonePeService.merchantId,
         "merchantTransactionId": merchantTransactionId,
-        "merchantUserId": "MUID123",
+        "merchantUserId": "MUID123456",
         "amount": amount * 100, // Amount in paise
-        "callbackUrl": _phonePeService.callback,
+        "redirectUrl": "https://aadab.online/",
+        "redirectMode": "POST",
+        "callbackUrl": "",
         "mobileNumber": mobileNumber,
         "paymentInstrument": {"type": "PAY_PAGE"}
       };
@@ -199,8 +201,8 @@ class _CartPageState extends State<CartPage> {
       debugPrint("Checksum: $checksum");
 
       // Start the transaction
-      payment = await _phonePeService.startTransaction(
-          base64body, _phonePeService.callback, checksum, context);
+      payment = await _phonePeService.startTransaction(requestBody,
+          _phonePeService.callback, checksum, merchantTransactionId, context);
 
       if (payment?.state == 'COMPLETED') {
         // Add transaction details to payload

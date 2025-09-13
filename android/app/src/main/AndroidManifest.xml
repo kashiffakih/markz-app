@@ -40,7 +40,7 @@
 
             <meta-data android:name="com.phonepe.android.sdk.isUAT" android:value="true"/>
             <meta-data android:name="com.phonepe.android.sdk.isSimulator" android:value="true"/>
-            <meta-data android:name="com.phonepe.android.sdk.MerchantId" android:value="M231CJCCQCTYF"/>
+            <meta-data android:name="com.phonepe.android.sdk.MerchantId" android:value="PGTESTPAYUAT"/>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

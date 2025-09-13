@@ -19,26 +19,40 @@ class PhonePeService {
   final String packageName = "com.crazzycode.aadab";
   final bool enableLogs = true;
   // final String callback = "https://webhook.site/fc47ee05-89c1-4418-89b1-e554ab833df1";
-  final String callback = "https://webhook.site/callback-url";
+  final String callback = "https://aadab.online/callback";
   // final String saltKey = "96434309-7796-489d-8924-ab56988a6076"; //test
   final String saltKey = "3455cebd-53ca-41b3-b9f9-24ed90290997"; //production
   final String saltIndex = "1";
   final String apiEndPoint = "/pg/v1/pay";
-  final String transactionId = DateTime.now().millisecondsSinceEpoch.toString();
   Object? result;
   Payment? payment;
 
   // Public method to initialize the PhonePe SDK
   Future<void> initializePhonePe() async {
-    await PhonePePaymentSdk.init(
-        environmentValue, appId, merchantId, enableLogs);
-    //print("PhonePe SDK Initialized");
+    try {
+      await PhonePePaymentSdk.init(
+          this.environmentValue, this.appId, this.merchantId, this.enableLogs);
+      debugPrint("PhonePe SDK Initialized");
+    } catch (e) {
+      debugPrint("SDK Initialization Error: $e");
+    }
   }
 
-  Future<Payment?> startTransaction(String body, String callback,
-      String checksum, BuildContext context) async {
+  Future<Payment?> startTransaction(
+      String body,
+      String callback,
+      String checksum,
+      String merchantTransactionId,
+      BuildContext context) async {
     try {
-      final response = await PhonePePaymentSdk.startTransaction(body, checksum);
+      debugPrint("Starting PhonePe transaction with body: $body");
+      debugPrint("Checksum: $checksum");
+      debugPrint("Merchant Transaction ID: $merchantTransactionId");
+      
+      // The body should be a JSON string
+      // Try with all possible parameters
+      final response = await PhonePePaymentSdk.startTransaction(
+          body, checksum);
 
       debugPrint("Transaction Response: $response");
 
@@ -48,7 +62,8 @@ class PhonePeService {
 
         if (status == 'SUCCESS') {
           result = "Flow Completed - Status: Success!";
-          payment = await checkStatus(context) ?? Payment(state: "UNKNOWN");
+          payment = await checkStatus(merchantTransactionId, context) ??
+              Payment(state: "UNKNOWN");
         } else {
           payment ??= Payment(state: "UNKNOWN");
           payment!.state = status;
@@ -66,19 +81,22 @@ class PhonePeService {
     return payment;
   }
 
-  Future<Payment?> checkStatus(BuildContext context) async {
+  Future<Payment?> checkStatus(
+      String merchantTransactionId, BuildContext context) async {
     try {
       String url =
-          "https://api.phonepe.com/apis/hermes/pg/v1/status/$merchantId/$transactionId";
+          "https://api.phonepe.com/apis/hermes/pg/v1/status/${this.merchantId}/$merchantTransactionId";
 
-      String concatString = "/pg/v1/status/$merchantId/$transactionId$saltKey";
+      String concatString =
+          "/pg/v1/status/${this.merchantId}/$merchantTransactionId${this.saltKey}";
       var digest = sha256.convert(utf8.encode(concatString));
-      String xVerify = "$digest###$saltIndex";
+      String xVerify = "$digest###${this.saltIndex}";
 
       Map<String, String> headers = {
         "Content-Type": "application/json",
         "X-VERIFY": xVerify,
-        "X-MERCHANT-ID": merchantId,
+        "X-MERCHANT-ID": this.merchantId,
+        "accept": "application/json"
       };
 
       final response = await http.get(Uri.parse(url), headers: headers);
@@ -127,15 +145,19 @@ class PhonePeService {
           return payment;
         } else {
           debugPrint("Transaction Failed: Something went wrong");
+          return Payment(
+              state: "FAILED",
+              message: responseData['message'] ?? "Transaction failed");
         }
       } else {
         debugPrint(
             "HTTP Error: ${response.statusCode} - ${response.reasonPhrase}");
+        return Payment(
+            state: "FAILED", message: "HTTP Error: ${response.statusCode}");
       }
     } catch (e) {
       debugPrint("Exception: $e");
+      return Payment(state: "FAILED", message: e.toString());
     }
-
-    return null; // Return null if the status check fails
   }
 }
