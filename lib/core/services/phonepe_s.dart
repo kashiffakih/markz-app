@@ -68,74 +68,76 @@ class PhonePeService {
   }
 
   Future<Payment?> checkStatus(BuildContext context) async {
-    try {
-      String url =
-          "https://api.phonepe.com/apis/hermes/pg/v1/status/$merchantId/$transactionId";
+    // try {
+    String url =
+        "https://api.phonepe.com/apis/hermes/pg/v1/status/$merchantId/$transactionId";
 
-      String concatString = "/pg/v1/status/$merchantId/$transactionId$saltKey";
-      var digest = sha256.convert(utf8.encode(concatString));
-      String xVerify = "$digest###$saltIndex";
+    String concatString = "/pg/v1/status/$merchantId/$transactionId$saltKey";
+    var digest = sha256.convert(utf8.encode(concatString));
+    String xVerify = "$digest###$saltIndex";
 
-      Map<String, String> headers = {
-        "Content-Type": "application/json",
-        "X-VERIFY": xVerify,
-        "X-MERCHANT-ID": merchantId,
-      };
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "X-VERIFY": xVerify,
+      "X-MERCHANT-ID": merchantId,
+    };
 
-      final response = await http.get(Uri.parse(url), headers: headers);
+    final response = await http.get(Uri.parse(url), headers: headers);
 
-      if (response.statusCode == 200) {
-        Map<String, dynamic> responseData = json.decode(response.body);
-        debugPrint("Response: $responseData");
+    print("Status Check Response Code: ${response}");
 
-        if (responseData['success'] == true &&
-            responseData['code'] == "PAYMENT_SUCCESS" &&
-            responseData['data']['state'] == "COMPLETED") {
-          // Payment payment = Payment.fromJson(responseData['data']);
-          //
-          //
-          // _phonePeModel.setPayment(payment);
-          // debugPrint("Payment Details: ${_phonePeModel.payment?.amount}");
-          // Parse the Payment object from response data
-          Payment payment = Payment.fromJson(responseData['data']);
+    if (response.statusCode == 200) {
+      Map<String, dynamic> responseData = json.decode(response.body);
+      debugPrint("Response: $responseData");
+
+      if (responseData['success'] == true &&
+          responseData['code'] == "PAYMENT_SUCCESS" &&
+          responseData['data']['state'] == "COMPLETED") {
+        // Payment payment = Payment.fromJson(responseData['data']);
+        //
+        //
+        // _phonePeModel.setPayment(payment);
+        // debugPrint("Payment Details: ${_phonePeModel.payment?.amount}");
+        // Parse the Payment object from response data
+        Payment payment = Payment.fromJson(responseData['data']);
 
 // Assign the nested PaymentInstrument if available
-          if (responseData['data']['paymentInstrument'] != null) {
-            payment.paymentInstrument = PaymentInstrument.fromJson(
-                responseData['data']['paymentInstrument']);
-          }
+        if (responseData['data']['paymentInstrument'] != null) {
+          payment.paymentInstrument = PaymentInstrument.fromJson(
+              responseData['data']['paymentInstrument']);
+        }
 
 // Set the Payment instance in your model
-          // _phonePeModel.setPayment(payment);
-          // _phonePeModel.transactionId = payment.transactionId!;
+        // _phonePeModel.setPayment(payment);
+        // _phonePeModel.transactionId = payment.transactionId!;
 // Debug Payment and PaymentInstrument details
-          // debugPrint("Payment Details:");
-          // debugPrint("Amount: ${_phonePeModel.payment?.amount}");
-          // debugPrint("Merchant ID: ${_phonePeModel.payment?.merchantId}");
-          // debugPrint("Transaction ID: ${_phonePeModel.payment?.transactionId}");
-          // debugPrint("State: ${_phonePeModel.payment?.state}");
-          // debugPrint("Response Code: ${_phonePeModel.payment?.responseCode}");
+        // debugPrint("Payment Details:");
+        // debugPrint("Amount: ${_phonePeModel.payment?.amount}");
+        // debugPrint("Merchant ID: ${_phonePeModel.payment?.merchantId}");
+        // debugPrint("Transaction ID: ${_phonePeModel.payment?.transactionId}");
+        // debugPrint("State: ${_phonePeModel.payment?.state}");
+        // debugPrint("Response Code: ${_phonePeModel.payment?.responseCode}");
 
 // Debug PaymentInstrument details
-          if (payment.paymentInstrument != null) {
-            debugPrint("Payment Instrument Details:");
-            debugPrint("Type: ${payment.paymentInstrument?.type}");
-            debugPrint("Provider: ${payment.paymentInstrument?.accountType}");
-          } else {
-            debugPrint("No Payment Instrument Found.");
-          }
-
-          return payment;
+        if (payment.paymentInstrument != null) {
+          debugPrint("Payment Instrument Details:");
+          debugPrint("Type: ${payment.paymentInstrument?.type}");
+          debugPrint("Provider: ${payment.paymentInstrument?.accountType}");
         } else {
-          debugPrint("Transaction Failed: Something went wrong");
+          debugPrint("No Payment Instrument Found.");
         }
+
+        return payment;
       } else {
-        debugPrint(
-            "HTTP Error: ${response.statusCode} - ${response.reasonPhrase}");
+        debugPrint("Transaction Failed: Something went wrong");
       }
-    } catch (e) {
-      debugPrint("Exception: $e");
+    } else {
+      debugPrint(
+          "HTTP Error: ${response.statusCode} - ${response.reasonPhrase}");
     }
+    // } catch (e) {
+    //   debugPrint("Exception: $e");
+    // }
 
     return null; // Return null if the status check fails
   }

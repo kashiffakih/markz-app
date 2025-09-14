@@ -139,9 +139,9 @@ class _CartPageState extends State<CartPage> {
 
   @override
   void initState() {
-    super.initState();
-    _loadData();
     initializePhonePe();
+    _loadData();
+    super.initState();
   }
 
   // void initializePhonePe() async {
@@ -341,6 +341,8 @@ class _CartPageState extends State<CartPage> {
         result = "Error Initializing SDK: $error";
       });
     }
+
+    print('Check $result');
   }
 
   Future<void> _startTransaction(int amount, String mobileNumber,
