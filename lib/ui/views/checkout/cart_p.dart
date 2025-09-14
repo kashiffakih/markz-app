@@ -142,36 +142,12 @@ class _CartPageState extends State<CartPage> {
     super.initState();
     _loadData();
     initPlatformState();
-
-    initializePhonePe();
-  }
-
-  // Initialize the PhonePe SDK
-  void initializePhonePe() async {
-    try {
-      await _phonePeService.initializePhonePe();
-      setState(() {
-        result = "PhonePe SDK Initialized";
-      });
-    } catch (error) {
-      setState(() {
-        result = "Error Initializing SDK: $error";
-      });
-      debugPrint("Error Initializing PhonePe SDK: $error");
-      // Show error to user
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-              "Failed to initialize PhonePe payment service. Please try another payment method."),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
   }
 
   Future<void> _startTransaction(int amount, String mobileNumber,
       Map<String, dynamic> payload, BuildContext context) async {
-    debugPrint("Transaction initiated");
+    debugPrint(
+        "Transaction initiated with amount: $amount and mobile: $mobileNumber");
     final ConfigModel _configModel = locator<ConfigModel>();
     final OrderModel _orderModel =
         Provider.of<OrderModel>(context, listen: false);
@@ -181,6 +157,10 @@ class _CartPageState extends State<CartPage> {
     });
 
     try {
+      // Initialize PhonePe SDK first
+      await _phonePeService.initializePhonePe();
+      debugPrint("PhonePe SDK initialized successfully");
+
       // Generate unique transaction ID with proper format (alphanumeric only)
       String merchantTransactionId =
           "MTX${DateTime.now().millisecondsSinceEpoch}${Random().nextInt(1000)}";
@@ -189,13 +169,13 @@ class _CartPageState extends State<CartPage> {
       final requestData = {
         "merchantId": _phonePeService.merchantId,
         "orderId": merchantTransactionId,
-        "token": merchantTransactionId,
-
-        "merchantUserId": "MUID123456",
+        "merchantUserId": mobileNumber.isNotEmpty ? mobileNumber : "MUID123456",
         "amount": amount * 100, // Amount in paise
         "redirectUrl": "https://aadab.online/",
-        "paymentMode": {"type": "PAY_PAGE"}
+        "mobileNumber": mobileNumber,
       };
+
+      debugPrint("Request Data: ${jsonEncode(requestData)}");
 
       // Start the transaction with the request data object and app schema
       debugPrint(
@@ -287,14 +267,29 @@ class _CartPageState extends State<CartPage> {
           _isLoading = false;
         });
 
-        // Handle other states
+        // Handle other states (CANCELLED, PENDING, etc.)
+        String title = "Payment Status";
+        String message = "Payment process was not completed.";
+
+        if (payment?.state == 'CANCELLED') {
+          title = "Payment Cancelled";
+          message =
+              "Payment was cancelled. You can try again or choose a different payment method.";
+        } else if (payment?.state == 'PENDING') {
+          title = "Payment Pending";
+          message =
+              "Your payment is being processed. Please wait or contact support if this takes too long.";
+        } else if (payment?.state == 'INTERRUPTED') {
+          title = "Payment Interrupted";
+          message = "Payment process was interrupted. Please try again.";
+        }
+
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text("Payment Incomplete"),
-              content:
-                  Text("Payment process was not completed. Please try again."),
+              title: Text(title),
+              content: Text(message),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
@@ -314,13 +309,24 @@ class _CartPageState extends State<CartPage> {
 
       debugPrint("Error during transaction: $error");
 
-      // Show error dialog
+      // Show user-friendly error dialog
+      String errorMessage =
+          "An error occurred while processing your payment. Please try again or choose a different payment method.";
+
+      if (error.toString().contains("SDK")) {
+        errorMessage =
+            "Payment service is currently unavailable. Please try again later or choose a different payment method.";
+      } else if (error.toString().contains("timeout")) {
+        errorMessage =
+            "Payment request timed out. Please check your internet connection and try again.";
+      }
+
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Transaction Error"),
-            content: Text("An error occurred during the transaction: $error"),
+            title: Text("Payment Error"),
+            content: Text(errorMessage),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
