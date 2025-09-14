@@ -39,20 +39,27 @@ class PhonePeService {
   }
 
   Future<Payment?> startTransaction(
-      String body,
-      String callback,
-      String checksum,
-      String merchantTransactionId,
+      Map<String, dynamic> requestData,
+      String appSchema,
       BuildContext context) async {
     try {
-      debugPrint("Starting PhonePe transaction with body: $body");
-      debugPrint("Checksum: $checksum");
-      debugPrint("Merchant Transaction ID: $merchantTransactionId");
+      // Convert request data to JSON string
+      String bodyString = jsonEncode(requestData);
       
-      // The body should be a JSON string
-      // Try with all possible parameters
+      debugPrint("Calling PhonePe SDK with body: $bodyString");
+      debugPrint("App schema: $appSchema");
+      
+      // Add a timeout to the transaction
       final response = await PhonePePaymentSdk.startTransaction(
-          body, checksum);
+        bodyString, 
+        appSchema
+      ).timeout(
+        Duration(seconds: 30),
+        onTimeout: () {
+          debugPrint("PhonePe transaction timed out");
+          throw Exception("Transaction timed out");
+        },
+      );
 
       debugPrint("Transaction Response: $response");
 
@@ -62,8 +69,13 @@ class PhonePeService {
 
         if (status == 'SUCCESS') {
           result = "Flow Completed - Status: Success!";
-          payment = await checkStatus(merchantTransactionId, context) ??
-              Payment(state: "UNKNOWN");
+          // Extract the merchantTransactionId from the response data
+          String? merchantTransactionId = response['data']?['merchantTransactionId'];
+          if (merchantTransactionId != null) {
+            payment = await checkStatus(merchantTransactionId, context) ?? Payment(state: "UNKNOWN");
+          } else {
+            payment = Payment(state: "UNKNOWN");
+          }
         } else {
           payment ??= Payment(state: "UNKNOWN");
           payment!.state = status;

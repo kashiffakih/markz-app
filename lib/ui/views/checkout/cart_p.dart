@@ -7,7 +7,6 @@ import 'package:aadab/core/services/phonepe_s.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:crypto/crypto.dart';
 
 // import 'package:get_ip_address/get_ip_address.dart';
@@ -180,14 +179,15 @@ class _CartPageState extends State<CartPage> {
       // Prepare request data
       final requestData = {
         "merchantId": _phonePeService.merchantId,
-        "merchantTransactionId": merchantTransactionId,
+        "orderId": merchantTransactionId,
+        "token": merchantTransactionId,
         "merchantUserId": "MUID123456",
         "amount": amount * 100, // Amount in paise
         "redirectUrl": "https://aadab.online/",
         "redirectMode": "POST",
         "callbackUrl": "",
         "mobileNumber": mobileNumber,
-        "paymentInstrument": {"type": "PAY_PAGE"}
+        "paymentMode": {"type": "PAY_PAGE"}
       };
 
       // Encode request and generate checksum
@@ -200,9 +200,15 @@ class _CartPageState extends State<CartPage> {
       debugPrint("Encoded body: $base64body");
       debugPrint("Checksum: $checksum");
 
-      // Start the transaction
-      payment = await _phonePeService.startTransaction(requestBody,
-          _phonePeService.callback, checksum, merchantTransactionId, context);
+      // Start the transaction with the request data object and app schema
+      debugPrint(
+          "Calling PhonePe service with app schema: com.crazzycode.aadab");
+      payment = await _phonePeService.startTransaction(
+          requestData, "com.crazzycode.aadab", context);
+
+      // Add a debug print to see if we reach this point
+      debugPrint(
+          "Transaction completed, payment state: ${payment?.state ?? 'NULL'}");
 
       if (payment?.state == 'COMPLETED') {
         // Add transaction details to payload
@@ -492,40 +498,40 @@ class _CartPageState extends State<CartPage> {
   // Store order details for Razorpay
   Map<String, dynamic> _orderDetails = {};
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
-    // Payment success, now place the order
-    debugPrint('Payment Success: ${response.paymentId}');
-    debugPrint('Payment Order ID: ${response.orderId}');
-    debugPrint('Payment Signature: ${response.signature}');
+  // void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+  //   // Payment success, now place the order
+  //   debugPrint('Payment Success: ${response.paymentId}');
+  //   debugPrint('Payment Order ID: ${response.orderId}');
+  //   debugPrint('Payment Signature: ${response.signature}');
 
-    final AddToCartModel _addToCartModel =
-        Provider.of<AddToCartModel>(context, listen: false);
-    final OrderModel _orderModel =
-        Provider.of<OrderModel>(context, listen: false);
+  //   final AddToCartModel _addToCartModel =
+  //       Provider.of<AddToCartModel>(context, listen: false);
+  //   final OrderModel _orderModel =
+  //       Provider.of<OrderModel>(context, listen: false);
 
-    // Create payment details string with transaction info
-    String paymentDetails =
-        'Online Payment - Transaction ID: ${response.paymentId}';
-    if (response.orderId != null) {
-      paymentDetails += ', Order ID: ${response.orderId}';
-    }
+  //   // Create payment details string with transaction info
+  //   String paymentDetails =
+  //       'Online Payment - Transaction ID: ${response.paymentId}';
+  //   if (response.orderId != null) {
+  //     paymentDetails += ', Order ID: ${response.orderId}';
+  //   }
 
-    bool orderResponse = await _orderModel.placedOrder(
-      _addToCartModel.addToCarts!.toList(),
-      _orderDetails['cartTotal'],
-      _orderDetails['addressId'],
-      _orderDetails['isGift'],
-      _orderDetails['useWalletPoint'],
-      _orderDetails['couponId'],
-      paymentDetails,
-      _orderDetails['deliveryMethod'],
-      _orderDetails['couponValue'],
-    );
+  //   bool orderResponse = await _orderModel.placedOrder(
+  //     _addToCartModel.addToCarts!.toList(),
+  //     _orderDetails['cartTotal'],
+  //     _orderDetails['addressId'],
+  //     _orderDetails['isGift'],
+  //     _orderDetails['useWalletPoint'],
+  //     _orderDetails['couponId'],
+  //     paymentDetails,
+  //     _orderDetails['deliveryMethod'],
+  //     _orderDetails['couponValue'],
+  //   );
 
-    if (orderResponse == true) {
-      Navigator.pushNamed(context, '/successPage');
-    }
-  }
+  //   if (orderResponse == true) {
+  //     Navigator.pushNamed(context, '/successPage');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
