@@ -57,7 +57,7 @@ class _CartPageState extends State<CartPage> {
   int useWalletPoint = 0;
   bool _isLoading = true;
 
-  final PhonePeService _phonePeService = PhonePeService();
+  final PhonePeService _phonePeService = locator<PhonePeService>();
   String result = "";
 
   // Method to validate coupon against current cart total
@@ -141,209 +141,318 @@ class _CartPageState extends State<CartPage> {
   void initState() {
     super.initState();
     _loadData();
-    initPlatformState();
+    initializePhonePe();
+  }
+
+  // void initializePhonePe() async {
+  //   try {
+  //     await _phonePeService.initializePhonePe();
+  //     setState(() {
+  //       result = "PhonePe SDK Initialized";
+  //     });
+  //   } catch (error) {
+  //     setState(() {
+  //       result = "Error Initializing SDK: $error";
+  //     });
+  //   }
+  // }
+
+  // Future<void> _startTransaction(int amount, String mobileNumber,
+  //     Map<String, dynamic> payload, BuildContext context) async {
+  //   debugPrint(
+  //       "Transaction initiated with amount: $amount and mobile: $mobileNumber");
+
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+
+  //   // Initialize PhonePe SDK if not already initialized
+  //   try {
+  //     await _phonePeService.initializePhonePe();
+  //     debugPrint("PhonePe SDK initialized successfully");
+  //   } catch (error) {
+  //     debugPrint("Error initializing PhonePe SDK: $error");
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //     return;
+  //   }
+
+  //   // Generate unique transaction ID
+  //   String orderId = "MTX${DateTime.now().millisecondsSinceEpoch}";
+
+  //   // Prepare request data according to updated PhonePe service format
+  //   final requestData = {
+  //     "merchantId": _phonePeService.merchantId,
+  //     "orderId": orderId,
+  //     "merchantUserId": mobileNumber, // Using mobile number as user ID
+  //     "amount": amount * 100, // Amount in paise
+  //     "redirectUrl": "https://aadab.online/",
+  //     "mobileNumber": mobileNumber
+  //   };
+
+  //   debugPrint("Request Data: ${jsonEncode(requestData)}");
+  //   debugPrint("Calling PhonePe service with app schema: com.crazzycode.aadab");
+
+  //   // Start the transaction using the updated PhonePe service
+  //   payment = await _phonePeService.startTransaction(
+  //       requestData, "com.crazzycode.aadab", context);
+
+  //   debugPrint("Transaction completed, payment state: ${payment?.state}");
+
+  //   if (payment?.state == 'COMPLETED' || payment?.state == 'SUCCESS') {
+  //     payload['transaction_id'] = payment?.transactionId?.toString() ?? orderId;
+  //     payload['payment_type'] =
+  //         payment?.paymentInstrument?.type?.toString() ?? 'UPI';
+  //     payload['account_type'] =
+  //         payment?.paymentInstrument?.accountType?.toString() ?? 'WALLET';
+  //     payload['merchant_transaction_id'] = orderId;
+  //     payload['merchant_id'] = _phonePeService.merchantId;
+  //     payload['utr'] = payment?.paymentInstrument?.utr?.toString() ?? '';
+
+  //     // print(payload);
+  //     bool result = await aggregatorModel.meruConfirmBooking(payload: payload);
+
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+
+  //     if (result) {
+  //       showDialog(
+  //         context: context,
+  //         builder: (BuildContext context) {
+  //           return SuccessPopupWidget(
+  //               buttonColor: MyColors.primaryColor,
+  //               buttonTextColor: Colors.white,
+  //               targetPage: HomePage(),
+  //               text: widget.payload['payloadData']['saving_amount'] != '0'
+  //                   ? "Order confirmed! Rider will be assigned shortly.\nCongratulations, you saved ${widget.payload['payloadData']['saving_amount']}."
+  //                   : 'Order confirmed! Rider will be assigned shortly.');
+  //         },
+  //       );
+  //     } else {
+  //       showDialog(
+  //         context: context,
+  //         builder: (BuildContext context) {
+  //           return AlertDialog(
+  //             shape: RoundedRectangleBorder(
+  //               borderRadius: BorderRadius.circular(20)
+  //             ),
+  //             title: Text("Booking Failed"),
+  //             content: Text("Booking failed. Try again."),
+  //             actions: [
+  //               TextButton(
+  //                 onPressed: () => Navigator.pop(context),
+  //                 child: Text("OK", style: TextStyle(color: MyColors.primaryColor)),
+  //               ),
+  //             ],
+  //           );
+  //         },
+  //       );
+  //     }
+  //   } else if (payment?.state == 'FAILED' || payment?.state == 'FAILURE') {
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+
+  //     showDialog(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return AlertDialog(
+  //           shape: RoundedRectangleBorder(
+  //             borderRadius: BorderRadius.circular(20)
+  //           ),
+  //           title: Text("Transaction Failed"),
+  //           content: Text("Transaction failed due to an error. Please try again."),
+  //           actions: [
+  //             TextButton(
+  //               onPressed: () => Navigator.pop(context),
+  //               child: Text("OK", style: TextStyle(color: MyColors.primaryColor)),
+  //             ),
+  //           ],
+  //         );
+  //       },
+  //     ).then((_) {
+  //       Navigator.pop(context);
+  //       Navigator.pushNamed(
+  //         context,
+  //         '/bookingReview',
+  //         arguments: {"payloadData": widget.payload['payloadData']},
+  //       );
+  //     });
+  //   } else if (payment?.state == 'CANCELLED') {
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+
+  //     showDialog(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return AlertDialog(
+  //           shape: RoundedRectangleBorder(
+  //             borderRadius: BorderRadius.circular(20)
+  //           ),
+  //           title: Text("Transaction Cancelled"),
+  //           content: Text("Transaction was cancelled by user."),
+  //           actions: [
+  //             TextButton(
+  //               onPressed: () => Navigator.pop(context),
+  //               child: Text("OK", style: TextStyle(color: MyColors.primaryColor)),
+  //             ),
+  //           ],
+  //         );
+  //       },
+  //     );
+  //   } else {
+  //     // Handle unknown states
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+
+  // showDialog(
+  //   context: context,
+  //   builder: (BuildContext context) {
+  //     return AlertDialog(
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(20)
+  //       ),
+  //       title: Text("Transaction Status Unknown"),
+  //       content: Text("Transaction status unknown: ${payment?.state ?? 'No response'}. Please contact support."),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context),
+  //           child: Text("OK", style: TextStyle(color: MyColors.primaryColor)),
+  //         ),
+  //       ],
+  //     );
+  //   },
+  // );
+  //   }
+  // }
+
+  void initializePhonePe() async {
+    try {
+      await _phonePeService.initializePhonePe();
+      setState(() {
+        result = "PhonePe SDK Initialized";
+      });
+    } catch (error) {
+      setState(() {
+        result = "Error Initializing SDK: $error";
+      });
+    }
   }
 
   Future<void> _startTransaction(int amount, String mobileNumber,
       Map<String, dynamic> payload, BuildContext context) async {
-    debugPrint(
-        "Transaction initiated with amount: $amount and mobile: $mobileNumber");
+    // print(payload);
+    debugPrint("Transaction initiated");
     final ConfigModel _configModel = locator<ConfigModel>();
-    final OrderModel _orderModel =
-        Provider.of<OrderModel>(context, listen: false);
 
     setState(() {
       _isLoading = true;
     });
 
-    try {
-      // Initialize PhonePe SDK first
-      await _phonePeService.initializePhonePe();
-      debugPrint("PhonePe SDK initialized successfully");
+    // Prepare request data
+    final requestData = {
+      "merchantId": _phonePeService.merchantId,
+      "merchantTransactionId": _phonePeService.transactionId,
+      "merchantUserId": "MUID123",
+      "amount": amount * 100, // Amount in paise
+      "callbackUrl": _phonePeService.callback,
+      "mobileNumber": mobileNumber,
+      "paymentInstrument": {"type": "PAY_PAGE"}
+    };
 
-      // Generate unique transaction ID with proper format (alphanumeric only)
-      String merchantTransactionId =
-          "MTX${DateTime.now().millisecondsSinceEpoch}${Random().nextInt(1000)}";
+    // Encode request and generate checksum
+    String requestBody = jsonEncode(requestData);
+    String base64body = base64.encode(utf8.encode(json.encode(requestData)));
+    String checksum =
+        '${sha256.convert(utf8.encode(base64body + _phonePeService.apiEndPoint + _phonePeService.saltKey)).toString()}###${_phonePeService.saltIndex}';
 
-      // Prepare request data - Updated for PhonePe SDK v3.0.1
-      final requestData = {
-        "merchantId": _phonePeService.merchantId,
-        "orderId": merchantTransactionId,
-        "merchantUserId": mobileNumber.isNotEmpty ? mobileNumber : "MUID123456",
-        "amount": amount * 100, // Amount in paise
-        "redirectUrl": "https://aadab.online/",
-        "mobileNumber": mobileNumber,
-      };
+    debugPrint("Request body: $requestBody");
+    debugPrint("Encoded body: $base64body");
+    debugPrint("Checksum: $checksum");
 
-      debugPrint("Request Data: ${jsonEncode(requestData)}");
+    // Start the transaction
+    payment = await _phonePeService.startTransaction(
+        base64body, _phonePeService.callback, checksum, context);
 
-      // Start the transaction with the request data object and app schema
-      debugPrint(
-          "Calling PhonePe service with app schema: com.crazzycode.aadab");
-      payment = await _phonePeService.startTransaction(
-          requestData, "com.crazzycode.aadab", context);
+    if (payment?.state == 'COMPLETED') {
+      payload['transaction_id'] = payment?.transactionId.toString();
+      payload['payment_type'] = payment?.paymentInstrument?.type.toString();
+      payload['account_type'] =
+          payment?.paymentInstrument?.accountType.toString();
+      payload['merchant_transaction_id'] =
+          payment?.merchantTransactionId.toString();
+      payload['merchant_id'] = payment?.merchantId.toString();
+      payload['utr'] = payment?.paymentInstrument?.utr.toString();
 
-      // Add a debug print to see if we reach this point
-      debugPrint(
-          "Transaction completed, payment state: ${payment?.state ?? 'NULL'}");
+      // print(payload);
+      final AddToCartModel _addToCartModel =
+          Provider.of<AddToCartModel>(context, listen: false);
+      final OrderModel _orderModel =
+          Provider.of<OrderModel>(context, listen: false);
 
-      if (payment?.state == 'COMPLETED') {
-        // Add transaction details to payload
-        payload['transaction_id'] = payment?.transactionId?.toString();
-        payload['payment_type'] = payment?.paymentInstrument?.type?.toString();
-        payload['account_type'] =
-            payment?.paymentInstrument?.accountType?.toString();
-        payload['merchant_transaction_id'] =
-            payment?.merchantTransactionId?.toString();
-        payload['merchant_id'] = payment?.merchantId?.toString();
-        payload['utr'] = payment?.paymentInstrument?.utr?.toString();
-
-        // Place order with payment details
-        bool orderResponse = await _orderModel.placedOrder(
-          payload['cartItems'],
-          payload['cartTotal'].toString(),
-          payload['addressId'].toString(),
-          payload['isGift'],
-          payload['useWalletPoint'].toString(),
-          payload['couponId'].toString(),
-          'PhonePe Payment - Transaction ID: ${payment?.transactionId}',
-          payload['deliveryMethod'].toString(),
-          payload['couponValue'].toString(),
-        );
-
-        setState(() {
-          _isLoading = false;
-        });
-
-        if (orderResponse) {
-          // Navigate to success page
-          Navigator.pushNamed(context, '/successPage');
-        } else {
-          // Show error dialog
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text("Order Failed"),
-                content: Text("Failed to place order. Please try again."),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text('OK'),
-                  ),
-                ],
-              );
-            },
-          );
-        }
-      } else if (payment?.state == 'FAILED' || payment?.state == 'FAILURE') {
-        setState(() {
-          _isLoading = false;
-        });
-
-        // Show failure dialog
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Payment Failed"),
-              content:
-                  Text("Transaction failed due to an error. Please try again."),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        setState(() {
-          _isLoading = false;
-        });
-
-        // Handle other states (CANCELLED, PENDING, etc.)
-        String title = "Payment Status";
-        String message = "Payment process was not completed.";
-
-        if (payment?.state == 'CANCELLED') {
-          title = "Payment Cancelled";
-          message =
-              "Payment was cancelled. You can try again or choose a different payment method.";
-        } else if (payment?.state == 'PENDING') {
-          title = "Payment Pending";
-          message =
-              "Your payment is being processed. Please wait or contact support if this takes too long.";
-        } else if (payment?.state == 'INTERRUPTED') {
-          title = "Payment Interrupted";
-          message = "Payment process was interrupted. Please try again.";
-        }
-
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text(title),
-              content: Text(message),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+      // Create payment details string with transaction info
+      String paymentDetails =
+          'Online Payment - Transaction ID: ${payment!.transactionId}';
+      if (payment!.transactionId != null) {
+        paymentDetails += ', Order ID: ${payment!.transactionId}';
       }
-    } catch (error) {
+
+      bool orderResponse = await _orderModel.placedOrder(
+        _addToCartModel.addToCarts!.toList(),
+        _orderDetails['cartTotal'],
+        _orderDetails['addressId'],
+        _orderDetails['isGift'],
+        _orderDetails['useWalletPoint'],
+        _orderDetails['couponId'],
+        paymentDetails,
+        _orderDetails['deliveryMethod'],
+        _orderDetails['couponValue'],
+      );
+
+      if (orderResponse == true) {
+        Navigator.pushNamed(context, '/successPage');
+      }
+
       setState(() {
         _isLoading = false;
       });
-
-      debugPrint("Error during transaction: $error");
-
-      // Show user-friendly error dialog
-      String errorMessage =
-          "An error occurred while processing your payment. Please try again or choose a different payment method.";
-
-      if (error.toString().contains("SDK")) {
-        errorMessage =
-            "Payment service is currently unavailable. Please try again later or choose a different payment method.";
-      } else if (error.toString().contains("timeout")) {
-        errorMessage =
-            "Payment request timed out. Please check your internet connection and try again.";
-      }
+    }
+    if (payment?.state == 'FAILURE') {
+      setState(() {
+        _isLoading = false;
+      });
 
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Payment Error"),
-            content: Text(errorMessage),
-            actions: <Widget>[
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: Text("Transaction Status Unknown"),
+            content: Text(
+                "Transaction status unknown: ${payment?.state ?? 'No response'}. Please contact support."),
+            actions: [
               TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text('OK'),
+                onPressed: () => Navigator.pop(context),
+                child: Text("OK", style: TextStyle(color: Colors.black)),
               ),
             ],
           );
         },
       );
+      // .then((_) {
+      //   Navigator.pop(context);
+      //   Navigator.pushNamed(
+      //     context,
+      //     '/bookingReview',
+      //     arguments: {"payloadData": widget.payload['payloadData']},
+      //   );
+      // });
     }
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   Future<void> _loadData() async {

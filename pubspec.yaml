@@ -62,7 +62,7 @@ dependencies:
   flutter_local_notifications: ^19.3.0
   googleapis_auth: ^1.4.1
   connectivity_plus: ^6.0.5
-  phonepe_payment_sdk: ^3.0.1
+  phonepe_payment_sdk: ^2.0.1
   crypto: ^3.0.5
 
 
