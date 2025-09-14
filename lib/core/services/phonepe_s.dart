@@ -10,10 +10,8 @@ import 'package:phonepe_payment_sdk/phonepe_payment_sdk.dart';
 
 class PhonePeService {
   // final PhonePeModel _phonePeModel = locator<PhonePeModel>();
-  // final String merchantId = "PGTESTPAYUAT86"; //test
   final String merchantId = "M231CJCCQCTYF"; //live
   final String appId = "com.crazzycode.aadab";
-  // final String environmentValue = 'SANDBOX'; //test
   final String environmentValue = 'PRODUCTION'; //live
   // final String environment = 'UAT_SIM';
   final String packageName = "com.crazzycode.aadab";
@@ -32,9 +30,10 @@ class PhonePeService {
     try {
       await PhonePePaymentSdk.init(
           this.environmentValue, this.appId, this.merchantId, this.enableLogs);
-      debugPrint("PhonePe SDK Initialized");
-    } catch (e) {
-      debugPrint("SDK Initialization Error: $e");
+      debugPrint("PhonePe SDK Initialized successfully");
+    } catch (error) {
+      debugPrint("Error Initializing PhonePe SDK: $error");
+      throw Exception("Failed to initialize PhonePe SDK: $error");
     }
   }
 

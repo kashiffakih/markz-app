@@ -157,6 +157,15 @@ class _CartPageState extends State<CartPage> {
       setState(() {
         result = "Error Initializing SDK: $error";
       });
+      debugPrint("Error Initializing PhonePe SDK: $error");
+      // Show error to user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              "Failed to initialize PhonePe payment service. Please try another payment method."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -176,29 +185,17 @@ class _CartPageState extends State<CartPage> {
       String merchantTransactionId =
           "MTX${DateTime.now().millisecondsSinceEpoch}${Random().nextInt(1000)}";
 
-      // Prepare request data
+      // Prepare request data - Updated for PhonePe SDK v3.0.1
       final requestData = {
         "merchantId": _phonePeService.merchantId,
         "orderId": merchantTransactionId,
         "token": merchantTransactionId,
+
         "merchantUserId": "MUID123456",
         "amount": amount * 100, // Amount in paise
         "redirectUrl": "https://aadab.online/",
-        "redirectMode": "POST",
-        "callbackUrl": "",
-        "mobileNumber": mobileNumber,
         "paymentMode": {"type": "PAY_PAGE"}
       };
-
-      // Encode request and generate checksum
-      String requestBody = jsonEncode(requestData);
-      String base64body = base64.encode(utf8.encode(requestBody));
-      String checksum =
-          '${sha256.convert(utf8.encode(base64body + _phonePeService.apiEndPoint + _phonePeService.saltKey)).toString()}###${_phonePeService.saltIndex}';
-
-      debugPrint("Request body: $requestBody");
-      debugPrint("Encoded body: $base64body");
-      debugPrint("Checksum: $checksum");
 
       // Start the transaction with the request data object and app schema
       debugPrint(
@@ -323,8 +320,7 @@ class _CartPageState extends State<CartPage> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text("Transaction Error"),
-            content: Text(
-                "An error occurred during the transaction. Please try again."),
+            content: Text("An error occurred during the transaction: $error"),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
