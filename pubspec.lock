@@ -964,10 +964,10 @@ packages:
     dependency: "direct main"
     description:
       name: phonepe_payment_sdk
-      sha256: c1d3f8adf18b3b6d70addb96f22b6770fe36130f9caf042bdaba0849149db39d
+      sha256: e52859fdd2d3a7a2d68b3dcd91d1e51aa5f66664fb1f08f7b66a44579a5ce76e
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.3"
+    version: "3.0.1"
   pinch_zoom:
     dependency: "direct main"
     description:

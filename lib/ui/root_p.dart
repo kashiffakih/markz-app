@@ -17,11 +17,11 @@ class _RootPageState extends State<RootPage> {
   final PermissionService _permissionService = PermissionService();
 
   authenticateUser(_, AuthModel authModel, ConfigModel configModel) async {
-    // configModel.getApiConfig(domain: 'http://192.168.0.103:8080');
+    configModel.getApiConfig(domain: 'http://192.168.0.100:9090');
     // configModel.getApiConfig(domain: 'http://172.20.10.2:8089');
     // configModel.getApiConfig(domain: 'http://192.168.0.103:7070');
     // configModel.getApiConfig(domain: 'http://localhost:7070');
-    configModel.getApiConfig(domain: 'https://api.staging.aadab.online');
+    // configModel.getApiConfig(domain: 'https://api.staging.aadab.online');
     // print(configModel.apiConfig['baseURL']);
     await configModel.fetchLoginData();
 

@@ -1,13 +1,10 @@
 import 'dart:io';
-import 'dart:convert';
-import 'dart:math';
 
 import 'package:aadab/core/models/payment_response.dart';
 import 'package:aadab/core/services/phonepe_s.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:crypto/crypto.dart';
 
 // import 'package:get_ip_address/get_ip_address.dart';
 import 'package:provider/provider.dart';
@@ -347,38 +344,53 @@ class _CartPageState extends State<CartPage> {
 
   Future<void> _startTransaction(int amount, String mobileNumber,
       Map<String, dynamic> payload, BuildContext context) async {
-    // print(payload);
-    debugPrint("Transaction initiated");
-    final ConfigModel _configModel = locator<ConfigModel>();
+    debugPrint("PhonePe V2 Transaction initiated");
 
     setState(() {
       _isLoading = true;
     });
 
-    // Prepare request data
-    final requestData = {
-      "merchantId": _phonePeService.merchantId,
-      "merchantTransactionId": _phonePeService.transactionId,
-      "merchantUserId": "MUID123",
-      "amount": amount * 100, // Amount in paise
-      "callbackUrl": _phonePeService.callback,
-      "mobileNumber": mobileNumber,
-      "paymentInstrument": {"type": "PAY_PAGE"}
-    };
+    // try {
+    // Generate unique merchant order ID as per V2 documentation
+    final merchantOrderId = DateTime.now().millisecondsSinceEpoch.toString();
 
-    // Encode request and generate checksum
-    String requestBody = jsonEncode(requestData);
-    String base64body = base64.encode(utf8.encode(json.encode(requestData)));
-    String checksum =
-        '${sha256.convert(utf8.encode(base64body + _phonePeService.apiEndPoint + _phonePeService.saltKey)).toString()}###${_phonePeService.saltIndex}';
+    debugPrint("PhonePe V2 Transaction Details:");
+    debugPrint("Amount: ${amount * 100} paisa");
+    debugPrint("Merchant Order ID: $merchantOrderId");
 
-    debugPrint("Request body: $requestBody");
-    debugPrint("Encoded body: $base64body");
-    debugPrint("Checksum: $checksum");
-
-    // Start the transaction
+    // Start transaction using V2 documentation compliant method
     payment = await _phonePeService.startTransaction(
-        base64body, _phonePeService.callback, checksum, context);
+      merchantOrderId: merchantOrderId,
+      amount: amount * 100, // Amount in paisa as per docs
+    );
+
+    debugPrint("Transaction completed with state: ${payment?.state}");
+    // } catch (e) {
+    //   debugPrint("Transaction failed: $e");
+
+    //   setState(() {
+    //     _isLoading = false;
+    //   });
+
+    //   showDialog(
+    //     context: context,
+    //     builder: (BuildContext context) {
+    //       return AlertDialog(
+    //         shape:
+    //             RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    //         title: Text("Payment Error"),
+    //         content: Text("Payment failed: $e. Please try again."),
+    //         actions: [
+    //           TextButton(
+    //             onPressed: () => Navigator.pop(context),
+    //             child: Text("OK", style: TextStyle(color: Colors.black)),
+    //           ),
+    //         ],
+    //       );
+    //     },
+    //   );
+    //   return;
+    // }
 
     if (payment?.state == 'COMPLETED') {
       payload['transaction_id'] = payment?.transactionId.toString();
@@ -422,8 +434,7 @@ class _CartPageState extends State<CartPage> {
       setState(() {
         _isLoading = false;
       });
-    }
-    if (payment?.state == 'FAILURE') {
+    } else if (payment?.state == 'PENDING') {
       setState(() {
         _isLoading = false;
       });
@@ -434,9 +445,56 @@ class _CartPageState extends State<CartPage> {
           return AlertDialog(
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            title: Text("Transaction Status Unknown"),
+            title: Text("Payment Pending"),
             content: Text(
-                "Transaction status unknown: ${payment?.state ?? 'No response'}. Please contact support."),
+                "Your payment is being processed. You will receive a confirmation shortly. Check your order status in the app."),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("OK", style: TextStyle(color: Colors.black)),
+              ),
+            ],
+          );
+        },
+      );
+    } else if (payment?.state == 'FAILED' || payment?.state == 'FAILURE') {
+      setState(() {
+        _isLoading = false;
+      });
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: Text("Payment Failed"),
+            content: Text(
+                "Payment failed: ${payment?.state}. Please try again or contact support."),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("OK", style: TextStyle(color: Colors.black)),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      // Handle unknown or other states
+      setState(() {
+        _isLoading = false;
+      });
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: Text("Transaction Status"),
+            content: Text(
+                "Transaction status: ${payment?.state ?? 'Unknown'}. Please check your order status or contact support."),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
