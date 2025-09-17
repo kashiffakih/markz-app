@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/providers/auth_pr.dart';
@@ -19,6 +18,7 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   final _registerKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
   ConfigModel _configModel = locator<ConfigModel>();
 
   Map<String, dynamic> _registerData = {
@@ -26,71 +26,10 @@ class _RegisterPageState extends State<RegisterPage> {
     'email': '',
     'phone': '',
     'password': '',
+    'confirm_password': '',
   };
   Map<String, dynamic> _loginData = {};
   bool _isLoading = false;
-  // @override
-  // void initState() {
-  //   initPlatformState();
-  // }
-
-  // static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-  // Map<String, dynamic> _deviceData = <String, dynamic>{};
-  // String? identifier = '';
-
-  // Future<void> initPlatformState() async {
-  //   try {
-  //     if (Platform.isAndroid) {
-  //       _deviceData = _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
-  //     }
-  //   } on PlatformException {
-  //     _deviceData = <String, dynamic>{
-  //       'Error:': 'Failed to get platform version.'
-  //     };
-  //   }
-
-  //   identifier = _deviceData['id'] + '@' + _deviceData['model'] + 'gmail.com';
-  // }
-
-  // Map<String, dynamic> _readAndroidBuildData(AndroidDeviceInfo build) {
-  //   return <String, dynamic>{
-  //     'version.securityPatch': build.version.securityPatch,
-  //     'version.sdkInt': build.version.sdkInt,
-  //     'version.release': build.version.release,
-  //     'version.previewSdkInt': build.version.previewSdkInt,
-  //     'version.incremental': build.version.incremental,
-  //     'version.codename': build.version.codename,
-  //     'version.baseOS': build.version.baseOS,
-  //     'board': build.board,
-  //     'bootloader': build.bootloader,
-  //     'brand': build.brand,
-  //     'device': build.device,
-  //     'display': build.display,
-  //     'fingerprint': build.fingerprint,
-  //     'hardware': build.hardware,
-  //     'host': build.host,
-  //     'id': build.id,
-  //     'manufacturer': build.manufacturer,
-  //     'model': build.model,
-  //     'product': build.product,
-  //     'supported32BitAbis': build.supported32BitAbis,
-  //     'supported64BitAbis': build.supported64BitAbis,
-  //     'supportedAbis': build.supportedAbis,
-  //     'tags': build.tags,
-  //     'type': build.type,
-  //     'isPhysicalDevice': build.isPhysicalDevice,
-  //     'systemFeatures': build.systemFeatures,
-  //     // 'displaySizeInches':
-  //     //     ((build.displayMetrics.sizeInches * 10).roundToDouble() / 10),
-  //     // 'displayWidthPixels': build.displayMetrics.widthPx,
-  //     // 'displayWidthInches': build.displayMetrics.widthInches,
-  //     // 'displayHeightPixels': build.displayMetrics.heightPx,
-  //     // 'displayHeightInches': build.displayMetrics.heightInches,
-  //     // 'displayXDpi': build.displayMetrics.xDpi,
-  //     // 'displayYDpi': build.displayMetrics.yDpi,
-  //     'serialNumber': build.serialNumber,
-  //   };
-  // }
 
   bool _isValidEmail(String input) {
     String emailPattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
@@ -99,8 +38,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    // print(widget.argument['role']);
-    // debugPrint("role ${widget.argument['role']}");
     double baseWidth = 360;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
@@ -211,7 +148,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           height: 1.25 * ffem / fem,
                           color: Color(0xff000000),
                         ),
-                        // initialValue: _registerData['first_name'],
                         validator: (value) {
                           if (value!.isEmpty)
                             return 'Full name cannot be empty';
@@ -250,7 +186,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           height: 1.25 * ffem / fem,
                           color: Color(0xff000000),
                         ),
-                        // initialValue: _registerData['email'],
                         validator: (value) {
                           if (value!.isEmpty) return 'Email cannot be empty';
                           if (!_isValidEmail(value)) {
@@ -284,7 +219,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               16.34 * fem, 17.94 * fem, 17.66 * fem),
                           hintText: 'Phone',
                           hintStyle: TextStyle(color: Color(0xff8390a1)),
-                          counterText: '', // Hide the counter text
+                          counterText: '',
                         ),
                         style: MyGoogleFontStyle(
                           fontFamily: 'Urbanist',
@@ -293,12 +228,10 @@ class _RegisterPageState extends State<RegisterPage> {
                           height: 1.25 * ffem / fem,
                           color: Color(0xff000000),
                         ),
-                        // initialValue: _registerData['phone'],
                         validator: (value) {
                           if (value!.isEmpty) return 'Phone cannot be empty';
                           if (value.length != 10)
                             return "Phone number must be exactly 10 digits";
-                          // Check if the value contains only digits
                           if (!RegExp(r'^[0-9]+$').hasMatch(value))
                             return "Phone number must contain only digits";
                           return null;
@@ -348,13 +281,77 @@ class _RegisterPageState extends State<RegisterPage> {
                           height: 1.25 * ffem / fem,
                           color: Color(0xff000000),
                         ),
-                        // initialValue: _registerData['password'],
                         validator: (value) {
                           if (value!.isEmpty) return 'Password cannot be empty';
+                          _registerData['password'] =
+                              value; // Update password for comparison
                           return null;
+                        },
+                        onChanged: (value) {
+                          _registerData['password'] = value;
+                          _registerKey.currentState!
+                              .validate(); // Revalidate form
                         },
                         onSaved: (value) {
                           _registerData['password'] = value;
+                        },
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Color(0xffe8ecf4)),
+                        color: Color(0xfff7f8f9),
+                        borderRadius: BorderRadius.circular(7.6632652283),
+                      ),
+                      child: TextFormField(
+                        obscureText: _obscureConfirmPassword,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                          contentPadding: EdgeInsets.fromLTRB(17.94 * fem,
+                              16.34 * fem, 17.94 * fem, 17.66 * fem),
+                          hintText: 'Confirm Password',
+                          hintStyle: TextStyle(color: Color(0xff8390a1)),
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _obscureConfirmPassword =
+                                    !_obscureConfirmPassword;
+                              });
+                            },
+                            child: Icon(
+                              _obscureConfirmPassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                          ),
+                        ),
+                        style: MyGoogleFontStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 14 * ffem,
+                          fontWeight: FontWeight.w500,
+                          height: 1.25 * ffem / fem,
+                          color: Color(0xff000000),
+                        ),
+                        validator: (value) {
+                          if (value!.isEmpty)
+                            return 'Confirm password cannot be empty';
+                          if (value != _registerData['password']) {
+                            return 'Passwords do not match';
+                          }
+                          return null;
+                        },
+                        onChanged: (value) {
+                          _registerKey.currentState!
+                              .validate(); // Revalidate form
+                        },
+                        onSaved: (value) {
+                          _registerData['confirm_password'] = value;
                         },
                       ),
                     ),
@@ -381,7 +378,6 @@ class _RegisterPageState extends State<RegisterPage> {
                             });
                             if (_registerKey.currentState!.validate()) {
                               _registerKey.currentState!.save();
-                              // _registerData['guest_email'] = identifier;
                               _registerData['role'] = widget.argument['role'];
 
                               print(_registerData);
@@ -450,7 +446,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     try {
                       final googleAccount = await GoogleSignIn().signIn();
                       if (googleAccount == null) {
-                        // User canceled the sign-in
                         return;
                       }
 
@@ -481,7 +476,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       var authModel =
                           Provider.of<AuthModel>(context, listen: false);
 
-                      // Handle the login response to check for existing users
                       Map<String, dynamic> loginResponse =
                           await authModel.login(loginData: _loginData);
                       if (_configModel.isLoggedIn) {
@@ -490,7 +484,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           '/',
                         );
                       } else {
-                        // Check if it's an existing user error
                         String errorMessage =
                             loginResponse['message'] ?? 'Login failed';
                         if (loginResponse['error'] == 'EMAIL_ALREADY_EXISTS' ||
@@ -500,10 +493,8 @@ class _RegisterPageState extends State<RegisterPage> {
                             errorMessage
                                 .toLowerCase()
                                 .contains('already registered')) {
-                          // Show existing user dialog with appropriate message for social login
                           _showSocialLoginExistingUserDialog();
                         } else {
-                          // Show generic error dialog
                           _showErrorDialog(errorMessage);
                         }
                       }
@@ -589,7 +580,6 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // Show beautiful success dialog
   void _showSuccessDialog() {
     showDialog(
       context: context,
@@ -617,7 +607,6 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Success Icon
                 Container(
                   width: 80,
                   height: 80,
@@ -632,7 +621,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Success Title
                 Text(
                   'Registration Successful!',
                   style: MyGoogleFontStyle(
@@ -644,7 +632,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
-                // Success Message
                 Text(
                   'Your account has been created successfully. You can now login with your credentials.',
                   style: MyGoogleFontStyle(
@@ -657,7 +644,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 30),
-                // Continue Button
                 Container(
                   width: double.infinity,
                   height: 50,
@@ -692,7 +678,6 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // Show beautiful error dialog
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
@@ -719,7 +704,6 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Error Icon
                 Container(
                   width: 80,
                   height: 80,
@@ -734,7 +718,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Error Title
                 Text(
                   'Registration Failed',
                   style: MyGoogleFontStyle(
@@ -746,7 +729,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
-                // Error Message
                 Text(
                   message,
                   style: MyGoogleFontStyle(
@@ -759,7 +741,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 30),
-                // Try Again Button
                 Container(
                   width: double.infinity,
                   height: 50,
@@ -793,7 +774,6 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // Show dialog for already registered user
   void _showAlreadyRegisteredDialog() {
     showDialog(
       context: context,
@@ -820,7 +800,6 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Warning Icon
                 Container(
                   width: 80,
                   height: 80,
@@ -835,7 +814,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Warning Title
                 Text(
                   'Already Registered!',
                   style: MyGoogleFontStyle(
@@ -847,7 +825,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
-                // Warning Message
                 Text(
                   'An account with this email or phone number already exists. Please use different credentials or try logging in instead.',
                   style: MyGoogleFontStyle(
@@ -860,10 +837,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 30),
-                // Action Buttons
                 Row(
                   children: [
-                    // Try Again Button
                     Expanded(
                       child: Container(
                         height: 45,
@@ -890,7 +865,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    // Go to Login Button
                     Expanded(
                       child: Container(
                         height: 45,
@@ -929,7 +903,6 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // Show dialog for existing user during social login
   void _showSocialLoginExistingUserDialog() {
     showDialog(
       context: context,
@@ -956,7 +929,6 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Warning Icon
                 Container(
                   width: 80,
                   height: 80,
@@ -971,7 +943,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Warning Title
                 Text(
                   'Account Already Exists!',
                   style: MyGoogleFontStyle(
@@ -983,7 +954,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
-                // Warning Message
                 Text(
                   'An account with this email already exists. Please login with your existing credentials or use a different Google account.',
                   style: MyGoogleFontStyle(
@@ -996,10 +966,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 30),
-                // Action Buttons
                 Row(
                   children: [
-                    // Go to Login Button
                     Expanded(
                       child: Container(
                         height: 45,

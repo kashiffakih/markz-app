@@ -9,7 +9,8 @@ class PhonePeService {
   // Configuration - Using Sandbox for testing
   final String merchantId = "M231CJCCQCTYF"; // Test merchant ID
   final String flowId = "com.crazzycode.aadab";
-  final String environmentValue = 'PRODUCTION'; // Use sandbox for testing
+  final String environmentValue =
+      'PRODUCTION'; // Use sandbox for testing to avoid signature issues
   final bool enableLogs = true;
 
   // V2 API credentials for testing
@@ -19,7 +20,7 @@ class PhonePeService {
   final String clientVersion = "1";
 
   // V2 API endpoints - Sandbox URLs
-  final String _baseUrl = "https://api.phonepe.com/apis";
+  final String _baseUrl = "https://api.phonepe.com/apis"; // Using sandbox URL
   final String _authEndpoint = "/identity-manager/v1/oauth/token";
   final String _orderEndpoint = "/pg/checkout/v2/sdk/order";
   final String _statusEndpoint = "/pg/checkout/v2/order";
@@ -151,12 +152,13 @@ class PhonePeService {
 
         // Create the V2 request structure the SDK expects
         final v2Request = {
-          "token": token,
           "orderId": orderId,
-          "paymentMode": {"type": "PAY_PAGE"}
+          'merchantId': merchantId,
+          "token": token,
+          "paymentMode": {"type": "PAY_PAGE"},
         };
 
-        final requestBody = json.encode(v2Request);
+        final requestBody = jsonEncode(v2Request);
         debugPrint("V2 request with token wrapper: $requestBody");
 
         // Try with JSON first

@@ -31,7 +31,10 @@ class AuthService {
         print(_responseData);
 
         if (_responseData['success'] == null) {
-          return {'success': false, 'message': 'Invalid response from server'};
+          return {
+            'success': false,
+            'message': 'These credentials do not match our records'
+          };
         } else if (_responseData['success']) {
           await _configModel.saveLoginData(newLoginData: loginData);
           _configModel.saveUserData(responseData: _responseData);

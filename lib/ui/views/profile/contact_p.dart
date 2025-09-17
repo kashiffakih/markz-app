@@ -545,11 +545,12 @@ class _ContactPageState extends State<ContactPage> {
           _buildContactItem(
             context: context,
             title: 'WhatsApp',
-            subtitle: productModel.banners?['phone']?.toString() ??
+            subtitle: '+${productModel.banners?['phone']?.toString()}' ??
                 'No phone number available',
             icon: Icons.message,
             onTap: () async {
-              final phone = productModel.banners?['phone']?.toString() ?? '';
+              final phone =
+                  '+${productModel.banners?['phone']?.toString()}' ?? '';
               if (phone.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Phone number not available')),
@@ -579,11 +580,12 @@ class _ContactPageState extends State<ContactPage> {
           _buildContactItem(
             context: context,
             title: 'Call Us',
-            subtitle: productModel.banners?['phone']?.toString() ??
+            subtitle: '+${productModel.banners?['phone']?.toString()}' ??
                 'No phone number available',
             icon: Icons.phone,
             onTap: () async {
-              final phone = productModel.banners?['phone']?.toString() ?? '';
+              final phone =
+                  '+${productModel.banners?['phone']?.toString()}' ?? '';
               if (phone.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Phone number not available')),

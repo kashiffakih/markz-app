@@ -141,192 +141,6 @@ class _CartPageState extends State<CartPage> {
     super.initState();
   }
 
-  // void initializePhonePe() async {
-  //   try {
-  //     await _phonePeService.initializePhonePe();
-  //     setState(() {
-  //       result = "PhonePe SDK Initialized";
-  //     });
-  //   } catch (error) {
-  //     setState(() {
-  //       result = "Error Initializing SDK: $error";
-  //     });
-  //   }
-  // }
-
-  // Future<void> _startTransaction(int amount, String mobileNumber,
-  //     Map<String, dynamic> payload, BuildContext context) async {
-  //   debugPrint(
-  //       "Transaction initiated with amount: $amount and mobile: $mobileNumber");
-
-  //   setState(() {
-  //     _isLoading = true;
-  //   });
-
-  //   // Initialize PhonePe SDK if not already initialized
-  //   try {
-  //     await _phonePeService.initializePhonePe();
-  //     debugPrint("PhonePe SDK initialized successfully");
-  //   } catch (error) {
-  //     debugPrint("Error initializing PhonePe SDK: $error");
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //     return;
-  //   }
-
-  //   // Generate unique transaction ID
-  //   String orderId = "MTX${DateTime.now().millisecondsSinceEpoch}";
-
-  //   // Prepare request data according to updated PhonePe service format
-  //   final requestData = {
-  //     "merchantId": _phonePeService.merchantId,
-  //     "orderId": orderId,
-  //     "merchantUserId": mobileNumber, // Using mobile number as user ID
-  //     "amount": amount * 100, // Amount in paise
-  //     "redirectUrl": "https://aadab.online/",
-  //     "mobileNumber": mobileNumber
-  //   };
-
-  //   debugPrint("Request Data: ${jsonEncode(requestData)}");
-  //   debugPrint("Calling PhonePe service with app schema: com.crazzycode.aadab");
-
-  //   // Start the transaction using the updated PhonePe service
-  //   payment = await _phonePeService.startTransaction(
-  //       requestData, "com.crazzycode.aadab", context);
-
-  //   debugPrint("Transaction completed, payment state: ${payment?.state}");
-
-  //   if (payment?.state == 'COMPLETED' || payment?.state == 'SUCCESS') {
-  //     payload['transaction_id'] = payment?.transactionId?.toString() ?? orderId;
-  //     payload['payment_type'] =
-  //         payment?.paymentInstrument?.type?.toString() ?? 'UPI';
-  //     payload['account_type'] =
-  //         payment?.paymentInstrument?.accountType?.toString() ?? 'WALLET';
-  //     payload['merchant_transaction_id'] = orderId;
-  //     payload['merchant_id'] = _phonePeService.merchantId;
-  //     payload['utr'] = payment?.paymentInstrument?.utr?.toString() ?? '';
-
-  //     // print(payload);
-  //     bool result = await aggregatorModel.meruConfirmBooking(payload: payload);
-
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-
-  //     if (result) {
-  //       showDialog(
-  //         context: context,
-  //         builder: (BuildContext context) {
-  //           return SuccessPopupWidget(
-  //               buttonColor: MyColors.primaryColor,
-  //               buttonTextColor: Colors.white,
-  //               targetPage: HomePage(),
-  //               text: widget.payload['payloadData']['saving_amount'] != '0'
-  //                   ? "Order confirmed! Rider will be assigned shortly.\nCongratulations, you saved ${widget.payload['payloadData']['saving_amount']}."
-  //                   : 'Order confirmed! Rider will be assigned shortly.');
-  //         },
-  //       );
-  //     } else {
-  //       showDialog(
-  //         context: context,
-  //         builder: (BuildContext context) {
-  //           return AlertDialog(
-  //             shape: RoundedRectangleBorder(
-  //               borderRadius: BorderRadius.circular(20)
-  //             ),
-  //             title: Text("Booking Failed"),
-  //             content: Text("Booking failed. Try again."),
-  //             actions: [
-  //               TextButton(
-  //                 onPressed: () => Navigator.pop(context),
-  //                 child: Text("OK", style: TextStyle(color: MyColors.primaryColor)),
-  //               ),
-  //             ],
-  //           );
-  //         },
-  //       );
-  //     }
-  //   } else if (payment?.state == 'FAILED' || payment?.state == 'FAILURE') {
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-
-  //     showDialog(
-  //       context: context,
-  //       builder: (BuildContext context) {
-  //         return AlertDialog(
-  //           shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.circular(20)
-  //           ),
-  //           title: Text("Transaction Failed"),
-  //           content: Text("Transaction failed due to an error. Please try again."),
-  //           actions: [
-  //             TextButton(
-  //               onPressed: () => Navigator.pop(context),
-  //               child: Text("OK", style: TextStyle(color: MyColors.primaryColor)),
-  //             ),
-  //           ],
-  //         );
-  //       },
-  //     ).then((_) {
-  //       Navigator.pop(context);
-  //       Navigator.pushNamed(
-  //         context,
-  //         '/bookingReview',
-  //         arguments: {"payloadData": widget.payload['payloadData']},
-  //       );
-  //     });
-  //   } else if (payment?.state == 'CANCELLED') {
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-
-  //     showDialog(
-  //       context: context,
-  //       builder: (BuildContext context) {
-  //         return AlertDialog(
-  //           shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.circular(20)
-  //           ),
-  //           title: Text("Transaction Cancelled"),
-  //           content: Text("Transaction was cancelled by user."),
-  //           actions: [
-  //             TextButton(
-  //               onPressed: () => Navigator.pop(context),
-  //               child: Text("OK", style: TextStyle(color: MyColors.primaryColor)),
-  //             ),
-  //           ],
-  //         );
-  //       },
-  //     );
-  //   } else {
-  //     // Handle unknown states
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-
-  // showDialog(
-  //   context: context,
-  //   builder: (BuildContext context) {
-  //     return AlertDialog(
-  //       shape: RoundedRectangleBorder(
-  //         borderRadius: BorderRadius.circular(20)
-  //       ),
-  //       title: Text("Transaction Status Unknown"),
-  //       content: Text("Transaction status unknown: ${payment?.state ?? 'No response'}. Please contact support."),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () => Navigator.pop(context),
-  //           child: Text("OK", style: TextStyle(color: MyColors.primaryColor)),
-  //         ),
-  //       ],
-  //     );
-  //   },
-  // );
-  //   }
-  // }
-
   void initializePhonePe() async {
     try {
       await _phonePeService.initializePhonePe();
@@ -361,36 +175,11 @@ class _CartPageState extends State<CartPage> {
     // Start transaction using V2 documentation compliant method
     payment = await _phonePeService.startTransaction(
       merchantOrderId: merchantOrderId,
+      // amount: 100, // Amount in paisa as per docs
       amount: amount * 100, // Amount in paisa as per docs
     );
 
     debugPrint("Transaction completed with state: ${payment?.state}");
-    // } catch (e) {
-    //   debugPrint("Transaction failed: $e");
-
-    //   setState(() {
-    //     _isLoading = false;
-    //   });
-
-    //   showDialog(
-    //     context: context,
-    //     builder: (BuildContext context) {
-    //       return AlertDialog(
-    //         shape:
-    //             RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-    //         title: Text("Payment Error"),
-    //         content: Text("Payment failed: $e. Please try again."),
-    //         actions: [
-    //           TextButton(
-    //             onPressed: () => Navigator.pop(context),
-    //             child: Text("OK", style: TextStyle(color: Colors.black)),
-    //           ),
-    //         ],
-    //       );
-    //     },
-    //   );
-    //   return;
-    // }
 
     if (payment?.state == 'COMPLETED') {
       payload['transaction_id'] = payment?.transactionId.toString();
@@ -417,23 +206,22 @@ class _CartPageState extends State<CartPage> {
 
       bool orderResponse = await _orderModel.placedOrder(
         _addToCartModel.addToCarts!.toList(),
-        _orderDetails['cartTotal'],
-        _orderDetails['addressId'],
-        _orderDetails['isGift'],
-        _orderDetails['useWalletPoint'],
-        _orderDetails['couponId'],
+        payload['cartTotal'],
+        payload['addressId'],
+        payload['isGift'],
+        payload['useWalletPoint'],
+        payload['couponId'],
         paymentDetails,
-        _orderDetails['deliveryMethod'],
-        _orderDetails['couponValue'],
+        payload['deliveryMethod'],
+        payload['couponValue'],
       );
-
-      if (orderResponse == true) {
-        Navigator.pushNamed(context, '/successPage');
-      }
 
       setState(() {
         _isLoading = false;
       });
+      if (orderResponse == true) {
+        Navigator.pushNamed(context, '/successPage');
+      }
     } else if (payment?.state == 'PENDING') {
       setState(() {
         _isLoading = false;
@@ -657,7 +445,7 @@ class _CartPageState extends State<CartPage> {
       "icon": "assets/images/cash-on-delivery-logo-free-png.webp",
     },
     {
-      "name": "PhonePe",
+      "name": "UPI - Online",
       "icon": "assets/images/PhonePe-Logo.wine.png",
     }
   ];
@@ -3151,7 +2939,7 @@ class _CartPageState extends State<CartPage> {
                                                         taxAmount;
 
                                                 if (paymentOption ==
-                                                    'PhonePe') {
+                                                    'UPI - Online') {
                                                   // Prepare payload data for the transaction
                                                   Map<String, dynamic>
                                                       payloadData = {
