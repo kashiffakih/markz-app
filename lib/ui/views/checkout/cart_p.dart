@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:aadab/core/models/payment_response.dart';
 import 'package:aadab/core/services/phonepe_s.dart';
@@ -539,10 +540,6 @@ class _CartPageState extends State<CartPage> {
     }
 
     double discountPrice = 0.0;
-
-    double baseWidth = 360;
-    double fem = MediaQuery.of(context).size.width / baseWidth;
-
     return WillPopScope(
       onWillPop: () async {
         if (widget.isProfile != null && widget.isProfile['isProfile'] == true) {
@@ -683,8 +680,8 @@ class _CartPageState extends State<CartPage> {
                       ),
                       // Body
                       Container(
-                        width: MediaQuery.of(context).size.width - 50,
-                        // height: MediaQuery.of(context).size.height - 250,
+                        width: 1.0.sw - 50,
+                        // height: 1.0.sh - 250,
                         child: _addToCartModel.addToCarts!.isEmpty
                             ? Column(
                                 children: [
@@ -806,19 +803,19 @@ class _CartPageState extends State<CartPage> {
                                                                           child:
                                                                               Container(
                                                                             margin: EdgeInsets.fromLTRB(
-                                                                                0 * fem,
-                                                                                0 * fem,
-                                                                                0 * fem,
-                                                                                5 * fem),
+                                                                                0.0.w,
+                                                                                0.0.w,
+                                                                                0.0.w,
+                                                                                5.0.w),
                                                                             padding: EdgeInsets.fromLTRB(
-                                                                                106 * fem,
-                                                                                13 * fem,
-                                                                                14 * fem,
-                                                                                15 * fem),
+                                                                                106.0.w,
+                                                                                13.0.w,
+                                                                                14.0.w,
+                                                                                15.0.w),
                                                                             width:
-                                                                                MediaQuery.of(context).size.width * 0.4,
+                                                                                0.4.sw,
                                                                             height:
-                                                                                MediaQuery.of(context).size.height * 0.26,
+                                                                                0.26.sh,
                                                                             decoration:
                                                                                 BoxDecoration(
                                                                               borderRadius: BorderRadius.circular(15),
@@ -948,7 +945,7 @@ class _CartPageState extends State<CartPage> {
                                 ],
                               )
                             : SizedBox(
-                                height: MediaQuery.of(context).size.height *
+                                height: 1.0.sh *
                                     (0.23 *
                                         (_addToCartModel.addToCarts!.length < 2
                                             ? _addToCartModel.addToCarts!.length
@@ -1420,7 +1417,7 @@ class _CartPageState extends State<CartPage> {
                   Padding(
                     padding: const EdgeInsets.all(10),
                     child: Container(
-                      width: MediaQuery.of(context).size.width - 50,
+                      width: 1.0.sw - 50,
                       child: Column(
                         children: [
                           // if (couponValue == '')
@@ -1913,7 +1910,7 @@ class _CartPageState extends State<CartPage> {
                                 // Body
                                 Container(
                                   height:
-                                      MediaQuery.of(context).size.height * 0.75,
+                                      0.75.sh,
                                   // height: 480,
                                   child: Column(
                                     crossAxisAlignment:
@@ -2345,7 +2342,7 @@ class _CartPageState extends State<CartPage> {
                                       ),
                                       Container(
                                         width:
-                                            MediaQuery.of(context).size.width -
+                                            1.0.sw -
                                                 50,
                                         margin: EdgeInsets.only(
                                           top: 5,
@@ -3107,10 +3104,9 @@ class _CartPageState extends State<CartPage> {
                                       ),
                                       Container(
                                         width:
-                                            MediaQuery.of(context).size.width,
+                                            1.0.sw,
                                         height:
-                                            MediaQuery.of(context).size.height *
-                                                0.35,
+                                            0.35.sh,
                                         child: Row(
                                           children: [
                                             Expanded(
@@ -3195,23 +3191,17 @@ class _CartPageState extends State<CartPage> {
                                                                       child:
                                                                           Container(
                                                                         margin: EdgeInsets.fromLTRB(
-                                                                            0 * fem,
-                                                                            0 * fem,
-                                                                            0 * fem,
-                                                                            5 * fem),
+                                                                            0.0.w,
+                                                                            0.0.w,
+                                                                            0.0.w,
+                                                                            5.0.w),
                                                                         padding: EdgeInsets.fromLTRB(
-                                                                            106 *
-                                                                                fem,
-                                                                            13 *
-                                                                                fem,
-                                                                            14 *
-                                                                                fem,
-                                                                            15 *
-                                                                                fem),
-                                                                        width: MediaQuery.of(context).size.width *
-                                                                            0.4,
-                                                                        height: MediaQuery.of(context).size.height *
-                                                                            0.26,
+                                                                            106.0.w,
+                                                                            13.0.w,
+                                                                            14.0.w,
+                                                                            15.0.w),
+                                                                        width: 0.4.sw,
+                                                                        height: 0.26.sh,
                                                                         decoration:
                                                                             BoxDecoration(
                                                                           borderRadius:

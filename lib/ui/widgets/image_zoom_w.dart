@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pinch_zoom/pinch_zoom.dart';
 
 class ImageScreen extends StatefulWidget {

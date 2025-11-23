@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/models/product.dart';
 import 'package:aadab/core/providers/add_to_cart_pr.dart';
@@ -50,8 +51,6 @@ class _WishlistPageState extends State<WishlistPage> {
     return Consumer2<WishListModel, AddToCartModel>(
       builder: (context, wishListModel, addToCartModel, _) {
         final configModel = locator<ConfigModel>();
-        final double fem = MediaQuery.sizeOf(context).width / 360;
-        final double ffem = fem * 0.97;
         final cartCount = addToCartModel.addToCarts?.length ?? 0;
 
         return Scaffold(
@@ -61,9 +60,9 @@ class _WishlistPageState extends State<WishlistPage> {
                 : SingleChildScrollView(
                     child: Column(
                       children: [
-                        _buildHeader(context, cartCount, fem, ffem),
+                        _buildHeader(context, cartCount),
                         _buildWishlistContent(context, wishListModel,
-                            addToCartModel, configModel, fem),
+                            addToCartModel, configModel),
                       ],
                     ),
                   ),
@@ -73,8 +72,7 @@ class _WishlistPageState extends State<WishlistPage> {
     );
   }
 
-  Widget _buildHeader(
-      BuildContext context, int cartCount, double fem, double ffem) {
+  Widget _buildHeader(BuildContext context, int cartCount) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Row(
@@ -91,7 +89,7 @@ class _WishlistPageState extends State<WishlistPage> {
               textAlign: TextAlign.center,
               style: MyGoogleFontStyle(
                 fontFamily: 'Urbanist',
-                fontSize: 18 * ffem,
+                fontSize: 18.0.sp,
                 fontWeight: FontWeight.bold,
                 color: const Color(0xff1e232c),
               ),
@@ -106,7 +104,7 @@ class _WishlistPageState extends State<WishlistPage> {
               ),
               child: Image.asset(
                 'assets/images/shopping_cart.png',
-                height: 20 * ffem,
+                height: 20.0.sp,
                 fit: BoxFit.cover,
               ),
             ),
@@ -121,7 +119,6 @@ class _WishlistPageState extends State<WishlistPage> {
     WishListModel wishListModel,
     AddToCartModel addToCartModel,
     ConfigModel configModel,
-    double fem,
   ) {
     if (wishListModel.wishLists?.isEmpty ?? true) {
       return const SizedBox(
@@ -143,7 +140,6 @@ class _WishlistPageState extends State<WishlistPage> {
           addToCartModel,
           configModel,
           index,
-          fem,
         ),
       ),
     );
@@ -155,7 +151,6 @@ class _WishlistPageState extends State<WishlistPage> {
     AddToCartModel addToCartModel,
     ConfigModel configModel,
     int index,
-    double fem,
   ) {
     final product = wishListModel.wishLists![index].product!;
     final price = int.parse(product.productPrices![0].price.toString());
@@ -168,11 +163,11 @@ class _WishlistPageState extends State<WishlistPage> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildProductImage(configModel, product, fem),
+            _buildProductImage(configModel, product),
             const SizedBox(width: 12),
             Expanded(
               child: _buildProductDetails(context, wishListModel,
-                  addToCartModel, product, discountPrice, index, fem),
+                  addToCartModel, product, discountPrice, index),
             ),
             IconButton(
               onPressed: () async {
@@ -187,15 +182,14 @@ class _WishlistPageState extends State<WishlistPage> {
     );
   }
 
-  Widget _buildProductImage(
-      ConfigModel configModel, Product product, double fem) {
+  Widget _buildProductImage(ConfigModel configModel, Product product) {
     return SizedBox(
-      height: 90 * fem,
-      width: 80 * fem,
+      height: 90.0.w,
+      width: 80.0.w,
       child: Image.network(
         '${configModel.apiConfig['mediaURL']}${product.productImages!.first.imagepath}',
-        width: 80 * fem,
-        height: 100 * fem,
+        width: 80.0.w,
+        height: 100.0.w,
         errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
       ),
     );
@@ -208,7 +202,6 @@ class _WishlistPageState extends State<WishlistPage> {
     Product product,
     int discountPrice,
     int index,
-    double fem,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -254,8 +247,7 @@ class _WishlistPageState extends State<WishlistPage> {
           ),
         ),
         const SizedBox(height: 10),
-        _buildAddToCartButton(
-            context, wishListModel, addToCartModel, index, fem),
+        _buildAddToCartButton(context, wishListModel, addToCartModel, index),
       ],
     );
   }
@@ -265,18 +257,17 @@ class _WishlistPageState extends State<WishlistPage> {
     WishListModel wishListModel,
     AddToCartModel addToCartModel,
     int index,
-    double fem,
   ) {
     return InkWell(
       onTap: () => _showAddToCartBottomSheet(
-          context, wishListModel, addToCartModel, index, fem),
+          context, wishListModel, addToCartModel, index),
       child: Container(
-        padding: EdgeInsets.fromLTRB(13 * fem, 4 * fem, 14 * fem, 6 * fem),
-        width: 100 * fem,
-        height: 30 * fem,
+        padding: EdgeInsets.fromLTRB(13.0.w, 4.0.w, 14.0.w, 6.0.w),
+        width: 100.0.w,
+        height: 30.0.w,
         decoration: BoxDecoration(
           color: const Color(0xff000000),
-          borderRadius: BorderRadius.circular(5 * fem),
+          borderRadius: BorderRadius.circular(5.0.r),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -285,7 +276,7 @@ class _WishlistPageState extends State<WishlistPage> {
               'Add to Cart',
               style: MyGoogleFontStyle(
                 fontFamily: 'Poppins',
-                fontSize: 9 * fem,
+                fontSize: 9.0.w,
                 fontWeight: FontWeight.w600,
                 color: const Color(0xffffffff),
               ),
@@ -293,8 +284,8 @@ class _WishlistPageState extends State<WishlistPage> {
             const SizedBox(width: 5),
             Image.asset(
               'assets/images/shopping-bag-03-YoY.png',
-              width: 9.5 * fem,
-              height: 9.2 * fem,
+              width: 9.5.w,
+              height: 9.2.w,
             ),
           ],
         ),
@@ -307,7 +298,6 @@ class _WishlistPageState extends State<WishlistPage> {
     WishListModel wishListModel,
     AddToCartModel addToCartModel,
     int index,
-    double fem,
   ) {
     int activeIndex = -1;
     int sizeActiveIndex = -1;
@@ -343,14 +333,14 @@ class _WishlistPageState extends State<WishlistPage> {
                     'Select Variant:',
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 15 * fem,
+                      fontSize: 15.0.w,
                       fontWeight: FontWeight.w600,
                       height: 1.2,
                       letterSpacing: -0.36,
                     ),
                   ),
                   const SizedBox(height: 20),
-                  _buildVariantSelector(product, activeIndex, fem, (index) {
+                  _buildVariantSelector(product, activeIndex, (index) {
                     modalSetState(() {
                       activeIndex = index;
                       sizeActiveIndex = -1;
@@ -364,14 +354,14 @@ class _WishlistPageState extends State<WishlistPage> {
                     'Select Size:',
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 15 * fem,
+                      fontSize: 15.0.w,
                       fontWeight: FontWeight.w600,
                       height: 1.2,
                       letterSpacing: -0.36,
                     ),
                   ),
                   const SizedBox(height: 20),
-                  _buildSizeSelector(filteredProductPacks, sizeActiveIndex, fem,
+                  _buildSizeSelector(filteredProductPacks, sizeActiveIndex,
                       (index) {
                     modalSetState(() {
                       sizeActiveIndex = index;
@@ -389,7 +379,6 @@ class _WishlistPageState extends State<WishlistPage> {
                     cartData,
                     activeIndex,
                     sizeActiveIndex,
-                    fem,
                   ),
                 ],
               ),
@@ -403,11 +392,10 @@ class _WishlistPageState extends State<WishlistPage> {
   Widget _buildVariantSelector(
     Product product,
     int activeIndex,
-    double fem,
     Function(int) onSelect,
   ) {
     return SizedBox(
-      height: 50 * fem,
+      height: 50.0.w,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: product.productImages!.length,
@@ -420,15 +408,15 @@ class _WishlistPageState extends State<WishlistPage> {
               padding: EdgeInsets.zero,
               backgroundColor: isActive ? Colors.black : null,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30.0 * fem),
+                borderRadius: BorderRadius.circular(30.0.r),
               ),
             ),
             child: Container(
               width: MediaQuery.sizeOf(context).width * 0.3,
-              padding: EdgeInsets.symmetric(horizontal: 10 * fem),
+              padding: EdgeInsets.symmetric(horizontal: 10.0.w),
               decoration: ShapeDecoration(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0 * fem),
+                  borderRadius: BorderRadius.circular(30.0.r),
                   side: const BorderSide(color: Colors.black, width: 1.0),
                 ),
               ),
@@ -437,7 +425,7 @@ class _WishlistPageState extends State<WishlistPage> {
                   product.productImages![index].unit!.name.toString(),
                   style: MyGoogleFontStyle(
                     fontFamily: 'Urbanist',
-                    fontSize: 12 * fem,
+                    fontSize: 12.0.w,
                     fontWeight: FontWeight.w600,
                     height: 1.2,
                     letterSpacing: -0.36,
@@ -455,11 +443,10 @@ class _WishlistPageState extends State<WishlistPage> {
   Widget _buildSizeSelector(
     List<ProductPack> filteredProductPacks,
     int sizeActiveIndex,
-    double fem,
     Function(int) onSelect,
   ) {
     return SizedBox(
-      height: 50 * fem,
+      height: 50.0.w,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: filteredProductPacks.length,
@@ -472,15 +459,15 @@ class _WishlistPageState extends State<WishlistPage> {
               padding: EdgeInsets.zero,
               backgroundColor: isSizeActive ? Colors.black : null,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30.0 * fem),
+                borderRadius: BorderRadius.circular(30.0.r),
               ),
             ),
             child: Container(
               width: MediaQuery.sizeOf(context).width * 0.3,
-              padding: EdgeInsets.symmetric(horizontal: 10 * fem),
+              padding: EdgeInsets.symmetric(horizontal: 10.0.w),
               decoration: ShapeDecoration(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0 * fem),
+                  borderRadius: BorderRadius.circular(30.0.r),
                   side: const BorderSide(color: Colors.black, width: 1.0),
                 ),
               ),
@@ -489,7 +476,7 @@ class _WishlistPageState extends State<WishlistPage> {
                   filteredProductPacks[index].value.toString(),
                   style: MyGoogleFontStyle(
                     fontFamily: 'Urbanist',
-                    fontSize: 12 * fem,
+                    fontSize: 12.0.w,
                     fontWeight: FontWeight.w600,
                     height: 1.2,
                     letterSpacing: -0.36,
@@ -512,7 +499,6 @@ class _WishlistPageState extends State<WishlistPage> {
     Map<String, dynamic> cartData,
     int activeIndex,
     int sizeActiveIndex,
-    double fem,
   ) {
     bool isLoading = false;
 
@@ -563,12 +549,12 @@ class _WishlistPageState extends State<WishlistPage> {
             }
           },
           child: Container(
-            padding: EdgeInsets.fromLTRB(13 * fem, 4 * fem, 14 * fem, 6 * fem),
-            width: 160 * fem,
-            height: 50 * fem,
+            padding: EdgeInsets.fromLTRB(13.0.w, 4.0.w, 14.0.w, 6.0.w),
+            width: 160.0.w,
+            height: 50.0.w,
             decoration: BoxDecoration(
               color: const Color(0xff000000),
-              borderRadius: BorderRadius.circular(5 * fem),
+              borderRadius: BorderRadius.circular(5.0.r),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -579,7 +565,7 @@ class _WishlistPageState extends State<WishlistPage> {
                         'Add to Cart',
                         style: MyGoogleFontStyle(
                           fontFamily: 'Poppins',
-                          fontSize: 15 * fem,
+                          fontSize: 15.0.w,
                           fontWeight: FontWeight.w600,
                           color: const Color(0xffffffff),
                         ),
@@ -587,8 +573,8 @@ class _WishlistPageState extends State<WishlistPage> {
                 const SizedBox(width: 5),
                 Image.asset(
                   'assets/images/shopping-bag-03-YoY.png',
-                  width: 18 * fem,
-                  height: 15 * fem,
+                  width: 18.0.w,
+                  height: 15.0.w,
                 ),
               ],
             ),

@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
@@ -38,10 +39,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    double baseWidth = 360;
-    double fem = MediaQuery.of(context).size.width / baseWidth;
-    double ffem = fem * 0.97;
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -136,16 +133,16 @@ class _RegisterPageState extends State<RegisterPage> {
                           enabledBorder: InputBorder.none,
                           errorBorder: InputBorder.none,
                           disabledBorder: InputBorder.none,
-                          contentPadding: EdgeInsets.fromLTRB(17.94 * fem,
-                              16.34 * fem, 17.94 * fem, 17.66 * fem),
+                          contentPadding: EdgeInsets.fromLTRB(17.94.w,
+                              16.34.w, 17.94.w, 17.66.w),
                           hintText: 'Full Name',
                           hintStyle: TextStyle(color: Color(0xff8390a1)),
                         ),
                         style: MyGoogleFontStyle(
                           fontFamily: 'Urbanist',
-                          fontSize: 14 * ffem,
+                          fontSize: 14.0.sp,
                           fontWeight: FontWeight.w500,
-                          height: 1.25 * ffem / fem,
+                          height: 1.25,
                           color: Color(0xff000000),
                         ),
                         validator: (value) {
@@ -174,16 +171,16 @@ class _RegisterPageState extends State<RegisterPage> {
                           enabledBorder: InputBorder.none,
                           errorBorder: InputBorder.none,
                           disabledBorder: InputBorder.none,
-                          contentPadding: EdgeInsets.fromLTRB(17.94 * fem,
-                              16.34 * fem, 17.94 * fem, 17.66 * fem),
+                          contentPadding: EdgeInsets.fromLTRB(17.94.w,
+                              16.34.w, 17.94.w, 17.66.w),
                           hintText: 'Email',
                           hintStyle: TextStyle(color: Color(0xff8390a1)),
                         ),
                         style: MyGoogleFontStyle(
                           fontFamily: 'Urbanist',
-                          fontSize: 14 * ffem,
+                          fontSize: 14.0.sp,
                           fontWeight: FontWeight.w500,
-                          height: 1.25 * ffem / fem,
+                          height: 1.25,
                           color: Color(0xff000000),
                         ),
                         validator: (value) {
@@ -215,17 +212,17 @@ class _RegisterPageState extends State<RegisterPage> {
                           enabledBorder: InputBorder.none,
                           errorBorder: InputBorder.none,
                           disabledBorder: InputBorder.none,
-                          contentPadding: EdgeInsets.fromLTRB(17.94 * fem,
-                              16.34 * fem, 17.94 * fem, 17.66 * fem),
+                          contentPadding: EdgeInsets.fromLTRB(17.94.w,
+                              16.34.w, 17.94.w, 17.66.w),
                           hintText: 'Phone',
                           hintStyle: TextStyle(color: Color(0xff8390a1)),
                           counterText: '',
                         ),
                         style: MyGoogleFontStyle(
                           fontFamily: 'Urbanist',
-                          fontSize: 14 * ffem,
+                          fontSize: 14.0.sp,
                           fontWeight: FontWeight.w500,
-                          height: 1.25 * ffem / fem,
+                          height: 1.25,
                           color: Color(0xff000000),
                         ),
                         validator: (value) {
@@ -257,8 +254,8 @@ class _RegisterPageState extends State<RegisterPage> {
                           enabledBorder: InputBorder.none,
                           errorBorder: InputBorder.none,
                           disabledBorder: InputBorder.none,
-                          contentPadding: EdgeInsets.fromLTRB(17.94 * fem,
-                              16.34 * fem, 17.94 * fem, 17.66 * fem),
+                          contentPadding: EdgeInsets.fromLTRB(17.94.w,
+                              16.34.w, 17.94.w, 17.66.w),
                           hintText: 'Password',
                           hintStyle: TextStyle(color: Color(0xff8390a1)),
                           suffixIcon: GestureDetector(
@@ -276,9 +273,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         style: MyGoogleFontStyle(
                           fontFamily: 'Urbanist',
-                          fontSize: 14 * ffem,
+                          fontSize: 14.0.sp,
                           fontWeight: FontWeight.w500,
-                          height: 1.25 * ffem / fem,
+                          height: 1.25,
                           color: Color(0xff000000),
                         ),
                         validator: (value) {
@@ -313,8 +310,8 @@ class _RegisterPageState extends State<RegisterPage> {
                           enabledBorder: InputBorder.none,
                           errorBorder: InputBorder.none,
                           disabledBorder: InputBorder.none,
-                          contentPadding: EdgeInsets.fromLTRB(17.94 * fem,
-                              16.34 * fem, 17.94 * fem, 17.66 * fem),
+                          contentPadding: EdgeInsets.fromLTRB(17.94.w,
+                              16.34.w, 17.94.w, 17.66.w),
                           hintText: 'Confirm Password',
                           hintStyle: TextStyle(color: Color(0xff8390a1)),
                           suffixIcon: GestureDetector(
@@ -333,9 +330,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         style: MyGoogleFontStyle(
                           fontFamily: 'Urbanist',
-                          fontSize: 14 * ffem,
+                          fontSize: 14.0.sp,
                           fontWeight: FontWeight.w500,
-                          height: 1.25 * ffem / fem,
+                          height: 1.25,
                           color: Color(0xff000000),
                         ),
                         validator: (value) {
@@ -357,20 +354,20 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     Container(
                       margin: EdgeInsets.fromLTRB(
-                          20 * fem, 10 * fem, 20 * fem, 46 * fem),
+                          20.0.w, 10.0.w, 20.0.w, 46.0.w),
                       width: double.infinity,
-                      height: 52 * fem,
+                      height: 52.0.w,
                       decoration: BoxDecoration(
                         color: Color(0xff0f0f0f),
-                        borderRadius: BorderRadius.circular(7.6632652283 * fem),
+                        borderRadius: BorderRadius.circular(7.6632652283.r),
                       ),
                       child: Consumer<AuthModel>(
                         builder: (context, authModel, child) => MaterialButton(
-                          height: 52 * fem,
+                          height: 52.0.w,
                           shape: RoundedRectangleBorder(
                               borderRadius: new BorderRadius.circular(
-                                  7.6632652283 * fem)),
-                          minWidth: MediaQuery.of(context).size.width * .8,
+                                  7.6632652283.w)),
+                          minWidth: 0.8.sw,
                           color: Color(0xff0f0f0f),
                           onPressed: () async {
                             setState(() {
@@ -411,7 +408,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   'Sign Up',
                                   style: MyGoogleFontStyle(
                                     fontFamily: 'Urbanist',
-                                    fontSize: 15 * ffem,
+                                    fontSize: 15.0.sp,
                                     fontWeight: FontWeight.bold,
                                     color: Color(0xffffffff),
                                   ),
@@ -424,14 +421,14 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               Container(
                 margin:
-                    EdgeInsets.fromLTRB(0 * fem, 0 * fem, 12.36 * fem, 0 * fem),
+                    EdgeInsets.fromLTRB(0.0.w, 0.0.w, 12.36.w, 0.0.w),
                 child: Text(
                   'Or Register with',
                   style: MyGoogleFontStyle(
                     fontFamily: 'Urbanist',
-                    fontSize: 12.792224884 * ffem,
+                    fontSize: 12.792224884.sp,
                     fontWeight: FontWeight.w600,
-                    height: 1.2 * ffem / fem,
+                    height: 1.2,
                     color: Color(0xff6a707c),
                   ),
                 ),
@@ -511,20 +508,20 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Container(
                     margin: EdgeInsets.all(5),
                     padding: EdgeInsets.fromLTRB(
-                        30.99 * fem, 15.25 * fem, 35.7 * fem, 15.25 * fem),
+                        30.99.w, 15.25.w, 35.7.w, 15.25.w),
                     decoration: BoxDecoration(
                       border: Border.all(color: Color(0xffe8ecf4)),
                       color: Color(0xffffffff),
-                      borderRadius: BorderRadius.circular(7.5407857895 * fem),
+                      borderRadius: BorderRadius.circular(7.5407857895.r),
                     ),
                     child: Center(
                       child: SizedBox(
-                        width: 22.28 * fem,
-                        height: 22.28 * fem,
+                        width: 22.28.w,
+                        height: 22.28.w,
                         child: Image.asset(
                           'assets/images/googleic-3Lc.png',
-                          width: 22.28 * fem,
-                          height: 22.28 * fem,
+                          width: 22.28.w,
+                          height: 22.28.w,
                         ),
                       ),
                     ),
@@ -540,10 +537,10 @@ class _RegisterPageState extends State<RegisterPage> {
                   text: TextSpan(
                     style: MyGoogleFontStyle(
                       fontFamily: 'Poppins',
-                      fontSize: 13 * ffem,
+                      fontSize: 13.0.sp,
                       fontWeight: FontWeight.w600,
-                      height: 1.399999912 * ffem / fem,
-                      letterSpacing: 0.13 * fem,
+                      height: 1.399999912,
+                      letterSpacing: 0.13.w,
                       color: Color(0xff1e232c),
                     ),
                     children: [
@@ -551,10 +548,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         text: 'Already have an account? ',
                         style: MyGoogleFontStyle(
                           fontFamily: 'Urbanist',
-                          fontSize: 13 * ffem,
+                          fontSize: 13.0.sp,
                           fontWeight: FontWeight.w500,
-                          height: 1.399999912 * ffem / fem,
-                          letterSpacing: 0.13 * fem,
+                          height: 1.399999912,
+                          letterSpacing: 0.13.w,
                           color: Color(0xff1e232c),
                         ),
                       ),
@@ -562,10 +559,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         text: 'Login Now',
                         style: MyGoogleFontStyle(
                           fontFamily: 'Urbanist',
-                          fontSize: 13 * ffem,
+                          fontSize: 13.0.sp,
                           fontWeight: FontWeight.w700,
-                          height: 1.399999912 * ffem / fem,
-                          letterSpacing: 0.13 * fem,
+                          height: 1.399999912,
+                          letterSpacing: 0.13.w,
                           color: Color(0xffc9b758),
                         ),
                       ),

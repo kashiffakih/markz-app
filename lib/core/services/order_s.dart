@@ -70,33 +70,46 @@ class OrderService {
       });
     });
 
+    // Safe parsing of all numeric values
+    final parsedCouponValue = int.tryParse(couponValue?.toString() ?? '0') ?? 0;
+    final parsedCartTotal =
+        double.tryParse(cartTotal?.toString() ?? '0') ?? 0.0;
+    final parsedUserWalletUsed =
+        double.tryParse(userWalletUsed?.toString() ?? '0') ?? 0.0;
+    final parsedAddressId = int.tryParse(addressId?.toString() ?? '0') ?? 0;
+    final parsedTaxPercent = double.tryParse(
+            _configModel.user?.companies?[0].taxPercent?.toString() ?? '0') ??
+        0.0;
+    final parsedDeliveryAmount = double.tryParse(
+            _configModel.user?.companies?[0].deliveryCharges?.toString() ??
+                '0') ??
+        0.0;
+
+    // Calculate tax amount
+    final taxAmount = (parsedCartTotal / 100) * parsedTaxPercent;
+
+    // Calculate total amount (cart + tax)
+    final totalAmount = parsedCartTotal + taxAmount;
+
+    // Calculate order cost (total - wallet - coupon)
+    final orderCost =
+        (parsedCartTotal - parsedUserWalletUsed.toInt() - parsedCouponValue)
+            .toInt();
+
     Order order = Order(
-        couponAmount: int.parse(couponValue),
+        couponAmount: parsedCouponValue,
         couponId: couponId,
-        deliveryAmount:
-            double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ?? '0') ??
-                0.0,
+        deliveryAmount: parsedDeliveryAmount,
         details: '-',
         isApprovedByHotelier: 0,
-        orderCost: (int.parse(cartTotal.toString()) -
-            double.parse(userWalletUsed.toString()).toInt() -
-            int.parse(couponValue)),
+        orderCost: orderCost,
         packagingAmount: _configModel.user?.companies?[0].packagingCharges ?? 0,
-        taxAmount: double.parse(cartTotal) /
-            100 *
-            (double.tryParse(_configModel.user?.companies?[0].taxPercent?.toString() ?? '0') ??
-                0.0),
-        taxPercent:
-            _configModel.user?.companies?[0].taxPercent?.toString() ?? '0',
+        taxAmount: taxAmount,
+        taxPercent: parsedTaxPercent.toString(),
         tipAmount: 0,
-        totalAmount: double.parse(((double.parse(cartTotal)) +
-                (double.parse(cartTotal) /
-                    100 *
-                    (double.tryParse(_configModel.user?.companies?[0].taxPercent?.toString() ?? '0') ??
-                        0.0)))
-            .toString()),
+        totalAmount: totalAmount,
         totalCashback: 0,
-        walletAmountUsed: double.parse(userWalletUsed.toString()).toInt(),
+        walletAmountUsed: parsedUserWalletUsed.toInt(),
         userId: _configModel.user?.id ?? 0,
         isDelivered: 0,
         isDeliveryBoyAccepted: 0,
@@ -106,7 +119,7 @@ class OrderService {
         paymentmode: paymentOption.toString(),
         isGift: isGift,
         deliveryMethod: deliveryMethod.toString(),
-        addressId: int.parse(addressId.toString()));
+        addressId: parsedAddressId);
 
     var _orderJson = order.toJson();
     _orderJson['order_details'] = orderDetails;
@@ -248,26 +261,116 @@ class OrderService {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
     if (_configModel.user == null) {
+      debugPrint('getOrders: User is null');
       return <Order>[];
     }
 
-    var userId = _configModel.user!.id;
-    http.Response _response = await http.get(
-      Uri.parse('${_apiConfig['baseURL']}/orders?userId=$userId'),
-      headers: _apiConfig['headers'],
-    );
-    Map<String, dynamic> _responseData = json.decode(_response.body);
-    if (_responseData['success']) {
-      _orders = [];
-      _responseData['data'].forEach((data) {
-        _orders.add(Order.fromJson(data));
+    try {
+      var userId = _configModel.user!.id;
+      debugPrint('getOrders: Fetching orders for userId=$userId');
+      debugPrint(
+          'getOrders: API URL = ${_apiConfig['baseURL']}/orders?userId=$userId');
 
-        print(data);
-        // debugPrint("gt orders data${data}");
-      });
+      http.Response _response = await http.get(
+        Uri.parse('${_apiConfig['baseURL']}/orders?userId=$userId'),
+        headers: _apiConfig['headers'],
+      );
+
+      debugPrint('getOrders: Response status code = ${_response.statusCode}');
+      debugPrint('getOrders: Response body = ${_response.body}');
+
+      if (_response.statusCode == 200) {
+        Map<String, dynamic> _responseData = json.decode(_response.body);
+
+        // Handle different API response formats
+        bool hasSuccess = _responseData.containsKey('success') &&
+            _responseData['success'] == true;
+        bool hasData = _responseData.containsKey('data');
+
+        debugPrint('getOrders: hasSuccess=$hasSuccess, hasData=$hasData');
+
+        if (hasSuccess && hasData) {
+          _orders = [];
+          var dataList = _responseData['data'];
+
+          if (dataList is List) {
+            debugPrint(
+                'getOrders: Found ${dataList.length} orders in API response');
+            int successCount = 0;
+            int failCount = 0;
+
+            for (int i = 0; i < dataList.length; i++) {
+              try {
+                final data = dataList[i];
+                _orders.add(Order.fromJson(data));
+                successCount++;
+                debugPrint(
+                    'getOrders: Successfully added order #${i + 1} - ID: ${data['id']}');
+              } catch (e, stackTrace) {
+                failCount++;
+                debugPrint('getOrders: ERROR parsing order #${i + 1}');
+                debugPrint('getOrders: Error details: $e');
+                debugPrint('getOrders: Order data: ${dataList[i]}');
+                debugPrint('getOrders: Stack trace: $stackTrace');
+              }
+            }
+
+            debugPrint(
+                'getOrders: Summary - Success: $successCount, Failed: $failCount');
+          } else {
+            debugPrint('getOrders: Data is not a list');
+          }
+        } else if (hasData && !hasSuccess) {
+          // Try to parse data even if success field is missing
+          _orders = [];
+          var dataList = _responseData['data'];
+
+          if (dataList is List) {
+            debugPrint(
+                'getOrders: Found ${dataList.length} orders (no success field)');
+            int successCount = 0;
+            int failCount = 0;
+
+            for (int i = 0; i < dataList.length; i++) {
+              try {
+                final data = dataList[i];
+                _orders.add(Order.fromJson(data));
+                successCount++;
+                debugPrint(
+                    'getOrders: Successfully added order #${i + 1} - ID: ${data['id']}');
+              } catch (e, stackTrace) {
+                failCount++;
+                debugPrint('getOrders: ERROR parsing order #${i + 1}');
+                debugPrint('getOrders: Error details: $e');
+                debugPrint('getOrders: Order data: ${dataList[i]}');
+                debugPrint('getOrders: Stack trace: $stackTrace');
+              }
+            }
+
+            debugPrint(
+                'getOrders: Summary - Success: $successCount, Failed: $failCount');
+          }
+        } else {
+          debugPrint('getOrders: No valid data found in response');
+        }
+      } else {
+        debugPrint(
+            'getOrders: Failed with status code ${_response.statusCode}');
+      }
+
+      if (_orders.isNotEmpty) {
+        debugPrint('getOrders: Successfully loaded ${_orders.length} orders');
+        if (_orders.first.orderDetails?.isNotEmpty == true) {
+          debugPrint(
+              "getOrders: First order image path = ${_orders.first.orderDetails?.first.product?.productImages?.first.imagepath}");
+        }
+      } else {
+        debugPrint('getOrders: No orders found');
+      }
+    } catch (e) {
+      debugPrint('getOrders: Exception occurred - $e');
     }
-    debugPrint(
-        "gt orders----------${_orders.first.orderDetails?.first.product?.productImages?.first.imagepath}");
+
     return _orders;
   }
 
@@ -312,22 +415,53 @@ class OrderService {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
     if (_configModel.user == null) {
+      debugPrint('cancelOrder: User is null');
       return false;
     }
 
-    final response = await http.post(
-      Uri.parse('${_apiConfig['baseURL']}/orders/$orderId/order_statuses'),
-      headers: _apiConfig['headers'],
-      body: jsonEncode({
-        // 'id': orderId,
-        'status_id': '8', // Assuming 8 is the cancelled status ID
-        'date': DateTime.now().toIso8601String(),
-      }),
-    );
+    try {
+      debugPrint('cancelOrder: Cancelling order $orderId');
 
-    debugPrint('Cancel order response: ${response.statusCode}');
-    debugPrint('Cancel order body: ${response.body}');
+      final response = await http.post(
+        Uri.parse('${_apiConfig['baseURL']}/orders/$orderId/order_statuses'),
+        headers: _apiConfig['headers'],
+        body: jsonEncode({
+          'status_id': '8', // Cancelled status ID
+          'date': DateTime.now().toIso8601String(),
+        }),
+      );
 
-    return true;
+      debugPrint('cancelOrder: Response status code = ${response.statusCode}');
+      debugPrint('cancelOrder: Response body = ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Try to parse response and check for success
+        try {
+          Map<String, dynamic> responseData = json.decode(response.body);
+
+          // Check various success indicators
+          if (responseData.containsKey('success')) {
+            return responseData['success'] == true;
+          } else if (responseData.containsKey('status')) {
+            return responseData['status'] == 'success' ||
+                responseData['status'] == true;
+          }
+
+          // If no explicit success field but status is 200/201, assume success
+          return true;
+        } catch (e) {
+          debugPrint(
+              'cancelOrder: Could not parse response, assuming success based on status code');
+          return true;
+        }
+      } else {
+        debugPrint(
+            'cancelOrder: Failed with status code ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('cancelOrder: Exception occurred - $e');
+      return false;
+    }
   }
 }

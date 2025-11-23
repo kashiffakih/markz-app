@@ -1,4 +1,5 @@
 // import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 // import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 // import 'package:intl/intl.dart';
 // import 'package:provider/provider.dart';
@@ -376,9 +377,6 @@ class _ReviewsPageState extends State<ReviewsPage> {
   Widget build(BuildContext context) {
     final reviewModel = Provider.of<ReviewModel>(context, listen: false);
     final configModel = locator<ConfigModel>();
-    final double fem = MediaQuery.of(context).size.width / 360;
-    final double ffem = fem * 0.97;
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -388,7 +386,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
           'Reviews',
           style: MyGoogleFontStyle(
             fontFamily: 'Urbanist',
-            fontSize: 18 * ffem,
+            fontSize: 18.0.sp,
             fontWeight: FontWeight.bold,
             color: const Color(0xff1e232c),
           ),
@@ -398,7 +396,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
           icon: Icon(
             Icons.arrow_back_ios,
             color: const Color(0xffEED056),
-            size: 18 * fem,
+            size: 18.0.w,
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -408,7 +406,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
           : reviewModel.reviews == null || reviewModel.reviews!.isEmpty
               ? const Center(child: Text('No reviews available'))
               : Padding(
-                  padding: EdgeInsets.all(20 * fem),
+                  padding: EdgeInsets.all(20.0.w),
                   child: ListView.builder(
                     itemCount: reviewModel.reviews!.length,
                     itemBuilder: (context, index) {
@@ -419,8 +417,8 @@ class _ReviewsPageState extends State<ReviewsPage> {
                         review: review,
                         configModel: configModel,
                         dateFormat: _dateFormat,
-                        fem: fem,
-                        ffem: ffem,
+                        // 1.0.w: 1.0.w,
+                        // 1.0.sp: 1.0.sp,
                         onTap: () {
                           final createdAt =
                               DateTime.tryParse(review.createdAt.toString());
@@ -437,7 +435,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
                               ),
                             );
                           } else if (widget.arguments['is_popup'] != false) {
-                            _showReviewUpdatePopup(context, fem, ffem);
+                            _showReviewUpdatePopup(context);
                           }
                         },
                       );
@@ -451,8 +449,6 @@ class _ReviewsPageState extends State<ReviewsPage> {
     required Review review,
     required ConfigModel configModel,
     required DateFormat dateFormat,
-    required double fem,
-    required double ffem,
     required VoidCallback onTap,
   }) {
     // final productImages = review.product?.productImages ?? [];
@@ -462,17 +458,17 @@ class _ReviewsPageState extends State<ReviewsPage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.only(bottom: 10 * fem),
-        padding: EdgeInsets.all(10 * fem),
+        margin: EdgeInsets.only(bottom: 10.0.w),
+        padding: EdgeInsets.all(10.0.w),
         decoration: BoxDecoration(
           border: Border.all(color: const Color(0xffc7b456)),
           color: Colors.white,
-          borderRadius: BorderRadius.circular(5 * fem),
+          borderRadius: BorderRadius.circular(5.0.r),
           boxShadow: [
             BoxShadow(
               color: const Color(0x338a959e),
-              offset: Offset(0, 7.6 * fem),
-              blurRadius: 19.1 * fem,
+              offset: Offset(0, 7.6.w),
+              blurRadius: 19.1.w,
             ),
           ],
         ),
@@ -500,9 +496,9 @@ class _ReviewsPageState extends State<ReviewsPage> {
                       // );
                     },
                     child: Container(
-                      width: 80 * fem,
-                      height: 80 * fem,
-                      margin: EdgeInsets.only(right: 15 * fem),
+                      width: 80.0.w,
+                      height: 80.0.w,
+                      margin: EdgeInsets.only(right: 15.0.w),
                       decoration: BoxDecoration(
                         image: DecorationImage(
                           image: NetworkImage(
@@ -514,9 +510,9 @@ class _ReviewsPageState extends State<ReviewsPage> {
                   )
                 else
                   Container(
-                    width: 80 * fem,
-                    height: 80 * fem,
-                    margin: EdgeInsets.only(right: 15 * fem),
+                    width: 80.0.w,
+                    height: 80.0.w,
+                    margin: EdgeInsets.only(right: 15.0.w),
                     child: const Icon(Icons.image_not_supported),
                   ),
                 Expanded(
@@ -527,25 +523,25 @@ class _ReviewsPageState extends State<ReviewsPage> {
                         review.product?.name?.toString() ?? 'Unknown Product',
                         style: MyGoogleFontStyle(
                           fontFamily: 'Poppins',
-                          fontSize: 16 * ffem,
+                          fontSize: 16.0.sp,
                           fontWeight: FontWeight.w400,
                           color: const Color(0xff232323),
                         ),
                       ),
-                      SizedBox(height: 5 * fem),
+                      SizedBox(height: 5.0.w),
                       // Text(review.toJson().toString()),
                       double.tryParse(review.rating?.toString() ?? '') == null
                           ? Text(
                               'No Rating',
                               style: MyGoogleFontStyle(
                                 fontFamily: 'Poppins',
-                                fontSize: 12 * ffem,
+                                fontSize: 12.0.sp,
                                 fontWeight: FontWeight.w400,
                                 color: const Color(0xff909090),
                               ),
                             )
                           : RatingBarIndicator(
-                              itemSize: 15 * fem,
+                              itemSize: 15.0.w,
                               rating:
                                   double.tryParse(review.rating.toString()) ??
                                       0.0,
@@ -561,7 +557,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
                 ),
               ],
             ),
-            SizedBox(height: 10 * fem),
+            SizedBox(height: 10.0.w),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -569,7 +565,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
                   review.user?.firstName?.toString() ?? 'Anonymous',
                   style: MyGoogleFontStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 12 * ffem,
+                    fontSize: 12.0.sp,
                     fontWeight: FontWeight.w400,
                     color: const Color(0xff909090),
                   ),
@@ -581,28 +577,28 @@ class _ReviewsPageState extends State<ReviewsPage> {
                       : 'N/A',
                   style: MyGoogleFontStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 12 * ffem,
+                    fontSize: 12.0.sp,
                     fontWeight: FontWeight.w400,
                     color: const Color(0xff909090),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 10 * fem),
+            SizedBox(height: 10.0.w),
             if (review.description?.isNotEmpty ?? false)
               Text(
                 review.description!,
                 style: MyGoogleFontStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 12 * ffem,
+                  fontSize: 12.0.sp,
                   fontWeight: FontWeight.w400,
                   color: const Color(0xff909090),
                 ),
               ),
-            SizedBox(height: 15 * fem),
+            SizedBox(height: 15.0.w),
             if (review.reviewImages?.isNotEmpty ?? false)
               SizedBox(
-                height: 100 * fem,
+                height: 100.0.w,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: review.reviewImages!.length,
@@ -621,9 +617,9 @@ class _ReviewsPageState extends State<ReviewsPage> {
                         );
                       },
                       child: Container(
-                        margin: EdgeInsets.only(right: 10 * fem),
-                        width: 66.71 * fem,
-                        height: 66.71 * fem,
+                        margin: EdgeInsets.only(right: 10.0.w),
+                        width: 66.71.w,
+                        height: 66.71.w,
                         child: Image.network(
                           configModel.apiConfig['mediaURL'] + image.imagePath,
                           fit: BoxFit.contain,
@@ -640,7 +636,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
                 'No review images available',
                 style: MyGoogleFontStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 12 * ffem,
+                  fontSize: 12.0.sp,
                   fontWeight: FontWeight.w400,
                   color: const Color(0xff909090),
                 ),
@@ -651,17 +647,17 @@ class _ReviewsPageState extends State<ReviewsPage> {
     );
   }
 
-  void _showReviewUpdatePopup(BuildContext context, double fem, double ffem) {
+  void _showReviewUpdatePopup(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10 * fem)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0.r)),
         title: Text(
           'Update Not Allowed',
           style: MyGoogleFontStyle(
             fontFamily: 'Urbanist',
-            fontSize: 16 * ffem,
+            fontSize: 16.0.sp,
             fontWeight: FontWeight.w600,
             color: const Color(0xff1e232c),
           ),
@@ -670,7 +666,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
           "You can't update your review after 30 days.",
           style: MyGoogleFontStyle(
             fontFamily: 'Poppins',
-            fontSize: 14 * ffem,
+            fontSize: 14.0.sp,
             fontWeight: FontWeight.w400,
             color: const Color(0xff909090),
           ),
@@ -682,7 +678,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
               'OK',
               style: MyGoogleFontStyle(
                 fontFamily: 'Poppins',
-                fontSize: 14 * ffem,
+                fontSize: 14.0.sp,
                 fontWeight: FontWeight.w500,
                 color: const Color(0xff1e232c),
               ),

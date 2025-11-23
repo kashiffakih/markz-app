@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/providers/auth_pr.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
@@ -29,10 +30,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    double baseWidth = 360;
-    double fem = MediaQuery.of(context).size.width / baseWidth;
-    double ffem = fem * 0.97;
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -102,17 +99,17 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 Container(
                   // dontworryitoccurspleaseenterth (318:2072)
                   margin: EdgeInsets.fromLTRB(
-                      0 * fem, 0 * fem, 3.24 * fem, 40 * fem),
+                      0.w, 0.w, 3.24.w, 40.w),
                   constraints: BoxConstraints(
-                    maxWidth: 302 * fem,
+                    maxWidth: 302.w,
                   ),
                   child: Text(
                     'Your new password must be unique from those previously used.',
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 13 * ffem,
+                      fontSize: 13.sp,
                       fontWeight: FontWeight.w500,
-                      height: 1.5 * ffem / fem,
+                      height: 1.5,
                       color: Color(0xff8390a1),
                     ),
                   ),
@@ -123,10 +120,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 Container(
                   // enteryouremailinputdtz (318:3047)
                   margin: EdgeInsets.fromLTRB(
-                      20 * fem, 0 * fem, 20 * fem, 10 * fem),
+                      20.w, 0.w, 20.w, 10.w),
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(7.6632652283 * fem),
+                    borderRadius: BorderRadius.circular(7.6632652283.w),
                     border: Border.all(color: Color(0xffe8ecf4)),
                     color: Color(0xfff7f8f9),
                   ),
@@ -138,15 +135,15 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       errorBorder: InputBorder.none,
                       disabledBorder: InputBorder.none,
                       contentPadding: EdgeInsets.fromLTRB(
-                          16.82 * fem, 15.87 * fem, 16.82 * fem, 18.13 * fem),
+                          16.82.w, 15.87.w, 16.82.w, 18.13.w),
                       hintText: 'New Password',
                       hintStyle: TextStyle(color: Color(0xff8390a1)),
                     ),
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 14 * ffem,
+                      fontSize: 14.sp,
                       fontWeight: FontWeight.w500,
-                      height: 1.25 * ffem / fem,
+                      height: 1.25,
                       color: Color(0xff000000),
                     ),
                     initialValue: _changePasswordData['password'],
@@ -163,10 +160,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 Container(
                   // enteryouremailinputdtz (318:3047)
                   margin: EdgeInsets.fromLTRB(
-                      20 * fem, 0 * fem, 20 * fem, 10 * fem),
+                      20.w, 0.w, 20.w, 10.w),
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(7.6632652283 * fem),
+                    borderRadius: BorderRadius.circular(7.6632652283.w),
                     border: Border.all(color: Color(0xffe8ecf4)),
                     color: Color(0xfff7f8f9),
                   ),
@@ -178,15 +175,15 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       errorBorder: InputBorder.none,
                       disabledBorder: InputBorder.none,
                       contentPadding: EdgeInsets.fromLTRB(
-                          16.82 * fem, 15.87 * fem, 16.82 * fem, 18.13 * fem),
+                          16.82.w, 15.87.w, 16.82.w, 18.13.w),
                       hintText: 'Confirm Password',
                       hintStyle: TextStyle(color: Color(0xff8390a1)),
                     ),
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 14 * ffem,
+                      fontSize: 14.sp,
                       fontWeight: FontWeight.w500,
-                      height: 1.25 * ffem / fem,
+                      height: 1.25,
                       color: Color(0xff000000),
                     ),
                     initialValue: _changePasswordData['confirm_password'],
@@ -208,10 +205,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 ),
                 Consumer<AuthModel>(
                   builder: (context, authModel, child) => MaterialButton(
-                    height: 52 * fem,
+                    height: 52.w,
                     shape: RoundedRectangleBorder(
                         borderRadius:
-                            new BorderRadius.circular(7.6632652283 * fem)),
+                            new BorderRadius.circular(7.6632652283.w)),
                     minWidth: MediaQuery.of(context).size.width * .8,
                     color: Color(0xff0f0f0f),
                     onPressed: () async {
@@ -265,7 +262,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                             'Submit',
                             style: MyGoogleFontStyle(
                               fontFamily: 'Urbanist',
-                              fontSize: 15 * ffem,
+                              fontSize: 15.sp,
                               fontWeight: FontWeight.bold,
                               color: Color(0xffffffff),
                             ),

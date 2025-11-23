@@ -1,4 +1,5 @@
 // import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 // import 'package:provider/provider.dart';
 // import 'package:aadab/core/providers/config_pr.dart';
 // import 'package:aadab/core/providers/product_pr.dart';
@@ -444,9 +445,6 @@ class _ContactPageState extends State<ContactPage> {
   @override
   Widget build(BuildContext context) {
     final productModel = Provider.of<ProductModel>(context, listen: false);
-    final double fem = MediaQuery.of(context).size.width / 360;
-    final double ffem = fem * 0.97;
-
     return Scaffold(
       body: SafeArea(
         child: _isLoading
@@ -455,8 +453,8 @@ class _ContactPageState extends State<ContactPage> {
                 child: Container(
                   child: Column(
                     children: [
-                      _buildHeader(context, fem, ffem),
-                      _buildBody(context, productModel, fem, ffem),
+                      _buildHeader(context),
+                      _buildBody(context, productModel),
                     ],
                   ),
                 ),
@@ -465,9 +463,9 @@ class _ContactPageState extends State<ContactPage> {
     );
   }
 
-  Widget _buildHeader(BuildContext context, double fem, double ffem) {
+  Widget _buildHeader(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 30 * fem, vertical: 10 * fem),
+      margin: EdgeInsets.symmetric(horizontal: 30.0.w, vertical: 10.0.w),
       width: double.infinity,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -475,7 +473,7 @@ class _ContactPageState extends State<ContactPage> {
           IconButton(
             icon: Icon(
               Icons.arrow_back_ios,
-              size: 18 * fem,
+              size: 18.0.w,
               color: const Color(0xffEED056),
             ),
             onPressed: () => Navigator.pop(context),
@@ -486,22 +484,21 @@ class _ContactPageState extends State<ContactPage> {
               textAlign: TextAlign.center,
               style: MyGoogleFontStyle(
                 fontFamily: 'Urbanist',
-                fontSize: 18 * ffem,
+                fontSize: 18.0.sp,
                 fontWeight: FontWeight.bold,
                 color: const Color(0xff1e232c),
               ),
             ),
           ),
-          SizedBox(width: 48 * fem),
+          SizedBox(width: 48.0.w),
         ],
       ),
     );
   }
 
-  Widget _buildBody(BuildContext context, ProductModel productModel, double fem,
-      double ffem) {
+  Widget _buildBody(BuildContext context, ProductModel productModel) {
     return Container(
-      margin: EdgeInsets.all(10 * fem),
+      margin: EdgeInsets.all(10.0.w),
       child: Column(
         children: [
           _buildContactItem(
@@ -539,8 +536,6 @@ class _ContactPageState extends State<ContactPage> {
                 }
               }
             },
-            fem: fem,
-            ffem: ffem,
           ),
           _buildContactItem(
             context: context,
@@ -574,8 +569,6 @@ class _ContactPageState extends State<ContactPage> {
                 }
               }
             },
-            fem: fem,
-            ffem: ffem,
           ),
           _buildContactItem(
             context: context,
@@ -609,8 +602,6 @@ class _ContactPageState extends State<ContactPage> {
                 }
               }
             },
-            fem: fem,
-            ffem: ffem,
           ),
         ],
       ),
@@ -623,45 +614,43 @@ class _ContactPageState extends State<ContactPage> {
     required String subtitle,
     required IconData icon,
     required VoidCallback onTap,
-    required double fem,
-    required double ffem,
   }) {
     return InkWell(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 10 * fem),
-        padding: EdgeInsets.all(10 * fem),
+        margin: EdgeInsets.symmetric(vertical: 10.0.w),
+        padding: EdgeInsets.all(10.0.w),
         decoration: BoxDecoration(
           border: Border.all(color: const Color(0xffc7b456)),
           color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(5 * fem)),
+          borderRadius: BorderRadius.all(Radius.circular(5.0.w)),
           boxShadow: [
             BoxShadow(
               color: const Color(0x338a959e),
-              offset: Offset(0, 7.6690645218 * fem),
-              blurRadius: 19.1726608276 * fem,
+              offset: Offset(0, 7.6690645218.w),
+              blurRadius: 19.1726608276.w,
             ),
           ],
         ),
         child: Row(
           children: [
             Container(
-              margin: EdgeInsets.only(right: 18 * fem),
-              padding: EdgeInsets.all(5 * fem),
+              margin: EdgeInsets.only(right: 18.0.w),
+              padding: EdgeInsets.all(5.0.w),
               decoration: BoxDecoration(
                 color: const Color(0xfffbfbfb),
-                borderRadius: BorderRadius.circular(10 * fem),
+                borderRadius: BorderRadius.circular(10.0.r),
                 boxShadow: [
                   BoxShadow(
                     color: const Color(0x3f000000),
-                    offset: Offset(0, 4 * fem),
-                    blurRadius: 2 * fem,
+                    offset: Offset(0, 4.0.w),
+                    blurRadius: 2.0.w,
                   ),
                 ],
               ),
               child: Icon(
                 icon,
-                size: 25 * fem,
+                size: 25.0.w,
                 color: const Color(0xff232323),
               ),
             ),
@@ -673,17 +662,17 @@ class _ContactPageState extends State<ContactPage> {
                     title,
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 16 * ffem,
+                      fontSize: 16.0.sp,
                       fontWeight: FontWeight.w700,
                       color: const Color(0xff232323),
                     ),
                   ),
-                  SizedBox(height: 5 * fem),
+                  SizedBox(height: 5.0.w),
                   Text(
                     subtitle,
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 15 * ffem,
+                      fontSize: 15.0.sp,
                       fontWeight: FontWeight.w400,
                       color: const Color(0xff232323),
                     ),

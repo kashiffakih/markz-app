@@ -64,6 +64,7 @@ dependencies:
   connectivity_plus: ^6.0.5
   phonepe_payment_sdk: ^3.0.0
   crypto: ^3.0.5
+  flutter_screenutil: ^5.9.0
 
 
 

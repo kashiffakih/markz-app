@@ -1,4 +1,5 @@
 import 'package:aadab/ui/views/profile/orders_p.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
@@ -81,11 +82,6 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   Widget build(BuildContext context) {
     final configModel = locator<ConfigModel>();
     final reviewModel = Provider.of<ReviewModel>(context, listen: false);
-
-    final double baseWidth = 360;
-    final double fem = MediaQuery.of(context).size.width / baseWidth;
-    final double ffem = fem * 0.97;
-
     // Calculate GST
     String calculateReverseGst() {
       double price = double.tryParse(
@@ -102,21 +98,20 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         child: SingleChildScrollView(
           child: Container(
             width: double.infinity,
-            padding:
-                EdgeInsets.symmetric(horizontal: 20 * fem, vertical: 10 * fem),
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.w),
             color: Colors.white,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeader(context, fem, ffem),
-                _buildOrderStatus(fem, ffem),
-                _buildOrderItems(context, fem, ffem, configModel, reviewModel),
-                _buildCostBreakdown(fem, ffem, reverseGstCalculation),
-                _buildPaymentInfo(fem, ffem),
-                _buildDateInfo(fem, ffem),
-                _buildPhoneInfo(fem, ffem),
-                _buildAddressInfo(fem, ffem),
-                _buildCancelButton(context, fem, ffem),
+                _buildHeader(context),
+                _buildOrderStatus(),
+                _buildOrderItems(context, configModel, reviewModel),
+                _buildCostBreakdown(reverseGstCalculation),
+                _buildPaymentInfo(),
+                _buildDateInfo(),
+                _buildPhoneInfo(),
+                _buildAddressInfo(),
+                _buildCancelButton(context),
               ],
             ),
           ),
@@ -125,16 +120,16 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     );
   }
 
-  Widget _buildHeader(BuildContext context, double fem, double ffem) {
+  Widget _buildHeader(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10 * fem, vertical: 10 * fem),
+      margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
             icon: Icon(
               Icons.arrow_back_ios,
-              size: 18 * fem,
+              size: 18.w,
               color: const Color(0xffEED056),
             ),
             onPressed: () => Navigator.pop(context),
@@ -145,23 +140,23 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               textAlign: TextAlign.center,
               style: MyGoogleFontStyle(
                 fontFamily: 'Urbanist',
-                fontSize: 18 * ffem,
+                fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
                 color: const Color(0xff1e232c),
               ),
             ),
           ),
-          SizedBox(width: 48 * fem),
+          SizedBox(width: 48.w),
         ],
       ),
     );
   }
 
-  Widget _buildOrderStatus(double fem, double ffem) {
+  Widget _buildOrderStatus() {
     final status = widget.arguments?['status']?.toString() ?? 'Unknown';
     return Container(
-      width: 320 * fem,
-      padding: EdgeInsets.only(bottom: 5 * fem),
+      width: 320.w,
+      padding: EdgeInsets.only(bottom: 5.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -169,9 +164,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             status,
             style: MyGoogleFontStyle(
               fontFamily: 'Urbanist',
-              fontSize: 18 * ffem,
+              fontSize: 18.sp,
               fontWeight: FontWeight.w600,
-              letterSpacing: -0.9 * fem,
+              letterSpacing: -0.9.w,
               color: status == 'Delivered'
                   ? Colors.green
                   : status == 'Order in processing'
@@ -186,9 +181,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             'Order #${widget.arguments?['order']['id']?.toString() ?? 'N/A'}',
             style: MyGoogleFontStyle(
               fontFamily: 'Urbanist',
-              fontSize: 12 * ffem,
+              fontSize: 12.sp,
               fontWeight: FontWeight.w400,
-              letterSpacing: -0.6 * fem,
+              letterSpacing: -0.6.w,
               color: const Color(0xff1e1e1e),
             ),
           ),
@@ -197,12 +192,12 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     );
   }
 
-  Widget _buildOrderItems(BuildContext context, double fem, double ffem,
-      ConfigModel configModel, ReviewModel reviewModel) {
+  Widget _buildOrderItems(
+      BuildContext context, ConfigModel configModel, ReviewModel reviewModel) {
     final orderDetails =
         widget.arguments?['order']['order_details'] as List<dynamic>? ?? [];
     return Container(
-      width: 322 * fem,
+      width: 322.w,
       height: MediaQuery.of(context).size.height *
           0.23 *
           (orderDetails.length < 2 ? orderDetails.length : 2),
@@ -221,23 +216,23 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    margin: EdgeInsets.only(bottom: 11 * fem),
+                    margin: EdgeInsets.only(bottom: 11.w),
                     child: Text(
-                      detail['product']['name']?.toString() ??
+                      detail['product']?['name']?.toString() ??
                           'Unknown Product',
                       style: MyGoogleFontStyle(
                         fontFamily: 'Urbanist',
-                        fontSize: 15 * ffem,
+                        fontSize: 15.sp,
                         fontWeight: FontWeight.w600,
-                        letterSpacing: -0.3 * fem,
+                        letterSpacing: -0.3.w,
                         color: const Color(0xff1e1e1e),
                       ),
                     ),
                   ),
-                  SizedBox(width: 50 * fem),
+                  SizedBox(width: 50.w),
                   Container(
-                    width: 60 * fem,
-                    height: 80 * fem,
+                    width: 60.w,
+                    height: 80.w,
                     decoration: BoxDecoration(
                       image: DecorationImage(
                         image: newImageDisplay != null
@@ -253,8 +248,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     const Spacer(),
                     if (_isLoadingReviews)
                       SizedBox(
-                        width: 20 * fem,
-                        height: 20 * fem,
+                        width: 20.w,
+                        height: 20.w,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           valueColor:
@@ -266,12 +261,11 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                             ? int.tryParse(detail['product_pack']) ??
                                 detail['product_pack']
                             : detail['product_pack']))
-                      _buildReviewButton(
-                          context, fem, ffem, reviewModel, detail),
+                      _buildReviewButton(context, reviewModel, detail),
                   ],
                 ],
               ),
-              _buildProductDetails(detail, fem, ffem),
+              _buildProductDetails(detail),
               Divider(color: Colors.black),
             ],
           );
@@ -280,8 +274,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     );
   }
 
-  Widget _buildReviewButton(BuildContext context, double fem, double ffem,
-      ReviewModel reviewModel, dynamic detail) {
+  Widget _buildReviewButton(
+      BuildContext context, ReviewModel reviewModel, dynamic detail) {
     final productId = detail['product_id'];
     final productPackId = detail['product_pack'];
     final productPackIdInt = productPackId is String
@@ -292,18 +286,18 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       onTap: () =>
           _showReviewDialog(context, reviewModel, productPackIdInt, productId),
       child: Container(
-        width: 74.5 * fem,
-        height: 30 * fem,
+        width: 74.5.w,
+        height: 30.w,
         decoration: BoxDecoration(
           color: const Color(0xff232323),
-          borderRadius: BorderRadius.circular(8 * fem),
+          borderRadius: BorderRadius.circular(8.w),
         ),
         child: Center(
           child: Text(
             '+ Review',
             style: MyGoogleFontStyle(
               fontFamily: 'Poppins',
-              fontSize: 12 * ffem,
+              fontSize: 12.sp,
               fontWeight: FontWeight.w400,
               color: Colors.white,
             ),
@@ -478,14 +472,14 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     );
   }
 
-  Widget _buildProductDetails(dynamic detail, double fem, double ffem) {
+  Widget _buildProductDetails(dynamic detail) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (detail['flavour'] != null)
           Container(
-            margin: EdgeInsets.only(bottom: 7 * fem),
-            constraints: BoxConstraints(maxWidth: 205 * fem),
+            margin: EdgeInsets.only(bottom: 7.w),
+            constraints: BoxConstraints(maxWidth: 205.w),
             child: RichText(
               text: TextSpan(
                 children: [
@@ -493,9 +487,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     text: 'Colour: ',
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 12 * ffem,
+                      fontSize: 12.sp,
                       fontWeight: FontWeight.w500,
-                      letterSpacing: -0.24 * fem,
+                      letterSpacing: -0.24.w,
                       color: const Color(0xff1e1e1e),
                     ),
                   ),
@@ -503,9 +497,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     text: detail['flavour'].toString(),
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 12 * ffem,
+                      fontSize: 12.sp,
                       fontWeight: FontWeight.w500,
-                      letterSpacing: -0.24 * fem,
+                      letterSpacing: -0.24.w,
                       color: const Color(0xff1e1e1e),
                     ),
                   ),
@@ -522,9 +516,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     text: 'Size: ',
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 12 * ffem,
+                      fontSize: 12.sp,
                       fontWeight: FontWeight.w400,
-                      letterSpacing: -0.24 * fem,
+                      letterSpacing: -0.24.w,
                       color: const Color(0xff1e1e1e),
                     ),
                   ),
@@ -532,16 +526,16 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     text: detail['kind_of_flower']?.toString() ?? 'N/A',
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 12 * ffem,
+                      fontSize: 12.sp,
                       fontWeight: FontWeight.w400,
-                      letterSpacing: -0.24 * fem,
+                      letterSpacing: -0.24.w,
                       color: const Color(0xff1e1e1e),
                     ),
                   ),
                 ],
               ),
             ),
-            SizedBox(width: 34 * fem),
+            SizedBox(width: 34.w),
             RichText(
               text: TextSpan(
                 children: [
@@ -549,9 +543,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     text: 'Quantity: ',
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 12 * ffem,
+                      fontSize: 12.sp,
                       fontWeight: FontWeight.w400,
-                      letterSpacing: -0.24 * fem,
+                      letterSpacing: -0.24.w,
                       color: const Color(0xff1e1e1e),
                     ),
                   ),
@@ -559,9 +553,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     text: '${detail['quantity']?.toString()} X ' ?? '0',
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 12 * ffem,
+                      fontSize: 12.sp,
                       fontWeight: FontWeight.w400,
-                      letterSpacing: -0.24 * fem,
+                      letterSpacing: -0.24.w,
                       color: const Color(0xff1e1e1e),
                     ),
                   ),
@@ -569,9 +563,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     text: detail['order_detail_cost'].toString() ?? '0',
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 12 * ffem,
+                      fontSize: 12.sp,
                       fontWeight: FontWeight.w400,
-                      letterSpacing: -0.24 * fem,
+                      letterSpacing: -0.24.w,
                       color: const Color(0xff1e1e1e),
                     ),
                   ),
@@ -583,9 +577,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               'RS ${(int.parse(detail['quantity'].toString()) * int.parse(detail['order_detail_cost'].toString())).toString() ?? '0'}',
               style: MyGoogleFontStyle(
                 fontFamily: 'Urbanist',
-                fontSize: 12 * ffem,
+                fontSize: 12.sp,
                 fontWeight: FontWeight.w600,
-                letterSpacing: -0.24 * fem,
+                letterSpacing: -0.24.w,
                 color: const Color(0xff1e1e1e),
               ),
             ),
@@ -595,46 +589,43 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     );
   }
 
-  Widget _buildCostBreakdown(
-      double fem, double ffem, String reverseGstCalculation) {
+  Widget _buildCostBreakdown(String reverseGstCalculation) {
     final order = widget.arguments?['order'] ?? {};
+    final address = order['address'];
     final isMaharashtra =
-        order['address']?['state']?.toString() == 'Maharashtra';
+        address != null && address['state']?.toString() == 'Maharashtra';
     String abc = (order['order_cost'] - (order['order_cost'] / 105 * 100))
         .toStringAsFixed(2);
     return Column(
       children: [
-        _buildCostRow('Item total',
-            (order['order_cost'] / 105 * 100).toStringAsFixed(2), fem, ffem),
-        if (isMaharashtra) ...[
-          _buildCostRow('CGST 2.5%', (double.parse(abc) / 2).toStringAsFixed(2),
-              fem, ffem),
-          _buildCostRow('SGST 2.5%', (double.parse(abc) / 2).toStringAsFixed(2),
-              fem, ffem),
-        ] else
-          _buildCostRow('IGST 5%', abc, fem, ffem),
-        _buildCostRow('Delivery charge',
-            order['delivery_amount']?.toString() ?? '0', fem, ffem),
-        _buildCostRow('Packing charge',
-            order['packaging_amount']?.toString() ?? '0', fem, ffem),
-        _buildCostRow('Coupon Value', order['coupon_amount']?.toString() ?? '0',
-            fem, ffem),
-        _buildCostRow('Reward', order['wallet_amount_used']?.toString() ?? '0',
-            fem, ffem),
-        Divider(color: Colors.black, indent: 20 * fem, endIndent: 20 * fem),
         _buildCostRow(
-            'Grand Total', order['order_cost']?.toString() ?? '0', fem, ffem,
+            'Item total', (order['order_cost'] / 105 * 100).toStringAsFixed(2)),
+        if (isMaharashtra) ...[
+          _buildCostRow(
+              'CGST 2.5%', (double.parse(abc) / 2).toStringAsFixed(2)),
+          _buildCostRow(
+              'SGST 2.5%', (double.parse(abc) / 2).toStringAsFixed(2)),
+        ] else
+          _buildCostRow('IGST 5%', abc),
+        _buildCostRow(
+            'Delivery charge', order['delivery_amount']?.toString() ?? '0'),
+        _buildCostRow(
+            'Packing charge', order['packaging_amount']?.toString() ?? '0'),
+        _buildCostRow(
+            'Coupon Value', order['coupon_amount']?.toString() ?? '0'),
+        _buildCostRow('Reward', order['wallet_amount_used']?.toString() ?? '0'),
+        Divider(color: Colors.black, indent: 20.w, endIndent: 20.w),
+        _buildCostRow('Grand Total', order['order_cost']?.toString() ?? '0',
             isBold: true),
-        Divider(color: Colors.black, indent: 20 * fem, endIndent: 20 * fem),
+        Divider(color: Colors.black, indent: 20.w, endIndent: 20.w),
       ],
     );
   }
 
-  Widget _buildCostRow(String label, String value, double fem, double ffem,
-      {bool isBold = false}) {
+  Widget _buildCostRow(String label, String value, {bool isBold = false}) {
     return Container(
-      width: 320 * fem,
-      padding: EdgeInsets.symmetric(vertical: 2 * fem),
+      width: 320.w,
+      padding: EdgeInsets.symmetric(vertical: 2.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -642,7 +633,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             label,
             style: MyGoogleFontStyle(
               fontFamily: 'Urbanist',
-              fontSize: isBold ? 14 * ffem : 12 * ffem,
+              fontSize: isBold ? 14.sp : 12.sp,
               fontWeight: isBold ? FontWeight.w500 : FontWeight.w400,
               color: const Color(0xff1e1e1e),
             ),
@@ -651,9 +642,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             'RS $value',
             style: MyGoogleFontStyle(
               fontFamily: 'Urbanist',
-              fontSize: isBold ? 15 * ffem : 12 * ffem,
+              fontSize: isBold ? 15.sp : 12.sp,
               fontWeight: isBold ? FontWeight.w500 : FontWeight.w400,
-              letterSpacing: -0.24 * fem,
+              letterSpacing: -0.24.w,
               color: const Color(0xff1e1e1e),
             ),
           ),
@@ -662,9 +653,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     );
   }
 
-  Widget _buildPaymentInfo(double fem, double ffem) {
+  Widget _buildPaymentInfo() {
     return Padding(
-      padding: EdgeInsets.only(left: 20 * fem, top: 20 * fem),
+      padding: EdgeInsets.only(left: 20.w, top: 20.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -672,7 +663,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             'Payment',
             style: MyGoogleFontStyle(
               fontFamily: 'Urbanist',
-              fontSize: 12 * ffem,
+              fontSize: 12.sp,
               fontWeight: FontWeight.w400,
               color: const Color(0xff1e1e1e),
             ),
@@ -681,7 +672,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             'Paid: ${widget.arguments?['order']['paymentmode']?.toString()}',
             style: MyGoogleFontStyle(
               fontFamily: 'Urbanist',
-              fontSize: 13 * ffem,
+              fontSize: 13.sp,
               fontWeight: FontWeight.w600,
               color: const Color(0xff1e1e1e),
             ),
@@ -691,7 +682,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     );
   }
 
-  Widget _buildDateInfo(double fem, double ffem) {
+  Widget _buildDateInfo() {
     final String? rawDate =
         widget.arguments?['order']['created_at']?.toString();
     final String formattedDate = rawDate != null
@@ -699,7 +690,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         : 'N/A';
 
     return Padding(
-      padding: EdgeInsets.only(left: 20 * fem, top: 20 * fem),
+      padding: EdgeInsets.only(left: 20.w, top: 20.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -707,7 +698,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             'Date',
             style: MyGoogleFontStyle(
               fontFamily: 'Urbanist',
-              fontSize: 12 * ffem,
+              fontSize: 12.sp,
               fontWeight: FontWeight.w400,
               color: const Color(0xff1e1e1e),
             ),
@@ -716,7 +707,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             formattedDate,
             style: MyGoogleFontStyle(
               fontFamily: 'Urbanist',
-              fontSize: 13 * ffem,
+              fontSize: 13.sp,
               fontWeight: FontWeight.w600,
               color: const Color(0xff1e1e1e),
             ),
@@ -726,9 +717,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     );
   }
 
-  Widget _buildPhoneInfo(double fem, double ffem) {
+  Widget _buildPhoneInfo() {
     return Padding(
-      padding: EdgeInsets.only(left: 20 * fem, top: 20 * fem),
+      padding: EdgeInsets.only(left: 20.w, top: 20.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -736,7 +727,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             'Phone number',
             style: MyGoogleFontStyle(
               fontFamily: 'Urbanist',
-              fontSize: 12 * ffem,
+              fontSize: 12.sp,
               fontWeight: FontWeight.w400,
               color: const Color(0xff1e1e1e),
             ),
@@ -745,7 +736,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             widget.arguments?['order']['address']?['phone'].toString() ?? 'N/A',
             style: MyGoogleFontStyle(
               fontFamily: 'Urbanist',
-              fontSize: 13 * ffem,
+              fontSize: 13.sp,
               fontWeight: FontWeight.w600,
               color: const Color(0xff1e1e1e),
             ),
@@ -755,10 +746,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     );
   }
 
-  Widget _buildAddressInfo(double fem, double ffem) {
+  Widget _buildAddressInfo() {
     final address = widget.arguments?['order']['address'] ?? {};
     return Padding(
-      padding: EdgeInsets.only(left: 20 * fem, top: 20 * fem),
+      padding: EdgeInsets.only(left: 20.w, top: 20.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -766,7 +757,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             'Deliver to:',
             style: MyGoogleFontStyle(
               fontFamily: 'Urbanist',
-              fontSize: 12 * ffem,
+              fontSize: 12.sp,
               fontWeight: FontWeight.w400,
               color: const Color(0xff1e1e1e),
             ),
@@ -782,7 +773,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             ].where((e) => e != null && e.isNotEmpty).join(', '),
             style: MyGoogleFontStyle(
               fontFamily: 'Urbanist',
-              fontSize: 13 * ffem,
+              fontSize: 13.sp,
               fontWeight: FontWeight.w600,
               color: const Color(0xff1e1e1e),
             ),
@@ -792,7 +783,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     );
   }
 
-  Widget _buildCancelButton(BuildContext context, double fem, double ffem) {
+  Widget _buildCancelButton(BuildContext context) {
     final status = widget.arguments?['status']?.toString().toLowerCase() ?? '';
     final orderId = widget.arguments?['order']['id'];
 
@@ -808,15 +799,15 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 20 * fem, vertical: 20 * fem),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.w),
       child: ElevatedButton(
         onPressed:
             _isLoading ? null : () => _showCancelConfirmation(context, orderId),
         style: ElevatedButton.styleFrom(
           backgroundColor: _isLoading ? Colors.grey : Colors.red,
-          padding: EdgeInsets.symmetric(vertical: 15 * fem),
+          padding: EdgeInsets.symmetric(vertical: 15.w),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10 * fem),
+            borderRadius: BorderRadius.circular(10.w),
           ),
         ),
         child: _isLoading
@@ -831,12 +822,12 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(width: 10 * fem),
+                  SizedBox(width: 10.w),
                   Text(
                     'Cancelling...',
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 16 * ffem,
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
@@ -847,7 +838,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 'Cancel Order',
                 style: MyGoogleFontStyle(
                   fontFamily: 'Urbanist',
-                  fontSize: 16 * ffem,
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),

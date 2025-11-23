@@ -1,4 +1,5 @@
 import 'package:csc_picker/csc_picker.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -703,9 +704,10 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                                   if (response == true) {
                                     // Refresh the addresses list
                                     await _userAddressModel.getUserAddresses();
-                                    
+
                                     // Navigate back
-                                    if (widget.arguments['isShipping'] == true) {
+                                    if (widget.arguments['isShipping'] ==
+                                        true) {
                                       // If coming from checkout flow, just pop back
                                       Navigator.pop(context);
                                     } else {
@@ -719,9 +721,10 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                                                     'cartTotal': cartTotal,
                                                     'couponValue': couponValue,
                                                     'address': [],
-                                                    'isAddress': widget.arguments[
-                                                            'isShipping'] ??
-                                                        false
+                                                    'isAddress':
+                                                        widget.arguments[
+                                                                'isShipping'] ??
+                                                            false
                                                   })));
                                     }
                                   }

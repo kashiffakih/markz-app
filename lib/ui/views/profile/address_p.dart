@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/models/user_address.dart';
 import 'package:aadab/core/providers/user_address_pr.dart';
@@ -45,8 +46,6 @@ class _AddressPageState extends State<AddressPage> {
   Widget build(BuildContext context) {
     final userAddressModel =
         Provider.of<UserAddressModel>(context, listen: false);
-    final double fem = MediaQuery.of(context).size.width / 360;
-    final double ffem = fem * 0.97;
     final isAddressSelectionMode = widget.arguments?['isAddress'] == true;
     final cartItems = widget.arguments?['cartItems'] as List<dynamic>? ?? [];
     final cartTotal = widget.arguments?['cartTotal']?.toString() ?? '';
@@ -71,9 +70,9 @@ class _AddressPageState extends State<AddressPage> {
               : SingleChildScrollView(
                   child: Column(
                     children: [
-                      _buildHeader(context, fem, ffem),
+                      _buildHeader(context),
                       _buildBody(context, userAddressModel,
-                          isAddressSelectionMode, fem, ffem),
+                          isAddressSelectionMode),
                     ],
                   ),
                 ),
@@ -94,15 +93,15 @@ class _AddressPageState extends State<AddressPage> {
             );
           },
           backgroundColor: Colors.black,
-          child: Icon(Icons.add, size: 24 * fem, color: Colors.white),
+          child: Icon(Icons.add, size: 24.0.w, color: Colors.white),
         ),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context, double fem, double ffem) {
+  Widget _buildHeader(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 30 * fem, vertical: 10 * fem),
+      margin: EdgeInsets.symmetric(horizontal: 30.0.w, vertical: 10.0.w),
       width: double.infinity,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -110,7 +109,7 @@ class _AddressPageState extends State<AddressPage> {
           IconButton(
             icon: Icon(
               Icons.arrow_back_ios,
-              size: 18 * fem,
+              size: 18.0.w,
               color: const Color(0xffEED056),
             ),
             onPressed: () {
@@ -127,13 +126,13 @@ class _AddressPageState extends State<AddressPage> {
               textAlign: TextAlign.center,
               style: MyGoogleFontStyle(
                 fontFamily: 'Urbanist',
-                fontSize: 18 * ffem,
+                fontSize: 18.0.sp,
                 fontWeight: FontWeight.bold,
                 color: const Color(0xff1e232c),
               ),
             ),
           ),
-          SizedBox(width: 48 * fem),
+          SizedBox(width: 48.0.w),
         ],
       ),
     );
@@ -143,18 +142,16 @@ class _AddressPageState extends State<AddressPage> {
     BuildContext context,
     UserAddressModel userAddressModel,
     bool isAddressSelectionMode,
-    double fem,
-    double ffem,
   ) {
     return Container(
-      padding: EdgeInsets.all(15 * fem),
+      padding: EdgeInsets.all(15.0.w),
       child: userAddressModel.userAddresses?.isEmpty ?? true
           ? Center(
               child: Text(
                 'No address found.',
                 style: MyGoogleFontStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 14 * ffem,
+                  fontSize: 14.0.sp,
                   fontWeight: FontWeight.w400,
                   color: const Color(0xff909090),
                 ),
@@ -170,8 +167,6 @@ class _AddressPageState extends State<AddressPage> {
                 index: index,
                 isAddressSelectionMode: isAddressSelectionMode,
                 userAddressModel: userAddressModel,
-                fem: fem,
-                ffem: ffem,
               ),
             ),
     );
@@ -183,8 +178,6 @@ class _AddressPageState extends State<AddressPage> {
     required int index,
     required bool isAddressSelectionMode,
     required UserAddressModel userAddressModel,
-    required double fem,
-    required double ffem,
   }) {
     return Column(
       children: [
@@ -201,18 +194,16 @@ class _AddressPageState extends State<AddressPage> {
                       context,
                       userAddressModel,
                       address,
-                      fem,
-                      ffem,
                     );
                   }
                 },
               ),
-              SizedBox(width: 10 * fem),
+              SizedBox(width: 10.0.w),
               Text(
                 'Use as the shipping address',
                 style: MyGoogleFontStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 15 * ffem,
+                  fontSize: 15.0.sp,
                   fontWeight: FontWeight.w400,
                   color: const Color(0xff232323),
                 ),
@@ -233,17 +224,17 @@ class _AddressPageState extends State<AddressPage> {
             );
           },
           child: Container(
-            margin: EdgeInsets.only(bottom: 10 * fem),
-            padding: EdgeInsets.all(10 * fem),
+            margin: EdgeInsets.only(bottom: 10.0.w),
+            padding: EdgeInsets.all(10.0.w),
             decoration: BoxDecoration(
               border: Border.all(color: const Color(0xffc7b456)),
               color: Colors.white,
-              borderRadius: BorderRadius.circular(5 * fem),
+              borderRadius: BorderRadius.circular(5.0.r),
               boxShadow: [
                 BoxShadow(
                   color: const Color(0x338a959e),
-                  offset: Offset(0, 8 * fem),
-                  blurRadius: 19 * fem,
+                  offset: Offset(0, 8.0.w),
+                  blurRadius: 19.0.w,
                 ),
               ],
             ),
@@ -258,20 +249,20 @@ class _AddressPageState extends State<AddressPage> {
                         address.label?.toString() ?? 'No Label',
                         style: MyGoogleFontStyle(
                           fontFamily: 'Urbanist',
-                          fontSize: 16 * ffem,
+                          fontSize: 16.0.sp,
                           fontWeight: FontWeight.w700,
                           color: const Color(0xff232323),
                         ),
                       ),
                       Divider(
-                        thickness: 1 * fem,
+                        thickness: 1.0.w,
                         color: Colors.grey,
                       ),
                       Text(
                         _formatAddress(address),
                         style: MyGoogleFontStyle(
                           fontFamily: 'Urbanist',
-                          fontSize: 14 * ffem,
+                          fontSize: 14.0.sp,
                           fontWeight: FontWeight.w400,
                           color: const Color(0xff909090),
                         ),
@@ -281,8 +272,8 @@ class _AddressPageState extends State<AddressPage> {
                 ),
                 IconButton(
                   onPressed: () => _showDeleteDialog(
-                      context, userAddressModel, address, fem, ffem),
-                  icon: Icon(Icons.delete, size: 20 * fem, color: Colors.red),
+                      context, userAddressModel, address),
+                  icon: Icon(Icons.delete, size: 20.0.w, color: Colors.red),
                 ),
               ],
             ),
@@ -311,20 +302,18 @@ class _AddressPageState extends State<AddressPage> {
     BuildContext context,
     UserAddressModel userAddressModel,
     UserAddress address,
-    double fem,
-    double ffem,
   ) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20 * fem)),
+            borderRadius: BorderRadius.circular(20.0.r)),
         title: Text(
           'Confirm Address',
           style: MyGoogleFontStyle(
             fontFamily: 'Urbanist',
-            fontSize: 16 * ffem,
+            fontSize: 16.0.sp,
             fontWeight: FontWeight.w600,
             color: const Color(0xff1e232c),
           ),
@@ -333,7 +322,7 @@ class _AddressPageState extends State<AddressPage> {
           'Use this address for shipping?',
           style: MyGoogleFontStyle(
             fontFamily: 'Poppins',
-            fontSize: 14 * ffem,
+            fontSize: 14.0.sp,
             fontWeight: FontWeight.w400,
             color: const Color(0xff909090),
           ),
@@ -348,7 +337,7 @@ class _AddressPageState extends State<AddressPage> {
               'No',
               style: MyGoogleFontStyle(
                 fontFamily: 'Poppins',
-                fontSize: 14 * ffem,
+                fontSize: 14.0.sp,
                 fontWeight: FontWeight.w500,
                 color: Colors.red,
               ),
@@ -367,7 +356,7 @@ class _AddressPageState extends State<AddressPage> {
               'Yes',
               style: MyGoogleFontStyle(
                 fontFamily: 'Poppins',
-                fontSize: 14 * ffem,
+                fontSize: 14.0.sp,
                 fontWeight: FontWeight.w500,
                 color: const Color(0xff1e232c),
               ),
@@ -382,20 +371,18 @@ class _AddressPageState extends State<AddressPage> {
     BuildContext context,
     UserAddressModel userAddressModel,
     UserAddress address,
-    double fem,
-    double ffem,
   ) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20 * fem)),
+            borderRadius: BorderRadius.circular(20.0.r)),
         title: Text(
           'Delete Address',
           style: MyGoogleFontStyle(
             fontFamily: 'Urbanist',
-            fontSize: 16 * ffem,
+            fontSize: 16.0.sp,
             fontWeight: FontWeight.w600,
             color: const Color(0xff1e232c),
           ),
@@ -404,7 +391,7 @@ class _AddressPageState extends State<AddressPage> {
           'Do you really want to delete this address? This action cannot be undone.',
           style: MyGoogleFontStyle(
             fontFamily: 'Poppins',
-            fontSize: 14 * ffem,
+            fontSize: 14.0.sp,
             fontWeight: FontWeight.w400,
             color: const Color(0xff909090),
           ),
@@ -419,7 +406,7 @@ class _AddressPageState extends State<AddressPage> {
               'No',
               style: MyGoogleFontStyle(
                 fontFamily: 'Poppins',
-                fontSize: 14 * ffem,
+                fontSize: 14.0.sp,
                 fontWeight: FontWeight.w500,
                 color: Colors.red,
               ),
@@ -449,7 +436,7 @@ class _AddressPageState extends State<AddressPage> {
               'Yes',
               style: MyGoogleFontStyle(
                 fontFamily: 'Poppins',
-                fontSize: 14 * ffem,
+                fontSize: 14.0.sp,
                 fontWeight: FontWeight.w500,
                 color: const Color(0xff1e232c),
               ),

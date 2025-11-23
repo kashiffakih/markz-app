@@ -52,7 +52,11 @@ class OrderModel with ChangeNotifier {
 
   List<Order> get orders => _orders;
   getOrder() async {
-    orders = await _orderService.getOrders();
+    debugPrint('OrderModel: Fetching orders...');
+    final fetchedOrders = await _orderService.getOrders();
+    debugPrint('OrderModel: Received ${fetchedOrders.length} orders from service');
+    orders = fetchedOrders;
+    debugPrint('OrderModel: Set ${_orders.length} orders in state');
   }
 
   // Check coupon usage count

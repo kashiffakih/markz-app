@@ -17,11 +17,9 @@ class _RootPageState extends State<RootPage> {
   final PermissionService _permissionService = PermissionService();
 
   authenticateUser(_, AuthModel authModel, ConfigModel configModel) async {
-    // configModel.getApiConfig(domain: 'http://192.168.0.100:9090');
-    // configModel.getApiConfig(domain: 'http://172.20.10.2:8089');
-    // configModel.getApiConfig(domain: 'http://192.168.0.103:7070');
+    configModel.getApiConfig(domain: 'http://192.168.0.104:9090');
     // configModel.getApiConfig(domain: 'http://localhost:7070');
-    configModel.getApiConfig(domain: 'https://api.staging.aadab.online');
+    // configModel.getApiConfig(domain: 'https://api.staging.aadab.online');
     // print(configModel.apiConfig['baseURL']);
     await configModel.fetchLoginData();
 
@@ -110,47 +108,117 @@ class _RootPageState extends State<RootPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 200,
-                  height: 600,
+      body: Container(
+        width: double.infinity,
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.white,
+              Color(0xffFFFDF7),
+              Color(0xffFFF9E6),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Spacer(flex: 2),
+              // Logo with subtle animation effect
+              Hero(
+                tag: 'app_logo',
+                child: Container(
+                  width: 220,
+                  height: 220,
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xffEED056).withOpacity(0.15),
+                        blurRadius: 30,
+                        spreadRadius: 5,
+                        offset: Offset(0, 10),
+                      ),
+                    ],
+                  ),
                   child: Image.asset(
                     'assets/images/aadab-logo.png',
+                    fit: BoxFit.contain,
                   ),
                 ),
-                Text(
-                  'Loading...',
-                  style: MyGoogleFontStyle(
-                    fontFamily: 'Urbanist',
-                    color: Color(0xff000000),
-                  ),
+              ),
+              SizedBox(height: 50),
+              // Loading text with modern styling
+              Text(
+                'Loading...',
+                style: MyGoogleFontStyle(
+                  fontFamily: 'Urbanist',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xff232323),
+                  letterSpacing: 0.5,
                 ),
-                SizedBox(
-                  height: 10,
+              ),
+              SizedBox(height: 20),
+              // Modern progress bar
+              Container(
+                width: 220,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: Color(0xffF5F5F5),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
                 ),
-                Container(
-                  width: 200,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: Color(0xffd9d9d9),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: LinearProgressIndicator(
-                      color: Color(0xff232323),
-                      backgroundColor: Colors.white,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: LinearProgressIndicator(
+                    backgroundColor: Colors.transparent,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Color(0xffEED056),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+              Spacer(flex: 3),
+              // Subtle branding footer
+              Padding(
+                padding: EdgeInsets.only(bottom: 30),
+                child: Column(
+                  children: [
+                    Text(
+                      'Welcome to Aadab',
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xff909090),
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Your trusted shopping companion',
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xffAAAAAA),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),

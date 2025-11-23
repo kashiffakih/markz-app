@@ -135,7 +135,7 @@ class Order {
     banktxnid = json['banktxnid'];
     bankname = json['bankname'];
     couponAmount = json['coupon_amount'];
-    couponId = json['coupon_id'].toString();
+    couponId = json['coupon_id']?.toString() ?? '';
     taxAmount = json['tax_amount'];
     packagingAmount = json['packaging_amount'];
     deliveryAmount = json['delivery_amount'];
@@ -155,25 +155,64 @@ class Order {
     rpyCode = json['rpy_code'];
     rpyMessage = json['rpy_message'];
     deliveryMethod = json['delivery_method'];
-    user = json['user'] != null ? new User.fromJson(json['user']) : null;
+    // Convert is_gift from int (0/1) to bool
+    isGift = json['is_gift'] == 1 || json['is_gift'] == true;
+
+    // Parse user with error handling
+    try {
+      user = json['user'] != null ? new User.fromJson(json['user']) : null;
+    } catch (e) {
+      print('Error parsing user in order ${json['id']}: $e');
+      user = null;
+    }
+
+    // Parse order_details with error handling
     if (json['order_details'] != null) {
       orderDetails = <OrderDetails>[];
-      json['order_details'].forEach((v) {
-        orderDetails!.add(new OrderDetails.fromJson(v));
-      });
+      if (json['order_details'] is List) {
+        (json['order_details'] as List).forEach((v) {
+          try {
+            orderDetails!.add(new OrderDetails.fromJson(v));
+          } catch (e) {
+            print('Error parsing order_detail in order ${json['id']}: $e');
+          }
+        });
+      }
     }
+
+    // Parse order_statuses with error handling
     if (json['order_statuses'] != null) {
       orderStatuses = <OrderStatuses>[];
-      json['order_statuses'].forEach((v) {
-        orderStatuses!.add(new OrderStatuses.fromJson(v));
-      });
+      if (json['order_statuses'] is List) {
+        (json['order_statuses'] as List).forEach((v) {
+          try {
+            orderStatuses!.add(new OrderStatuses.fromJson(v));
+          } catch (e) {
+            print('Error parsing order_status in order ${json['id']}: $e');
+          }
+        });
+      }
     }
-    company =
-        json['company'] != null ? new Company.fromJson(json['company']) : null;
+
+    // Parse company with error handling
+    try {
+      company = json['company'] != null ? new Company.fromJson(json['company']) : null;
+    } catch (e) {
+      print('Error parsing company in order ${json['id']}: $e');
+      company = null;
+    }
+
     deliveryBoy = json['delivery_boy'];
-    address = json['address'] != null
-        ? new UserAddress.fromJson(json['address'])
-        : null;
+
+    // Parse address with error handling
+    try {
+      address = json['address'] != null
+          ? new UserAddress.fromJson(json['address'])
+          : null;
+    } catch (e) {
+      print('Error parsing address in order ${json['id']}: $e');
+      address = null;
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -312,13 +351,32 @@ class OrderDetails {
     orderDetailCost = json['order_detail_cost'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-    productPack = json['product_pack'];
+
+    // Handle product_pack which can be either String or Map
+    if (json['product_pack'] != null) {
+      if (json['product_pack'] is String) {
+        productPack = json['product_pack'];
+      } else if (json['product_pack'] is Map) {
+        // Extract the value from the map
+        productPack = json['product_pack']['value']?.toString() ??
+            json['product_pack']['id']?.toString();
+      }
+    }
+
     cashback = json['cashback'];
     kindOfFlower = json['kind_of_flower'];
     flavour = json['flavour'];
     writeOnCake = json['write_on_cake'];
-    product =
-        json['product'] != null ? new Product.fromJson(json['product']) : null;
+
+    // Parse product with error handling
+    try {
+      product =
+          json['product'] != null ? new Product.fromJson(json['product']) : null;
+    } catch (e) {
+      print('Error parsing product in order_detail ${json['id']}: $e');
+      product = null;
+    }
+
     unit = json['unit'];
     productImagePath = json['product_image_path'];
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/providers/order_pr.dart';
@@ -42,9 +43,7 @@ class _OrdersPageState extends State<OrdersPage> {
   @override
   Widget build(BuildContext context) {
     final orderModel = Provider.of<OrderModel>(context, listen: false);
-    final double fem = MediaQuery.of(context).size.width / 360;
-    final double ffem = fem * 0.97;
-
+    print('Building OrdersPage with ${orderModel.orders.first.id} orders');
     return Scaffold(
       body: PopScope(
         canPop: false,
@@ -60,11 +59,11 @@ class _OrdersPageState extends State<OrdersPage> {
         child: SafeArea(
           child: SingleChildScrollView(
             child: Container(
-              padding: EdgeInsets.only(top: 20 * fem),
+              padding: EdgeInsets.only(top: 20.0.w),
               child: Column(
                 children: [
-                  _buildHeader(context, fem, ffem),
-                  _buildTabBar(context, orderModel, fem, ffem),
+                  _buildHeader(context),
+                  _buildTabBar(context, orderModel),
                 ],
               ),
             ),
@@ -74,16 +73,16 @@ class _OrdersPageState extends State<OrdersPage> {
     );
   }
 
-  Widget _buildHeader(BuildContext context, double fem, double ffem) {
+  Widget _buildHeader(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 30 * fem, vertical: 10 * fem),
+      margin: EdgeInsets.symmetric(horizontal: 30.0.w, vertical: 10.0.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
             icon: Icon(
               Icons.arrow_back_ios,
-              size: 18 * fem,
+              size: 18.0.w,
               color: const Color(0xffEED056),
             ),
             onPressed: () {
@@ -100,45 +99,44 @@ class _OrdersPageState extends State<OrdersPage> {
               textAlign: TextAlign.center,
               style: MyGoogleFontStyle(
                 fontFamily: 'Urbanist',
-                fontSize: 18 * ffem,
+                fontSize: 18.0.sp,
                 fontWeight: FontWeight.bold,
                 color: const Color(0xff1e232c),
               ),
             ),
           ),
-          SizedBox(width: 48 * fem),
+          SizedBox(width: 48.0.w),
         ],
       ),
     );
   }
 
-  Widget _buildTabBar(
-      BuildContext context, OrderModel orderModel, double fem, double ffem) {
+  Widget _buildTabBar(BuildContext context, OrderModel orderModel) {
     return DefaultTabController(
       length: 4,
       child: Column(
         children: [
           TabBar(
-            labelPadding: EdgeInsets.all(8 * fem),
+            labelPadding: EdgeInsets.all(8.0.w),
             indicatorColor: Colors.black,
             isScrollable: true,
             tabs: [
-              _buildTab('Order Placed', fem, ffem),
-              _buildTab('Processing', fem, ffem),
-              _buildTab('Delivered', fem, ffem),
-              _buildTab('Cancelled', fem, ffem),
+              _buildTab('Order Placed'),
+              _buildTab('Processing'),
+              _buildTab('Delivered'),
+              _buildTab('Cancelled'),
             ],
           ),
           Container(
-            height: MediaQuery.of(context).size.height * 0.8,
+            height: 0.8.sh,
             child: _isPageLoading
                 ? const Center(child: CircularProgressIndicator())
                 : TabBarView(
                     children: [
-                      _buildOrderTab(orderModel, 'Order Placed', fem, ffem),
-                      _buildOrderTab(orderModel, 'Processing', fem, ffem),
-                      _buildOrderTab(orderModel, 'Delivered', fem, ffem),
-                      _buildOrderTab(orderModel, 'Cancelled', fem, ffem),
+                      _buildOrderTab(orderModel, 'Order Placed'),
+                      _buildOrderTab(orderModel, 'Processing'),
+                      _buildOrderTab(orderModel, 'Delivered'),
+                      _buildOrderTab(orderModel, 'Cancelled'),
                     ],
                   ),
           ),
@@ -147,14 +145,14 @@ class _OrdersPageState extends State<OrdersPage> {
     );
   }
 
-  Widget _buildTab(String label, double fem, double ffem) {
+  Widget _buildTab(String label) {
     return Padding(
-      padding: EdgeInsets.all(2 * fem),
+      padding: EdgeInsets.all(2.0.w),
       child: Text(
         label,
         style: MyGoogleFontStyle(
           fontFamily: 'Urbanist',
-          fontSize: 14 * ffem,
+          fontSize: 14.0.sp,
           fontWeight: FontWeight.w400,
           color: Colors.black,
         ),
@@ -162,8 +160,7 @@ class _OrdersPageState extends State<OrdersPage> {
     );
   }
 
-  Widget _buildOrderTab(
-      OrderModel orderModel, String status, double fem, double ffem) {
+  Widget _buildOrderTab(OrderModel orderModel, String status) {
     final filteredOrders = _getFilteredOrders(orderModel.orders, status);
 
     if (filteredOrders.isEmpty) {
@@ -176,27 +173,25 @@ class _OrdersPageState extends State<OrdersPage> {
     return SingleChildScrollView(
       child: Column(
         children: filteredOrders
-            .map((order) => _buildOrderCard(order, status, fem, ffem))
+            .map((order) => _buildOrderCard(order, status))
             .toList(),
       ),
     );
   }
 
-  Widget _buildOrderCard(
-      dynamic order, String status, double fem, double ffem) {
+  Widget _buildOrderCard(dynamic order, String status) {
     return Container(
-      height: 120 * fem,
-      margin: EdgeInsets.all(10 * fem),
-      padding: EdgeInsets.all(10 * fem),
+      margin: EdgeInsets.all(10.0.w),
+      padding: EdgeInsets.all(10.0.w),
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0xffc7b456)),
         color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(5 * fem)),
+        borderRadius: BorderRadius.all(Radius.circular(5.0.w)),
         boxShadow: [
           BoxShadow(
             color: const Color(0x338a959e),
-            offset: Offset(0, 7.6690645218 * fem),
-            blurRadius: 19.1726608276 * fem,
+            offset: Offset(0, 7.6690645218.w),
+            blurRadius: 19.1726608276.w,
           ),
         ],
       ),
@@ -210,7 +205,7 @@ class _OrdersPageState extends State<OrdersPage> {
                   'Order No: ${order.id?.toString() ?? 'N/A'}',
                   style: MyGoogleFontStyle(
                     fontFamily: 'Urbanist',
-                    fontSize: 14 * ffem,
+                    fontSize: 14.0.sp,
                     fontWeight: FontWeight.w700,
                     color: const Color(0xff232323),
                   ),
@@ -225,7 +220,7 @@ class _OrdersPageState extends State<OrdersPage> {
                   textAlign: TextAlign.right,
                   style: MyGoogleFontStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 12 * ffem,
+                    fontSize: 12.0.sp,
                     fontWeight: FontWeight.w400,
                     color: const Color(0xff909090),
                   ),
@@ -233,7 +228,7 @@ class _OrdersPageState extends State<OrdersPage> {
               ),
             ],
           ),
-          Divider(thickness: 1 * fem, color: Colors.grey),
+          Divider(thickness: 1.0.w, color: Colors.grey),
           Row(
             children: [
               Expanded(
@@ -244,16 +239,24 @@ class _OrdersPageState extends State<OrdersPage> {
                         text: 'Quantity: ',
                         style: MyGoogleFontStyle(
                           fontFamily: 'Urbanist',
-                          fontSize: 12 * ffem,
+                          fontSize: 12.0.sp,
                           fontWeight: FontWeight.w400,
                           color: const Color(0xffaaaaaa),
                         ),
                       ),
                       TextSpan(
-                        text: order.orderDetails?.length.toString() ?? '0',
+                        text: () {
+                          int totalQty = 0;
+                          if (order.orderDetails != null) {
+                            for (var detail in order.orderDetails!) {
+                              totalQty += (detail.quantity ?? 0) as int;
+                            }
+                          }
+                          return totalQty.toString();
+                        }(),
                         style: MyGoogleFontStyle(
                           fontFamily: 'Poppins',
-                          fontSize: 12 * ffem,
+                          fontSize: 12.0.sp,
                           fontWeight: FontWeight.w700,
                           color: const Color(0xff000000),
                         ),
@@ -271,7 +274,7 @@ class _OrdersPageState extends State<OrdersPage> {
                         text: 'Total Amount: ',
                         style: MyGoogleFontStyle(
                           fontFamily: 'Urbanist',
-                          fontSize: 12 * ffem,
+                          fontSize: 12.0.sp,
                           fontWeight: FontWeight.w400,
                           color: const Color(0xffaaaaaa),
                         ),
@@ -280,7 +283,7 @@ class _OrdersPageState extends State<OrdersPage> {
                         text: order.orderCost?.toString() ?? '0',
                         style: MyGoogleFontStyle(
                           fontFamily: 'Poppins',
-                          fontSize: 12 * ffem,
+                          fontSize: 12.0.sp,
                           fontWeight: FontWeight.w700,
                           color: const Color(0xff000000),
                         ),
@@ -291,7 +294,7 @@ class _OrdersPageState extends State<OrdersPage> {
               ),
             ],
           ),
-          SizedBox(height: 15 * fem),
+          SizedBox(height: 15.0.w),
           Row(
             children: [
               InkWell(
@@ -312,18 +315,18 @@ class _OrdersPageState extends State<OrdersPage> {
                   );
                 },
                 child: Container(
-                  width: 74.5 * fem,
-                  height: 30 * fem,
+                  width: 74.5.w,
+                  height: 30.0.w,
                   decoration: BoxDecoration(
                     color: const Color(0xff232323),
-                    borderRadius: BorderRadius.circular(8 * fem),
+                    borderRadius: BorderRadius.circular(8.0.r),
                   ),
                   child: Center(
                     child: Text(
                       'Detail',
                       style: MyGoogleFontStyle(
                         fontFamily: 'Poppins',
-                        fontSize: 12 * ffem,
+                        fontSize: 12.0.sp,
                         fontWeight: FontWeight.w400,
                         color: Colors.white,
                       ),
@@ -337,7 +340,7 @@ class _OrdersPageState extends State<OrdersPage> {
                   textAlign: TextAlign.right,
                   style: MyGoogleFontStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 14 * ffem,
+                    fontSize: 14.0.sp,
                     fontWeight: FontWeight.w400,
                     color: _getOrderStatus(order) == 'Delivered'
                         ? Colors.green

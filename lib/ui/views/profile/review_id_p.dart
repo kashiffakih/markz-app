@@ -1,4 +1,5 @@
 // import 'package:aadab/ui/widgets/multi_image_w.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 // import 'package:flutter/material.dart';
 // import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 // import 'package:provider/provider.dart';
@@ -239,18 +240,15 @@ class _ReviewsPageState extends State<ReviewUpdatePage> {
   Widget build(BuildContext context) {
     final reviewModel = Provider.of<ReviewModel>(context, listen: false);
     final configModel = locator<ConfigModel>();
-    final double fem = MediaQuery.of(context).size.width / 360;
-    final double ffem = fem * 0.97;
-
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
-            padding: EdgeInsets.only(top: 20 * fem),
+            padding: EdgeInsets.only(top: 20.0.w),
             child: Column(
               children: [
-                _buildHeader(context, fem, ffem),
-                _buildBody(context, reviewModel, configModel, fem, ffem),
+                _buildHeader(context),
+                _buildBody(context, reviewModel, configModel),
               ],
             ),
           ),
@@ -259,9 +257,9 @@ class _ReviewsPageState extends State<ReviewUpdatePage> {
     );
   }
 
-  Widget _buildHeader(BuildContext context, double fem, double ffem) {
+  Widget _buildHeader(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(20 * fem),
+      margin: EdgeInsets.all(20.0.w),
       width: double.infinity,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -269,7 +267,7 @@ class _ReviewsPageState extends State<ReviewUpdatePage> {
           IconButton(
             icon: Icon(
               Icons.arrow_back_ios,
-              size: 18 * fem,
+              size: 18.0.w,
               color: const Color(0xffEED056),
             ),
             onPressed: () => Navigator.pop(context),
@@ -280,13 +278,13 @@ class _ReviewsPageState extends State<ReviewUpdatePage> {
               textAlign: TextAlign.center,
               style: MyGoogleFontStyle(
                 fontFamily: 'Urbanist',
-                fontSize: 18 * ffem,
+                fontSize: 18.0.sp,
                 fontWeight: FontWeight.bold,
                 color: const Color(0xff1e232c),
               ),
             ),
           ),
-          SizedBox(width: 48 * fem),
+          SizedBox(width: 48.0.w),
         ],
       ),
     );
@@ -296,15 +294,13 @@ class _ReviewsPageState extends State<ReviewUpdatePage> {
     BuildContext context,
     ReviewModel reviewModel,
     ConfigModel configModel,
-    double fem,
-    double ffem,
   ) {
     final productImages = _review.product?.productImages ?? [];
     final firstImage =
         productImages.isNotEmpty ? productImages.first.imagepath : null;
 
     return Container(
-      padding: EdgeInsets.all(15 * fem),
+      padding: EdgeInsets.all(15.0.w),
       child: Form(
         key: _formKey,
         child: Column(
@@ -323,9 +319,9 @@ class _ReviewsPageState extends State<ReviewUpdatePage> {
                       );
                     },
                     child: Container(
-                      width: 80 * fem,
-                      height: 80 * fem,
-                      margin: EdgeInsets.only(right: 15 * fem),
+                      width: 80.0.w,
+                      height: 80.0.w,
+                      margin: EdgeInsets.only(right: 15.0.w),
                       decoration: BoxDecoration(
                         image: DecorationImage(
                           image: NetworkImage(
@@ -337,9 +333,9 @@ class _ReviewsPageState extends State<ReviewUpdatePage> {
                   )
                 else
                   Container(
-                    width: 80 * fem,
-                    height: 80 * fem,
-                    margin: EdgeInsets.only(right: 15 * fem),
+                    width: 80.0.w,
+                    height: 80.0.w,
+                    margin: EdgeInsets.only(right: 15.0.w),
                     child: const Icon(Icons.image_not_supported),
                   ),
                 Expanded(
@@ -347,7 +343,7 @@ class _ReviewsPageState extends State<ReviewUpdatePage> {
                     _review.product?.name?.toString() ?? 'Unknown Product',
                     style: MyGoogleFontStyle(
                       fontFamily: 'Poppins',
-                      fontSize: 16 * ffem,
+                      fontSize: 16.0.sp,
                       fontWeight: FontWeight.w400,
                       color: const Color(0xff232323),
                     ),
@@ -355,36 +351,36 @@ class _ReviewsPageState extends State<ReviewUpdatePage> {
                 ),
               ],
             ),
-            SizedBox(height: 10 * fem),
+            SizedBox(height: 10.0.w),
             RatingBar.builder(
-              itemSize: 30 * fem,
+              itemSize: 30.0.w,
               initialRating: _currentRating,
               minRating: 0.5,
               direction: Axis.horizontal,
               allowHalfRating: true,
               itemCount: 5,
-              itemPadding: EdgeInsets.symmetric(horizontal: 4 * fem),
+              itemPadding: EdgeInsets.symmetric(horizontal: 4.0.w),
               itemBuilder: (context, _) =>
                   const Icon(Icons.star, color: Colors.amber),
               onRatingUpdate: (rating) =>
                   setState(() => _currentRating = rating),
             ),
-            SizedBox(height: 10 * fem),
+            SizedBox(height: 10.0.w),
             Container(
               decoration: BoxDecoration(
                 border: Border.all(color: const Color(0xffdadada)),
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20 * fem),
+                borderRadius: BorderRadius.circular(20.0.r),
               ),
               child: TextFormField(
                 maxLines: 5,
                 decoration: InputDecoration(
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.all(10 * fem),
+                  contentPadding: EdgeInsets.all(10.0.w),
                   hintText: 'Write your review here.',
                   hintStyle: MyGoogleFontStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 12 * ffem,
+                    fontSize: 12.0.sp,
                     fontWeight: FontWeight.w400,
                     color: const Color(0xff8390a1),
                   ),
@@ -395,9 +391,9 @@ class _ReviewsPageState extends State<ReviewUpdatePage> {
                     value?.isEmpty ?? true ? 'Please write some review.' : null,
               ),
             ),
-            SizedBox(height: 10 * fem),
+            SizedBox(height: 10.0.w),
             SizedBox(
-              height: 120 * fem,
+              height: 120.0.w,
               child: MultipleImageUploadPage(
                 onImagesSelected: (images) {
                   setState(() {
@@ -407,7 +403,7 @@ class _ReviewsPageState extends State<ReviewUpdatePage> {
               ),
             ),
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 5 * fem),
+              margin: EdgeInsets.symmetric(horizontal: 5.0.w),
               child: TextButton(
                 onPressed: _isLoading
                     ? null
@@ -446,16 +442,16 @@ class _ReviewsPageState extends State<ReviewUpdatePage> {
                 style: TextButton.styleFrom(padding: EdgeInsets.zero),
                 child: Container(
                   width: double.infinity,
-                  height: 53 * fem,
+                  height: 53.0.w,
                   decoration: BoxDecoration(
                     color: const Color(0xff1e1e1e),
-                    borderRadius: BorderRadius.circular(10 * fem),
+                    borderRadius: BorderRadius.circular(10.0.r),
                   ),
                   child: Center(
                     child: _isLoading
                         ? SizedBox(
-                            width: 20 * fem,
-                            height: 20 * fem,
+                            width: 20.0.w,
+                            height: 20.0.w,
                             child: const CircularProgressIndicator(
                                 color: Colors.white),
                           )
@@ -463,7 +459,7 @@ class _ReviewsPageState extends State<ReviewUpdatePage> {
                             'Update Review',
                             style: MyGoogleFontStyle(
                               fontFamily: 'Urbanist',
-                              fontSize: 15 * ffem,
+                              fontSize: 15.0.sp,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
                             ),

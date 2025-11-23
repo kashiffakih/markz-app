@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/models/product.dart';
@@ -118,12 +119,6 @@ class _ProductsPageState extends State<ProductsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double baseWidth = 360;
-    final double fem = screenWidth / baseWidth;
-    final double ffem = fem * 0.97;
-
     final configModel = locator<ConfigModel>();
     final productModel = context.watch<ProductModel>();
     final addToCartModel = context.watch<AddToCartModel>();
@@ -135,14 +130,14 @@ class _ProductsPageState extends State<ProductsPage> {
       body: SafeArea(
         child: _isLoading
             ? SizedBox(
-                height: screenHeight,
-                width: screenWidth,
+                height: 1.0.sh,
+                width: 1.0.sw,
                 child: const Center(child: CircularProgressIndicator()),
               )
             : _errorMessage != null
                 ? SizedBox(
-                    height: screenHeight,
-                    width: screenWidth,
+                    height: 1.0.sh,
+                    width: 1.0.sw,
                     child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -160,33 +155,32 @@ class _ProductsPageState extends State<ProductsPage> {
                 : RefreshIndicator(
                     onRefresh: _fetchInitialData,
                     child: SizedBox(
-                      width: screenWidth,
-                      height: screenHeight,
+                      width: 1.0.sw,
+                      height: 1.0.sh,
                       child: SingleChildScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         child: Container(
-                          padding: EdgeInsets.fromLTRB(
-                              9 * fem, 16 * fem, 9 * fem, 22 * fem),
-                          width: screenWidth,
-                          constraints: BoxConstraints(minHeight: screenHeight),
+                          padding:
+                              EdgeInsets.fromLTRB(9.0.w, 16.0.w, 9.0.w, 22.0.w),
+                          width: 1.0.sw,
+                          constraints: BoxConstraints(minHeight: 1.0.sh),
                           decoration: const BoxDecoration(color: Colors.white),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildTopSection(
-                                  context, fem, ffem, cartCount, productModel),
-                              SizedBox(height: 2 * fem),
-                              _buildCategoriesSection(
-                                  context, fem, ffem, productModel),
+                                  context, cartCount, productModel),
+                              SizedBox(height: 2.0.w),
+                              _buildCategoriesSection(context, productModel),
                               if (_isSearching)
                                 SizedBox(
-                                  height: screenHeight * 0.5,
+                                  height: 1.0.sh * 0.5,
                                   child: const Center(
                                       child: CircularProgressIndicator()),
                                 )
                               else
-                                _buildProductList(context, fem, ffem,
-                                    configModel, wishListModel),
+                                _buildProductList(
+                                    context, configModel, wishListModel),
                             ],
                           ),
                         ),
@@ -197,11 +191,10 @@ class _ProductsPageState extends State<ProductsPage> {
     );
   }
 
-  Widget _buildTopSection(BuildContext context, double fem, double ffem,
-      int cartCount, ProductModel productModel) {
+  Widget _buildTopSection(
+      BuildContext context, int cartCount, ProductModel productModel) {
     return Container(
-      margin:
-          EdgeInsets.only(left: 20 * fem, bottom: 20 * fem, right: 30 * fem),
+      margin: EdgeInsets.only(left: 20.0.w, bottom: 20.0.w, right: 30.0.w),
       width: double.infinity,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -214,32 +207,32 @@ class _ProductsPageState extends State<ProductsPage> {
                 textAlign: TextAlign.center,
                 style: MyGoogleFontStyle(
                   fontFamily: 'Urbanist',
-                  fontSize: 18 * ffem,
+                  fontSize: 18.0.sp,
                   fontWeight: FontWeight.bold,
                   color: const Color(0xff1e232c),
                 ),
               ),
             ),
           ),
-          SizedBox(height: 15 * fem),
+          SizedBox(height: 15.0.w),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               InkWell(
                 onTap: () => Navigator.pop(context),
                 child: Icon(Icons.arrow_back_ios,
-                    size: 18 * ffem, color: const Color(0xffEED056)),
+                    size: 18.0.sp, color: const Color(0xffEED056)),
               ),
-              SizedBox(width: 10 * fem),
+              SizedBox(width: 10.0.w),
               Expanded(
                 child: Container(
-                  height: 38 * fem,
-                  padding: EdgeInsets.only(left: 21 * fem, right: 20.70 * fem),
+                  height: 38.0.w,
+                  padding: EdgeInsets.only(left: 21.0.w, right: 20.70.w),
                   decoration: ShapeDecoration(
                     shape: RoundedRectangleBorder(
                       side: const BorderSide(
                           width: 0.50, color: Color(0xFFC7B456)),
-                      borderRadius: BorderRadius.circular(10 * fem),
+                      borderRadius: BorderRadius.circular(10.0.r),
                     ),
                   ),
                   child: Row(
@@ -267,26 +260,26 @@ class _ProductsPageState extends State<ProductsPage> {
                           ),
                           style: TextStyle(
                             color: Colors.black.withOpacity(0.6),
-                            fontSize: 18 * ffem,
+                            fontSize: 18.0.sp,
                             fontFamily: 'Urbanist',
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                       Image.asset('assets/images/Search-1.png',
-                          height: 20 * fem, fit: BoxFit.cover),
+                          height: 20.0.w, fit: BoxFit.cover),
                     ],
                   ),
                 ),
               ),
-              SizedBox(width: 10 * fem),
+              SizedBox(width: 10.0.w),
               InkWell(
                 onTap: () => Navigator.pushNamed(context, '/cartPage'),
                 child: badges.Badge(
                   badgeContent: Text(cartCount.toString(),
                       style: const TextStyle(color: Colors.white)),
                   child: Image.asset('assets/images/cart-icon.png',
-                      width: 23 * fem, height: 23 * fem),
+                      width: 23.0.w, height: 23.0.w),
                 ),
               ),
             ],
@@ -296,11 +289,11 @@ class _ProductsPageState extends State<ProductsPage> {
     );
   }
 
-  Widget _buildCategoriesSection(BuildContext context, double fem, double ffem,
-      ProductModel productModel) {
+  Widget _buildCategoriesSection(
+      BuildContext context, ProductModel productModel) {
     return Container(
-      height: 35 * fem,
-      padding: EdgeInsets.symmetric(horizontal: 9 * fem),
+      height: 35.0.w,
+      padding: EdgeInsets.symmetric(horizontal: 9.0.w),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -320,30 +313,30 @@ class _ProductsPageState extends State<ProductsPage> {
               backgroundColor: activeIndex == -1 ? Colors.black : Colors.white,
             ),
             child: Container(
-              width: 55 * fem,
+              width: 55.0.w,
               height: double.infinity,
               decoration: BoxDecoration(
                 border: activeIndex == -1
                     ? null
                     : Border.all(color: const Color(0xffc7b456)),
-                borderRadius: BorderRadius.circular(15 * fem),
+                borderRadius: BorderRadius.circular(15.0.r),
               ),
               child: Center(
                 child: Text(
                   'All',
                   style: MyGoogleFontStyle(
                     fontFamily: 'Urbanist',
-                    fontSize: 15 * ffem,
+                    fontSize: 15.0.sp,
                     fontWeight: FontWeight.w700,
                     height: 1.2,
-                    letterSpacing: -0.36 * fem,
+                    letterSpacing: -0.36.w,
                     color: activeIndex == -1 ? Colors.white : Colors.black,
                   ),
                 ),
               ),
             ),
           ),
-          SizedBox(width: 5 * fem),
+          SizedBox(width: 5.0.w),
           Expanded(
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
@@ -351,7 +344,7 @@ class _ProductsPageState extends State<ProductsPage> {
               itemBuilder: (context, index) {
                 final isActive = index == activeIndex;
                 return Padding(
-                  padding: EdgeInsets.only(right: 6 * fem),
+                  padding: EdgeInsets.only(right: 6.0.w),
                   child: TextButton(
                     onPressed: () {
                       setState(() {
@@ -369,11 +362,11 @@ class _ProductsPageState extends State<ProductsPage> {
                       backgroundColor: isActive ? Colors.black : Colors.white,
                     ),
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10 * fem),
+                      padding: EdgeInsets.symmetric(horizontal: 10.0.w),
                       height: double.infinity,
                       decoration: BoxDecoration(
                         border: Border.all(color: const Color(0xffc7b456)),
-                        borderRadius: BorderRadius.circular(15 * fem),
+                        borderRadius: BorderRadius.circular(15.0.r),
                       ),
                       child: Center(
                         child: Text(
@@ -382,10 +375,10 @@ class _ProductsPageState extends State<ProductsPage> {
                               '',
                           style: MyGoogleFontStyle(
                             fontFamily: 'Urbanist',
-                            fontSize: 15 * ffem,
+                            fontSize: 15.0.sp,
                             fontWeight: FontWeight.w600,
                             height: 1.2,
-                            letterSpacing: -0.36 * fem,
+                            letterSpacing: -0.36.w,
                             color: isActive
                                 ? Colors.white
                                 : const Color(0x99000000),
@@ -403,10 +396,10 @@ class _ProductsPageState extends State<ProductsPage> {
     );
   }
 
-  Widget _buildProductList(BuildContext context, double fem, double ffem,
-      ConfigModel configModel, WishListModel wishListModel) {
+  Widget _buildProductList(BuildContext context, ConfigModel configModel,
+      WishListModel wishListModel) {
     return Container(
-      margin: EdgeInsets.fromLTRB(12 * fem, 0, 12 * fem, 0),
+      margin: EdgeInsets.fromLTRB(12.0.w, 0, 12.0.w, 0),
       padding: EdgeInsets.symmetric(vertical: 10),
       width: double.infinity,
       child: filteredProducts?.isNotEmpty ?? false
@@ -415,27 +408,35 @@ class _ProductsPageState extends State<ProductsPage> {
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                 childAspectRatio: 1 / 2,
-                maxCrossAxisExtent: 200 * fem,
-                mainAxisSpacing: 12 * fem,
-                crossAxisSpacing: 12 * fem,
+                maxCrossAxisExtent: 200.0.w,
+                mainAxisSpacing: 12.0.w,
+                crossAxisSpacing: 12.0.w,
               ),
               itemCount: filteredProducts!.length,
               itemBuilder: (context, index) {
                 final product = filteredProducts![index];
-                final discountPrice = product.productPrices?.isNotEmpty ?? false
-                    ? ((int.parse(product.productPrices![0].price.toString()) -
-                            int.parse(product.productPrices![0].offerPrice
-                                .toString())) /
-                        int.parse(product.productPrices![0].price.toString()) *
-                        100)
-                    : 0.0;
+                double discountPrice = 0.0;
 
-                return _buildProductCard(context, fem, ffem, configModel,
-                    wishListModel, product, discountPrice);
+                if (product.productPrices?.isNotEmpty ?? false) {
+                  final price = int.tryParse(
+                          product.productPrices![0].price?.toString() ?? '0') ??
+                      0;
+                  final offerPrice = int.tryParse(
+                          product.productPrices![0].offerPrice?.toString() ??
+                              '0') ??
+                      0;
+
+                  if (price > 0 && offerPrice > 0 && offerPrice < price) {
+                    discountPrice = ((price - offerPrice) / price * 100);
+                  }
+                }
+
+                return _buildProductCard(context, configModel, wishListModel,
+                    product, discountPrice);
               },
             )
           : SizedBox(
-              height: MediaQuery.of(context).size.height * 0.5,
+              height: 0.5.sh,
               child: const Center(child: Text('No products found.')),
             ),
     );
@@ -443,17 +444,15 @@ class _ProductsPageState extends State<ProductsPage> {
 
   Widget _buildProductCard(
     BuildContext context,
-    double fem,
-    double ffem,
     ConfigModel configModel,
     WishListModel wishListModel,
     Product product,
     double discountPrice,
   ) {
     return Container(
-      width: 145 * fem,
+      width: 145.0.w,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15 * fem),
+        borderRadius: BorderRadius.circular(15.0.r),
         color: Colors.white,
         boxShadow: [
           BoxShadow(
@@ -467,7 +466,7 @@ class _ProductsPageState extends State<ProductsPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            height: 210.33 * fem,
+            height: 210.33.w,
             child: Stack(
               children: [
                 InkWell(
@@ -486,10 +485,10 @@ class _ProductsPageState extends State<ProductsPage> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
-                      // width: 145 * fem,
-                      // height: 193 * fem,
+                      // width: 145.0.w,
+                      // height: 193.0.w,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15 * fem),
+                        borderRadius: BorderRadius.circular(15.0.r),
                         color: const Color(0x0c000000),
                         image: product.productImages?.isNotEmpty ?? false
                             ? DecorationImage(
@@ -507,7 +506,7 @@ class _ProductsPageState extends State<ProductsPage> {
                       child: Align(
                         alignment: Alignment.topRight,
                         child: Padding(
-                          padding: EdgeInsets.all(8 * fem),
+                          padding: EdgeInsets.all(8.0.w),
                           child: InkWell(
                             onTap: () async {
                               await wishListModel.getWishLists(product.id);
@@ -518,9 +517,9 @@ class _ProductsPageState extends State<ProductsPage> {
                                         wishList.userId == configModel.user?.id)
                                     .isEmpty
                                 ? Icon(Icons.favorite_border_outlined,
-                                    size: 20 * ffem)
+                                    size: 20.0.sp)
                                 : Icon(Icons.favorite_outlined,
-                                    color: Colors.red, size: 20 * ffem),
+                                    color: Colors.red, size: 20.0.sp),
                           ),
                         ),
                       ),
@@ -544,8 +543,8 @@ class _ProductsPageState extends State<ProductsPage> {
               );
             },
             child: Container(
-              margin: EdgeInsets.fromLTRB(10 * fem, 8 * fem, 10 * fem, 4 * fem),
-              constraints: BoxConstraints(maxWidth: 123 * fem),
+              margin: EdgeInsets.fromLTRB(10.0.w, 8.0.w, 10.0.w, 4.0.w),
+              constraints: BoxConstraints(maxWidth: 123.0.w),
               child: Text(
                 product.name ?? 'Unnamed Product',
                 textAlign: TextAlign.center,
@@ -553,10 +552,10 @@ class _ProductsPageState extends State<ProductsPage> {
                 overflow: TextOverflow.ellipsis,
                 style: MyGoogleFontStyle(
                   fontFamily: 'Urbanist',
-                  fontSize: 15 * ffem,
+                  fontSize: 15.0.sp,
                   fontWeight: FontWeight.w700,
                   height: 1.2,
-                  letterSpacing: -0.3 * fem,
+                  letterSpacing: -0.3.w,
                   color: const Color(0xff000000),
                 ),
               ),
@@ -564,26 +563,28 @@ class _ProductsPageState extends State<ProductsPage> {
           ),
           if (product.productPrices?.isNotEmpty ?? false)
             Container(
-              margin: EdgeInsets.fromLTRB(0, 0, 0, 4 * fem),
-              child: product.productPrices![0].offerPrice != 0
+              margin: EdgeInsets.fromLTRB(0, 0, 0, 4.0.w),
+              child: (product.productPrices![0].offerPrice != null &&
+                      product.productPrices![0].offerPrice != 0)
                   ? Text.rich(
                       TextSpan(
                         children: [
                           TextSpan(
-                            text: '₹${product.productPrices![0].price}',
+                            text: '₹${product.productPrices![0].price ?? '0'}',
                             style: TextStyle(
                               color: Colors.grey,
                               decoration: TextDecoration.lineThrough,
-                              fontSize: 13 * ffem,
+                              fontSize: 13.0.sp,
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                           TextSpan(
-                            text: ' ₹${product.productPrices![0].offerPrice}',
+                            text:
+                                ' ₹${product.productPrices![0].offerPrice ?? '0'}',
                             style: TextStyle(
                               color: const Color(0x99000000),
-                              fontSize: 13 * ffem,
+                              fontSize: 13.0.sp,
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.w500,
                             ),
@@ -592,13 +593,13 @@ class _ProductsPageState extends State<ProductsPage> {
                       ),
                     )
                   : Text(
-                      '₹${product.productPrices![0].price}',
+                      '₹${product.productPrices![0].price ?? '0'}',
                       style: MyGoogleFontStyle(
                         fontFamily: 'Poppins',
-                        fontSize: 13 * ffem,
+                        fontSize: 13.0.sp,
                         fontWeight: FontWeight.w500,
                         height: 1.5,
-                        letterSpacing: -0.2190869331 * fem,
+                        letterSpacing: -0.2190869331.w,
                         color: const Color(0x99000000),
                       ),
                     ),
@@ -608,25 +609,25 @@ class _ProductsPageState extends State<ProductsPage> {
               '(${discountPrice.round()}% Off)',
               style: MyGoogleFontStyle(
                 fontFamily: 'Poppins',
-                fontSize: 13 * ffem,
+                fontSize: 13.0.sp,
                 fontWeight: FontWeight.w500,
                 height: 1.5,
-                letterSpacing: -0.2190869331 * fem,
+                letterSpacing: -0.2190869331.w,
                 color: const Color(0x99000000),
               ),
             ),
           Padding(
-            padding: EdgeInsets.only(top: 4 * fem),
+            padding: EdgeInsets.only(top: 4.0.w),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 product.rating == null || product.rating == '0'
                     ? Text(
                         "No Rating",
-                        style: TextStyle(fontSize: 10 * ffem),
+                        style: TextStyle(fontSize: 10.0.sp),
                       )
                     : RatingBar.builder(
-                        itemSize: 15 * ffem,
+                        itemSize: 15.0.sp,
                         initialRating:
                             double.tryParse(product.rating ?? '0.0') ?? 0.0,
                         direction: Axis.horizontal,
@@ -639,10 +640,10 @@ class _ProductsPageState extends State<ProductsPage> {
                       ),
                 if (product.rating != '0')
                   Padding(
-                    padding: EdgeInsets.only(left: 4 * fem),
+                    padding: EdgeInsets.only(left: 4.0.w),
                     child: Text(
                       '(${product.totalReviews} Review${product.totalReviews == 1 ? '' : 's'})',
-                      style: TextStyle(fontSize: 10 * ffem),
+                      style: TextStyle(fontSize: 10.0.sp),
                     ),
                   ),
               ],

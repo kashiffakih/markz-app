@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/providers/auth_pr.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
@@ -26,10 +27,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    double baseWidth = 360;
-    double fem = MediaQuery.of(context).size.width / baseWidth;
-    double ffem = fem * 0.97;
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -99,17 +96,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 Container(
                   // dontworryitoccurspleaseenterth (318:2072)
                   margin: EdgeInsets.fromLTRB(
-                      0 * fem, 0 * fem, 3.24 * fem, 40 * fem),
+                      0.w, 0.w, 3.24.w, 40.w),
                   constraints: BoxConstraints(
-                    maxWidth: 302 * fem,
+                    maxWidth: 302.w,
                   ),
                   child: Text(
                     'Don\'t worry! It occurs. Please enter the email address linked with your account.',
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 13 * ffem,
+                      fontSize: 13.sp,
                       fontWeight: FontWeight.w500,
-                      height: 1.5 * ffem / fem,
+                      height: 1.5,
                       color: Color(0xff8390a1),
                     ),
                   ),
@@ -120,10 +117,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 Container(
                   // enteryouremailinputdtz (318:3047)
                   margin: EdgeInsets.fromLTRB(
-                      20 * fem, 0 * fem, 20 * fem, 10 * fem),
+                      20.w, 0.w, 20.w, 10.w),
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(7.6632652283 * fem),
+                    borderRadius: BorderRadius.circular(7.6632652283.w),
                     border: Border.all(color: Color(0xffe8ecf4)),
                     color: Color(0xfff7f8f9),
                   ),
@@ -135,15 +132,15 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       errorBorder: InputBorder.none,
                       disabledBorder: InputBorder.none,
                       contentPadding: EdgeInsets.fromLTRB(
-                          16.82 * fem, 15.87 * fem, 16.82 * fem, 18.13 * fem),
+                          16.82.w, 15.87.w, 16.82.w, 18.13.w),
                       hintText: 'Enter your email',
                       hintStyle: TextStyle(color: Color(0xff8390a1)),
                     ),
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 14 * ffem,
+                      fontSize: 14.sp,
                       fontWeight: FontWeight.w500,
-                      height: 1.25 * ffem / fem,
+                      height: 1.25,
                       color: Color(0xff000000),
                     ),
                     initialValue: _loginData['email'],
@@ -161,10 +158,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   child: Container(
                     // enteryouremailinputdtz (318:3047)
                     margin: EdgeInsets.fromLTRB(
-                        20 * fem, 0 * fem, 20 * fem, 10 * fem),
+                        20.w, 0.w, 20.w, 10.w),
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(7.6632652283 * fem),
+                      borderRadius: BorderRadius.circular(7.6632652283.w),
                       border: Border.all(color: Color(0xffe8ecf4)),
                       color: Color(0xfff7f8f9),
                     ),
@@ -176,15 +173,15 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         errorBorder: InputBorder.none,
                         disabledBorder: InputBorder.none,
                         contentPadding: EdgeInsets.fromLTRB(
-                            16.82 * fem, 15.87 * fem, 16.82 * fem, 18.13 * fem),
+                            16.82.w, 15.87.w, 16.82.w, 18.13.w),
                         hintText: 'Enter Code',
                         hintStyle: TextStyle(color: Color(0xff8390a1)),
                       ),
                       style: MyGoogleFontStyle(
                         fontFamily: 'Urbanist',
-                        fontSize: 14 * ffem,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
-                        height: 1.25 * ffem / fem,
+                        height: 1.25,
                         color: Color(0xff000000),
                       ),
                       initialValue: _loginData['code'],
@@ -204,10 +201,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 _enterCode == false
                     ? Consumer<AuthModel>(
                         builder: (context, authModel, child) => MaterialButton(
-                          height: 52 * fem,
+                          height: 52.w,
                           shape: RoundedRectangleBorder(
                               borderRadius: new BorderRadius.circular(
-                                  7.6632652283 * fem)),
+                                  7.6632652283.w)),
                           minWidth: MediaQuery.of(context).size.width * .8,
                           color: Color(0xff0f0f0f),
                           onPressed: () async {
@@ -280,7 +277,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                   'Send Code',
                                   style: MyGoogleFontStyle(
                                     fontFamily: 'Urbanist',
-                                    fontSize: 15 * ffem,
+                                    fontSize: 15.sp,
                                     fontWeight: FontWeight.bold,
                                     color: Color(0xffffffff),
                                   ),
@@ -289,10 +286,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       )
                     : Consumer<AuthModel>(
                         builder: (context, authModel, child) => MaterialButton(
-                          height: 52 * fem,
+                          height: 52.w,
                           shape: RoundedRectangleBorder(
                               borderRadius: new BorderRadius.circular(
-                                  7.6632652283 * fem)),
+                                  7.6632652283.w)),
                           minWidth: MediaQuery.of(context).size.width * .8,
                           color: Color(0xff0f0f0f),
                           onPressed: () async {
@@ -347,7 +344,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                   'Verify Code',
                                   style: MyGoogleFontStyle(
                                     fontFamily: 'Urbanist',
-                                    fontSize: 15 * ffem,
+                                    fontSize: 15.sp,
                                     fontWeight: FontWeight.bold,
                                     color: Color(0xffffffff),
                                   ),
@@ -357,7 +354,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 Container(
                   // rememberpasswordloginANa (318:2064)
                   margin: EdgeInsets.fromLTRB(
-                      13.76 * fem, 270 * fem, 0 * fem, 0 * fem),
+                      13.76.w, 270.w, 0.w, 0.w),
                   child: TextButton(
                     onPressed: () {
                       Navigator.pushReplacementNamed(context, '/loginPage');
@@ -370,10 +367,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       text: TextSpan(
                         style: MyGoogleFontStyle(
                           fontFamily: 'Poppins',
-                          fontSize: 13 * ffem,
+                          fontSize: 13.sp,
                           fontWeight: FontWeight.w600,
-                          height: 1.399999912 * ffem / fem,
-                          letterSpacing: 0.13 * fem,
+                          height: 1.399999912,
+                          letterSpacing: 0.13.w,
                           color: Color(0xff1e232c),
                         ),
                         children: [
@@ -381,10 +378,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             text: 'Remember Password? ',
                             style: MyGoogleFontStyle(
                               fontFamily: 'Urbanist',
-                              fontSize: 13 * ffem,
+                              fontSize: 13.sp,
                               fontWeight: FontWeight.w500,
-                              height: 1.399999912 * ffem / fem,
-                              letterSpacing: 0.13 * fem,
+                              height: 1.399999912,
+                              letterSpacing: 0.13.w,
                               color: Color(0xff1e232c),
                             ),
                           ),
@@ -392,10 +389,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             text: 'Login',
                             style: MyGoogleFontStyle(
                               fontFamily: 'Urbanist',
-                              fontSize: 13 * ffem,
+                              fontSize: 13.sp,
                               fontWeight: FontWeight.w700,
-                              height: 1.399999912 * ffem / fem,
-                              letterSpacing: 0.13 * fem,
+                              height: 1.399999912,
+                              letterSpacing: 0.13.w,
                               color: Color(0xffc9b758),
                             ),
                           ),

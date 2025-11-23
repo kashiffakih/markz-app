@@ -1,4 +1,5 @@
 import 'package:aadab/ui/views/profile/orders_p.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 
@@ -17,7 +18,7 @@ class SuccessPage extends StatelessWidget {
       child: Scaffold(
         body: SafeArea(
           child: Container(
-            height: MediaQuery.of(context).size.height,
+            height: 1.0.sh,
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

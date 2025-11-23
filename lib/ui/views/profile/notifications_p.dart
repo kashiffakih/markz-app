@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/providers/notification_pr.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
@@ -45,24 +46,18 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double baseWidth = 360;
-    final double fem = screenWidth / baseWidth;
-    final double ffem = fem * 0.97;
-
     return Scaffold(
       body: SafeArea(
         child: _isLoading
             ? SizedBox(
-                height: screenHeight,
-                width: screenWidth,
+                height: 1.0.sh,
+                width: 1.0.sw,
                 child: const Center(child: CircularProgressIndicator()),
               )
             : _errorMessage != null
                 ? SizedBox(
-                    height: screenHeight,
-                    width: screenWidth,
+                    height: 1.0.sh,
+                    width: 1.0.sw,
                     child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -71,7 +66,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                             _errorMessage!,
                             style: const TextStyle(color: Colors.red),
                           ),
-                          SizedBox(height: 16 * fem),
+                          SizedBox(height: 16.0.w),
                           ElevatedButton(
                             onPressed: _fetchNotifications,
                             child: const Text('Retry'),
@@ -83,20 +78,20 @@ class _NotificationsPageState extends State<NotificationsPage> {
                 : RefreshIndicator(
                     onRefresh: _fetchNotifications,
                     child: SizedBox(
-                      width: screenWidth,
-                      height: screenHeight,
+                      width: 1.0.sw,
+                      height: 1.0.sh,
                       child: Column(
                         children: [
                           // Header
                           Padding(
                             padding: EdgeInsets.symmetric(
-                                horizontal: 20 * fem, vertical: 16 * fem),
+                                horizontal: 20.0.w, vertical: 16.0.w),
                             child: Row(
                               children: [
                                 IconButton(
                                   icon: Icon(
                                     Icons.arrow_back_ios,
-                                    size: 18 * ffem,
+                                    size: 18.0.sp,
                                     color: const Color(0xffEED056),
                                   ),
                                   onPressed: () => Navigator.pop(context),
@@ -107,7 +102,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                       'Notifications',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
-                                        fontSize: 18 * ffem,
+                                        fontSize: 18.0.sp,
                                         fontWeight: FontWeight.bold,
                                         color: const Color(0xff1e232c),
                                       ),
@@ -115,7 +110,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                   ),
                                 ),
                                 SizedBox(
-                                    width: 48 * fem), // Balance for back button
+                                    width: 48.0.w), // Balance for back button
                               ],
                             ),
                           ),
@@ -128,7 +123,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                 if (notifications == null ||
                                     notifications.isEmpty) {
                                   return SizedBox(
-                                    height: screenHeight * 0.5,
+                                    height: 1.0.sh * 0.5,
                                     child: Center(
                                       child: Column(
                                         mainAxisAlignment:
@@ -136,26 +131,26 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                         children: [
                                           Icon(
                                             Icons.notifications_off,
-                                            size: 48 * fem,
+                                            size: 48.0.w,
                                             color: const Color(0xff909090),
                                           ),
-                                          SizedBox(height: 16 * fem),
+                                          SizedBox(height: 16.0.w),
                                           Text(
                                             'No notifications found',
                                             style: MyGoogleFontStyle(
                                               fontFamily: 'Urbanist',
-                                              fontSize: 16 * ffem,
+                                              fontSize: 16.0.sp,
                                               fontWeight: FontWeight.w500,
                                               color: const Color(0xff909090),
                                             ),
                                           ),
-                                          SizedBox(height: 8 * fem),
+                                          SizedBox(height: 8.0.w),
                                           Text(
                                             'You\'ll see notifications here when there\'s an update',
                                             textAlign: TextAlign.center,
                                             style: MyGoogleFontStyle(
                                               fontFamily: 'Urbanist',
-                                              fontSize: 12 * ffem,
+                                              fontSize: 12.0.sp,
                                               fontWeight: FontWeight.w400,
                                               color: const Color(0xffB0B0B0),
                                             ),
@@ -167,10 +162,10 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                 }
                                 return ListView.separated(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: 25 * fem, vertical: 8 * fem),
+                                      horizontal: 25.0.w, vertical: 8.0.w),
                                   itemCount: notifications.length,
                                   separatorBuilder: (context, index) =>
-                                      SizedBox(height: 12 * fem),
+                                      SizedBox(height: 12.0.w),
                                   itemBuilder: (context, index) {
                                     final notification = notifications[index];
                                     return InkWell(
@@ -185,11 +180,11 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                         );
                                       },
                                       child: Container(
-                                        padding: EdgeInsets.all(12 * fem),
+                                        padding: EdgeInsets.all(12.0.w),
                                         decoration: BoxDecoration(
                                           color: Colors.white,
                                           borderRadius:
-                                              BorderRadius.circular(12 * fem),
+                                              BorderRadius.circular(12.0.r),
                                           boxShadow: [
                                             BoxShadow(
                                               color:
@@ -208,18 +203,18 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                                   'Notification',
                                               style: MyGoogleFontStyle(
                                                 fontFamily: 'Poppins',
-                                                fontSize: 14 * ffem,
+                                                fontSize: 14.0.sp,
                                                 fontWeight: FontWeight.w600,
                                                 color: const Color(0xff232323),
                                               ),
                                             ),
-                                            SizedBox(height: 4 * fem),
+                                            SizedBox(height: 4.0.w),
                                             Text(
                                               notification.details ??
                                                   'No details available',
                                               style: MyGoogleFontStyle(
                                                 fontFamily: 'Poppins',
-                                                fontSize: 12 * ffem,
+                                                fontSize: 12.0.sp,
                                                 fontWeight: FontWeight.w400,
                                                 color: const Color(0xff909090),
                                               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 
 class TermsAndConditionsPage extends StatefulWidget {
@@ -15,7 +16,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
-            height: MediaQuery.of(context).size.height * 1.0,
+            height: 1.0.sh,
             padding: EdgeInsets.only(top: 20),
             child: Column(
               children: [
@@ -58,13 +59,13 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                 ),
                 // Body
                 Container(
-                  height: MediaQuery.of(context).size.height,
+                  height: 1.0.sh,
                   margin: EdgeInsets.all(20),
                   child: Column(
                     children: [
                       Container(
-                        height: MediaQuery.of(context).size.height,
-                        width: MediaQuery.of(context).size.width,
+                        height: 1.0.sh,
+                        width: 1.0.sw,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,

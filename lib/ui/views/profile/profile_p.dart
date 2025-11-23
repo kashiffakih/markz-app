@@ -1,4 +1,5 @@
 import 'package:aadab/ui/root_p.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:aadab/ui/views/checkout/cart_p.dart';
 import 'package:aadab/ui/views/profile/address_p.dart';
 import 'package:aadab/ui/views/profile/orders_p.dart';
@@ -70,9 +71,6 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final configModel = locator<ConfigModel>();
-    final double fem = MediaQuery.of(context).size.width / 360;
-    final double ffem = fem * 0.97;
-
     return Scaffold(
       body: PopScope(
         canPop: false,
@@ -88,8 +86,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Container(
                     child: Column(
                       children: [
-                        _buildHeader(context, configModel, fem, ffem),
-                        _buildBody(context, fem, ffem),
+                        _buildHeader(context, configModel),
+                        _buildBody(context),
                       ],
                     ),
                   ),
@@ -99,10 +97,9 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildHeader(
-      BuildContext context, ConfigModel configModel, double fem, double ffem) {
+  Widget _buildHeader(BuildContext context, ConfigModel configModel) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 30 * fem, vertical: 10 * fem),
+      margin: EdgeInsets.symmetric(horizontal: 30.0.w, vertical: 10.0.w),
       width: double.infinity,
       child: Column(
         children: [
@@ -112,7 +109,7 @@ class _ProfilePageState extends State<ProfilePage> {
               IconButton(
                 icon: Icon(
                   Icons.arrow_back_ios,
-                  size: 18 * fem,
+                  size: 18.0.w,
                   color: const Color(0xffEED056),
                 ),
                 onPressed: () =>
@@ -124,13 +121,13 @@ class _ProfilePageState extends State<ProfilePage> {
                   textAlign: TextAlign.center,
                   style: MyGoogleFontStyle(
                     fontFamily: 'Urbanist',
-                    fontSize: 18 * ffem,
+                    fontSize: 18.0.sp,
                     fontWeight: FontWeight.bold,
                     color: const Color(0xff1e232c),
                   ),
                 ),
               ),
-              SizedBox(width: 48 * fem),
+              SizedBox(width: 48.0.w),
             ],
           ),
           Row(
@@ -144,7 +141,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       configModel.user?.firstName?.toString() ?? 'Anonymous',
                       style: MyGoogleFontStyle(
                         fontFamily: 'Urbanist',
-                        fontSize: 16 * ffem,
+                        fontSize: 16.0.sp,
                         fontWeight: FontWeight.w700,
                         color: const Color(0xff303030),
                       ),
@@ -153,7 +150,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       configModel.user?.email?.toString() ?? 'No email',
                       style: MyGoogleFontStyle(
                         fontFamily: 'Urbanist',
-                        fontSize: 14 * ffem,
+                        fontSize: 14.0.sp,
                         fontWeight: FontWeight.w400,
                         color: const Color(0xff808080),
                       ),
@@ -162,22 +159,21 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               TextButton(
-                onPressed: () =>
-                    _showLogoutDialog(context, configModel, fem, ffem),
+                onPressed: () => _showLogoutDialog(context, configModel),
                 style: TextButton.styleFrom(padding: EdgeInsets.zero),
                 child: Container(
-                  width: 80 * fem,
-                  height: 35 * fem,
+                  width: 80.0.w,
+                  height: 35.0.w,
                   decoration: BoxDecoration(
                     color: const Color(0xff1e1e1e),
-                    borderRadius: BorderRadius.circular(10 * fem),
+                    borderRadius: BorderRadius.circular(10.0.r),
                   ),
                   child: Center(
                     child: Text(
                       'Logout',
                       style: MyGoogleFontStyle(
                         fontFamily: 'Urbanist',
-                        fontSize: 15 * ffem,
+                        fontSize: 15.0.sp,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                       ),
@@ -192,7 +188,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildBody(BuildContext context, double fem, double ffem) {
+  Widget _buildBody(BuildContext context) {
     final orderModel = Provider.of<OrderModel>(context, listen: false);
     final userWalletModel =
         Provider.of<UserWalletModel>(context, listen: false);
@@ -203,7 +199,7 @@ class _ProfilePageState extends State<ProfilePage> {
         Provider.of<UserAddressModel>(context, listen: false);
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 20 * fem, vertical: 20 * fem),
+      margin: EdgeInsets.symmetric(horizontal: 20.0.w, vertical: 20.0.w),
       child: Column(
         children: [
           _buildProfileItem(
@@ -219,8 +215,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     OrdersPage(isProfile: {'isProfile': true}),
               ),
             ),
-            fem: fem,
-            ffem: ffem,
           ),
           _buildProfileItem(
             context: context,
@@ -228,8 +222,6 @@ class _ProfilePageState extends State<ProfilePage> {
             subtitle:
                 'Total earn ${userWalletModel.totalEarnPoint.toString()} points',
             onTap: () => Navigator.pushNamed(context, '/rewardsPage'),
-            fem: fem,
-            ffem: ffem,
           ),
           _buildProfileItem(
             context: context,
@@ -238,8 +230,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 ? 'Wishlist is empty'
                 : 'Already have ${wishListModel.wishLists!.length} items',
             onTap: () => Navigator.pushNamed(context, '/wishlistPage'),
-            fem: fem,
-            ffem: ffem,
           ),
           _buildProfileItem(
             context: context,
@@ -264,8 +254,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               );
             },
-            fem: fem,
-            ffem: ffem,
           ),
           _buildProfileItem(
             context: context,
@@ -279,8 +267,6 @@ class _ProfilePageState extends State<ProfilePage> {
               'is_edit': true,
               'is_popup': true,
             }),
-            fem: fem,
-            ffem: ffem,
           ),
           _buildProfileItem(
             context: context,
@@ -300,52 +286,44 @@ class _ProfilePageState extends State<ProfilePage> {
                 }),
               ),
             ),
-            fem: fem,
-            ffem: ffem,
           ),
           _buildProfileItem(
             context: context,
             title: 'Contact Us',
             subtitle: 'Email & Whatsapp',
             onTap: () => Navigator.pushNamed(context, '/contactPage'),
-            fem: fem,
-            ffem: ffem,
           ),
           _buildProfileItem(
             context: context,
             title: 'Settings',
             subtitle: 'Update your profile',
             onTap: () => Navigator.pushNamed(context, '/settingsPage'),
-            fem: fem,
-            ffem: ffem,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildProfileItem({
-    required BuildContext context,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-    required double fem,
-    required double ffem,
-  }) {
+  Widget _buildProfileItem(
+      {required BuildContext context,
+      required String title,
+      required String subtitle,
+      required VoidCallback onTap,
+      required}) {
     return InkWell(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.only(bottom: 10 * fem),
-        padding: EdgeInsets.all(10 * fem),
+        margin: EdgeInsets.only(bottom: 10.0.w),
+        padding: EdgeInsets.all(10.0.w),
         decoration: BoxDecoration(
           border: Border.all(color: const Color(0xffc7b456)),
           color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(5 * fem)),
+          borderRadius: BorderRadius.all(Radius.circular(5.0.w)),
           boxShadow: [
             BoxShadow(
               color: const Color(0x338a959e),
-              offset: Offset(0, 7.6690645218 * fem),
-              blurRadius: 19.1726608276 * fem,
+              offset: Offset(0, 7.6690645218.w),
+              blurRadius: 19.1726608276.w,
             ),
           ],
         ),
@@ -359,17 +337,17 @@ class _ProfilePageState extends State<ProfilePage> {
                     title,
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 16 * ffem,
+                      fontSize: 16.0.sp,
                       fontWeight: FontWeight.w700,
                       color: const Color(0xff232323),
                     ),
                   ),
-                  SizedBox(height: 5 * fem),
+                  SizedBox(height: 5.0.w),
                   Text(
                     subtitle,
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 11 * ffem,
+                      fontSize: 11.0.sp,
                       fontWeight: FontWeight.w400,
                       color: const Color(0xff909090),
                     ),
@@ -379,7 +357,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             Icon(
               Icons.arrow_forward_ios,
-              size: 12 * fem,
+              size: 12.0.w,
               color: const Color(0xff232323),
             ),
           ],
@@ -413,18 +391,17 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _showLogoutDialog(
-      BuildContext context, ConfigModel configModel, double fem, double ffem) {
+  void _showLogoutDialog(BuildContext context, ConfigModel configModel) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20 * fem)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0.r)),
         title: Text(
           'Confirm Logout',
           style: MyGoogleFontStyle(
             fontFamily: 'Urbanist',
-            fontSize: 16 * ffem,
+            fontSize: 16.0.sp,
             fontWeight: FontWeight.w600,
             color: const Color(0xff1e232c),
           ),
@@ -433,7 +410,7 @@ class _ProfilePageState extends State<ProfilePage> {
           'Are you sure you want to logout?',
           style: MyGoogleFontStyle(
             fontFamily: 'Poppins',
-            fontSize: 14 * ffem,
+            fontSize: 14.0.sp,
             fontWeight: FontWeight.w400,
             color: const Color(0xff909090),
           ),
@@ -445,7 +422,7 @@ class _ProfilePageState extends State<ProfilePage> {
               'No',
               style: MyGoogleFontStyle(
                 fontFamily: 'Poppins',
-                fontSize: 14 * ffem,
+                fontSize: 14.0.sp,
                 fontWeight: FontWeight.w500,
                 color: const Color(0xff1e232c),
               ),
@@ -486,7 +463,7 @@ class _ProfilePageState extends State<ProfilePage> {
               'Yes',
               style: MyGoogleFontStyle(
                 fontFamily: 'Poppins',
-                fontSize: 14 * ffem,
+                fontSize: 14.0.sp,
                 fontWeight: FontWeight.w500,
                 color: const Color(0xff1e232c),
               ),

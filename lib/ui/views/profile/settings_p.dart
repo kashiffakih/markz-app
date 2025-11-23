@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/providers/config_pr.dart';
 import 'package:aadab/core/providers/user_wallet_pr.dart';
@@ -73,7 +74,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           left: 25,
                           top: 0,
                           child: Container(
-                            width: MediaQuery.of(context).size.width - 50,
+                            width: 1.0.sw - 50,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -110,7 +111,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ],
                                 ),
                                 Container(
-                                  width: MediaQuery.of(context).size.width - 50,
+                                  width: 1.0.sw - 50,
                                   margin: EdgeInsets.only(top: 10, bottom: 10),
                                   padding: EdgeInsets.all(10),
                                   decoration: BoxDecoration(
@@ -155,7 +156,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ),
                                 ),
                                 Container(
-                                  width: MediaQuery.of(context).size.width - 50,
+                                  width: 1.0.sw - 50,
                                   margin: EdgeInsets.only(top: 10, bottom: 10),
                                   padding: EdgeInsets.all(10),
                                   decoration: BoxDecoration(
@@ -200,7 +201,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ),
                                 ),
                                 Container(
-                                  width: MediaQuery.of(context).size.width - 50,
+                                  width: 1.0.sw - 50,
                                   margin: EdgeInsets.only(top: 10, bottom: 10),
                                   padding: EdgeInsets.all(10),
                                   decoration: BoxDecoration(
@@ -245,7 +246,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ),
                                 ),
                                 Container(
-                                  width: MediaQuery.of(context).size.width - 50,
+                                  width: 1.0.sw - 50,
                                   margin: EdgeInsets.only(top: 10, bottom: 10),
                                   padding: EdgeInsets.all(10),
                                   decoration: BoxDecoration(
@@ -465,7 +466,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 //   ],
                                 // ),
                                 // Container(
-                                //   width: MediaQuery.of(context).size.width - 50,
+                                //   width: 1.0.sw - 50,
                                 //   margin: EdgeInsets.only(top: 10, bottom: 10),
                                 //   padding: EdgeInsets.all(10),
                                 //   decoration: BoxDecoration(

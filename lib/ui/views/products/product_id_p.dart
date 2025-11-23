@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/models/product.dart';
 import 'package:aadab/core/models/add_to_cart.dart';
@@ -41,6 +42,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
   double discountPrice = 0.0;
   bool _isLoading = true;
   String? _errorMessage;
+  int currentPackQty = 0;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
@@ -93,33 +95,50 @@ class _ProductIdPageState extends State<ProductIdPage> {
 
   void _initializeProductData() {
     productDisplayImages = widget.arguments?['product_images']?.toList() ?? [];
+
+    // Get all product packs
+    final allPacks = widget.arguments?['product']?['product_packs'] ?? [];
+
+    // Initialize unitName from product images or first pack
     if (productDisplayImages.isNotEmpty) {
       unitName = productDisplayImages[0].unit?.name ?? '';
       _cartData['flavour'] = unitName;
+    } else if (allPacks.isNotEmpty) {
+      // If no product images, use the first pack's unit
+      unitName = allPacks[0]['unit']?['name']?.toString() ?? '';
+      _cartData['flavour'] = unitName;
     }
-    _sizes = widget.arguments?['product']?['product_packs']
-            ?.where((pack) => pack['unit']?['name'] == unitName)
-            ?.toList() ??
-        [];
+
+    // Filter sizes by unitName, or use all packs if unitName is empty
+    _sizes = unitName.isNotEmpty
+        ? allPacks.where((pack) => pack['unit']?['name'] == unitName).toList()
+        : allPacks.toList();
+
     if (_sizes.isNotEmpty) {
       _cartData['kindOfFlower'] = _sizes[0]['value']?.toString() ?? '';
       _cartData['pack'] = _sizes[0]['id']?.toString() ?? '';
       size = _sizes[0]['value']?.toString() ?? '';
-      _productPoints = _sizes[0]['points'];
+      _productPoints = _sizes[0]['points']?.toString() ?? '';
       activeIndex = 0; // Pre-select the first size
+      currentPackQty = _sizes[0]['qty'] ?? 0; // Initialize quantity
+
+      // Get prices for the selected pack
+      _prices = widget.arguments?['product']?['product_prices']
+              ?.where((price) => price['product_pack_id'] == _sizes[0]['id'])
+              ?.toList() ??
+          [];
+
+      if (_prices.isNotEmpty) {
+        final price = int.tryParse(_prices[0]['price']?.toString() ?? '0') ?? 0;
+        final offerPrice =
+            int.tryParse(_prices[0]['offer_price']?.toString() ?? '0') ?? 0;
+
+        if (price > 0 && offerPrice > 0 && offerPrice < price) {
+          discountPrice = ((price - offerPrice) / price * 100);
+        }
+      }
     }
-    _prices = widget.arguments?['product']?['product_prices']
-            ?.where((price) => price['product_pack_id'] == _sizes[0]['id'])
-            ?.toList() ??
-        [];
-    if (_prices.isNotEmpty) {
-      discountPrice = _prices[0]['offer_price'] != 0
-          ? ((int.parse(_prices[0]['price'].toString()) -
-                  int.parse(_prices[0]['offer_price'].toString())) /
-              int.parse(_prices[0]['price'].toString()) *
-              100)
-          : 0.0;
-    }
+
     cartCount = context.read<AddToCartModel>().addToCarts?.length ?? 0;
   }
 
@@ -138,18 +157,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
     return product.totalReviews ?? packReviews;
   }
 
-  int _getPackReviewsCount(Product? product, int packId) {
-    if (product == null || product.productPacks == null) return 0;
-
-    // Find the specific pack and return its review count
-    for (var pack in product.productPacks!) {
-      if (pack.id == packId) {
-        return pack.reviews?.length ?? 0;
-      }
-    }
-    return 0;
-  }
-
   @override
   void dispose() {
     _searchController.dispose();
@@ -159,12 +166,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double baseWidth = 360;
-    final double fem = screenWidth / baseWidth;
-    final double ffem = fem * 0.97;
-
     final configModel = locator<ConfigModel>();
     final productModel = context.watch<ProductModel>();
     final addToCartModel = context.watch<AddToCartModel>();
@@ -178,8 +179,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
       return Scaffold(
         body: SafeArea(
           child: SizedBox(
-            width: screenWidth,
-            height: screenHeight,
+            width: 1.0.sw,
+            height: 1.0.sh,
             child: const Center(child: CircularProgressIndicator()),
           ),
         ),
@@ -190,8 +191,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
       return Scaffold(
         body: SafeArea(
           child: SizedBox(
-            width: screenWidth,
-            height: screenHeight,
+            width: 1.0.sw,
+            height: 1.0.sh,
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -200,7 +201,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                     _errorMessage ?? 'Product data not available.',
                     style: const TextStyle(color: Colors.red),
                   ),
-                  SizedBox(height: 16 * fem),
+                  SizedBox(height: 16.0.w),
                   ElevatedButton(
                     onPressed: _fetchInitialData,
                     child: const Text('Retry'),
@@ -233,8 +234,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
           onRefresh: _fetchInitialData,
           child: SingleChildScrollView(
             child: Container(
-              width: screenWidth,
-              constraints: BoxConstraints(minHeight: screenHeight),
+              width: 1.0.sw,
+              constraints: BoxConstraints(minHeight: 1.0.sh),
               decoration: const BoxDecoration(color: Colors.white),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -242,7 +243,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                     // Header
                     Padding(
                       padding: EdgeInsets.symmetric(
-                          horizontal: 20 * fem, vertical: 16 * fem),
+                          horizontal: 20.0.w, vertical: 16.0.w),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -251,13 +252,13 @@ class _ProductIdPageState extends State<ProductIdPage> {
                               'Product Details',
                               style: MyGoogleFontStyle(
                                 fontFamily: 'Urbanist',
-                                fontSize: 18 * ffem,
+                                fontSize: 18.0.sp,
                                 fontWeight: FontWeight.bold,
                                 color: const Color(0xff1e232c),
                               ),
                             ),
                           ),
-                          SizedBox(height: 15 * fem),
+                          SizedBox(height: 15.0.w),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -265,23 +266,23 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                 onTap: () => Navigator.pop(context),
                                 child: Icon(
                                   Icons.arrow_back_ios,
-                                  size: 18 * ffem,
+                                  size: 18.0.sp,
                                   color: const Color(0xffEED056),
                                 ),
                               ),
-                              SizedBox(width: 10 * fem),
+                              SizedBox(width: 10.0.w),
                               Expanded(
                                 child: Container(
-                                  height: 38 * fem,
+                                  height: 38.0.w,
                                   padding: EdgeInsets.only(
-                                      left: 21 * fem, right: 20.70 * fem),
+                                      left: 21.0.w, right: 20.70.w),
                                   decoration: ShapeDecoration(
                                     shape: RoundedRectangleBorder(
                                       side: const BorderSide(
                                           width: 0.50,
                                           color: Color(0xFFC7B456)),
                                       borderRadius:
-                                          BorderRadius.circular(10 * fem),
+                                          BorderRadius.circular(10.0.r),
                                     ),
                                   ),
                                   child: Row(
@@ -315,7 +316,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                           style: TextStyle(
                                             color:
                                                 Colors.black.withOpacity(0.6),
-                                            fontSize: 18 * ffem,
+                                            fontSize: 18.0.sp,
                                             fontFamily: 'Urbanist',
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -323,14 +324,14 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                       ),
                                       Image.asset(
                                         'assets/images/Search-1.png',
-                                        height: 20 * fem,
+                                        height: 20.0.w,
                                         fit: BoxFit.cover,
                                       ),
                                     ],
                                   ),
                                 ),
                               ),
-                              SizedBox(width: 10 * fem),
+                              SizedBox(width: 10.0.w),
                               InkWell(
                                 onTap: () {
                                   if (configModel.user == null) {
@@ -356,7 +357,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                   ),
                                   child: Image.asset(
                                     'assets/images/shopping_cart.png',
-                                    height: 20 * fem,
+                                    height: 20.0.w,
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -376,8 +377,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                           Stack(
                             children: [
                               SizedBox(
-                                width: screenWidth,
-                                height: 350 * fem,
+                                width: 1.0.sw,
+                                height: 350.0.w,
                                 child: imageProduct.isEmpty
                                     ? const Center(
                                         child: Text('No images available'))
@@ -410,8 +411,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                       ),
                               ),
                               Positioned(
-                                top: 10 * fem,
-                                right: 10 * fem,
+                                top: 10.0.w,
+                                right: 10.0.w,
                                 child: Row(
                                   children: [
                                     InkWell(
@@ -431,8 +432,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                       },
                                       child: wishListModel.wishListLoader
                                           ? SizedBox(
-                                              width: 20 * ffem,
-                                              height: 20 * ffem,
+                                              width: 20.0.sp,
+                                              height: 20.0.sp,
                                               child:
                                                   const CircularProgressIndicator(
                                                       strokeWidth: 2),
@@ -463,10 +464,10 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       false
                                                   ? Colors.red
                                                   : null,
-                                              size: 20 * ffem,
+                                              size: 20.0.sp,
                                             ),
                                     ),
-                                    SizedBox(width: 10 * fem),
+                                    SizedBox(width: 10.0.w),
                                     IconButton(
                                       onPressed: () {
                                         Share.share(
@@ -480,15 +481,15 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                 ),
                               ),
                               Positioned(
-                                top: 325 * fem,
+                                top: 325.0.w,
                                 child: Container(
-                                  width: screenWidth,
-                                  height: 41 * fem,
+                                  width: 1.0.sw,
+                                  height: 41.0.w,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(30 * fem),
-                                      topRight: Radius.circular(30 * fem),
+                                      topLeft: Radius.circular(30.0.w),
+                                      topRight: Radius.circular(30.0.w),
                                     ),
                                   ),
                                 ),
@@ -500,24 +501,23 @@ class _ProductIdPageState extends State<ProductIdPage> {
                               controller: sliderController,
                               count: imageProduct.length,
                               effect: ExpandingDotsEffect(
-                                dotHeight: 8 * fem,
-                                dotWidth: 8 * fem,
+                                dotHeight: 8.0.w,
+                                dotWidth: 8.0.w,
                                 activeDotColor: Colors.blue,
                                 dotColor: Colors.grey,
                               ),
                             ),
                           ),
-                          SizedBox(height: 15 * fem),
+                          SizedBox(height: 15.0.w),
                           // Thumbnail Images
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 8 * fem),
+                            padding: EdgeInsets.symmetric(horizontal: 8.0.w),
                             child: Row(
                               children: [
                                 Expanded(
                                   flex: 1,
                                   child: IconButton(
-                                    icon:
-                                        Icon(Icons.arrow_left, size: 24 * ffem),
+                                    icon: Icon(Icons.arrow_left, size: 24.0.sp),
                                     onPressed: () {
                                       if (productDisplayImages.isNotEmpty) {
                                         final currentIndex =
@@ -564,6 +564,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                               ? _sizes[0]['id']?.toString() ??
                                                   ''
                                               : '';
+                                          currentPackQty = _sizes.isNotEmpty
+                                              ? _sizes[0]['qty'] ?? 0
+                                              : 0;
                                           _prices = widget.arguments?['product']
                                                       ?['product_prices']
                                                   ?.where((price) =>
@@ -577,17 +580,30 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       ?.toString() ??
                                                   ''
                                               : '';
-                                          discountPrice = _prices.isNotEmpty &&
-                                                  _prices[0]['offer_price'] != 0
-                                              ? ((int.parse(_prices[0]['price']
-                                                          .toString()) -
-                                                      int.parse(_prices[0]
-                                                              ['offer_price']
-                                                          .toString())) /
-                                                  int.parse(_prices[0]['price']
-                                                      .toString()) *
-                                                  100)
-                                              : 0.0;
+
+                                          // Calculate discount price safely
+                                          discountPrice = 0.0;
+                                          if (_prices.isNotEmpty) {
+                                            final price = int.tryParse(
+                                                    _prices[0]['price']
+                                                            ?.toString() ??
+                                                        '0') ??
+                                                0;
+                                            final offerPrice = int.tryParse(
+                                                    _prices[0]['offer_price']
+                                                            ?.toString() ??
+                                                        '0') ??
+                                                0;
+
+                                            if (price > 0 &&
+                                                offerPrice > 0 &&
+                                                offerPrice < price) {
+                                              discountPrice =
+                                                  ((price - offerPrice) /
+                                                      price *
+                                                      100);
+                                            }
+                                          }
                                         });
                                       }
                                     },
@@ -596,11 +612,11 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                 Expanded(
                                   flex: 10,
                                   child: SizedBox(
-                                    height: 100 * fem,
+                                    height: 100.0.w,
                                     child: ListView.builder(
                                       scrollDirection: Axis.horizontal,
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 5 * fem),
+                                          horizontal: 5.0.w),
                                       itemCount: productDisplayImages.length,
                                       itemBuilder: (context, index) {
                                         final isSelected = unitName ==
@@ -649,6 +665,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                               ?.toString() ??
                                                           ''
                                                       : '';
+                                              currentPackQty = _sizes.isNotEmpty
+                                                  ? _sizes[0]['qty'] ?? 0
+                                                  : 0;
                                               _prices = widget
                                                       .arguments?['product']
                                                           ?['product_prices']
@@ -663,39 +682,46 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                           ?.toString() ??
                                                       ''
                                                   : '';
-                                              discountPrice = _prices
-                                                          .isNotEmpty &&
-                                                      _prices[0]['offer_price'] !=
-                                                          0
-                                                  ? ((int.parse(_prices[0]
-                                                                  ['price']
-                                                              .toString()) -
-                                                          int.parse(_prices[0][
-                                                                  'offer_price']
-                                                              .toString())) /
-                                                      int.parse(_prices[0]
-                                                              ['price']
-                                                          .toString()) *
-                                                      100)
-                                                  : 0.0;
+                                              // Calculate discount price safely
+                                              discountPrice = 0.0;
+                                              if (_prices.isNotEmpty) {
+                                                final price = int.tryParse(
+                                                        _prices[0]['price']
+                                                                ?.toString() ??
+                                                            '0') ??
+                                                    0;
+                                                final offerPrice = int.tryParse(
+                                                        _prices[0]['offer_price']
+                                                                ?.toString() ??
+                                                            '0') ??
+                                                    0;
+
+                                                if (price > 0 &&
+                                                    offerPrice > 0 &&
+                                                    offerPrice < price) {
+                                                  discountPrice =
+                                                      ((price - offerPrice) /
+                                                          price *
+                                                          100);
+                                                }
+                                              }
                                             });
                                           },
                                           child: Container(
                                             margin:
-                                                EdgeInsets.only(right: 8 * fem),
-                                            width: 60 * fem,
-                                            height: 80 * fem,
+                                                EdgeInsets.only(right: 8.0.w),
+                                            width: 60.0.w,
+                                            height: 80.0.w,
                                             padding: EdgeInsets.all(2),
                                             decoration: BoxDecoration(
                                               border: isSelected
                                                   ? Border.all(
                                                       color: Colors.black,
-                                                      width: 2 * fem)
+                                                      width: 2.0.w)
                                                   : Border.all(
                                                       color: Colors.grey[300]!),
                                               borderRadius:
-                                                  BorderRadius.circular(
-                                                      8 * fem),
+                                                  BorderRadius.circular(8.0.w),
                                             ),
                                             child: productDisplayImages[index]
                                                         .imagepath !=
@@ -719,8 +745,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                 Expanded(
                                   flex: 1,
                                   child: IconButton(
-                                    icon: Icon(Icons.arrow_right,
-                                        size: 24 * ffem),
+                                    icon:
+                                        Icon(Icons.arrow_right, size: 24.0.sp),
                                     onPressed: () {
                                       if (productDisplayImages.isNotEmpty) {
                                         final currentIndex =
@@ -767,6 +793,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                               ? _sizes[0]['id']?.toString() ??
                                                   ''
                                               : '';
+                                          currentPackQty = _sizes.isNotEmpty
+                                              ? _sizes[0]['qty'] ?? 0
+                                              : 0;
                                           _prices = widget.arguments?['product']
                                                       ?['product_prices']
                                                   ?.where((price) =>
@@ -780,17 +809,30 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       ?.toString() ??
                                                   ''
                                               : '';
-                                          discountPrice = _prices.isNotEmpty &&
-                                                  _prices[0]['offer_price'] != 0
-                                              ? ((int.parse(_prices[0]['price']
-                                                          .toString()) -
-                                                      int.parse(_prices[0]
-                                                              ['offer_price']
-                                                          .toString())) /
-                                                  int.parse(_prices[0]['price']
-                                                      .toString()) *
-                                                  100)
-                                              : 0.0;
+
+                                          // Calculate discount price safely
+                                          discountPrice = 0.0;
+                                          if (_prices.isNotEmpty) {
+                                            final price = int.tryParse(
+                                                    _prices[0]['price']
+                                                            ?.toString() ??
+                                                        '0') ??
+                                                0;
+                                            final offerPrice = int.tryParse(
+                                                    _prices[0]['offer_price']
+                                                            ?.toString() ??
+                                                        '0') ??
+                                                0;
+
+                                            if (price > 0 &&
+                                                offerPrice > 0 &&
+                                                offerPrice < price) {
+                                              discountPrice =
+                                                  ((price - offerPrice) /
+                                                      price *
+                                                      100);
+                                            }
+                                          }
                                         });
                                       }
                                     },
@@ -801,7 +843,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                           ),
                           // Product Details
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 25 * fem),
+                            padding: EdgeInsets.symmetric(horizontal: 25.0.w),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -816,18 +858,18 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                             product.name ?? 'Unnamed Product',
                                             style: MyGoogleFontStyle(
                                               fontFamily: 'Urbanist',
-                                              fontSize: 19 * ffem,
+                                              fontSize: 19.0.sp,
                                               fontWeight: FontWeight.w700,
                                               color: const Color(0xff000000),
                                             ),
                                           ),
-                                          SizedBox(height: 8 * fem),
+                                          SizedBox(height: 8.0.w),
                                           Row(
                                             children: [
                                               if (product.rating != null &&
                                                   product.rating != '0')
                                                 RatingBar.builder(
-                                                  itemSize: 15 * ffem,
+                                                  itemSize: 15.0.sp,
                                                   initialRating:
                                                       double.tryParse(
                                                               product.rating ??
@@ -847,7 +889,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 '(${_getTotalReviewsCount(product)} Review${_getTotalReviewsCount(product) == 1 ? '' : 's'})',
                                                 style: MyGoogleFontStyle(
                                                   fontFamily: 'Urbanist',
-                                                  fontSize: 10 * ffem,
+                                                  fontSize: 10.0.sp,
                                                   fontWeight: FontWeight.w400,
                                                   color:
                                                       const Color(0xff000000),
@@ -858,18 +900,22 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                         ],
                                       ),
                                     ),
-                                    SizedBox(width: 20 * fem),
+                                    SizedBox(width: 20.0.w),
                                     Column(
                                       children: [
-                                        if (addToCartModel.addToCarts
-                                                ?.where((cart) =>
-                                                    cart.productId ==
-                                                        widget.arguments![
-                                                            'product']['id'] &&
-                                                    cart.flavour == unitName &&
-                                                    cart.kindOfFlower == size)
-                                                .isEmpty ??
-                                            true)
+                                        if ((addToCartModel.addToCarts
+                                                    ?.where((cart) =>
+                                                        cart.productId ==
+                                                            widget.arguments![
+                                                                    'product']
+                                                                ['id'] &&
+                                                        cart.flavour ==
+                                                            unitName &&
+                                                        cart.kindOfFlower ==
+                                                            size)
+                                                    .isEmpty ??
+                                                true) &&
+                                            currentPackQty > 0)
                                           TextButton(
                                             onPressed: () async {
                                               if (configModel.user == null) {
@@ -885,11 +931,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   context: context,
                                                   builder: (context) =>
                                                       AlertDialog(
-                                                    shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(
-                                                                    20 * fem)),
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20.0.w)),
                                                     title: const Text(
                                                         'Kindly choose a size.'),
                                                     actions: [
@@ -903,7 +950,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                               color:
                                                                   Colors.black,
                                                               fontSize:
-                                                                  16 * ffem),
+                                                                  16.0.sp),
                                                         ),
                                                       ),
                                                     ],
@@ -915,11 +962,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   context: context,
                                                   builder: (context) =>
                                                       AlertDialog(
-                                                    shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(
-                                                                    20 * fem)),
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20.0.w)),
                                                     title: const Text(
                                                         'Kindly choose a colour.'),
                                                     actions: [
@@ -933,7 +981,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                               color:
                                                                   Colors.black,
                                                               fontSize:
-                                                                  16 * ffem),
+                                                                  16.0.sp),
                                                         ),
                                                       ),
                                                     ],
@@ -942,16 +990,25 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                               } else {
                                                 _cartData['points'] =
                                                     _productPoints;
-                                                _cartData[
-                                                    'product_price'] = _prices
-                                                            .isNotEmpty &&
-                                                        _prices[0][
-                                                                'offer_price'] !=
-                                                            0
-                                                    ? _prices[0]['offer_price']
-                                                        .toString()
-                                                    : _prices[0]['price']
-                                                        .toString();
+
+                                                // Set product price safely
+                                                if (_prices.isNotEmpty) {
+                                                  final offerPrice =
+                                                      _prices[0]['offer_price'];
+                                                  final price =
+                                                      _prices[0]['price'];
+
+                                                  _cartData['product_price'] =
+                                                      (offerPrice != null &&
+                                                              offerPrice != 0)
+                                                          ? offerPrice
+                                                              .toString()
+                                                          : (price?.toString() ??
+                                                              '0');
+                                                } else {
+                                                  _cartData['product_price'] =
+                                                      '0';
+                                                }
                                                 _cartData['is_add_to_cart'] =
                                                     true;
 
@@ -973,8 +1030,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                             style: TextButton.styleFrom(
                                                 padding: EdgeInsets.zero),
                                             child: Container(
-                                              width: 82 * fem,
-                                              height: 27.33 * fem,
+                                              width: 82.0.w,
+                                              height: 27.33.w,
                                               decoration: BoxDecoration(
                                                 border: Border.all(
                                                     color: const Color(
@@ -982,7 +1039,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 color: Colors.white,
                                                 borderRadius:
                                                     BorderRadius.circular(
-                                                        15 * fem),
+                                                        15.0.w),
                                                 boxShadow: [
                                                   BoxShadow(
                                                     color: Colors.black
@@ -997,7 +1054,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   'ADD',
                                                   style: MyGoogleFontStyle(
                                                     fontFamily: 'DM Sans',
-                                                    fontSize: 12 * ffem,
+                                                    fontSize: 12.0.sp,
                                                     fontWeight: FontWeight.w700,
                                                     color:
                                                         const Color(0xffc7b456),
@@ -1006,15 +1063,19 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                               ),
                                             ),
                                           ),
-                                        if (addToCartModel.addToCarts
-                                                ?.where((cart) =>
-                                                    cart.productId ==
-                                                        widget.arguments![
-                                                            'product']['id'] &&
-                                                    cart.flavour == unitName &&
-                                                    cart.kindOfFlower == size)
-                                                .isNotEmpty ??
-                                            false)
+                                        if ((addToCartModel.addToCarts
+                                                    ?.where((cart) =>
+                                                        cart.productId ==
+                                                            widget.arguments![
+                                                                    'product']
+                                                                ['id'] &&
+                                                        cart.flavour ==
+                                                            unitName &&
+                                                        cart.kindOfFlower ==
+                                                            size)
+                                                    .isNotEmpty ??
+                                                false) &&
+                                            currentPackQty > 0)
                                           Row(
                                             children: [
                                               TextButton(
@@ -1031,8 +1092,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                         shape: RoundedRectangleBorder(
                                                             borderRadius:
                                                                 BorderRadius
-                                                                    .circular(20 *
-                                                                        fem)),
+                                                                    .circular(
+                                                                        20.0.w)),
                                                         title: Text(
                                                           _cartData['kindOfFlower'] ==
                                                                       '' &&
@@ -1058,8 +1119,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                               style: TextStyle(
                                                                   color: Colors
                                                                       .black,
-                                                                  fontSize: 16 *
-                                                                      ffem),
+                                                                  fontSize:
+                                                                      16.0.sp),
                                                             ),
                                                           ),
                                                         ],
@@ -1091,16 +1152,16 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                     border: Border.all(),
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                            5 * fem),
+                                                            5.0.w),
                                                   ),
                                                   child: Icon(Icons.remove,
                                                       color: Colors.black,
-                                                      size: 20 * ffem),
+                                                      size: 20.0.sp),
                                                 ),
                                               ),
                                               Padding(
                                                 padding: EdgeInsets.symmetric(
-                                                    horizontal: 8 * fem),
+                                                    horizontal: 8.0.w),
                                                 child: Text(
                                                   addToCartModel.addToCarts
                                                           ?.firstWhere(
@@ -1124,7 +1185,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       '0',
                                                   style: MyGoogleFontStyle(
                                                     fontFamily: 'Poppins',
-                                                    fontSize: 14 * ffem,
+                                                    fontSize: 14.0.sp,
                                                     fontWeight: FontWeight.w500,
                                                     color:
                                                         const Color(0xff1e1e1e),
@@ -1145,8 +1206,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                         shape: RoundedRectangleBorder(
                                                             borderRadius:
                                                                 BorderRadius
-                                                                    .circular(20 *
-                                                                        fem)),
+                                                                    .circular(
+                                                                        20.0.w)),
                                                         title: Text(
                                                           _cartData['kindOfFlower'] ==
                                                                       '' &&
@@ -1172,8 +1233,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                               style: TextStyle(
                                                                   color: Colors
                                                                       .black,
-                                                                  fontSize: 16 *
-                                                                      ffem),
+                                                                  fontSize:
+                                                                      16.0.sp),
                                                             ),
                                                           ),
                                                         ],
@@ -1205,22 +1266,26 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                     border: Border.all(),
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                            5 * fem),
+                                                            5.0.w),
                                                   ),
                                                   child: Icon(Icons.add,
                                                       color: Colors.black,
-                                                      size: 20 * ffem),
+                                                      size: 20.0.sp),
                                                 ),
                                               ),
                                             ],
                                           ),
                                         Text(
-                                          'Available in stock',
+                                          currentPackQty > 0
+                                              ? 'Available in stock ($currentPackQty)'
+                                              : 'Out of stock',
                                           style: MyGoogleFontStyle(
                                             fontFamily: 'Urbanist',
-                                            fontSize: 12 * ffem,
+                                            fontSize: 12.0.sp,
                                             fontWeight: FontWeight.w600,
-                                            color: const Color(0xff000000),
+                                            color: currentPackQty > 0
+                                                ? const Color(0xff000000)
+                                                : Colors.red,
                                           ),
                                         ),
                                       ],
@@ -1230,9 +1295,10 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                 // Price
                                 Padding(
                                   padding: EdgeInsets.only(
-                                      left: 25 * fem, top: 10 * fem),
+                                      left: 25.0.w, top: 10.0.w),
                                   child: _prices.isNotEmpty &&
-                                          _prices[0]['offer_price'] != 0
+                                          (_prices[0]['offer_price'] != null &&
+                                              _prices[0]['offer_price'] != 0)
                                       ? Text.rich(
                                           TextSpan(
                                             children: [
@@ -1240,30 +1306,31 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 text: 'Total Price',
                                                 style: TextStyle(
                                                     color: Colors.grey[500],
-                                                    fontSize: 14 * ffem),
+                                                    fontSize: 14.0.sp),
                                               ),
                                               WidgetSpan(
-                                                  child: SizedBox(
-                                                      width: 20 * fem)),
+                                                  child:
+                                                      SizedBox(width: 20.0.w)),
                                               TextSpan(
-                                                text: '₹${_prices[0]['price']}',
+                                                text:
+                                                    '₹${_prices[0]['price'] ?? '0'}',
                                                 style: TextStyle(
                                                   color:
                                                       const Color(0xFFC7B456),
                                                   decoration: TextDecoration
                                                       .lineThrough,
-                                                  fontSize: 18 * ffem,
+                                                  fontSize: 18.0.sp,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
                                               WidgetSpan(
-                                                  child: SizedBox(
-                                                      width: 20 * fem)),
+                                                  child:
+                                                      SizedBox(width: 20.0.w)),
                                               TextSpan(
                                                 text:
-                                                    '₹${_prices[0]['offer_price']}',
+                                                    '₹${_prices[0]['offer_price'] ?? '0'}',
                                                 style: TextStyle(
-                                                  fontSize: 18 * ffem,
+                                                  fontSize: 18.0.sp,
                                                   fontWeight: FontWeight.bold,
                                                   color:
                                                       const Color(0xff000000),
@@ -1272,12 +1339,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                               if (discountPrice != 0.0) ...[
                                                 WidgetSpan(
                                                     child: SizedBox(
-                                                        width: 10 * fem)),
+                                                        width: 10.0.w)),
                                                 TextSpan(
                                                   text:
                                                       '(${discountPrice.round()}% Off)',
                                                   style: TextStyle(
-                                                    fontSize: 16 * ffem,
+                                                    fontSize: 16.0.sp,
                                                     fontWeight: FontWeight.bold,
                                                     color:
                                                         const Color(0xff000000),
@@ -1289,11 +1356,11 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                         )
                                       : Text(
                                           _prices.isNotEmpty
-                                              ? '₹${_prices[0]['price']}'
+                                              ? '₹${_prices[0]['price'] ?? '0'}'
                                               : 'Price not available',
                                           style: MyGoogleFontStyle(
                                             fontFamily: 'Poppins',
-                                            fontSize: 18 * ffem,
+                                            fontSize: 18.0.sp,
                                             fontWeight: FontWeight.w500,
                                             color: const Color(0x99000000),
                                           ),
@@ -1302,9 +1369,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                 // Size Selection
                                 Padding(
                                   padding: EdgeInsets.only(
-                                      // left: 25 * fem,
-                                      top: 15 * fem,
-                                      bottom: 5 * fem),
+                                      // left: 25.0.w,
+                                      top: 15.0.w,
+                                      bottom: 5.0.w),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -1313,23 +1380,23 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                         'Size',
                                         style: MyGoogleFontStyle(
                                           fontFamily: 'Urbanist',
-                                          fontSize: 16 * ffem,
+                                          fontSize: 16.0.sp,
                                           fontWeight: FontWeight.w700,
                                           color: const Color(0xff000000),
                                         ),
                                       ),
-                                      SizedBox(height: 10 * fem),
+                                      SizedBox(height: 10.0.w),
                                       Row(
                                         children: [
                                           Expanded(
                                             flex: 8,
                                             child: SizedBox(
-                                              height: 60 * fem,
+                                              height: 60.0.w,
                                               child: ListView.builder(
                                                 scrollDirection:
                                                     Axis.horizontal,
                                                 padding: EdgeInsets.symmetric(
-                                                    horizontal: 10 * fem),
+                                                    horizontal: 10.0.w),
                                                 itemCount: _sizes.length,
                                                 itemBuilder: (context, index) {
                                                   final isActive =
@@ -1337,8 +1404,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   return Padding(
                                                     padding:
                                                         EdgeInsets.symmetric(
-                                                            horizontal:
-                                                                8 * fem),
+                                                            horizontal: 8.0.w),
                                                     child: TextButton(
                                                       onPressed: () {
                                                         setState(() {
@@ -1359,6 +1425,10 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                       ['value']
                                                                   ?.toString() ??
                                                               '';
+                                                          currentPackQty =
+                                                              _sizes[index]
+                                                                      ['qty'] ??
+                                                                  0;
                                                           _prices = widget
                                                                   .arguments?[
                                                                       'product']
@@ -1387,21 +1457,34 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                       ['points']
                                                                   ?.toString() ??
                                                               '';
-                                                          discountPrice = _prices
-                                                                      .isNotEmpty &&
-                                                                  _prices[0][
-                                                                          'offer_price'] !=
-                                                                      0
-                                                              ? ((int.parse(_prices[0]['price']
-                                                                          .toString()) -
-                                                                      int.parse(
-                                                                          _prices[0]['offer_price']
-                                                                              .toString())) /
-                                                                  int.parse(_prices[0]
-                                                                          ['price']
-                                                                      .toString()) *
-                                                                  100)
-                                                              : 0.0;
+
+                                                          // Calculate discount price safely
+                                                          discountPrice = 0.0;
+                                                          if (_prices
+                                                              .isNotEmpty) {
+                                                            final price = int.tryParse(
+                                                                    _prices[0]['price']
+                                                                            ?.toString() ??
+                                                                        '0') ??
+                                                                0;
+                                                            final offerPrice =
+                                                                int.tryParse(_prices[0]['offer_price']
+                                                                            ?.toString() ??
+                                                                        '0') ??
+                                                                    0;
+
+                                                            if (price > 0 &&
+                                                                offerPrice >
+                                                                    0 &&
+                                                                offerPrice <
+                                                                    price) {
+                                                              discountPrice =
+                                                                  ((price -
+                                                                          offerPrice) /
+                                                                      price *
+                                                                      100);
+                                                            }
+                                                          }
                                                         });
                                                       },
                                                       style:
@@ -1417,18 +1500,17 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(
-                                                                      30 * fem),
+                                                                      30.0.w),
                                                         ),
                                                       ),
                                                       child: Container(
-                                                        width: 50 * fem,
-                                                        height: 50 * fem,
+                                                        width: 50.0.w,
+                                                        height: 50.0.w,
                                                         decoration:
                                                             ShapeDecoration(
                                                           shape: OvalBorder(
                                                             side: BorderSide(
-                                                                width:
-                                                                    0.95 * fem,
+                                                                width: 0.95.w,
                                                                 color: const Color(
                                                                     0xFFDDDDDD)),
                                                           ),
@@ -1443,8 +1525,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                 MyGoogleFontStyle(
                                                               fontFamily:
                                                                   'Urbanist',
-                                                              fontSize:
-                                                                  15 * ffem,
+                                                              fontSize: 15.0.sp,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w600,
@@ -1462,7 +1543,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                               ),
                                             ),
                                           ),
-                                          SizedBox(width: 15 * fem),
+                                          SizedBox(width: 15.0.w),
                                           Expanded(
                                             flex: 2,
                                             child: InkWell(
@@ -1489,8 +1570,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       child: Container(
                                                         width: double.infinity,
                                                         padding: EdgeInsets.all(
-                                                            20 * fem),
-                                                        height: 200 * fem,
+                                                            20.0.w),
+                                                        height: 200.0.w,
                                                         child: Image.network(
                                                           '${configModel.apiConfig['mediaURL']}${product.sizeChartPath}',
                                                           fit: BoxFit.contain,
@@ -1509,13 +1590,13 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 children: [
                                                   Image.asset(
                                                     'assets/images/size-chart-icon.png',
-                                                    width: 40 * fem,
-                                                    height: 40 * fem,
+                                                    width: 40.0.w,
+                                                    height: 40.0.w,
                                                   ),
                                                   Text(
                                                     'Size Chart',
                                                     style: TextStyle(
-                                                      fontSize: 11 * ffem,
+                                                      fontSize: 11.0.sp,
                                                       color: Colors.black,
                                                       fontWeight:
                                                           FontWeight.bold,
@@ -1534,12 +1615,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                 if (_productPoints.isNotEmpty)
                                   Padding(
                                     padding: EdgeInsets.only(
-                                        left: 25 * fem, top: 10 * fem),
+                                        left: 25.0.w, top: 10.0.w),
                                     child: Text(
                                       'Earn $_productPoints points for this product',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Urbanist',
-                                        fontSize: 14 * ffem,
+                                        fontSize: 14.0.sp,
                                         fontWeight: FontWeight.w700,
                                         color: const Color(0xFFC7B456),
                                       ),
@@ -1547,7 +1628,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                   ),
                                 // Customer Ratings
                                 Padding(
-                                  padding: EdgeInsets.only(top: 10 * fem),
+                                  padding: EdgeInsets.only(top: 10.0.w),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -1556,7 +1637,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                         'Customer Ratings',
                                         style: MyGoogleFontStyle(
                                           fontFamily: 'Poppins',
-                                          fontSize: 14 * ffem,
+                                          fontSize: 14.0.sp,
                                           fontWeight: FontWeight.bold,
                                           color: const Color(0x99000000),
                                         ),
@@ -1575,7 +1656,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   product.rating.toString(),
                                                   style: MyGoogleFontStyle(
                                                     fontFamily: 'Poppins',
-                                                    fontSize: 14 * ffem,
+                                                    fontSize: 14.0.sp,
                                                     fontWeight: FontWeight.bold,
                                                     color:
                                                         const Color(0x99000000),
@@ -1583,7 +1664,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 ),
                                                 Padding(
                                                   padding: EdgeInsets.only(
-                                                      left: 3 * fem),
+                                                      left: 3.0.w),
                                                   child: const Icon(Icons.star,
                                                       color: Colors.amber,
                                                       size: 16),
@@ -1591,7 +1672,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 Text(
                                                   '(${totalReviewCount != 0 ? totalReviewCount : 0} ratings)',
                                                   style: TextStyle(
-                                                      fontSize: 12 * ffem),
+                                                      fontSize: 12.0.sp),
                                                 ),
                                                 const Spacer(),
                                                 InkWell(
@@ -1612,7 +1693,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                     'View Reviews & Ratings',
                                                     style: MyGoogleFontStyle(
                                                       fontFamily: 'Poppins',
-                                                      fontSize: 12 * ffem,
+                                                      fontSize: 12.0.sp,
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       color: const Color(
@@ -1631,7 +1712,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                 // Descriptions - Isolated widget to prevent rebuilds
                                 ProductDescriptionSection(
                                   product: product,
-                                  fem: fem,
                                   smallDescKey: _smallDescKey,
                                   descKey: _descKey,
                                   desc1Key: _desc1Key,
@@ -1639,7 +1719,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                 ),
                                 // Add More Items
                                 Padding(
-                                  padding: EdgeInsets.only(top: 20 * fem),
+                                  padding: EdgeInsets.only(top: 20.0.w),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -1648,14 +1728,14 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                         'Add More Items',
                                         style: MyGoogleFontStyle(
                                           fontFamily: 'Urbanist',
-                                          fontSize: 16 * ffem,
+                                          fontSize: 16.0.sp,
                                           fontWeight: FontWeight.w700,
                                           color: const Color(0xff000000),
                                         ),
                                       ),
-                                      SizedBox(height: 10 * fem),
+                                      SizedBox(height: 10.0.w),
                                       SizedBox(
-                                        height: 240 * fem,
+                                        height: 260.0.w,
                                         child: productModel
                                                 .categoryWiseproductsLoader
                                             ? const Center(
@@ -1679,26 +1759,54 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                           productModel
                                                                   .categoryWiseproducts![
                                                               index];
-                                                      final relatedDiscount = relatedProduct
-                                                                  .productPrices
-                                                                  ?.isNotEmpty ??
-                                                              false
-                                                          ? ((int.parse(relatedProduct
-                                                                      .productPrices![
-                                                                          0]
-                                                                      .price
-                                                                      .toString()) -
-                                                                  int.parse(relatedProduct
-                                                                      .productPrices![
-                                                                          0]
-                                                                      .offerPrice
-                                                                      .toString())) /
-                                                              int.parse(relatedProduct
-                                                                  .productPrices![0]
-                                                                  .price
-                                                                  .toString()) *
-                                                              100)
-                                                          : 0.0;
+
+                                                      // Calculate discount safely
+                                                      double relatedDiscount =
+                                                          0.0;
+                                                      if (relatedProduct
+                                                              .productPrices
+                                                              ?.isNotEmpty ??
+                                                          false) {
+                                                        final priceValue =
+                                                            relatedProduct
+                                                                .productPrices![
+                                                                    0]
+                                                                .price;
+                                                        final offerPriceValue =
+                                                            relatedProduct
+                                                                .productPrices![
+                                                                    0]
+                                                                .offerPrice;
+
+                                                        if (priceValue !=
+                                                                null &&
+                                                            offerPriceValue !=
+                                                                null &&
+                                                            offerPriceValue !=
+                                                                0) {
+                                                          final price =
+                                                              int.tryParse(
+                                                                      priceValue
+                                                                          .toString()) ??
+                                                                  0;
+                                                          final offerPrice =
+                                                              int.tryParse(
+                                                                      offerPriceValue
+                                                                          .toString()) ??
+                                                                  0;
+
+                                                          if (price > 0 &&
+                                                              offerPrice > 0 &&
+                                                              price >
+                                                                  offerPrice) {
+                                                            relatedDiscount =
+                                                                ((price -
+                                                                        offerPrice) /
+                                                                    price *
+                                                                    100);
+                                                          }
+                                                        }
+                                                      }
                                                       return InkWell(
                                                         onTap: () {
                                                           Navigator.of(context)
@@ -1719,18 +1827,17 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                           );
                                                         },
                                                         child: Container(
-                                                          width: 145 * fem,
+                                                          width: 145.0.w,
                                                           margin:
                                                               EdgeInsets.only(
                                                                   right:
-                                                                      12 * fem),
+                                                                      12.0.w),
                                                           decoration:
                                                               BoxDecoration(
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
-                                                                        15 *
-                                                                            fem),
+                                                                        15.0.w),
                                                             color: Colors.white,
                                                             boxShadow: [
                                                               BoxShadow(
@@ -1753,16 +1860,15 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                               Stack(
                                                                 children: [
                                                                   Container(
-                                                                    width: 145 *
-                                                                        fem,
+                                                                    width:
+                                                                        145.0.w,
                                                                     height:
-                                                                        140 *
-                                                                            fem,
+                                                                        140.0.w,
                                                                     decoration:
                                                                         BoxDecoration(
                                                                       borderRadius:
-                                                                          BorderRadius.circular(15 *
-                                                                              fem),
+                                                                          BorderRadius.circular(
+                                                                              15.0.r),
                                                                       image:
                                                                           DecorationImage(
                                                                         fit: BoxFit
@@ -1777,10 +1883,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                     ),
                                                                   ),
                                                                   Positioned(
-                                                                    top:
-                                                                        8 * fem,
+                                                                    top: 8.0.w,
                                                                     right:
-                                                                        8 * fem,
+                                                                        8.0.w,
                                                                     child:
                                                                         InkWell(
                                                                       onTap:
@@ -1803,26 +1908,27 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                       child: wishListModel
                                                                               .wishListLoader
                                                                           ? SizedBox(
-                                                                              width: 20 * ffem,
-                                                                              height: 20 * ffem,
+                                                                              width: 20.0.sp,
+                                                                              height: 20.0.sp,
                                                                               child: const CircularProgressIndicator(strokeWidth: 2),
                                                                             )
                                                                           : Icon(
                                                                               wishListModel.wishLists?.any((wishList) => wishList.productId == relatedProduct.id && wishList.userId == configModel.user?.id) ?? false ? Icons.favorite_outlined : Icons.favorite_border_outlined,
                                                                               color: wishListModel.wishLists?.any((wishList) => wishList.productId == relatedProduct.id && wishList.userId == configModel.user?.id) ?? false ? Colors.red : null,
-                                                                              size: 20 * ffem,
+                                                                              size: 20.0.sp,
                                                                             ),
                                                                     ),
                                                                   ),
                                                                 ],
                                                               ),
                                                               Padding(
-                                                                padding: EdgeInsets.symmetric(
-                                                                    horizontal:
-                                                                        10 *
-                                                                            fem,
-                                                                    vertical:
-                                                                        8 * fem),
+                                                                padding: EdgeInsets
+                                                                    .symmetric(
+                                                                        horizontal:
+                                                                            10.0
+                                                                                .w,
+                                                                        vertical:
+                                                                            8.0.w),
                                                                 child: Text(
                                                                   relatedProduct
                                                                           .name ??
@@ -1839,8 +1945,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                     fontFamily:
                                                                         'Urbanist',
                                                                     fontSize:
-                                                                        15 *
-                                                                            ffem,
+                                                                        15.0.sp,
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .w700,
@@ -1854,30 +1959,32 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                       ?.isNotEmpty ??
                                                                   false)
                                                                 Padding(
-                                                                  padding: EdgeInsets.only(
-                                                                      bottom: 4 *
-                                                                          fem),
-                                                                  child: relatedProduct
-                                                                              .productPrices![0]
-                                                                              .offerPrice !=
-                                                                          0
-                                                                      ? Text.rich(
+                                                                  padding: EdgeInsets
+                                                                      .only(
+                                                                          bottom:
+                                                                              4.0.w),
+                                                                  child: relatedProduct.productPrices![0].offerPrice !=
+                                                                              null &&
+                                                                          relatedProduct.productPrices![0].offerPrice !=
+                                                                              0
+                                                                      ? Text
+                                                                          .rich(
                                                                           TextSpan(
                                                                             children: [
                                                                               TextSpan(
-                                                                                text: '₹${relatedProduct.productPrices![0].price}',
+                                                                                text: '₹${relatedProduct.productPrices![0].price ?? '0'}',
                                                                                 style: TextStyle(
                                                                                   color: Colors.grey,
                                                                                   decoration: TextDecoration.lineThrough,
-                                                                                  fontSize: 13 * ffem,
+                                                                                  fontSize: 13.0.sp,
                                                                                   fontFamily: 'Poppins',
                                                                                   fontWeight: FontWeight.w500,
                                                                                 ),
                                                                               ),
                                                                               TextSpan(
-                                                                                text: ' ₹${relatedProduct.productPrices![0].offerPrice}',
+                                                                                text: ' ₹${relatedProduct.productPrices![0].offerPrice ?? '0'}',
                                                                                 style: TextStyle(
-                                                                                  fontSize: 13 * ffem,
+                                                                                  fontSize: 13.0.sp,
                                                                                   fontFamily: 'Poppins',
                                                                                   fontWeight: FontWeight.w500,
                                                                                   color: const Color(0x99000000),
@@ -1887,13 +1994,13 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                           ),
                                                                         )
                                                                       : Text(
-                                                                          '₹${relatedProduct.productPrices![0].price}',
+                                                                          '₹${relatedProduct.productPrices![0].price ?? '0'}',
                                                                           style:
                                                                               MyGoogleFontStyle(
                                                                             fontFamily:
                                                                                 'Poppins',
                                                                             fontSize:
-                                                                                13 * ffem,
+                                                                                13.0.sp,
                                                                             fontWeight:
                                                                                 FontWeight.w500,
                                                                             color:
@@ -1910,8 +2017,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                     fontFamily:
                                                                         'Poppins',
                                                                     fontSize:
-                                                                        13 *
-                                                                            ffem,
+                                                                        13.0.sp,
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .w500,
@@ -1923,8 +2029,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                               Padding(
                                                                 padding: EdgeInsets
                                                                     .only(
-                                                                        top: 4 *
-                                                                            fem),
+                                                                        top: 4.0
+                                                                            .w),
                                                                 child: Row(
                                                                   mainAxisAlignment:
                                                                       MainAxisAlignment
@@ -1937,12 +2043,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                         ? Text(
                                                                             "No Rating",
                                                                             style:
-                                                                                TextStyle(fontSize: 10 * ffem),
+                                                                                TextStyle(fontSize: 10.0.sp),
                                                                           )
                                                                         : RatingBar
                                                                             .builder(
                                                                             itemSize:
-                                                                                15 * ffem,
+                                                                                15.0.sp,
                                                                             initialRating:
                                                                                 double.tryParse(relatedProduct.rating ?? '0.0') ?? 0.0,
                                                                             direction:
@@ -1963,12 +2069,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                         '0')
                                                                       Padding(
                                                                         padding:
-                                                                            EdgeInsets.only(left: 4 * fem),
+                                                                            EdgeInsets.only(left: 4.0.w),
                                                                         child:
                                                                             Text(
                                                                           '(${relatedProduct.totalReviews ?? 0})',
                                                                           style:
-                                                                              TextStyle(fontSize: 10 * ffem),
+                                                                              TextStyle(fontSize: 10.0.sp),
                                                                         ),
                                                                       ),
                                                                   ],
@@ -1998,7 +2104,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
       bottomNavigationBar: configModel.user == null
           ? const SizedBox.shrink()
           : Container(
-              padding: EdgeInsets.all(8 * fem),
+              padding: EdgeInsets.all(8.0.w),
               child: Row(
                 children: [
                   Expanded(
@@ -2065,18 +2171,57 @@ class _ProductIdPageState extends State<ProductIdPage> {
                       ),
                     ),
                   ),
-                  SizedBox(width: 8 * fem),
+                  SizedBox(width: 8.0.w),
                   Expanded(
                     child: TextButton(
                       onPressed: () async {
-                        if (_cartData['kindOfFlower'] == '' ||
+                        if (currentPackQty <= 0) {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20.0.r)),
+                              title: Row(
+                                children: [
+                                  Icon(Icons.info_outline,
+                                      color: Colors.orange, size: 24.0.sp),
+                                  SizedBox(width: 10.0.w),
+                                  Expanded(
+                                    child: Text(
+                                      'Out of Stock',
+                                      style: TextStyle(
+                                        fontSize: 18.0.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              content: Text(
+                                'Sorry, this product is currently out of stock. Please try selecting a different size or check back later.',
+                                style: TextStyle(fontSize: 14.0.sp),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text(
+                                    'OK',
+                                    style: TextStyle(
+                                        color: const Color(0xFFC7B456),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16.0.sp),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        } else if (_cartData['kindOfFlower'] == '' ||
                             _cartData['flavour'] == '') {
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
                               shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(20 * fem)),
+                                  borderRadius: BorderRadius.circular(20.0.r)),
                               title: Text(
                                 _cartData['kindOfFlower'] == '' &&
                                         _cartData['flavour'] != ''
@@ -2092,8 +2237,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                   child: Text(
                                     'Ok',
                                     style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16 * ffem),
+                                        color: Colors.black, fontSize: 16.0.sp),
                                   ),
                                 ),
                               ],
@@ -2127,13 +2271,19 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                     AlertDialog(
                                   shape: RoundedRectangleBorder(
                                       borderRadius:
-                                          BorderRadius.circular(20 * fem)),
+                                          BorderRadius.circular(20.0.r)),
                                   title: Text('Add to Cart'),
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
                                           'This item is not in your cart. Please select quantity:'),
+                                      SizedBox(height: 10),
+                                      Text('Maximum available: $currentPackQty',
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 12.0.sp,
+                                          )),
                                       SizedBox(height: 20),
                                       Row(
                                         mainAxisAlignment:
@@ -2164,16 +2314,19 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                             child: Text(
                                               tempQuantity.toString(),
                                               style: TextStyle(
-                                                fontSize: 18 * ffem,
+                                                fontSize: 18.0.sp,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
                                           ),
                                           IconButton(
                                             onPressed: () {
-                                              setDialogState(() {
-                                                tempQuantity++;
-                                              });
+                                              if (tempQuantity <
+                                                  currentPackQty) {
+                                                setDialogState(() {
+                                                  tempQuantity++;
+                                                });
+                                              }
                                             },
                                             icon: Container(
                                               decoration: BoxDecoration(
@@ -2197,7 +2350,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                         'Cancel',
                                         style: TextStyle(
                                             color: Colors.grey,
-                                            fontSize: 16 * ffem),
+                                            fontSize: 16.0.sp),
                                       ),
                                     ),
                                     TextButton(
@@ -2207,12 +2360,21 @@ class _ProductIdPageState extends State<ProductIdPage> {
 
                                         // Add to cart with selected quantity
                                         _cartData['points'] = _productPoints;
-                                        _cartData['product_price'] = _prices
-                                                    .isNotEmpty &&
-                                                _prices[0]['offer_price'] != 0
-                                            ? _prices[0]['offer_price']
-                                                .toString()
-                                            : _prices[0]['price'].toString();
+
+                                        // Set product price safely
+                                        if (_prices.isNotEmpty) {
+                                          final offerPrice =
+                                              _prices[0]['offer_price'];
+                                          final price = _prices[0]['price'];
+
+                                          _cartData['product_price'] =
+                                              (offerPrice != null &&
+                                                      offerPrice != 0)
+                                                  ? offerPrice.toString()
+                                                  : (price?.toString() ?? '0');
+                                        } else {
+                                          _cartData['product_price'] = '0';
+                                        }
                                         _cartData['is_add_to_cart'] = true;
 
                                         // Add item to cart with quantity
@@ -2255,7 +2417,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                         style: TextStyle(
                                             color: Color(0xFFC7B456),
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 16 * ffem),
+                                            fontSize: 16.0.sp),
                                       ),
                                     ),
                                   ],
@@ -2277,25 +2439,25 @@ class _ProductIdPageState extends State<ProductIdPage> {
                       style: TextButton.styleFrom(padding: EdgeInsets.zero),
                       child: Container(
                         padding: EdgeInsets.symmetric(
-                            horizontal: 20 * fem, vertical: 10 * fem),
+                            horizontal: 20.0.w, vertical: 10.0.w),
                         decoration: BoxDecoration(
                           color: const Color(0xFFC7B456),
-                          borderRadius: BorderRadius.circular(10 * fem),
+                          borderRadius: BorderRadius.circular(10.0.r),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Image.asset(
                               'assets/images/shopping-bag-03.png',
-                              width: 18 * fem,
-                              height: 17 * fem,
+                              width: 18.0.w,
+                              height: 17.0.w,
                             ),
-                            SizedBox(width: 10 * fem),
+                            SizedBox(width: 10.0.w),
                             Text(
                               'Buy Now',
                               style: MyGoogleFontStyle(
                                 fontFamily: 'Urbanist',
-                                fontSize: 14 * ffem,
+                                fontSize: 14.0.sp,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
                               ),
@@ -2315,7 +2477,6 @@ class _ProductIdPageState extends State<ProductIdPage> {
 // Isolated widget for product descriptions that won't rebuild on parent state changes
 class ProductDescriptionSection extends StatelessWidget {
   final Product product;
-  final double fem;
   final GlobalKey smallDescKey;
   final GlobalKey descKey;
   final GlobalKey desc1Key;
@@ -2324,7 +2485,6 @@ class ProductDescriptionSection extends StatelessWidget {
   const ProductDescriptionSection({
     Key? key,
     required this.product,
-    required this.fem,
     required this.smallDescKey,
     required this.descKey,
     required this.desc1Key,
@@ -2338,16 +2498,16 @@ class ProductDescriptionSection extends StatelessWidget {
         if (product.smallDescription != null)
           RepaintBoundary(
             child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 10 * fem),
+              padding: EdgeInsets.symmetric(vertical: 10.0.w),
               child: Card(
                 elevation: 4,
                 color: Colors.white,
                 margin: EdgeInsets.zero,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12 * fem),
+                  borderRadius: BorderRadius.circular(12.0.r),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(16 * fem),
+                  padding: EdgeInsets.all(16.0.w),
                   child: PreservedHtmlWidget(
                     key: smallDescKey,
                     uniqueKey: 'small_desc_${product.id}',
@@ -2360,16 +2520,16 @@ class ProductDescriptionSection extends StatelessWidget {
         if (product.description != null)
           RepaintBoundary(
             child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 10 * fem),
+              padding: EdgeInsets.symmetric(vertical: 10.0.w),
               child: Card(
                 elevation: 4,
                 color: Colors.white,
                 margin: EdgeInsets.zero,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12 * fem),
+                  borderRadius: BorderRadius.circular(12.0.r),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(16 * fem),
+                  padding: EdgeInsets.all(16.0.w),
                   child: PreservedHtmlWidget(
                     key: descKey,
                     uniqueKey: 'desc_${product.id}',
@@ -2382,16 +2542,16 @@ class ProductDescriptionSection extends StatelessWidget {
         if (product.description1 != null)
           RepaintBoundary(
             child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 10 * fem),
+              padding: EdgeInsets.symmetric(vertical: 10.0.w),
               child: Card(
                 elevation: 4,
                 color: Colors.white,
                 margin: EdgeInsets.zero,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12 * fem),
+                  borderRadius: BorderRadius.circular(12.0.r),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(16 * fem),
+                  padding: EdgeInsets.all(16.0.w),
                   child: PreservedHtmlWidget(
                     key: desc1Key,
                     uniqueKey: 'desc1_${product.id}',
@@ -2404,16 +2564,16 @@ class ProductDescriptionSection extends StatelessWidget {
         if (product.description2 != null)
           RepaintBoundary(
             child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 10 * fem),
+              padding: EdgeInsets.symmetric(vertical: 10.0.w),
               child: Card(
                 elevation: 4,
                 color: Colors.white,
                 margin: EdgeInsets.zero,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12 * fem),
+                  borderRadius: BorderRadius.circular(12.0.r),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(16 * fem),
+                  padding: EdgeInsets.all(16.0.w),
                   child: PreservedHtmlWidget(
                     key: desc2Key,
                     uniqueKey: 'desc2_${product.id}',

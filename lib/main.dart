@@ -2,6 +2,7 @@ import 'package:aadab/core/services/firebase_api.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/providers/add_to_cart_pr.dart';
 import 'package:aadab/core/providers/auth_pr.dart';
@@ -133,30 +134,37 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => CouponModel()),
         ChangeNotifierProvider(create: (_) => UserWalletModel()),
       ],
-      child: MaterialApp(
-        navigatorKey: _navigatorKey,
-        debugShowCheckedModeBanner: false,
-        onGenerateRoute: generateRoute,
-        theme: ThemeData(
-          primarySwatch:
-              Colors.blue, // Fixed typo: primary свиш -> primarySwatch
-          textTheme: Theme.of(context).textTheme.copyWith(
-                titleLarge: MyGoogleFontStyle(),
-                titleMedium: MyGoogleFontStyle(),
-                titleSmall: MyGoogleFontStyle(),
-                labelSmall: MyGoogleFontStyle(),
-                labelMedium: MyGoogleFontStyle(),
-                labelLarge: MyGoogleFontStyle(),
-                bodySmall: MyGoogleFontStyle(),
-              ),
-        ),
-        home: NetworkAwareWidget(
-          child: NetworkStatusOverlay(
-            child: DeepLinkListener(
-              child: RootPage(),
+      child: ScreenUtilInit(
+        designSize: const Size(360, 690),
+        minTextAdapt: true,
+        splitScreenMode: true,
+        builder: (context, child) {
+          return MaterialApp(
+            navigatorKey: _navigatorKey,
+            debugShowCheckedModeBanner: false,
+            onGenerateRoute: generateRoute,
+            theme: ThemeData(
+              primarySwatch:
+                  Colors.blue, // Fixed typo: primary свиш -> primarySwatch
+              textTheme: Theme.of(context).textTheme.copyWith(
+                    titleLarge: MyGoogleFontStyle(),
+                    titleMedium: MyGoogleFontStyle(),
+                    titleSmall: MyGoogleFontStyle(),
+                    labelSmall: MyGoogleFontStyle(),
+                    labelMedium: MyGoogleFontStyle(),
+                    labelLarge: MyGoogleFontStyle(),
+                    bodySmall: MyGoogleFontStyle(),
+                  ),
             ),
-          ),
-        ),
+            home: NetworkAwareWidget(
+              child: NetworkStatusOverlay(
+                child: DeepLinkListener(
+                  child: RootPage(),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

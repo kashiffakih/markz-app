@@ -1,4 +1,5 @@
 // import 'package:csc_picker/csc_picker.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 // import 'package:flutter/material.dart';
 // import 'package:flutter/services.dart';
 // import 'package:provider/provider.dart';
@@ -1180,7 +1181,7 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                     if (success && mounted) {
                       // Refresh the addresses list
                       await userAddressModel.getUserAddresses();
-                      
+
                       // Navigate back based on where we came from
                       if (widget.arguments['isAddress'] == true) {
                         // If coming from checkout flow, go back to address selection
@@ -1192,10 +1193,14 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                           MaterialPageRoute(
                             builder: (context) => AddressPage(
                               arguments: {
-                                'cartItems': widget.arguments['cartItems'] ?? [],
-                                'cartTotal': widget.arguments['cartTotal'] ?? '',
-                                'couponValue': widget.arguments['couponValue'] ?? 0,
-                                'isAddress': widget.arguments['isAddress'] ?? false,
+                                'cartItems':
+                                    widget.arguments['cartItems'] ?? [],
+                                'cartTotal':
+                                    widget.arguments['cartTotal'] ?? '',
+                                'couponValue':
+                                    widget.arguments['couponValue'] ?? 0,
+                                'isAddress':
+                                    widget.arguments['isAddress'] ?? false,
                               },
                             ),
                           ),

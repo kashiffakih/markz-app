@@ -109,7 +109,7 @@
 //                                       },
 //                                       child: Container(
 //                                         width:
-//                                             MediaQuery.of(context).size.width,
+//                                             1.0.sw,
 //                                         margin: EdgeInsets.only(
 //                                             top: 10, bottom: 10),
 //                                         padding: EdgeInsets.all(10),
@@ -237,6 +237,7 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/providers/coupon_pr.dart';
@@ -294,7 +295,7 @@ class _PromocodesPageState extends State<PromocodesPage> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(20),
+      margin: EdgeInsets.all(20.0.w),
       width: double.infinity,
       child: Row(
         children: [
@@ -302,7 +303,7 @@ class _PromocodesPageState extends State<PromocodesPage> {
             onTap: () => Navigator.pop(context),
             child: Image.asset(
               'assets/images/vector-GJ4.png',
-              height: 15,
+              height: 15.0.h,
             ),
           ),
           Expanded(
@@ -311,13 +312,13 @@ class _PromocodesPageState extends State<PromocodesPage> {
               textAlign: TextAlign.center,
               style: MyGoogleFontStyle(
                 fontFamily: 'Urbanist',
-                fontSize: 18,
+                fontSize: 18.0.sp,
                 fontWeight: FontWeight.bold,
                 color: const Color(0xff1e232c),
               ),
             ),
           ),
-          const SizedBox(width: 15), // Balance the layout
+          SizedBox(width: 15.0.w), // Balance the layout
         ],
       ),
     );
@@ -331,12 +332,12 @@ class _PromocodesPageState extends State<PromocodesPage> {
     if (_errorMessage != null) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20.0.w),
           child: Text(
             _errorMessage!,
             style: MyGoogleFontStyle(
               fontFamily: 'Urbanist',
-              fontSize: 16,
+              fontSize: 16.0.sp,
               fontWeight: FontWeight.w400,
               color: Colors.red,
             ),
@@ -462,7 +463,7 @@ class _PromocodesPageState extends State<PromocodesPage> {
         Navigator.pop(context, {'name': coupon.name, 'isProfile': isProfile});
       },
       child: Container(
-        width: MediaQuery.of(context).size.width,
+        width: 1.0.sw,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           border: Border.all(color: const Color(0xffc7b456)),

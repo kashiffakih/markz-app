@@ -1,4 +1,5 @@
 // import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 // import 'package:provider/provider.dart';
 // import 'package:aadab/core/providers/user_wallet_pr.dart';
 // import 'package:aadab/ui/shared/font_sh.dart';
@@ -203,7 +204,7 @@
 //     }
 
 //     return SizedBox(
-//       height: MediaQuery.of(context).size.height - 350,
+//       height: 1.0.sh - 350,
 //       child: ListView.builder(
 //         itemCount: userWalletModel.userWallets!.length,
 //         scrollDirection: Axis.vertical,
@@ -493,7 +494,7 @@ class _RewardsPageState extends State<RewardsPage> {
     }
 
     return SizedBox(
-      height: MediaQuery.of(context).size.height - 350,
+      height: 1.0.sh - 350,
       child: ListView.builder(
         itemCount: wallets.length,
         scrollDirection: Axis.vertical,

@@ -10,6 +10,7 @@ import 'package:aadab/core/providers/auth_pr.dart';
 import 'package:aadab/core/providers/config_pr.dart';
 import 'package:aadab/locator.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 // import 'package:firebase_auth/firebase_auth.dart';
 class LoginPage extends StatefulWidget {
@@ -411,10 +412,6 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     // print(widget.argument['role']);
     // debugPrint("role login ${widget.argument['role']}");
-    double baseWidth = 360;
-    double fem = MediaQuery.of(context).size.width / baseWidth;
-    double ffem = fem * 0.97;
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -479,10 +476,10 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(height: 30),
                 Container(
                   margin: EdgeInsets.fromLTRB(
-                      20 * fem, 0 * fem, 20 * fem, 10 * fem),
+                      20.0.w, 0.0.w, 20.0.w, 10.0.w),
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(7.6632652283 * fem),
+                    borderRadius: BorderRadius.circular(7.6632652283.r),
                     border: Border.all(color: Color(0xffe8ecf4)),
                     color: Color(0xfff7f8f9),
                   ),
@@ -494,15 +491,15 @@ class _LoginPageState extends State<LoginPage> {
                       errorBorder: InputBorder.none,
                       disabledBorder: InputBorder.none,
                       contentPadding: EdgeInsets.fromLTRB(
-                          16.82 * fem, 15.87 * fem, 16.82 * fem, 18.13 * fem),
+                          16.82.w, 15.87.w, 16.82.w, 18.13.w),
                       hintText: 'Enter your email',
                       hintStyle: TextStyle(color: Color(0xff8390a1)),
                     ),
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 14 * ffem,
+                      fontSize: 14.0.sp,
                       fontWeight: FontWeight.w500,
-                      height: 1.25 * ffem / fem,
+                      height: 1.25,
                       color: Color(0xff000000),
                     ),
                     initialValue: _loginData['email'],
@@ -520,10 +517,10 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 Container(
                   margin: EdgeInsets.fromLTRB(
-                      20 * fem, 0 * fem, 20 * fem, 10 * fem),
+                      20.0.w, 0.0.w, 20.0.w, 10.0.w),
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(7.6632652283 * fem),
+                    borderRadius: BorderRadius.circular(7.6632652283.r),
                     border: Border.all(color: Color(0xffe8ecf4)),
                     color: Color(0xfff7f7f8),
                   ),
@@ -532,7 +529,7 @@ class _LoginPageState extends State<LoginPage> {
                       border: InputBorder.none,
                       disabledBorder: InputBorder.none,
                       contentPadding: EdgeInsets.fromLTRB(
-                          16.82 * fem, 15.86 * fem, 16.82 * fem, 18.14 * fem),
+                          16.82.w, 15.86.w, 16.82.w, 18.14.w),
                       hintText: 'Enter your password',
                       hintStyle: TextStyle(color: Color(0xff8390a1)),
                       suffixIcon: GestureDetector(
@@ -550,9 +547,9 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 14 * ffem,
+                      fontSize: 14.0.sp,
                       fontWeight: FontWeight.w500,
-                      height: 1.25 * ffem / fem,
+                      height: 1.25,
                       color: Color(0xff000000),
                     ),
                     obscureText: _obscurePassword,
@@ -577,7 +574,7 @@ class _LoginPageState extends State<LoginPage> {
                       textAlign: TextAlign.right,
                       style: MyGoogleFontStyle(
                         fontFamily: 'Urbanist',
-                        fontSize: 13 * ffem,
+                        fontSize: 13.0.sp,
                         fontWeight: FontWeight.bold,
                         color: Color(0xffc7b456),
                       ),
@@ -586,11 +583,11 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 Consumer<AuthModel>(
                   builder: (context, authModel, child) => MaterialButton(
-                    height: 52 * fem,
+                    height: 52.0.w,
                     shape: RoundedRectangleBorder(
                         borderRadius:
-                            BorderRadius.circular(7.6632652283 * fem)),
-                    minWidth: MediaQuery.of(context).size.width * .8,
+                            BorderRadius.circular(7.6632652283.r)),
+                    minWidth: 0.8.sw,
                     color: Color(0xff0f0f0f),
                     onPressed: () async {
                       setState(() {
@@ -649,7 +646,7 @@ class _LoginPageState extends State<LoginPage> {
                             'Login',
                             style: MyGoogleFontStyle(
                               fontFamily: 'Urbanist',
-                              fontSize: 15 * ffem,
+                              fontSize: 15.0.sp,
                               fontWeight: FontWeight.bold,
                               color: Color(0xffffffff),
                             ),
@@ -664,9 +661,9 @@ class _LoginPageState extends State<LoginPage> {
                       Expanded(
                         child: Container(
                           margin: EdgeInsets.fromLTRB(
-                              0 * fem, 1.91 * fem, 12.44 * fem, 0 * fem),
-                          width: 105.57 * fem,
-                          height: 0.94 * fem,
+                              0.0.w, 1.91.w, 12.44.w, 0.0.w),
+                          width: 105.57.w,
+                          height: 0.94.w,
                           decoration: BoxDecoration(
                             color: Color(0xffe8ecf4),
                           ),
@@ -675,14 +672,14 @@ class _LoginPageState extends State<LoginPage> {
                       Expanded(
                         child: Container(
                           margin: EdgeInsets.fromLTRB(
-                              0 * fem, 0 * fem, 12.36 * fem, 0 * fem),
+                              0.0.w, 0.0.w, 12.36.w, 0.0.w),
                           child: Text(
                             'Or Login with',
                             style: MyGoogleFontStyle(
                               fontFamily: 'Urbanist',
-                              fontSize: 12.792224884 * ffem,
+                              fontSize: 12.792224884.sp,
                               fontWeight: FontWeight.w600,
-                              height: 1.2 * ffem / fem,
+                              height: 1.2,
                               color: Color(0xff6a707c),
                             ),
                           ),
@@ -691,9 +688,9 @@ class _LoginPageState extends State<LoginPage> {
                       Expanded(
                         child: Container(
                           margin: EdgeInsets.fromLTRB(
-                              0 * fem, 1.91 * fem, 0 * fem, 0 * fem),
-                          width: 104.63 * fem,
-                          height: 0.94 * fem,
+                              0.0.w, 1.91.w, 0.0.w, 0.0.w),
+                          width: 104.63.w,
+                          height: 0.94.w,
                           decoration: BoxDecoration(
                             color: Color(0xffe8ecf4),
                           ),
@@ -778,20 +775,20 @@ class _LoginPageState extends State<LoginPage> {
                     child: Container(
                       margin: EdgeInsets.all(5),
                       padding: EdgeInsets.fromLTRB(
-                          30.99 * fem, 15.25 * fem, 35.7 * fem, 15.25 * fem),
+                          30.99.w, 15.25.w, 35.7.w, 15.25.w),
                       decoration: BoxDecoration(
                         border: Border.all(color: Color(0xffe8ecf4)),
                         color: Color(0xffffffff),
-                        borderRadius: BorderRadius.circular(7.5407857895 * fem),
+                        borderRadius: BorderRadius.circular(7.5407857895.r),
                       ),
                       child: Center(
                         child: SizedBox(
-                          width: 22.28 * fem,
-                          height: 22.28 * fem,
+                          width: 22.28.w,
+                          height: 22.28.w,
                           child: Image.asset(
                             'assets/images/googleic-3Lc.png',
-                            width: 22.28 * fem,
-                            height: 22.28 * fem,
+                            width: 22.28.w,
+                            height: 22.28.w,
                           ),
                         ),
                       ),
@@ -808,10 +805,10 @@ class _LoginPageState extends State<LoginPage> {
                     text: TextSpan(
                       style: MyGoogleFontStyle(
                         fontFamily: 'Poppins',
-                        fontSize: 13 * ffem,
+                        fontSize: 13.0.sp,
                         fontWeight: FontWeight.w600,
-                        height: 1.399999912 * ffem / fem,
-                        letterSpacing: 0.13 * fem,
+                        height: 1.399999912,
+                        letterSpacing: 0.13.w,
                         color: Color(0xff1e232c),
                       ),
                       children: [
@@ -819,10 +816,10 @@ class _LoginPageState extends State<LoginPage> {
                           text: 'Don’t have an account? ',
                           style: MyGoogleFontStyle(
                             fontFamily: 'Urbanist',
-                            fontSize: 13 * ffem,
+                            fontSize: 13.0.sp,
                             fontWeight: FontWeight.w500,
-                            height: 1.399999912 * ffem / fem,
-                            letterSpacing: 0.13 * fem,
+                            height: 1.399999912,
+                            letterSpacing: 0.13.w,
                             color: Color(0xff1e232c),
                           ),
                         ),
@@ -830,10 +827,10 @@ class _LoginPageState extends State<LoginPage> {
                           text: 'Register Now',
                           style: MyGoogleFontStyle(
                             fontFamily: 'Urbanist',
-                            fontSize: 13 * ffem,
+                            fontSize: 13.0.sp,
                             fontWeight: FontWeight.w700,
-                            height: 1.399999912 * ffem / fem,
-                            letterSpacing: 0.13 * fem,
+                            height: 1.399999912,
+                            letterSpacing: 0.13.w,
                             color: Color(0xffc9b758),
                           ),
                         ),

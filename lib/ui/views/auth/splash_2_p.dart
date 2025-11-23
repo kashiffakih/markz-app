@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 
 class Splash2Page extends StatefulWidget {
@@ -15,13 +16,11 @@ class _Splash2PageState extends State<Splash2Page> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.all(20),
-          height: screenHeight,
+          height: 1.0.sh,
           color: whiteColor,
           child: Center(
             child: Column(
@@ -162,7 +161,7 @@ class _Splash2PageState extends State<Splash2Page> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.75,
+        height: 0.75.sh,
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
@@ -225,7 +224,7 @@ class _Splash2PageState extends State<Splash2Page> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.75,
+        height: 0.75.sh,
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(

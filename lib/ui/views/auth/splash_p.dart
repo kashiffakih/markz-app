@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 
 class SplashPage extends StatefulWidget {
@@ -12,7 +13,7 @@ class _SplashPageState extends State<SplashPage> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          height: MediaQuery.of(context).size.height,
+          height: 1.0.sh,
           decoration: BoxDecoration(
             color: Color(0xffffffff),
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 
 class NoNetworkPage extends StatelessWidget {
@@ -32,7 +33,7 @@ class NoNetworkPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 30),
-                
+
                 // Title
                 Text(
                   'No Internet Connection',
@@ -44,7 +45,7 @@ class NoNetworkPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 15),
-                
+
                 // Description
                 Text(
                   'Please check your internet connection\nand try again',
@@ -57,7 +58,7 @@ class NoNetworkPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 40),
-                
+
                 // Retry button
                 if (onRetry != null)
                   ElevatedButton(
@@ -65,7 +66,8 @@ class NoNetworkPage extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xff232323),
                       foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -87,7 +89,7 @@ class NoNetworkPage extends StatelessWidget {
                     ),
                   ),
                 SizedBox(height: 20),
-                
+
                 // Additional info
                 Container(
                   padding: EdgeInsets.all(15),

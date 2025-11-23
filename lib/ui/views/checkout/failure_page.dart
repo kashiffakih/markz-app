@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 
 class FailurePage extends StatelessWidget {
