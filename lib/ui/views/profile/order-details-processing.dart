@@ -94,25 +94,37 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     final String reverseGstCalculation = calculateReverseGst();
 
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.w),
-            color: Colors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(context),
-                _buildOrderStatus(),
-                _buildOrderItems(context, configModel, reviewModel),
-                _buildCostBreakdown(reverseGstCalculation),
-                _buildPaymentInfo(),
-                _buildDateInfo(),
-                _buildPhoneInfo(),
-                _buildAddressInfo(),
-                _buildCancelButton(context),
-              ],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFFFFEF9),
+              Color(0xFFFFFDF7),
+              Colors.white,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(context),
+                  _buildOrderStatus(),
+                  _buildOrderItems(context, configModel, reviewModel),
+                  _buildCostBreakdown(reverseGstCalculation),
+                  _buildPaymentInfo(),
+                  _buildDateInfo(),
+                  _buildPhoneInfo(),
+                  _buildAddressInfo(),
+                  _buildCancelButton(context),
+                ],
+              ),
             ),
           ),
         ),
@@ -122,17 +134,31 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.w),
+      margin: EdgeInsets.symmetric(horizontal: 5.w, vertical: 10.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              size: 18.w,
-              color: const Color(0xffEED056),
+          InkWell(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0xFFEED056).withOpacity(0.15),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Icon(
+                Icons.arrow_back_ios_new,
+                size: 16.sp,
+                color: const Color(0xffEED056),
+              ),
             ),
-            onPressed: () => Navigator.pop(context),
           ),
           Expanded(
             child: Text(
@@ -140,8 +166,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               textAlign: TextAlign.center,
               style: MyGoogleFontStyle(
                 fontFamily: 'Urbanist',
-                fontSize: 18.sp,
-                fontWeight: FontWeight.bold,
+                fontSize: 20.sp,
+                fontWeight: FontWeight.w700,
                 color: const Color(0xff1e232c),
               ),
             ),
@@ -155,35 +181,71 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   Widget _buildOrderStatus() {
     final status = widget.arguments?['status']?.toString() ?? 'Unknown';
     return Container(
-      width: 320.w,
-      padding: EdgeInsets.only(bottom: 5.w),
+      margin: EdgeInsets.symmetric(vertical: 10.w),
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: Color(0xFFEED056).withOpacity(0.3),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0xFFEED056).withOpacity(0.12),
+            blurRadius: 20,
+            spreadRadius: 2,
+            offset: Offset(0, 6),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            status,
-            style: MyGoogleFontStyle(
-              fontFamily: 'Urbanist',
-              fontSize: 18.sp,
-              fontWeight: FontWeight.w600,
-              letterSpacing: -0.9.w,
-              color: status == 'Delivered'
-                  ? Colors.green
-                  : status == 'Order in processing'
-                      ? Colors.orange
-                      : status == 'Cancelled'
-                          ? Colors.red
-                          : Colors.black,
-            ),
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.w),
+                decoration: BoxDecoration(
+                  color: status == 'Delivered'
+                      ? Colors.green.withOpacity(0.15)
+                      : status == 'Order Processing'
+                          ? Colors.orange.withOpacity(0.15)
+                          : status == 'Cancelled'
+                              ? Colors.red.withOpacity(0.15)
+                              : Color(0xFFEED056).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Text(
+                  status,
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w700,
+                    color: status == 'Delivered'
+                        ? Colors.green
+                        : status == 'Order Processing'
+                            ? Colors.orange
+                            : status == 'Cancelled'
+                                ? Colors.red
+                                : Color(0xFFEED056),
+                  ),
+                ),
+              ),
+            ],
           ),
-          Divider(color: Colors.black),
+          SizedBox(height: 12.w),
           Text(
             'Order #${widget.arguments?['order']['id']?.toString() ?? 'N/A'}',
             style: MyGoogleFontStyle(
               fontFamily: 'Urbanist',
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w400,
-              letterSpacing: -0.6.w,
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
               color: const Color(0xff1e1e1e),
             ),
           ),
@@ -800,49 +862,65 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.w),
-      child: ElevatedButton(
-        onPressed:
-            _isLoading ? null : () => _showCancelConfirmation(context, orderId),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _isLoading ? Colors.grey : Colors.red,
-          padding: EdgeInsets.symmetric(vertical: 15.w),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.w),
-          ),
-        ),
-        child: _isLoading
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
+      child: InkWell(
+        onTap: _isLoading ? null : () => _showCancelConfirmation(context, orderId),
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 16.w),
+          decoration: BoxDecoration(
+            color: _isLoading ? Colors.grey : Colors.red,
+            borderRadius: BorderRadius.circular(14.r),
+            boxShadow: _isLoading
+                ? []
+                : [
+                    BoxShadow(
+                      color: Colors.red.withOpacity(0.3),
+                      blurRadius: 15,
+                      offset: Offset(0, 6),
                     ),
-                  ),
-                  SizedBox(width: 10.w),
-                  Text(
-                    'Cancelling...',
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+          ),
+          child: _isLoading
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Text(
+                      'Cancelling Order...',
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                )
+              : Center(
+                  child: Text(
+                    'Cancel Order',
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                       color: Colors.white,
+                      letterSpacing: 0.5,
                     ),
                   ),
-                ],
-              )
-            : Text(
-                'Cancel Order',
-                style: MyGoogleFontStyle(
-                  fontFamily: 'Urbanist',
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
                 ),
-              ),
+        ),
       ),
     );
   }

@@ -446,19 +446,59 @@ class _ContactPageState extends State<ContactPage> {
   Widget build(BuildContext context) {
     final productModel = Provider.of<ProductModel>(context, listen: false);
     return Scaffold(
-      body: SafeArea(
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                child: Container(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFFFFEF9), Color(0xFFFFFDF7), Colors.white],
+          ),
+        ),
+        child: SafeArea(
+          child: _isLoading
+              ? Center(
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildHeader(context),
-                      _buildBody(context, productModel),
+                      Container(
+                        padding: EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xFFEED056).withOpacity(0.15),
+                              blurRadius: 20,
+                              offset: Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
+                          strokeWidth: 3,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Text('Loading...', style: MyGoogleFontStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 16.0.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xff232323),
+                      )),
                     ],
                   ),
+                )
+              : SingleChildScrollView(
+                  child: Container(
+                    child: Column(
+                      children: [
+                        _buildHeader(context),
+                        _buildBody(context, productModel),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+        ),
       ),
     );
   }
@@ -470,13 +510,27 @@ class _ContactPageState extends State<ContactPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              size: 18.0.w,
-              color: const Color(0xffEED056),
+          InkWell(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              padding: EdgeInsets.all(8.0.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0xFFEED056).withOpacity(0.15),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Icon(
+                Icons.arrow_back_ios_new,
+                size: 16.0.sp,
+                color: const Color(0xffEED056),
+              ),
             ),
-            onPressed: () => Navigator.pop(context),
           ),
           Expanded(
             child: Text(
@@ -484,8 +538,8 @@ class _ContactPageState extends State<ContactPage> {
               textAlign: TextAlign.center,
               style: MyGoogleFontStyle(
                 fontFamily: 'Urbanist',
-                fontSize: 18.0.sp,
-                fontWeight: FontWeight.bold,
+                fontSize: 20.0.sp,
+                fontWeight: FontWeight.w700,
                 color: const Color(0xff1e232c),
               ),
             ),

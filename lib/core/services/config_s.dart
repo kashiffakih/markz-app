@@ -19,8 +19,8 @@ class ConfigService {
       },
       'responseType': 'json',
       'baseURL': url! + '/api',
-      'mediaURL': url! + '/storage/',
-      // 'mediaURL': 'https://api.staging.aadab.online/storage/Aadab/',
+      // 'mediaURL': url! + '/storage/',
+      'mediaURL': 'https://api.staging.aadab.online/storage/Aadab/',
     };
   }
 

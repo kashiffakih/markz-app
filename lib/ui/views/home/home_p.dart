@@ -131,8 +131,8 @@ class _HomePageState extends State<HomePage>
         return 0.0;
       }
 
-      final price = int.parse(priceValue.toString());
-      final offerPrice = int.parse(offerPriceValue.toString());
+      final price = int.tryParse(priceValue.toString()) ?? 0;
+      final offerPrice = int.tryParse(offerPriceValue.toString()) ?? 0;
 
       if (price > 0 && offerPrice > 0 && price > offerPrice) {
         return ((price - offerPrice) / price * 100);
@@ -160,38 +160,90 @@ class _HomePageState extends State<HomePage>
             SystemNavigator.pop();
           }
         },
-        child: SafeArea(
-          child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _errorMessage != null
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(_errorMessage!,
-                              style: const TextStyle(color: Colors.red)),
-                          ElevatedButton(
-                            onPressed: _initializeData,
-                            child: const Text('Retry'),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFFFFFEF9),
+                Color(0xFFFFFDF7),
+                Colors.white,
+              ],
+            ),
+          ),
+          child: SafeArea(
+            child: _isLoading
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0xFFEED056).withOpacity(0.15),
+                                blurRadius: 20,
+                                offset: Offset(0, 10),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    )
-                  : SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 20),
-                          _buildSearchBar(context),
-                          _buildBannerCarousel(context),
-                          _buildNewArrivals(context, productModel,
-                              wishListModel, configModel),
-                          const SizedBox(height: 20),
-                          _buildCategories(context, productModel, configModel),
-                          _buildInviteBanner(context, configModel),
-                        ],
-                      ),
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                Color(0xFFEED056)),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'Loading...',
+                          style: TextStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF232323),
+                          ),
+                        ),
+                      ],
                     ),
+                  )
+                : _errorMessage != null
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(_errorMessage!,
+                                style: const TextStyle(color: Colors.red)),
+                            ElevatedButton(
+                              onPressed: _initializeData,
+                              child: const Text('Retry'),
+                            ),
+                          ],
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 20),
+                            _buildSearchBar(context),
+                            const SizedBox(height: 16),
+                            _buildBannerCarousel(context),
+                            const SizedBox(height: 8),
+                            _buildNewArrivals(context, productModel,
+                                wishListModel, configModel),
+                            const SizedBox(height: 8),
+                            _buildCategories(
+                                context, productModel, configModel),
+                            const SizedBox(height: 16),
+                            _buildInviteBanner(context, configModel),
+                            const SizedBox(height: 20),
+                          ],
+                        ),
+                      ),
+          ),
         ),
       ),
       bottomNavigationBar: _buildBottomNavigationBar(
@@ -203,15 +255,28 @@ class _HomePageState extends State<HomePage>
     return Container(
       width: _searchBarWidthRatio.sw,
       height: _searchBarHeightRatio.sh,
-      padding: EdgeInsets.symmetric(horizontal: 10.0.w),
-      decoration: ShapeDecoration(
-        shape: RoundedRectangleBorder(
-          side: const BorderSide(width: 0.5, color: Color(0xFFC7B456)),
-          borderRadius: BorderRadius.circular(10.0.r),
-        ),
+      padding: EdgeInsets.symmetric(horizontal: 16.0.w, vertical: 4.0.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.0.r),
+        border:
+            Border.all(color: Color(0xFFEED056).withOpacity(0.3), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0xFFEED056).withOpacity(0.08),
+            blurRadius: 15,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
+          Icon(
+            Icons.search,
+            color: Color(0xFFEED056),
+            size: 22.0.sp,
+          ),
+          SizedBox(width: 12.0.w),
           Expanded(
             child: TextFormField(
               controller: _controller,
@@ -224,20 +289,26 @@ class _HomePageState extends State<HomePage>
                   ).then((_) => _controller.clear());
                 }
               },
-              decoration: const InputDecoration(
-                hintText: 'Search',
+              decoration: InputDecoration(
+                hintText: 'Search for products...',
+                hintStyle: TextStyle(
+                  color: Color(0xFFAAAAAA),
+                  fontSize: 15.sp,
+                  fontFamily: 'Urbanist',
+                  fontWeight: FontWeight.w400,
+                ),
                 border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
               ),
               style: TextStyle(
-                color: Colors.black.withOpacity(0.6),
-                fontSize: 18,
+                color: Color(0xff232323),
+                fontSize: 15.sp,
                 fontFamily: 'Urbanist',
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
-          Image.asset('assets/images/Search-1.png',
-              height: 20.0.h, fit: BoxFit.cover),
         ],
       ),
     );
@@ -264,20 +335,29 @@ class _HomePageState extends State<HomePage>
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: bannerUrls.asMap().entries.map((entry) {
+            bool isActive = _current == entry.key;
             return GestureDetector(
               onTap: () => _carouselController.animateToPage(entry.key),
-              child: Container(
-                width: _carouselIndicatorSize.w,
-                height: _carouselIndicatorSize.w,
+              child: AnimatedContainer(
+                duration: Duration(milliseconds: 300),
+                width: isActive ? 28.0.w : 8.0.w,
+                height: 8.0.w,
                 margin:
                     EdgeInsets.symmetric(vertical: 8.0.h, horizontal: 4.0.w),
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                          .withOpacity(_current == entry.key ? 0.9 : 0.4)
-                      : Colors.black
-                          .withOpacity(_current == entry.key ? 0.9 : 0.4),
+                  borderRadius: BorderRadius.circular(8.0.r),
+                  color: isActive
+                      ? Color(0xFFEED056)
+                      : Color(0xFFEED056).withOpacity(0.3),
+                  boxShadow: isActive
+                      ? [
+                          BoxShadow(
+                            color: Color(0xFFEED056).withOpacity(0.4),
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
+                          ),
+                        ]
+                      : [],
                 ),
               ),
             );
@@ -313,9 +393,69 @@ class _HomePageState extends State<HomePage>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.0.w),
-          child: Image.asset('assets/images/NewArrivals.png',
-              width: 500.58.w, height: 60.58.h),
+          padding: EdgeInsets.fromLTRB(20.0.w, 16.0.w, 20.0.w, 16.0.w),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'New Arrivals',
+                    style: MyGoogleFontStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 24.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xff232323),
+                    ),
+                  ),
+                  SizedBox(height: 6.0.w),
+                  Container(
+                    height: 4.0.w,
+                    width: 60.0.w,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFFEED056),
+                          Color(0xFFEED056).withOpacity(0.3),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(2.0.r),
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding:
+                    EdgeInsets.symmetric(horizontal: 14.0.w, vertical: 8.0.w),
+                decoration: BoxDecoration(
+                  color: Color(0xFFEED056).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(20.0.r),
+                  border: Border.all(
+                    color: Color(0xFFEED056).withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.fiber_new,
+                        size: 16.sp, color: Color(0xFFEED056)),
+                    SizedBox(width: 4.0.w),
+                    Text(
+                      'Fresh',
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF232323),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
         SizedBox(
           height: _newArrivalsHeightRatio.sh,
@@ -357,12 +497,18 @@ class _HomePageState extends State<HomePage>
       width: _productCardWidth.w,
       margin: EdgeInsets.only(right: 12.0.w),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15.0.r),
+        borderRadius: BorderRadius.circular(20.0.r),
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 5,
+            color: Color(0xFFEED056).withOpacity(0.12),
+            blurRadius: 20,
+            spreadRadius: 2,
+            offset: const Offset(0, 6),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
             offset: const Offset(0, 2),
           ),
         ],
@@ -409,7 +555,7 @@ class _HomePageState extends State<HomePage>
                       child: Align(
                         alignment: Alignment.topRight,
                         child: Padding(
-                          padding: EdgeInsets.all(8.0.w),
+                          padding: EdgeInsets.all(10.0.w),
                           child: InkWell(
                             onTap: () async {
                               if (configModel.user == null) {
@@ -421,12 +567,28 @@ class _HomePageState extends State<HomePage>
                                 await wishListModel.getWishLists(product.id);
                               }
                             },
-                            child: Icon(
-                              isWishListed
-                                  ? Icons.favorite_outlined
-                                  : Icons.favorite_border_outlined,
-                              color: isWishListed ? Colors.red : null,
-                              size: 20.0.sp,
+                            child: Container(
+                              padding: EdgeInsets.all(8.0.w),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.95),
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 8,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                isWishListed
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                color: isWishListed
+                                    ? Colors.red
+                                    : Color(0xFF909090),
+                                size: 18.0.sp,
+                              ),
                             ),
                           ),
                         ),
@@ -569,9 +731,69 @@ class _HomePageState extends State<HomePage>
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.0.w),
-          child:
-              Image.asset('assets/images/ShopByCategory.png', height: 20.0.h),
+          padding: EdgeInsets.fromLTRB(20.0.w, 16.0.w, 20.0.w, 16.0.w),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Shop By Category',
+                    style: MyGoogleFontStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 24.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xff232323),
+                    ),
+                  ),
+                  SizedBox(height: 6.0.w),
+                  Container(
+                    height: 4.0.w,
+                    width: 80.0.w,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFFEED056),
+                          Color(0xFFEED056).withOpacity(0.3),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(2.0.r),
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding:
+                    EdgeInsets.symmetric(horizontal: 14.0.w, vertical: 8.0.w),
+                decoration: BoxDecoration(
+                  color: Color(0xFFEED056).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(20.0.r),
+                  border: Border.all(
+                    color: Color(0xFFEED056).withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.category_rounded,
+                        size: 16.sp, color: Color(0xFFEED056)),
+                    SizedBox(width: 4.0.w),
+                    Text(
+                      'Browse',
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF232323),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
         ...?productModel.categories?.asMap().entries.map(
           (entry) {
@@ -610,9 +832,24 @@ class _HomePageState extends State<HomePage>
     final isEvenIndex = index % 2 == 0;
     return Container(
       height: _categoryHeightRatio.sh,
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10.0.r)),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20.0.r),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0xFFEED056).withOpacity(0.15),
+            blurRadius: 20,
+            spreadRadius: 2,
+            offset: Offset(0, 6),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(10.0.r),
+        borderRadius: BorderRadius.circular(20.0.r),
         child: Stack(
           children: [
             Image.network(
@@ -851,66 +1088,94 @@ class _HomePageState extends State<HomePage>
   ) {
     return Container(
       height: _bottomNavBarHeight,
-      decoration: const ShapeDecoration(
+      decoration: BoxDecoration(
         color: Colors.white,
-        shape: RoundedRectangleBorder(
-          side: BorderSide(width: 2.5, color: Color(0xFFC7B456)),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-        ),
-        shadows: [
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        boxShadow: [
           BoxShadow(
-              color: Color(0x3F000000),
-              blurRadius: 4,
-              offset: Offset(0, 4),
-              spreadRadius: 6),
+            color: Color(0xFFEED056).withOpacity(0.15),
+            blurRadius: 25,
+            spreadRadius: 0,
+            offset: Offset(0, -8),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
+            offset: Offset(0, -4),
+          ),
         ],
+        border: Border(
+          top: BorderSide(
+            color: Color(0xFFEED056).withOpacity(0.2),
+            width: 1.5,
+          ),
+        ),
       ),
-      child: BottomNavigationBar(
-        elevation: 10,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color.fromARGB(255, 249, 245, 225),
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.black,
-        selectedFontSize: 14,
-        unselectedFontSize: 14,
-        onTap: (value) =>
-            _handleBottomNavTap(context, value, configModel, addToCartModel),
-        items: [
-          BottomNavigationBarItem(
-            label: 'HOME',
-            icon: Image.asset('assets/images/home-icon.png',
-                width: _bottomNavIconSize.toDouble(),
-                height: _bottomNavIconSize.toDouble()),
+      child: ClipRRect(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        child: BottomNavigationBar(
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          selectedItemColor: Color(0xFFEED056),
+          unselectedItemColor: Color(0xFF909090),
+          selectedFontSize: 11,
+          unselectedFontSize: 11,
+          selectedLabelStyle: TextStyle(
+            fontFamily: 'Urbanist',
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.5,
           ),
-          BottomNavigationBarItem(
-            label: 'CATEGORY',
-            icon: Image.asset('assets/images/category-icon.png',
-                width: _bottomNavIconSize.toDouble(),
-                height: _bottomNavIconSize.toDouble()),
+          unselectedLabelStyle: TextStyle(
+            fontFamily: 'Urbanist',
+            fontWeight: FontWeight.w500,
           ),
-          BottomNavigationBarItem(
-            label: 'CART',
-            icon: badges.Badge(
-              badgeContent: Text('$cartCount',
-                  style: const TextStyle(color: Colors.white)),
-              child: Image.asset('assets/images/cart-icon.png',
+          onTap: (value) =>
+              _handleBottomNavTap(context, value, configModel, addToCartModel),
+          items: [
+            BottomNavigationBarItem(
+              label: 'Home',
+              icon: Image.asset('assets/images/home-icon.png',
                   width: _bottomNavIconSize.toDouble(),
                   height: _bottomNavIconSize.toDouble()),
             ),
-          ),
-          BottomNavigationBarItem(
-            label: 'PROFILE',
-            icon: Image.asset('assets/images/user-profile-icon.png',
-                width: _bottomNavIconSize.toDouble(),
-                height: _bottomNavIconSize.toDouble()),
-          ),
-          BottomNavigationBarItem(
-            label: 'NOTIFS',
-            icon: Image.asset('assets/images/notification-icon.png',
-                width: _bottomNavIconSize.toDouble(),
-                height: _bottomNavIconSize.toDouble()),
-          ),
-        ],
+            BottomNavigationBarItem(
+              label: 'Category',
+              icon: Image.asset('assets/images/category-icon.png',
+                  width: _bottomNavIconSize.toDouble(),
+                  height: _bottomNavIconSize.toDouble()),
+            ),
+            BottomNavigationBarItem(
+              label: 'Cart',
+              icon: badges.Badge(
+                badgeContent: Text('$cartCount',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold)),
+                badgeStyle: badges.BadgeStyle(
+                  badgeColor: Color(0xFFEED056),
+                  padding: EdgeInsets.all(6),
+                ),
+                child: Image.asset('assets/images/cart-icon.png',
+                    width: _bottomNavIconSize.toDouble(),
+                    height: _bottomNavIconSize.toDouble()),
+              ),
+            ),
+            BottomNavigationBarItem(
+              label: 'Profile',
+              icon: Image.asset('assets/images/user-profile-icon.png',
+                  width: _bottomNavIconSize.toDouble(),
+                  height: _bottomNavIconSize.toDouble()),
+            ),
+            BottomNavigationBarItem(
+              label: 'Notifs',
+              icon: Image.asset('assets/images/notification-icon.png',
+                  width: _bottomNavIconSize.toDouble(),
+                  height: _bottomNavIconSize.toDouble()),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -47,73 +47,137 @@ class _NotificationsPageState extends State<NotificationsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: _isLoading
-            ? SizedBox(
-                height: 1.0.sh,
-                width: 1.0.sw,
-                child: const Center(child: CircularProgressIndicator()),
-              )
-            : _errorMessage != null
-                ? SizedBox(
-                    height: 1.0.sh,
-                    width: 1.0.sw,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            _errorMessage!,
-                            style: const TextStyle(color: Colors.red),
-                          ),
-                          SizedBox(height: 16.0.w),
-                          ElevatedButton(
-                            onPressed: _fetchNotifications,
-                            child: const Text('Retry'),
-                          ),
-                        ],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFFFFEF9),
+              Color(0xFFFFFDF7),
+              Colors.white,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: _isLoading
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xFFEED056).withOpacity(0.15),
+                              blurRadius: 20,
+                              offset: Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
+                          strokeWidth: 3,
+                        ),
                       ),
-                    ),
-                  )
-                : RefreshIndicator(
-                    onRefresh: _fetchNotifications,
-                    child: SizedBox(
-                      width: 1.0.sw,
+                      SizedBox(height: 20),
+                      Text(
+                        'Loading Notifications...',
+                        style: MyGoogleFontStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 16.0.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff232323),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : _errorMessage != null
+                  ? SizedBox(
                       height: 1.0.sh,
-                      child: Column(
-                        children: [
-                          // Header
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20.0.w, vertical: 16.0.w),
-                            child: Row(
-                              children: [
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.arrow_back_ios,
-                                    size: 18.0.sp,
-                                    color: const Color(0xffEED056),
-                                  ),
-                                  onPressed: () => Navigator.pop(context),
+                      width: 1.0.sw,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              _errorMessage!,
+                              style: const TextStyle(color: Colors.red),
+                            ),
+                            SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: _fetchNotifications,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFFEED056),
+                                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                Expanded(
-                                  child: Center(
-                                    child: Text(
-                                      'Notifications',
-                                      style: MyGoogleFontStyle(
-                                        fontFamily: 'Urbanist',
-                                        fontSize: 18.0.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: const Color(0xff1e232c),
+                              ),
+                              child: const Text('Retry'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: _fetchNotifications,
+                      color: Color(0xFFEED056),
+                      child: SizedBox(
+                        width: 1.0.sw,
+                        height: 1.0.sh,
+                        child: Column(
+                          children: [
+                            // Header
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20.0.w, vertical: 16.0.w),
+                              child: Row(
+                                children: [
+                                  InkWell(
+                                    onTap: () => Navigator.pop(context),
+                                    child: Container(
+                                      padding: EdgeInsets.all(8.0.w),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Color(0xFFEED056).withOpacity(0.15),
+                                            blurRadius: 8,
+                                            offset: Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Icon(
+                                        Icons.arrow_back_ios_new,
+                                        size: 16.0.sp,
+                                        color: const Color(0xffEED056),
                                       ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(
-                                    width: 48.0.w), // Balance for back button
-                              ],
+                                  Expanded(
+                                    child: Center(
+                                      child: Text(
+                                        'Notifications',
+                                        style: MyGoogleFontStyle(
+                                          fontFamily: 'Urbanist',
+                                          fontSize: 20.0.sp,
+                                          fontWeight: FontWeight.w700,
+                                          color: const Color(0xff1e232c),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                      width: 48.0.w), // Balance for back button
+                                ],
+                              ),
                             ),
-                          ),
                           // Notification List
                           Expanded(
                             child: Consumer<NotificationModel>(
@@ -234,6 +298,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       ),
                     ),
                   ),
+        ),
       ),
     );
   }

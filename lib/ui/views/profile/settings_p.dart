@@ -26,56 +26,71 @@ class _SettingsPageState extends State<SettingsPage> {
         return false;
       },
       child: Scaffold(
-        body: SafeArea(
-          child: SingleChildScrollView(
-            child: Container(
-              child: Column(
-                children: [
-                  // Title
-                  Container(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 10),
-                    width: double.infinity,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.arrow_back_ios,
-                            size: 18,
-                            color: Color(0xffEED056),
-                          ),
-                          onPressed: () {
-                            Navigator.pushNamed(context, '/profilePage');
-                          },
-                        ),
-                        Expanded(
-                          child: Text(
-                            'Settings',
-                            textAlign: TextAlign.center,
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xff1e232c),
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFFFFFEF9), Color(0xFFFFFDF7), Colors.white],
+            ),
+          ),
+          child: SafeArea(
+            child: SingleChildScrollView(
+              child: Container(
+                child: Column(
+                  children: [
+                    // Title
+                    Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 10),
+                      width: double.infinity,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              Navigator.pushNamed(context, '/profilePage');
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(8.0.w),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0xFFEED056).withOpacity(0.15),
+                                    blurRadius: 8,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.arrow_back_ios_new,
+                                size: 16.0.sp,
+                                color: const Color(0xffEED056),
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 48),
-                      ],
+                          Expanded(
+                            child: Text(
+                              'Settings',
+                              textAlign: TextAlign.center,
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 20.0.sp,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xff1e232c),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 48),
+                        ],
+                      ),
                     ),
-                  ),
                   // Body
                   Container(
-                    height: 600,
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          left: 25,
-                          top: 0,
-                          child: Container(
-                            width: 1.0.sw - 50,
-                            child: Column(
+                    padding: EdgeInsets.symmetric(horizontal: 25.0.w),
+                    child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 // Personal information
@@ -111,7 +126,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ],
                                 ),
                                 Container(
-                                  width: 1.0.sw - 50,
+                                  width: double.infinity,
                                   margin: EdgeInsets.only(top: 10, bottom: 10),
                                   padding: EdgeInsets.all(10),
                                   decoration: BoxDecoration(
@@ -156,7 +171,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ),
                                 ),
                                 Container(
-                                  width: 1.0.sw - 50,
+                                  width: double.infinity,
                                   margin: EdgeInsets.only(top: 10, bottom: 10),
                                   padding: EdgeInsets.all(10),
                                   decoration: BoxDecoration(
@@ -201,7 +216,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ),
                                 ),
                                 Container(
-                                  width: 1.0.sw - 50,
+                                  width: double.infinity,
                                   margin: EdgeInsets.only(top: 10, bottom: 10),
                                   padding: EdgeInsets.all(10),
                                   decoration: BoxDecoration(
@@ -246,7 +261,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ),
                                 ),
                                 Container(
-                                  width: 1.0.sw - 50,
+                                  width: double.infinity,
                                   margin: EdgeInsets.only(top: 10, bottom: 10),
                                   padding: EdgeInsets.all(10),
                                   decoration: BoxDecoration(
@@ -512,12 +527,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                 // ),
                               ],
                             ),
-                          ),
-                        )
-                      ],
-                    ),
                   )
-                ],
+                  ],
+                ),
               ),
             ),
           ),

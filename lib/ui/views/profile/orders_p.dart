@@ -45,27 +45,42 @@ class _OrdersPageState extends State<OrdersPage> {
     final orderModel = Provider.of<OrderModel>(context, listen: false);
     print('Building OrdersPage with ${orderModel.orders.first.id} orders');
     return Scaffold(
-      body: PopScope(
-        canPop: false,
-        onPopInvoked: (didPop) {
-          if (!didPop) {
-            final isProfile = widget.isProfile?['isProfile'] ?? false;
-            Navigator.pushReplacementNamed(
-              context,
-              isProfile ? '/profilePage' : '/homePage',
-            );
-          }
-        },
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Container(
-              padding: EdgeInsets.only(top: 20.0.w),
-              child: Column(
-                children: [
-                  _buildHeader(context),
-                  _buildTabBar(context, orderModel),
-                ],
-              ),
+      body: Container(
+        width: 1.0.sw,
+        height: 1.0.sh,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFFFFEF9),
+              Color(0xFFFFFDF7),
+              Colors.white,
+            ],
+          ),
+        ),
+        child: PopScope(
+          canPop: false,
+          onPopInvoked: (didPop) {
+            if (!didPop) {
+              final isProfile = widget.isProfile?['isProfile'] ?? false;
+              Navigator.pushReplacementNamed(
+                context,
+                isProfile ? '/profilePage' : '/homePage',
+              );
+            }
+          },
+          child: SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 20.0.w),
+                  child: _buildHeader(context),
+                ),
+                Expanded(
+                  child: _buildTabBar(context, orderModel),
+                ),
+              ],
             ),
           ),
         ),
@@ -75,32 +90,46 @@ class _OrdersPageState extends State<OrdersPage> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 30.0.w, vertical: 10.0.w),
+      margin: EdgeInsets.symmetric(horizontal: 20.0.w, vertical: 10.0.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              size: 18.0.w,
-              color: const Color(0xffEED056),
-            ),
-            onPressed: () {
+          InkWell(
+            onTap: () {
               final isProfile = widget.isProfile?['isProfile'] ?? false;
               Navigator.pushReplacementNamed(
                 context,
                 isProfile ? '/profilePage' : '/homePage',
               );
             },
+            child: Container(
+              padding: EdgeInsets.all(8.0.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0xFFEED056).withOpacity(0.15),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Icon(
+                Icons.arrow_back_ios_new,
+                size: 16.0.sp,
+                color: const Color(0xffEED056),
+              ),
+            ),
           ),
           Expanded(
             child: Text(
-              'Orders',
+              'My Orders',
               textAlign: TextAlign.center,
               style: MyGoogleFontStyle(
                 fontFamily: 'Urbanist',
-                fontSize: 18.0.sp,
-                fontWeight: FontWeight.bold,
+                fontSize: 20.0.sp,
+                fontWeight: FontWeight.w700,
                 color: const Color(0xff1e232c),
               ),
             ),
@@ -127,10 +156,43 @@ class _OrdersPageState extends State<OrdersPage> {
               _buildTab('Cancelled'),
             ],
           ),
-          Container(
-            height: 0.8.sh,
+          Expanded(
             child: _isPageLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0xFFEED056).withOpacity(0.15),
+                                blurRadius: 20,
+                                offset: Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
+                            strokeWidth: 3,
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'Loading Orders...',
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 16.0.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff232323),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
                 : TabBarView(
                     children: [
                       _buildOrderTab(orderModel, 'Order Placed'),
@@ -181,17 +243,26 @@ class _OrdersPageState extends State<OrdersPage> {
 
   Widget _buildOrderCard(dynamic order, String status) {
     return Container(
-      margin: EdgeInsets.all(10.0.w),
-      padding: EdgeInsets.all(10.0.w),
+      margin: EdgeInsets.symmetric(horizontal: 16.0.w, vertical: 8.0.w),
+      padding: EdgeInsets.all(16.0.w),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xffc7b456)),
         color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(5.0.w)),
+        borderRadius: BorderRadius.all(Radius.circular(16.0.r)),
+        border: Border.all(
+          color: const Color(0xffEED056).withOpacity(0.3),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0x338a959e),
-            offset: Offset(0, 7.6690645218.w),
-            blurRadius: 19.1726608276.w,
+            color: const Color(0xFFEED056).withOpacity(0.12),
+            offset: Offset(0, 6),
+            blurRadius: 20,
+            spreadRadius: 2,
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            offset: Offset(0, 2),
+            blurRadius: 10,
           ),
         ],
       ),
@@ -315,20 +386,34 @@ class _OrdersPageState extends State<OrdersPage> {
                   );
                 },
                 child: Container(
-                  width: 74.5.w,
-                  height: 30.0.w,
+                  padding: EdgeInsets.symmetric(horizontal: 20.0.w, vertical: 10.0.w),
                   decoration: BoxDecoration(
-                    color: const Color(0xff232323),
-                    borderRadius: BorderRadius.circular(8.0.r),
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFFEED056),
+                        Color(0xFFC7B456),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12.0.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xFFEED056).withOpacity(0.4),
+                        offset: Offset(0, 4),
+                        blurRadius: 10,
+                      ),
+                    ],
                   ),
                   child: Center(
                     child: Text(
-                      'Detail',
+                      'View Details',
                       style: MyGoogleFontStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 12.0.sp,
-                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Urbanist',
+                        fontSize: 13.0.sp,
+                        fontWeight: FontWeight.w600,
                         color: Colors.white,
+                        letterSpacing: 0.3,
                       ),
                     ),
                   ),

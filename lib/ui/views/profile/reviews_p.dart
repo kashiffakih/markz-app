@@ -386,30 +386,84 @@ class _ReviewsPageState extends State<ReviewsPage> {
           'Reviews',
           style: MyGoogleFontStyle(
             fontFamily: 'Urbanist',
-            fontSize: 18.0.sp,
-            fontWeight: FontWeight.bold,
+            fontSize: 20.0.sp,
+            fontWeight: FontWeight.w700,
             color: const Color(0xff1e232c),
           ),
         ),
         centerTitle: true,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: const Color(0xffEED056),
-            size: 18.0.w,
+        leading: InkWell(
+          onTap: () => Navigator.pop(context),
+          child: Container(
+            margin: EdgeInsets.all(8.0.w),
+            padding: EdgeInsets.all(8.0.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xFFEED056).withOpacity(0.15),
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Icon(
+              Icons.arrow_back_ios_new,
+              size: 16.0.sp,
+              color: const Color(0xffEED056),
+            ),
           ),
-          onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : reviewModel.reviews == null || reviewModel.reviews!.isEmpty
-              ? const Center(child: Text('No reviews available'))
-              : Padding(
-                  padding: EdgeInsets.all(20.0.w),
-                  child: ListView.builder(
-                    itemCount: reviewModel.reviews!.length,
-                    itemBuilder: (context, index) {
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFFFFEF9), Color(0xFFFFFDF7), Colors.white],
+          ),
+        ),
+        child: _isLoading
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xFFEED056).withOpacity(0.15),
+                            blurRadius: 20,
+                            offset: Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
+                        strokeWidth: 3,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Text('Loading...', style: MyGoogleFontStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 16.0.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xff232323),
+                    )),
+                  ],
+                ),
+              )
+            : reviewModel.reviews == null || reviewModel.reviews!.isEmpty
+                ? const Center(child: Text('No reviews available'))
+                : Padding(
+                    padding: EdgeInsets.all(20.0.w),
+                    child: ListView.builder(
+                      itemCount: reviewModel.reviews!.length,
+                      itemBuilder: (context, index) {
                       final review = reviewModel.reviews![index];
                       // print(
                       //     'check review product image ${review.product!.imagepath1}');
@@ -439,9 +493,10 @@ class _ReviewsPageState extends State<ReviewsPage> {
                           }
                         },
                       );
-                    },
+                      },
+                    ),
                   ),
-                ),
+      ),
     );
   }
 
@@ -452,7 +507,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
     required VoidCallback onTap,
   }) {
     // final productImages = review.product?.productImages ?? [];
-    final firstImage = review.product!.imagepath1;
+    final firstImage = review.product?.imagepath1;
     // print('imaage $productImages');
 
     return GestureDetector(
@@ -478,13 +533,13 @@ class _ReviewsPageState extends State<ReviewsPage> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (firstImage != null)
+                if (firstImage != null && review.product != null)
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => ProductIdPage(arguments: {
-                            'product': review.product!.toJson(),
+                            'product': review.product?.toJson(),
                             'product_images': review.product?.productImages
                           }),
                         ),

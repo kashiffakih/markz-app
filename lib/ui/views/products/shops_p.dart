@@ -134,88 +134,139 @@ class ShopsPageState extends State<ShopsPage> {
     final cartCount = addToCartModel.addToCarts?.length ?? 0;
 
     return Scaffold(
-      body: SafeArea(
-        child: _isLoading
-            ? SizedBox(
-                height: 1.0.sh,
-                width: 1.0.sw,
-                child: const Center(child: CircularProgressIndicator()),
-              )
-            : _errorMessage != null
-                ? SizedBox(
-                    height: 1.0.sh,
-                    width: 1.0.sw,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(_errorMessage!,
-                              style: const TextStyle(color: Colors.red)),
-                          ElevatedButton(
-                            onPressed: _fetchInitialData,
-                            child: const Text('Retry'),
-                          ),
-                        ],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFFFFEF9),
+              Color(0xFFFFFDF7),
+              Colors.white,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: _isLoading
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xFFEED056).withOpacity(0.15),
+                              blurRadius: 20,
+                              offset: Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
+                          strokeWidth: 3,
+                        ),
                       ),
-                    ),
-                  )
-                : RefreshIndicator(
-                    onRefresh: _fetchInitialData,
-                    child: SizedBox(
-                      width: 1.0.sw,
+                      SizedBox(height: 20),
+                      Text(
+                        'Loading Products...',
+                        style: MyGoogleFontStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 16.0.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff232323),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : _errorMessage != null
+                  ? SizedBox(
                       height: 1.0.sh,
-                      child: SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        child: Container(
-                          padding:
-                              EdgeInsets.fromLTRB(9.0.w, 16.0.w, 9.0.w, 22.0.w),
-                          width: 1.0.sw,
-                          constraints: BoxConstraints(minHeight: 1.0.sh),
-                          decoration: const BoxDecoration(color: Colors.white),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildTopSection(context, cartCount),
-                              SizedBox(height: 2.0.w),
-                              _buildCategoriesSection(context, productModel),
-                              if (_isSearching)
-                                SizedBox(
-                                  height: 1.0.sh * 0.5,
-                                  child: const Center(
-                                      child: CircularProgressIndicator()),
-                                )
-                              else
-                                _buildProductList(
-                                    context, configModel, wishListModel),
-                            ],
+                      width: 1.0.sw,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(_errorMessage!,
+                                style: const TextStyle(color: Colors.red)),
+                            SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: _fetchInitialData,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFFEED056),
+                                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text('Retry'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: _fetchInitialData,
+                      color: Color(0xFFEED056),
+                      child: SizedBox(
+                        width: 1.0.sw,
+                        height: 1.0.sh,
+                        child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Container(
+                            padding:
+                                EdgeInsets.fromLTRB(9.0.w, 16.0.w, 9.0.w, 22.0.w),
+                            width: 1.0.sw,
+                            constraints: BoxConstraints(minHeight: 1.0.sh),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildTopSection(context, cartCount),
+                                SizedBox(height: 2.0.w),
+                                _buildCategoriesSection(context, productModel),
+                                if (_isSearching)
+                                  Container(
+                                    height: 200,
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
+                                      ),
+                                    ),
+                                  )
+                                else
+                                  _buildProductList(
+                                      context, configModel, wishListModel),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
+        ),
       ),
     );
   }
 
   Widget _buildTopSection(BuildContext context, int cartCount) {
     return Container(
-      margin: EdgeInsets.only(left: 20.0.w, bottom: 20.0.w, right: 30.0.w),
+      margin: EdgeInsets.only(left: 10.0.w, bottom: 20.0.w, right: 10.0.w),
       width: double.infinity,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          InkWell(
-            onTap: () => Navigator.pushNamed(context, '/homePage'),
-            child: Center(
-              child: Text(
-                'Shops',
-                textAlign: TextAlign.center,
-                style: MyGoogleFontStyle(
-                  fontFamily: 'Urbanist',
-                  fontSize: 18.0.sp,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xff1e232c),
-                ),
+          Center(
+            child: Text(
+              'Browse Products',
+              textAlign: TextAlign.center,
+              style: MyGoogleFontStyle(
+                fontFamily: 'Urbanist',
+                fontSize: 20.0.sp,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xff1e232c),
               ),
             ),
           ),
@@ -225,48 +276,89 @@ class ShopsPageState extends State<ShopsPage> {
             children: [
               InkWell(
                 onTap: () => Navigator.pop(context),
-                child: Icon(Icons.arrow_back_ios,
-                    size: 18.0.sp, color: const Color(0xffEED056)),
+                child: Container(
+                  padding: EdgeInsets.all(8.0.w),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xFFEED056).withOpacity(0.15),
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.arrow_back_ios_new,
+                    size: 16.0.sp,
+                    color: const Color(0xffEED056),
+                  ),
+                ),
               ),
-              SizedBox(width: 10.0.w),
+              SizedBox(width: 12.0.w),
               Expanded(
                 child: Container(
-                  height: 38.0.w,
-                  padding: EdgeInsets.only(left: 21.0.w, right: 20.70.w),
-                  decoration: ShapeDecoration(
-                    shape: RoundedRectangleBorder(
-                      side: const BorderSide(
-                          width: 0.50, color: Color(0xFFC7B456)),
-                      borderRadius: BorderRadius.circular(10.0.r),
+                  height: 45.0.w,
+                  padding: EdgeInsets.symmetric(horizontal: 16.0.w, vertical: 4.0.w),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16.0.r),
+                    border: Border.all(
+                      color: Color(0xFFEED056).withOpacity(0.3),
+                      width: 1.5,
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xFFEED056).withOpacity(0.08),
+                        blurRadius: 15,
+                        offset: Offset(0, 4),
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.03),
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Row(
                     children: [
+                      Icon(
+                        Icons.search,
+                        color: Color(0xFFEED056),
+                        size: 20.0.sp,
+                      ),
+                      SizedBox(width: 10.0.w),
                       Expanded(
                         child: TextFormField(
                           controller: _controller,
                           onChanged: (value) {
                             _searchProducts(value);
                           },
-                          decoration: const InputDecoration(
-                            hintText: 'Search',
+                          decoration: InputDecoration(
+                            hintText: 'Search products...',
+                            hintStyle: TextStyle(
+                              color: Color(0xFF909090),
+                              fontSize: 14.0.sp,
+                              fontFamily: 'Urbanist',
+                              fontWeight: FontWeight.w400,
+                            ),
                             border: InputBorder.none,
+                            contentPadding: EdgeInsets.zero,
                           ),
                           style: TextStyle(
-                            color: Colors.black.withOpacity(0.6),
-                            fontSize: 18.0.sp,
+                            color: Colors.black,
+                            fontSize: 14.0.sp,
                             fontFamily: 'Urbanist',
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
-                      Image.asset('assets/images/Search-1.png',
-                          height: 20.0.w, fit: BoxFit.cover),
                     ],
                   ),
                 ),
               ),
-              SizedBox(width: 10.0.w),
+              SizedBox(width: 12.0.w),
               InkWell(
                 onTap: () {
                   if (context.read<ConfigModel>().user == null) {
@@ -285,11 +377,38 @@ class ShopsPageState extends State<ShopsPage> {
                     );
                   }
                 },
-                child: badges.Badge(
-                  badgeContent: Text(cartCount.toString(),
-                      style: const TextStyle(color: Colors.white)),
-                  child: Image.asset('assets/images/cart-icon.png',
-                      width: 23.0.w, height: 23.0.w),
+                child: Container(
+                  padding: EdgeInsets.all(10.0.w),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xFFEED056).withOpacity(0.15),
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: badges.Badge(
+                    badgeContent: Text(
+                      cartCount.toString(),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10.0.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    badgeStyle: badges.BadgeStyle(
+                      badgeColor: Color(0xFFEED056),
+                      padding: EdgeInsets.all(4.0.w),
+                    ),
+                    child: Icon(
+                      Icons.shopping_cart_outlined,
+                      color: Color(0xFF232323),
+                      size: 22.0.sp,
+                    ),
+                  ),
                 ),
               ),
             ],

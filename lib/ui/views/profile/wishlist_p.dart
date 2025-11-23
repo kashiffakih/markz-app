@@ -54,18 +54,60 @@ class _WishlistPageState extends State<WishlistPage> {
         final cartCount = addToCartModel.addToCarts?.length ?? 0;
 
         return Scaffold(
-          body: SafeArea(
-            child: _isPageLoading
-                ? const Center(child: CircularProgressIndicator())
-                : SingleChildScrollView(
-                    child: Column(
+          body: Container(
+            width: 1.0.sw,
+            height: 1.0.sh,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFFFFFEF9), Color(0xFFFFFDF7), Colors.white],
+              ),
+            ),
+            child: SafeArea(
+              child: _isPageLoading
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0xFFEED056).withOpacity(0.15),
+                                  blurRadius: 20,
+                                  offset: Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
+                              strokeWidth: 3,
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          Text('Loading...', style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 16.0.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff232323),
+                          )),
+                        ],
+                      ),
+                    )
+                  : Column(
                       children: [
                         _buildHeader(context, cartCount),
-                        _buildWishlistContent(context, wishListModel,
-                            addToCartModel, configModel),
+                        Expanded(
+                          child: _buildWishlistContent(context, wishListModel,
+                              addToCartModel, configModel),
+                        ),
                       ],
                     ),
-                  ),
+            ),
           ),
         );
       },
@@ -78,10 +120,27 @@ class _WishlistPageState extends State<WishlistPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back_ios,
-                size: 18, color: Color(0xffEED056)),
-            onPressed: () => Navigator.pop(context),
+          InkWell(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              padding: EdgeInsets.all(8.0.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0xFFEED056).withOpacity(0.15),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Icon(
+                Icons.arrow_back_ios_new,
+                size: 16.0.sp,
+                color: const Color(0xffEED056),
+              ),
+            ),
           ),
           Expanded(
             child: Text(
@@ -89,8 +148,8 @@ class _WishlistPageState extends State<WishlistPage> {
               textAlign: TextAlign.center,
               style: MyGoogleFontStyle(
                 fontFamily: 'Urbanist',
-                fontSize: 18.0.sp,
-                fontWeight: FontWeight.bold,
+                fontSize: 20.0.sp,
+                fontWeight: FontWeight.w700,
                 color: const Color(0xff1e232c),
               ),
             ),
@@ -121,25 +180,25 @@ class _WishlistPageState extends State<WishlistPage> {
     ConfigModel configModel,
   ) {
     if (wishListModel.wishLists?.isEmpty ?? true) {
-      return const SizedBox(
-        height: 60,
-        child: Center(child: Text('Wishlist is empty')),
-      );
+      return const Center(child: Text('Wishlist is empty'));
     }
 
-    return SizedBox(
-      height: MediaQuery.sizeOf(context).height - 240,
-      width: MediaQuery.sizeOf(context).width - 50,
-      child: ListView.separated(
-        itemCount: wishListModel.wishLists!.length,
-        separatorBuilder: (_, __) =>
-            const Divider(thickness: 2, color: Colors.black),
-        itemBuilder: (context, index) => _buildWishlistItem(
-          context,
-          wishListModel,
-          addToCartModel,
-          configModel,
-          index,
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 25.0.w),
+        child: ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: wishListModel.wishLists!.length,
+          separatorBuilder: (_, __) =>
+              const Divider(thickness: 2, color: Colors.black),
+          itemBuilder: (context, index) => _buildWishlistItem(
+            context,
+            wishListModel,
+            addToCartModel,
+            configModel,
+            index,
+          ),
         ),
       ),
     );

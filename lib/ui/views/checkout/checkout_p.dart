@@ -115,15 +115,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ),
                 // Body
                 Container(
-                  height: 600,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 25,
-                        top: 0,
-                        child: Container(
-                          width: 1.0.sw - 50,
-                          child: Column(
+                  padding: EdgeInsets.symmetric(horizontal: 25.0.w),
+                  child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // Shipping Address
@@ -165,7 +158,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               ),
                               if (widget.arguments['address'] != null)
                                 Container(
-                                  width: 1.0.sw - 50,
+                                  width: double.infinity,
                                   margin: EdgeInsets.only(top: 10, bottom: 10),
                                   padding: EdgeInsets.all(10),
                                   decoration: BoxDecoration(
@@ -509,7 +502,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 ],
                               ),
                               Container(
-                                width: 1.0.sw - 50,
+                                width: double.infinity,
                                 margin: EdgeInsets.only(top: 10, bottom: 10),
                                 padding: EdgeInsets.all(10),
                                 decoration: BoxDecoration(
@@ -766,10 +759,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               ),
                             ],
                           ),
-                        ),
-                      )
-                    ],
-                  ),
                 ),
                 SizedBox(
                   height: 120,
