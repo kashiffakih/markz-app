@@ -2663,6 +2663,18 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                     ),
                                     TextButton(
                                       onPressed: () async {
+                                        // Check if quantity exceeds available stock
+                                        if (currentPackQty > 0 && tempQuantity > currentPackQty) {
+                                          ScaffoldMessenger.of(parentContext).showSnackBar(
+                                            SnackBar(
+                                              content: Text('Only $currentPackQty items available in stock'),
+                                              backgroundColor: Colors.orange,
+                                              duration: Duration(seconds: 2),
+                                            ),
+                                          );
+                                          return;
+                                        }
+
                                         Navigator.pop(
                                             dialogContext); // Close dialog
 
@@ -2684,6 +2696,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                           _cartData['product_price'] = '0';
                                         }
                                         _cartData['is_add_to_cart'] = true;
+
+                                        // Pass available quantity for validation
+                                        _cartData['available_qty'] = currentPackQty;
 
                                         // Add item to cart with quantity
                                         // First add the item to cart

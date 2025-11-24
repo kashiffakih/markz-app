@@ -54,7 +54,10 @@ class OrderService {
       // Fallback to primary image if flavour-specific image not found
       if (productImagePath == null && item.product != null) {
         productImagePath = item.product!.imagepath1 ??
-            item.product!.productImages?.first.imagepath;
+            (item.product!.productImages != null &&
+                    item.product!.productImages!.isNotEmpty
+                ? item.product!.productImages!.first.imagepath
+                : null);
       }
 
       orderDetails.add({
@@ -360,9 +363,14 @@ class OrderService {
 
       if (_orders.isNotEmpty) {
         debugPrint('getOrders: Successfully loaded ${_orders.length} orders');
-        if (_orders.first.orderDetails?.isNotEmpty == true) {
-          debugPrint(
-              "getOrders: First order image path = ${_orders.first.orderDetails?.first.product?.productImages?.first.imagepath}");
+        if (_orders.first.orderDetails != null &&
+            _orders.first.orderDetails!.isNotEmpty) {
+          final firstOrderDetail = _orders.first.orderDetails!.first;
+          if (firstOrderDetail.product?.productImages != null &&
+              firstOrderDetail.product!.productImages!.isNotEmpty) {
+            debugPrint(
+                "getOrders: First order image path = ${firstOrderDetail.product!.productImages!.first.imagepath}");
+          }
         }
       } else {
         debugPrint('getOrders: No orders found');

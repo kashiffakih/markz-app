@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:aadab/core/models/payment_response.dart';
 import 'package:aadab/core/services/phonepe_s.dart';
+import 'package:aadab/core/services/product_s.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -40,7 +41,8 @@ class _CartPageState extends State<CartPage> {
   String coupon = '';
   String couponId = '';
   bool buttonLoading = false;
-  bool quantityLoading = false;
+  int? loadingItemIndex; // Which cart item is loading
+  String? quantityLoadingAction; // 'increment' or 'decrement'
   bool couponValidationLoading = false;
   int couponValue = 0;
   UserAddress address = UserAddress();
@@ -155,6 +157,44 @@ class _CartPageState extends State<CartPage> {
     }
 
     print('Check $result');
+  }
+
+  // Helper method to get available quantity for a cart item
+  Future<int> _getAvailableQty(cartItem) async {
+    try {
+      debugPrint(
+          '_getAvailableQty: Fetching for productId=${cartItem.productId}, pack=${cartItem.pack}');
+      final productService = locator<ProductService>();
+      final product =
+          await productService.getProductById(cartItem.productId ?? 0);
+
+      if (product != null &&
+          product.productPacks != null &&
+          product.productPacks!.isNotEmpty) {
+        debugPrint(
+            '_getAvailableQty: Found ${product.productPacks!.length} packs');
+        try {
+          final matchingPack = product.productPacks!.firstWhere(
+            (pack) => pack.id.toString() == cartItem.pack,
+          );
+          debugPrint(
+              '_getAvailableQty: Found matching pack with qty=${matchingPack.qty}');
+          return matchingPack.qty ?? 0;
+        } catch (e) {
+          debugPrint(
+              '_getAvailableQty: No matching pack found, using first pack');
+          if (product.productPacks!.isNotEmpty) {
+            return product.productPacks!.first.qty ?? 0;
+          }
+        }
+      }
+      debugPrint(
+          '_getAvailableQty: Falling back to product qty=${cartItem.product?.qty}');
+      return cartItem.product?.qty ?? 0;
+    } catch (e) {
+      debugPrint('_getAvailableQty ERROR: $e');
+      return 0;
+    }
   }
 
   Future<void> _startTransaction(int amount, String mobileNumber,
@@ -861,7 +901,7 @@ class _CartPageState extends State<CartPage> {
                                                                                 borderRadius: BorderRadius.circular(15),
                                                                                 image: DecorationImage(
                                                                                   fit: BoxFit.contain,
-                                                                                  image: NetworkImage(_configModel.apiConfig['mediaURL'] + (_productModel.allProducts?[index].productImages?.first.imagepath?.toString() ?? '')),
+                                                                                  image: NetworkImage(_configModel.apiConfig['mediaURL'] + ((_productModel.allProducts?[index].productImages?.isNotEmpty ?? false) ? _productModel.allProducts![index].productImages!.first.imagepath?.toString() ?? '' : '')),
                                                                                 ),
                                                                               ),
                                                                               child: InkWell(
@@ -1090,24 +1130,54 @@ class _CartPageState extends State<CartPage> {
                                                             15.0.r),
                                                     child: Builder(
                                                       builder: (context) {
-                                                        final product = _addToCartModel.addToCarts![index].product!;
-                                                        final matchingImages = product.productImages!
+                                                        final product =
+                                                            _addToCartModel
+                                                                .addToCarts![
+                                                                    index]
+                                                                .product!;
+                                                        final matchingImages = product
+                                                            .productImages!
                                                             .where((image) =>
-                                                                image.unit?.name ==
-                                                                _addToCartModel.addToCarts![index].flavour)
+                                                                image.unit
+                                                                    ?.name ==
+                                                                _addToCartModel
+                                                                    .addToCarts![
+                                                                        index]
+                                                                    .flavour)
                                                             .toList();
 
-                                                        final imageUrl = matchingImages.isNotEmpty
-                                                            ? _configModel.apiConfig['mediaURL'] + matchingImages[0].imagepath.toString()
-                                                            : (product.productImages!.isNotEmpty
-                                                                ? _configModel.apiConfig['mediaURL'] + product.productImages!.first.imagepath.toString()
+                                                        final imageUrl = matchingImages
+                                                                .isNotEmpty
+                                                            ? _configModel
+                                                                        .apiConfig[
+                                                                    'mediaURL'] +
+                                                                matchingImages[
+                                                                        0]
+                                                                    .imagepath
+                                                                    .toString()
+                                                            : (product
+                                                                    .productImages!
+                                                                    .isNotEmpty
+                                                                ? _configModel
+                                                                            .apiConfig[
+                                                                        'mediaURL'] +
+                                                                    product
+                                                                        .productImages!
+                                                                        .first
+                                                                        .imagepath
+                                                                        .toString()
                                                                 : '');
 
                                                         return Image.network(
                                                           imageUrl,
                                                           fit: BoxFit.cover,
-                                                          errorBuilder: (context, error, stackTrace) =>
-                                                              Icon(Icons.image, size: 50, color: Colors.grey),
+                                                          errorBuilder: (context,
+                                                                  error,
+                                                                  stackTrace) =>
+                                                              Icon(Icons.image,
+                                                                  size: 50,
+                                                                  color: Colors
+                                                                      .grey),
                                                         );
                                                       },
                                                     ),
@@ -1353,13 +1423,16 @@ class _CartPageState extends State<CartPage> {
                                                           child: Row(
                                                             children: [
                                                               InkWell(
-                                                                onTap: quantityLoading
+                                                                onTap: loadingItemIndex !=
+                                                                        null
                                                                     ? null
                                                                     : () async {
                                                                         setState(
                                                                             () {
-                                                                          quantityLoading =
-                                                                              true;
+                                                                          loadingItemIndex =
+                                                                              index;
+                                                                          quantityLoadingAction =
+                                                                              'decrement';
                                                                         });
 
                                                                         bool
@@ -1378,8 +1451,10 @@ class _CartPageState extends State<CartPage> {
 
                                                                         setState(
                                                                             () {
-                                                                          quantityLoading =
-                                                                              false;
+                                                                          loadingItemIndex =
+                                                                              null;
+                                                                          quantityLoadingAction =
+                                                                              null;
                                                                         });
                                                                       },
                                                                 child:
@@ -1388,20 +1463,30 @@ class _CartPageState extends State<CartPage> {
                                                                       EdgeInsets
                                                                           .all(8.0
                                                                               .w),
-                                                                  child:
-                                                                      quantityLoading
-                                                                          ? SizedBox(
-                                                                              width: 16.0.w,
-                                                                              height: 16.0.w,
-                                                                              child: CircularProgressIndicator(
-                                                                                strokeWidth: 2,
-                                                                                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
-                                                                              ),
-                                                                            )
-                                                                          : Icon(
-                                                                              Icons.remove,
-                                                                              size: 18.0.sp,
-                                                                              color: Colors.black87),
+                                                                  child: (loadingItemIndex ==
+                                                                              index &&
+                                                                          quantityLoadingAction ==
+                                                                              'decrement')
+                                                                      ? SizedBox(
+                                                                          width:
+                                                                              16.0.w,
+                                                                          height:
+                                                                              16.0.w,
+                                                                          child:
+                                                                              CircularProgressIndicator(
+                                                                            strokeWidth:
+                                                                                2,
+                                                                            valueColor:
+                                                                                AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
+                                                                          ),
+                                                                        )
+                                                                      : Icon(
+                                                                          Icons
+                                                                              .remove,
+                                                                          size: 18.0
+                                                                              .sp,
+                                                                          color:
+                                                                              Colors.black87),
                                                                 ),
                                                               ),
                                                               Container(
@@ -1429,49 +1514,144 @@ class _CartPageState extends State<CartPage> {
                                                                   ),
                                                                 ),
                                                               ),
-                                                              InkWell(
-                                                                onTap: quantityLoading
-                                                                    ? null
-                                                                    : () async {
-                                                                        setState(
-                                                                            () {
-                                                                          quantityLoading =
-                                                                              true;
-                                                                        });
+                                                              FutureBuilder<
+                                                                  int>(
+                                                                future: _getAvailableQty(
+                                                                    _addToCartModel
+                                                                            .addToCarts![
+                                                                        index]),
+                                                                builder: (context,
+                                                                    snapshot) {
+                                                                  final currentQty =
+                                                                      _addToCartModel
+                                                                              .addToCarts![index]
+                                                                              .qty ??
+                                                                          0;
+                                                                  final availableQty =
+                                                                      snapshot.data ??
+                                                                          0;
 
-                                                                        bool
-                                                                            type =
-                                                                            true;
-                                                                        _cartData['is_add_to_cart'] =
-                                                                            true;
-                                                                        await _addToCartModel.getAddToCart(
-                                                                            _addToCartModel.addToCarts![index].product!.id,
-                                                                            type,
-                                                                            _cartData);
-                                                                        setState(
-                                                                            () {});
-                                                                        await _validateAppliedCoupon();
-                                                                        await _recalculateRewards();
+                                                                  debugPrint(
+                                                                      'FutureBuilder: currentQty=$currentQty, availableQty=$availableQty, snapshot.hasData=${snapshot.hasData}');
 
-                                                                        setState(
-                                                                            () {
-                                                                          quantityLoading =
-                                                                              false;
-                                                                        });
-                                                                      },
-                                                                child:
-                                                                    Container(
-                                                                  padding:
-                                                                      EdgeInsets
+                                                                  // Hide plus button if qty limit reached
+                                                                  if (availableQty >
+                                                                          0 &&
+                                                                      currentQty >=
+                                                                          availableQty) {
+                                                                    debugPrint(
+                                                                        'FutureBuilder: HIDING plus button (limit reached)');
+                                                                    return SizedBox(
+                                                                        width: 34.0
+                                                                            .w); // Empty space to maintain layout
+                                                                  }
+
+                                                                  return InkWell(
+                                                                    onTap: loadingItemIndex !=
+                                                                            null
+                                                                        ? null
+                                                                        : () async {
+                                                                            // Check available quantity before incrementing
+                                                                            final cartItem =
+                                                                                _addToCartModel.addToCarts![index];
+                                                                            final currentQty =
+                                                                                cartItem.qty ?? 0;
+
+                                                                            setState(() {
+                                                                              loadingItemIndex = index;
+                                                                              quantityLoadingAction = 'increment';
+                                                                            });
+
+                                                                            // Fetch fresh product data with packs
+                                                                            final productService =
+                                                                                locator<ProductService>();
+                                                                            final product =
+                                                                                await productService.getProductById(cartItem.productId ?? 0);
+
+                                                                            int availableQty =
+                                                                                0;
+                                                                            if (product != null &&
+                                                                                product.productPacks != null &&
+                                                                                product.productPacks!.isNotEmpty) {
+                                                                              // Find the matching pack based on cart item's pack ID
+                                                                              try {
+                                                                                final matchingPack = product.productPacks!.firstWhere(
+                                                                                  (pack) => pack.id.toString() == cartItem.pack,
+                                                                                );
+                                                                                availableQty = matchingPack.qty ?? 0;
+                                                                              } catch (e) {
+                                                                                // If no matching pack found, use first pack or product qty
+                                                                                if (product.productPacks!.isNotEmpty) {
+                                                                                  availableQty = product.productPacks!.first.qty ?? 0;
+                                                                                } else {
+                                                                                  availableQty = product.qty ?? 0;
+                                                                                }
+                                                                              }
+                                                                            } else {
+                                                                              // Fallback to product qty if no packs
+                                                                              availableQty = cartItem.product?.qty ?? 0;
+                                                                            }
+
+                                                                            debugPrint('Increment check: current=$currentQty, available=$availableQty, pack=${cartItem.pack}');
+
+                                                                            // Check if available quantity is set and if limit reached
+                                                                            if (availableQty > 0 &&
+                                                                                currentQty >= availableQty) {
+                                                                              setState(() {
+                                                                                loadingItemIndex = null;
+                                                                                quantityLoadingAction = null;
+                                                                              });
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                SnackBar(
+                                                                                  content: Text('Maximum available quantity is $availableQty'),
+                                                                                  backgroundColor: Colors.orange,
+                                                                                  duration: Duration(seconds: 2),
+                                                                                ),
+                                                                              );
+                                                                              return;
+                                                                            }
+
+                                                                            bool
+                                                                                type =
+                                                                                true;
+                                                                            _cartData['is_add_to_cart'] =
+                                                                                true;
+                                                                            await _addToCartModel.getAddToCart(
+                                                                                _addToCartModel.addToCarts![index].product!.id,
+                                                                                type,
+                                                                                _cartData);
+                                                                            setState(() {});
+                                                                            await _validateAppliedCoupon();
+                                                                            await _recalculateRewards();
+
+                                                                            setState(() {
+                                                                              loadingItemIndex = null;
+                                                                              quantityLoadingAction = null;
+                                                                            });
+                                                                          },
+                                                                    child:
+                                                                        Container(
+                                                                      padding: EdgeInsets
                                                                           .all(8.0
                                                                               .w),
-                                                                  child: Icon(
-                                                                      Icons.add,
-                                                                      size: 18.0
-                                                                          .sp,
-                                                                      color: Colors
-                                                                          .black87),
-                                                                ),
+                                                                      child: (loadingItemIndex == index &&
+                                                                              quantityLoadingAction ==
+                                                                                  'increment')
+                                                                          ? SizedBox(
+                                                                              width: 16.0.w,
+                                                                              height: 16.0.w,
+                                                                              child: CircularProgressIndicator(
+                                                                                strokeWidth: 2,
+                                                                                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
+                                                                              ),
+                                                                            )
+                                                                          : Icon(
+                                                                              Icons.add,
+                                                                              size: 18.0.sp,
+                                                                              color: Colors.black87),
+                                                                    ),
+                                                                  );
+                                                                },
                                                               ),
                                                             ],
                                                           ),
@@ -3024,50 +3204,7 @@ class _CartPageState extends State<CartPage> {
                                                 } else {
                                                   var addressId = address.id;
 
-                                                  // GST calculation: Item Total = Cart Total - SGST - CGST
-                                                  int cartTotal = int.parse(
-                                                      _addToCartModel.cartTotal
-                                                          .toString());
-                                                  // Calculate GST on cart total after applying discounts
-                                                  int cartTotalAfterDiscounts =
-                                                      cartTotal -
-                                                          couponValue -
-                                                          useWalletPoint;
-                                                  // Calculate using new method: item total = cartTotalAfterDiscounts / 105 * 100
-                                                  double itemTotal =
-                                                      (cartTotalAfterDiscounts /
-                                                              105) *
-                                                          100;
-                                                  // GST = Cart Total After Discounts - Item Total
-                                                  double gstAmount =
-                                                      cartTotalAfterDiscounts -
-                                                          itemTotal;
-                                                  double sgstAmount =
-                                                      gstAmount / 2;
-                                                  double cgstAmount =
-                                                      gstAmount / 2;
-
-                                                  int deliveryCharges = _configModel
-                                                              .user!
-                                                              .companies![0]
-                                                              .deliveryCharges ==
-                                                          null
-                                                      ? 0
-                                                      : int.parse(_configModel
-                                                          .user!
-                                                          .companies![0]
-                                                          .deliveryCharges
-                                                          .toString());
-                                                  // Item total is already calculated after discounts
-                                                  double amountAfterDiscounts =
-                                                      itemTotal;
-                                                  // Use GST amounts calculated on discounted cart total
-                                                  double taxAmount =
-                                                      sgstAmount + cgstAmount;
-                                                  double totalAmount =
-                                                      amountAfterDiscounts +
-                                                          deliveryCharges +
-                                                          taxAmount;
+                                                  // Payment processing
 
                                                   if (paymentOption ==
                                                       'UPI - Online') {
@@ -3350,7 +3487,7 @@ class _CartPageState extends State<CartPage> {
                                                                             image:
                                                                                 DecorationImage(
                                                                               fit: BoxFit.contain,
-                                                                              image: NetworkImage(_configModel.apiConfig['mediaURL'] + (_productModel.allProducts?[index].productImages?.first.imagepath?.toString() ?? '')),
+                                                                              image: NetworkImage(_configModel.apiConfig['mediaURL'] + ((_productModel.allProducts?[index].productImages?.isNotEmpty ?? false) ? _productModel.allProducts![index].productImages!.first.imagepath?.toString() ?? '' : '')),
                                                                             ),
                                                                           ),
                                                                           child:
@@ -3421,22 +3558,22 @@ class _CartPageState extends State<CartPage> {
                                                                         ),
                                                                       ),
                                                                       Container(
-                                                                        child: (_productModel.allProducts?[index]?.productPrices?[0]?.offerPrice ?? 0) !=
-                                                                                0
+                                                                        child: ((_productModel.allProducts?[index].productPrices?.isNotEmpty ?? false) &&
+                                                                                (_productModel.allProducts![index].productPrices![0].offerPrice ?? 0) != 0)
                                                                             ? Text.rich(TextSpan(children: [
                                                                                 new TextSpan(
-                                                                                  text: 'RS. ${_productModel.allProducts?[index].productPrices?[0].price?.toString() ?? '0'}',
+                                                                                  text: 'RS. ${_productModel.allProducts![index].productPrices![0].price?.toString() ?? '0'}',
                                                                                   style: new TextStyle(
                                                                                     color: Colors.grey,
                                                                                     decoration: TextDecoration.lineThrough,
                                                                                   ),
                                                                                 ),
                                                                                 new TextSpan(
-                                                                                  text: ' RS.${_productModel.allProducts?[index].productPrices?[0].offerPrice?.toString() ?? '0'}',
+                                                                                  text: ' RS.${_productModel.allProducts![index].productPrices![0].offerPrice?.toString() ?? '0'}',
                                                                                 ),
                                                                               ]))
                                                                             : Text(
-                                                                                _productModel.products![index].productPrices![0].price.toString() + " " + 'RS',
+                                                                                (_productModel.allProducts?[index].productPrices?.isNotEmpty ?? false) ? (_productModel.allProducts![index].productPrices![0].price?.toString() ?? '0') + " " + 'RS' : '0 RS',
                                                                                 style: MyGoogleFontStyle(
                                                                                   fontFamily: 'Poppins',
                                                                                   fontSize: 13,

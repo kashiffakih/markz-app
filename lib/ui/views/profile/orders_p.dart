@@ -43,7 +43,7 @@ class _OrdersPageState extends State<OrdersPage> {
   @override
   Widget build(BuildContext context) {
     final orderModel = Provider.of<OrderModel>(context, listen: false);
-    print('Building OrdersPage with ${orderModel.orders.first.id} orders');
+    print('Building OrdersPage with ${orderModel.orders.length} orders');
     return Scaffold(
       body: Container(
         width: 1.0.sw,

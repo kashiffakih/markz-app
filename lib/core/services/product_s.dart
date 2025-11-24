@@ -104,4 +104,25 @@ class ProductService {
     }
     return _banners;
   }
+
+  // Get product by ID with full details including packs
+  Future<Product?> getProductById(int productId) async {
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    try {
+      http.Response _response = await http.get(
+        Uri.parse('${_apiConfig['baseURL']}/products/$productId'),
+        headers: _apiConfig['headers'],
+      );
+
+      if (_response.statusCode == 200) {
+        Map<String, dynamic> _responseData = json.decode(_response.body);
+        if (_responseData['success'] && _responseData['data'] != null) {
+          return Product.fromJson(_responseData['data']);
+        }
+      }
+    } catch (e) {
+      print('Error fetching product by ID: $e');
+    }
+    return null;
+  }
 }
