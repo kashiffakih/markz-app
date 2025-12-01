@@ -20,6 +20,7 @@ class OrderService {
     paymentOption,
     deliveryMethod,
     couponValue,
+    gstAmount,
   ) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
@@ -31,6 +32,7 @@ class OrderService {
       couponId = '';
     }
     var orderDetails = [];
+    double orderCostSum = 0.0; // Sum of all order_detail_cost
     cartItems.forEach((item) {
       debugPrint("Item pack order s :${userWalletUsed}");
 
@@ -60,9 +62,20 @@ class OrderService {
                 : null);
       }
 
+      // Calculate order_detail_cost with reverse GST (price / 105 * 100)
+      final productPrice =
+          double.tryParse(item.productPrice?.toString() ?? '0') ?? 0.0;
+      final orderDetailCost =
+          double.parse(((productPrice / 105) * 100).toStringAsFixed(2));
+
+      // Add to order cost sum (quantity * order_detail_cost)
+      orderCostSum = double.parse(
+          ((orderDetailCost * (item.qty ?? 0))).toStringAsFixed(2));
+
       orderDetails.add({
-        'cashback': (item.points ?? 0) * (item.qty ?? 0),
-        'order_detail_cost': item.productPrice ?? 0.0,
+        'cashback': double.parse(
+            ((item.points ?? 0) * (item.qty ?? 0)).toStringAsFixed(2)),
+        'order_detail_cost': orderDetailCost,
         'product_id': item.productId,
         'quantity': item.qty ?? 0,
         'product_pack': item.pack,
@@ -74,45 +87,57 @@ class OrderService {
     });
 
     // Safe parsing of all numeric values
-    final parsedCouponValue = int.tryParse(couponValue?.toString() ?? '0') ?? 0;
-    final parsedCartTotal =
-        double.tryParse(cartTotal?.toString() ?? '0') ?? 0.0;
+    final parsedCouponValue =
+        double.tryParse(couponValue?.toString() ?? '0') ?? 0.0;
+    final parsedCartTotal = double.tryParse(cartTotal.toString()) ?? 0.0;
     final parsedUserWalletUsed =
         double.tryParse(userWalletUsed?.toString() ?? '0') ?? 0.0;
     final parsedAddressId = int.tryParse(addressId?.toString() ?? '0') ?? 0;
-    final parsedTaxPercent = double.tryParse(
-            _configModel.user?.companies?[0].taxPercent?.toString() ?? '0') ??
-        0.0;
     final parsedDeliveryAmount = double.tryParse(
             _configModel.user?.companies?[0].deliveryCharges?.toString() ??
                 '0') ??
         0.0;
 
-    // Calculate tax amount
-    final taxAmount = (parsedCartTotal / 100) * parsedTaxPercent;
+    // Get packaging charges
+    final packagingCharges = double.tryParse(
+            _configModel.user?.companies?[0].packagingCharges?.toString() ??
+                '0') ??
+        0.0;
 
-    // Calculate total amount (cart + tax)
-    final totalAmount = parsedCartTotal + taxAmount;
+    // Parse gstAmount passed from cart_p.dart
+    final taxAmount = double.parse(
+        (double.tryParse(gstAmount?.toString() ?? '0') ?? 0.0)
+            .toStringAsFixed(2));
 
-    // Calculate order cost (total - wallet - coupon)
-    final orderCost =
-        (parsedCartTotal - parsedUserWalletUsed.toInt() - parsedCouponValue)
-            .toInt();
+    // Calculate total amount: cartTotal + delivery + packaging - coupon - rewards
+    // (matches cart_p.dart UI calculation)
+    final totalAmount = double.parse((parsedCartTotal +
+            parsedDeliveryAmount +
+            packagingCharges -
+            parsedCouponValue -
+            parsedUserWalletUsed)
+        .toStringAsFixed(2));
+
+    // Calculate order cost (sum of all order_detail_cost)
+    // final orderCost = double.parse(orderCostSum.toStringAsFixed(2));
 
     Order order = Order(
-        couponAmount: parsedCouponValue,
+        couponAmount: double.parse(parsedCouponValue.toStringAsFixed(2))
+            .toStringAsFixed(2),
         couponId: couponId,
-        deliveryAmount: parsedDeliveryAmount,
+        deliveryAmount: double.parse(parsedDeliveryAmount.toStringAsFixed(2)),
         details: '-',
         isApprovedByHotelier: 0,
-        orderCost: orderCost,
-        packagingAmount: _configModel.user?.companies?[0].packagingCharges ?? 0,
+        orderCost: orderCostSum.toStringAsFixed(2),
+        packagingAmount:
+            double.parse(packagingCharges.toStringAsFixed(2)).toInt(),
         taxAmount: taxAmount,
-        taxPercent: parsedTaxPercent.toString(),
+        taxPercent: '5',
         tipAmount: 0,
-        totalAmount: totalAmount,
+        totalAmount: totalAmount.toStringAsFixed(2),
         totalCashback: 0,
-        walletAmountUsed: parsedUserWalletUsed.toInt(),
+        walletAmountUsed: double.parse(parsedUserWalletUsed.toStringAsFixed(2))
+            .toStringAsFixed(2),
         userId: _configModel.user?.id ?? 0,
         isDelivered: 0,
         isDeliveryBoyAccepted: 0,
@@ -127,7 +152,7 @@ class OrderService {
     var _orderJson = order.toJson();
     _orderJson['order_details'] = orderDetails;
 
-    print('Order $_orderJson');
+    // print('Order $_orderJson');
     try {
       http.Response _response = await http.post(
         Uri.parse('${_apiConfig['baseURL']}/orders'),
@@ -135,12 +160,12 @@ class OrderService {
         headers: _apiConfig['headers'],
       );
 
-      print('Response status: ${_response.statusCode}');
-      print('Response body: ${_response.body}');
+      // print('Response status: ${_response.statusCode}');
+      // print('Response body: ${_response.body}');
 
       if (_response.statusCode == 200 || _response.statusCode == 201) {
         Map<String, dynamic> _responseData = json.decode(_response.body);
-        print('Place order: $_responseData');
+        // print('Place order: $_responseData');
 
         // Check if success field exists and return it, otherwise check status code
         if (_responseData.containsKey('success')) {
@@ -156,107 +181,14 @@ class OrderService {
         // If response is 200/201 but no explicit success field, assume success
         return true;
       } else {
-        print('Order placement failed with status: ${_response.statusCode}');
+        // print('Order placement failed with status: ${_response.statusCode}');
         return false;
       }
     } catch (e) {
-      print('Error placing order: $e');
+      // print('Error placing order: $e');
       return false;
     }
   }
-
-  // Future<bool> placedOrder(
-  //   List<AddToCart> cartItems,
-  //   String cartTotal,
-  //   addressId,
-  //   isGift,
-  //   userWalletUsed,
-  //   couponId,
-  //   paymentOption,
-  //   deliveryMethod,
-  //   couponValue,
-  // ) async {
-  //   Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-
-  //   // Ensure `couponId` is not null or 'null'
-  //   if (couponId == null ||
-  //       couponId.toString().trim().isEmpty ||
-  //       couponId.toString() == 'null') {
-  //     couponId = '';
-  //   }
-
-  //   var orderDetails = cartItems.map((item) {
-  //     debugPrint("Item pack order s :${item.pack}");
-  //     return {
-  //       'cashback': item.points,
-  //       'order_detail_cost': item.productPrice,
-  //       'product_id': item.productId,
-  //       'quantity': item.qty,
-  //       'product_pack': item.pack,
-  //       'kind_of_flower': item.kindOfFlower,
-  //       'flavour': item.flavour,
-  //       'write_on_cake': item.writeOnCake,
-  //     };
-  //   }).toList();
-
-  //   // Safe Parsing to avoid exceptions
-  //   int parsedCouponAmount = int.tryParse(couponValue.toString()) ?? 0;
-  //   int parsedCartTotal = int.tryParse(cartTotal.toString()) ?? 0;
-  //   int parsedAddressId = int.tryParse(addressId.toString()) ?? 0;
-  //   int parsedGst = 5 * parsedCartTotal ~/ 100;
-  // double parsedDeliveryAmount = double.tryParse(
-  //         _configModel.user?.companies?[0].deliveryCharges?.toString() ??
-  //             '0') ??
-  //     0.0;
-  //   double parsedTaxPercent = double.tryParse(
-  //           _configModel.user?.companies?[0].taxPercent?.toString() ?? '0') ??
-  //       0.0;
-  //   double parsedTaxAmount = (parsedCartTotal / 100) * parsedTaxPercent;
-  //   int parsedWalletAmountUsed =
-  //       double.tryParse(userWalletUsed.toString())?.toInt() ?? 0;
-
-  //   double parsedTotalAmount = (parsedCartTotal + parsedTaxAmount + parsedGst);
-
-  //   Order order = Order(
-  //     couponAmount: parsedCouponAmount,
-  //     couponId: couponId,
-  //     deliveryAmount: parsedDeliveryAmount,
-  //     details: '-',
-  //     isApprovedByHotelier: 0,
-  //     orderCost: parsedCartTotal,
-  //     packagingAmount: _configModel.user?.companies?[0].packagingCharges ?? 0,
-  //     taxAmount: parsedTaxAmount,
-  //     taxPercent: parsedTaxPercent.toString(),
-  //     tipAmount: 0,
-  //     totalAmount: parsedTotalAmount,
-  //     totalCashback: 0,
-  //     walletAmountUsed: parsedWalletAmountUsed,
-  //     userId: _configModel.user?.id ?? 0,
-  //     isDelivered: 0,
-  //     isDeliveryBoyAccepted: 0,
-  //     isDinein: 0,
-  //     storePayableAmount: 0,
-  //     comissionAmount: 0,
-  //     paymentmode: paymentOption.toString(),
-  //     isGift: isGift,
-  //     deliveryMethod: deliveryMethod.toString(),
-  //     addressId: parsedAddressId,
-  //   );
-
-  //   var _orderJson = order.toJson();
-  //   _orderJson['order_details'] = orderDetails;
-
-  //   http.Response _response = await http.post(
-  //     Uri.parse('${_apiConfig['baseURL']}/orders'),
-  //     body: json.encode(_orderJson),
-  //     headers: _apiConfig['headers'],
-  //   );
-
-  //   Map<String, dynamic> _responseData = json.decode(_response.body);
-  //   print('Place order: $_responseData');
-
-  //   return _responseData['success'] ?? false;
-  // }
 
   List<Order> _orders = [];
 

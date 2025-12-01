@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:aadab/core/models/order.dart';
 import 'package:aadab/core/providers/order_pr.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 import 'package:aadab/ui/views/profile/order-details-processing.dart';
@@ -42,8 +43,8 @@ class _OrdersPageState extends State<OrdersPage> {
 
   @override
   Widget build(BuildContext context) {
-    final orderModel = Provider.of<OrderModel>(context, listen: false);
-    print('Building OrdersPage with ${orderModel.orders.length} orders');
+    final orderModel = Provider.of<OrderModel>(context, listen: true);
+    // print('Building OrdersPage with ${orderModel.orders.length} orders');
     return Scaffold(
       body: Container(
         width: 1.0.sw,
@@ -176,7 +177,8 @@ class _OrdersPageState extends State<OrdersPage> {
                             ],
                           ),
                           child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                Color(0xFFEED056)),
                             strokeWidth: 3,
                           ),
                         ),
@@ -241,7 +243,8 @@ class _OrdersPageState extends State<OrdersPage> {
     );
   }
 
-  Widget _buildOrderCard(dynamic order, String status) {
+  Widget _buildOrderCard(Order order, String status) {
+    // print('orderDetails: ${order.orderDetails}');
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.0.w, vertical: 8.0.w),
       padding: EdgeInsets.all(16.0.w),
@@ -320,7 +323,7 @@ class _OrdersPageState extends State<OrdersPage> {
                           int totalQty = 0;
                           if (order.orderDetails != null) {
                             for (var detail in order.orderDetails!) {
-                              totalQty += (detail.quantity ?? 0) as int;
+                              totalQty += detail.quantity ?? 0;
                             }
                           }
                           return totalQty.toString();
@@ -351,7 +354,7 @@ class _OrdersPageState extends State<OrdersPage> {
                         ),
                       ),
                       TextSpan(
-                        text: order.orderCost?.toString() ?? '0',
+                        text: order.totalAmount?.toString() ?? '0',
                         style: MyGoogleFontStyle(
                           fontFamily: 'Poppins',
                           fontSize: 12.0.sp,
@@ -386,7 +389,8 @@ class _OrdersPageState extends State<OrdersPage> {
                   );
                 },
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0.w, vertical: 10.0.w),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 20.0.w, vertical: 10.0.w),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
@@ -444,7 +448,7 @@ class _OrdersPageState extends State<OrdersPage> {
     );
   }
 
-  List<dynamic> _getFilteredOrders(List<dynamic> orders, String status) {
+  List<Order> _getFilteredOrders(List<Order> orders, String status) {
     return orders.where((order) {
       // Get the current order status based on orderStatuses array
       String orderStatus = _getOrderStatus(order);
@@ -461,7 +465,7 @@ class _OrdersPageState extends State<OrdersPage> {
     }).toList();
   }
 
-  String _getOrderStatus(dynamic order) {
+  String _getOrderStatus(Order order) {
     // If orderStatuses is empty or null, it's "Order Placed"
     if (order.orderStatuses == null || order.orderStatuses!.isEmpty) {
       return 'Order Placed';

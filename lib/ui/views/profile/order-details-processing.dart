@@ -656,12 +656,14 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     final address = order['address'];
     final isMaharashtra =
         address != null && address['state']?.toString() == 'Maharashtra';
-    String abc = (order['order_cost'] - (order['order_cost'] / 105 * 100))
-        .toStringAsFixed(2);
+    // Parse order_cost to double (handles both String and num from API)
+    final orderCost =
+        double.tryParse(order['order_cost']?.toString() ?? '0') ?? 0.0;
+    final itemTotal = double.parse((orderCost / 105 * 100).toStringAsFixed(2));
+    String abc = (orderCost - itemTotal).toStringAsFixed(2);
     return Column(
       children: [
-        _buildCostRow(
-            'Item total', (order['order_cost'] / 105 * 100).toStringAsFixed(2)),
+        _buildCostRow('Item total', itemTotal.toStringAsFixed(2)),
         if (isMaharashtra) ...[
           _buildCostRow(
               'CGST 2.5%', (double.parse(abc) / 2).toStringAsFixed(2)),
@@ -673,18 +675,20 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             'Delivery charge', order['delivery_amount']?.toString() ?? '0'),
         _buildCostRow(
             'Packing charge', order['packaging_amount']?.toString() ?? '0'),
-        _buildCostRow(
-            'Coupon Value', order['coupon_amount']?.toString() ?? '0'),
-        _buildCostRow('Reward', order['wallet_amount_used']?.toString() ?? '0'),
+        _buildCostRow('Coupon Value', order['coupon_amount']?.toString() ?? '0',
+            isNegative: true),
+        _buildCostRow('Reward', order['wallet_amount_used']?.toString() ?? '0',
+            isNegative: true),
         Divider(color: Colors.black, indent: 20.w, endIndent: 20.w),
-        _buildCostRow('Grand Total', order['order_cost']?.toString() ?? '0',
+        _buildCostRow('Grand Total', order['total_amount']?.toString() ?? '0',
             isBold: true),
         Divider(color: Colors.black, indent: 20.w, endIndent: 20.w),
       ],
     );
   }
 
-  Widget _buildCostRow(String label, String value, {bool isBold = false}) {
+  Widget _buildCostRow(String label, String value,
+      {bool isBold = false, bool isNegative = false}) {
     return Container(
       width: 320.w,
       padding: EdgeInsets.symmetric(vertical: 2.w),
@@ -701,7 +705,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             ),
           ),
           Text(
-            'RS $value',
+            isNegative ? '- RS $value' : 'RS $value',
             style: MyGoogleFontStyle(
               fontFamily: 'Urbanist',
               fontSize: isBold ? 15.sp : 12.sp,
@@ -863,7 +867,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.w),
       child: InkWell(
-        onTap: _isLoading ? null : () => _showCancelConfirmation(context, orderId),
+        onTap:
+            _isLoading ? null : () => _showCancelConfirmation(context, orderId),
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 16.w),
           decoration: BoxDecoration(

@@ -8,7 +8,7 @@ class Order {
   int? companyId;
   int? userId;
   String? details;
-  int? orderCost;
+  String? orderCost;
   String? createdAt;
   String? updatedAt;
   String? paymentMode;
@@ -27,14 +27,14 @@ class Order {
   String? gatewayname;
   String? banktxnid;
   String? bankname;
-  int? couponAmount;
+  String? couponAmount;
   String? couponId;
   num? taxAmount;
   int? packagingAmount;
   num? deliveryAmount;
   int? tipAmount;
-  num? totalAmount;
-  int? walletAmountUsed;
+  String? totalAmount;
+  String? walletAmountUsed;
   int? isApprovedByHotelier;
   int? isDinein;
   int? storePayableAmount;
@@ -115,7 +115,7 @@ class Order {
     companyId = json['company_id'];
     userId = json['user_id'];
     details = json['details'];
-    orderCost = json['order_cost'];
+    orderCost = json['order_cost']?.toString();
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     paymentMode = json['payment_mode'];
@@ -134,14 +134,14 @@ class Order {
     gatewayname = json['gatewayname'];
     banktxnid = json['banktxnid'];
     bankname = json['bankname'];
-    couponAmount = json['coupon_amount'];
+    couponAmount = json['coupon_amount']?.toString();
     couponId = json['coupon_id']?.toString() ?? '';
     taxAmount = json['tax_amount'];
     packagingAmount = json['packaging_amount'];
     deliveryAmount = json['delivery_amount'];
     tipAmount = json['tip_amount'];
-    totalAmount = json['total_amount'];
-    walletAmountUsed = json['wallet_amount_used'];
+    totalAmount = json['total_amount']?.toString();
+    walletAmountUsed = json['wallet_amount_used']?.toString();
     isApprovedByHotelier = json['is_approved_by_hotelier'];
     isDinein = json['is_dinein'];
     storePayableAmount = json['store_payable_amount'];
@@ -196,7 +196,9 @@ class Order {
 
     // Parse company with error handling
     try {
-      company = json['company'] != null ? new Company.fromJson(json['company']) : null;
+      company = json['company'] != null
+          ? new Company.fromJson(json['company'])
+          : null;
     } catch (e) {
       print('Error parsing company in order ${json['id']}: $e');
       company = null;
@@ -348,7 +350,10 @@ class OrderDetails {
     orderId = json['order_id'];
     productId = json['product_id'];
     quantity = json['quantity'];
-    orderDetailCost = json['order_detail_cost'];
+    // Handle orderDetailCost which can be int or double from API
+    orderDetailCost = (json['order_detail_cost'] is double)
+        ? (json['order_detail_cost'] as double).toInt()
+        : json['order_detail_cost'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
 
@@ -363,15 +368,19 @@ class OrderDetails {
       }
     }
 
-    cashback = json['cashback'];
+    // Handle cashback which can be int or double from API
+    cashback = (json['cashback'] is double)
+        ? (json['cashback'] as double).toInt()
+        : json['cashback'];
     kindOfFlower = json['kind_of_flower'];
     flavour = json['flavour'];
     writeOnCake = json['write_on_cake'];
 
     // Parse product with error handling
     try {
-      product =
-          json['product'] != null ? new Product.fromJson(json['product']) : null;
+      product = json['product'] != null
+          ? new Product.fromJson(json['product'])
+          : null;
     } catch (e) {
       print('Error parsing product in order_detail ${json['id']}: $e');
       product = null;

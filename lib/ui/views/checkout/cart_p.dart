@@ -44,7 +44,7 @@ class _CartPageState extends State<CartPage> {
   int? loadingItemIndex; // Which cart item is loading
   String? quantityLoadingAction; // 'increment' or 'decrement'
   bool couponValidationLoading = false;
-  int couponValue = 0;
+  double couponValue = 0;
   UserAddress address = UserAddress();
   Map<String, dynamic> _CartData = {
     'kindOfFlower': '',
@@ -255,6 +255,7 @@ class _CartPageState extends State<CartPage> {
         paymentDetails,
         payload['deliveryMethod'],
         payload['couponValue'],
+        payload['gstAmount'],
       );
 
       setState(() {
@@ -1842,10 +1843,38 @@ class _CartPageState extends State<CartPage> {
                                                         .minOrderValue! <
                                                     cartTotal) {
                                                   setState(() {
-                                                    couponValue = double.parse(
-                                                            firstCoupon.value
-                                                                .toString())
-                                                        .toInt();
+                                                    // Calculate item total (cart total without GST)
+                                                    final itemTotal =
+                                                        (cartTotal / 105) * 100;
+
+                                                    // Check coupon type and calculate value accordingly
+                                                    final couponType =
+                                                        firstCoupon.type
+                                                            ?.toLowerCase()
+                                                            .trim();
+                                                    final isPercentage =
+                                                        couponType ==
+                                                                'percentage' ||
+                                                            couponType ==
+                                                                'percent' ||
+                                                            couponType == '%';
+
+                                                    if (isPercentage) {
+                                                      // Calculate percentage of item total
+                                                      final percentageValue =
+                                                          double.parse(firstCoupon
+                                                                  .value
+                                                                  .toString()) /
+                                                              100;
+                                                      couponValue = itemTotal *
+                                                          percentageValue;
+                                                    } else {
+                                                      // Flat discount - use value directly
+                                                      couponValue =
+                                                          double.parse(
+                                                              firstCoupon.value
+                                                                  .toString());
+                                                    }
                                                     couponId = firstCoupon.id
                                                         .toString();
                                                     usedCoupon = firstCoupon
@@ -2020,9 +2049,33 @@ class _CartPageState extends State<CartPage> {
                                         setState(() {
                                           usedCoupon =
                                               firstCoupon.name.toString();
-                                          couponValue = double.parse(
-                                                  firstCoupon.value.toString())
-                                              .toInt();
+
+                                          // Calculate item total (cart total without GST)
+                                          final itemTotal =
+                                              (cartTotal / 105) * 100;
+
+                                          // Check coupon type and calculate value accordingly
+                                          final couponType = firstCoupon.type
+                                              ?.toLowerCase()
+                                              .trim();
+                                          final isPercentage =
+                                              couponType == 'percentage' ||
+                                                  couponType == 'percent' ||
+                                                  couponType == '%';
+
+                                          if (isPercentage) {
+                                            // Calculate percentage of item total
+                                            final percentageValue =
+                                                double.parse(firstCoupon.value
+                                                        .toString()) /
+                                                    100;
+                                            couponValue =
+                                                itemTotal * percentageValue;
+                                          } else {
+                                            // Flat discount - use value directly
+                                            couponValue = double.parse(
+                                                firstCoupon.value.toString());
+                                          }
                                           couponId = firstCoupon.id.toString();
                                         });
                                       } else {
@@ -2737,7 +2790,8 @@ class _CartPageState extends State<CartPage> {
                                                                     .cartTotal
                                                                     .toString());
                                                             // Calculate GST on cart total after applying discounts
-                                                            int cartTotalAfterDiscounts =
+                                                            double
+                                                                cartTotalAfterDiscounts =
                                                                 cartTotal -
                                                                     couponValue -
                                                                     useWalletPoint;
@@ -2802,7 +2856,8 @@ class _CartPageState extends State<CartPage> {
                                                                     .cartTotal
                                                                     .toString());
                                                             // Calculate GST on cart total after applying discounts
-                                                            int cartTotalAfterDiscounts =
+                                                            double
+                                                                cartTotalAfterDiscounts =
                                                                 cartTotal -
                                                                     couponValue -
                                                                     useWalletPoint;
@@ -3087,69 +3142,40 @@ class _CartPageState extends State<CartPage> {
                                                     'RS' +
                                                         ' ' +
                                                         (() {
-                                                          // GST calculation: Item Total = Cart Total - SGST - CGST
+                                                          // cartTotal already includes GST (Item Total + 5% GST)
                                                           int cartTotal = int.parse(
                                                               _addToCartModel
                                                                   .cartTotal
                                                                   .toString());
-                                                          // Calculate GST on cart total after applying discounts
-                                                          int cartTotalAfterDiscounts =
-                                                              cartTotal -
-                                                                  int.parse(
-                                                                      couponValue
-                                                                          .toString()) -
-                                                                  useWalletPoint;
-                                                          // Calculate using new method: item total = cartTotalAfterDiscounts / 105 * 100
-                                                          double itemTotal =
-                                                              (cartTotalAfterDiscounts /
-                                                                      105) *
-                                                                  100;
-                                                          // GST = Cart Total After Discounts - Item Total
-                                                          double gstAmount =
-                                                              cartTotalAfterDiscounts -
-                                                                  itemTotal;
-                                                          double sgstAmount =
-                                                              gstAmount / 2;
-                                                          double cgstAmount =
-                                                              gstAmount / 2;
-                                                          // Item total is already calculated after discounts
-                                                          double
-                                                              amountAfterDiscounts =
-                                                              itemTotal;
-                                                          int deliveryCharges = _configModel
-                                                                      .user!
-                                                                      .companies![
-                                                                          0]
-                                                                      .deliveryCharges ==
-                                                                  null
-                                                              ? 0
-                                                              : int.parse(_configModel
-                                                                  .user!
-                                                                  .companies![0]
-                                                                  .deliveryCharges
-                                                                  .toString());
-                                                          int packagingCharges = _configModel
-                                                                      .user!
-                                                                      .companies![
-                                                                          0]
-                                                                      .packagingCharges ==
-                                                                  null
-                                                              ? 0
-                                                              : int.parse(_configModel
-                                                                  .user!
-                                                                  .companies![0]
-                                                                  .packagingCharges
-                                                                  .toString());
 
-                                                          // Use fixed GST amounts calculated on original cart total
-                                                          double taxAmount =
-                                                              sgstAmount +
-                                                                  cgstAmount;
-                                                          double total =
-                                                              amountAfterDiscounts +
-                                                                  deliveryCharges +
-                                                                  packagingCharges +
-                                                                  taxAmount;
+                                                          // Get delivery and packaging charges
+                                                          double
+                                                              deliveryCharges =
+                                                              double.tryParse(_configModel
+                                                                          .user
+                                                                          ?.companies?[
+                                                                              0]
+                                                                          .deliveryCharges
+                                                                          ?.toString() ??
+                                                                      '0') ??
+                                                                  0;
+                                                          double
+                                                              packagingCharges =
+                                                              double.tryParse(_configModel
+                                                                          .user
+                                                                          ?.companies?[
+                                                                              0]
+                                                                          .packagingCharges
+                                                                          ?.toString() ??
+                                                                      '0') ??
+                                                                  0;
+
+                                                          // Total = Cart Total (includes GST) + Delivery + Packaging - Coupon - Rewards
+                                                          double total = cartTotal +
+                                                              deliveryCharges +
+                                                              packagingCharges -
+                                                              couponValue -
+                                                              useWalletPoint;
                                                           return total
                                                               .toStringAsFixed(
                                                                   2);
@@ -3204,6 +3230,24 @@ class _CartPageState extends State<CartPage> {
                                                 } else {
                                                   var addressId = address.id;
 
+                                                  // Calculate gstAmount before payment processing
+                                                  int cartTotalForGst =
+                                                      int.parse(_addToCartModel
+                                                          .cartTotal
+                                                          .toString());
+                                                  double
+                                                      cartTotalAfterDiscountsForGst =
+                                                      cartTotalForGst -
+                                                          couponValue -
+                                                          useWalletPoint;
+                                                  double itemTotalForGst =
+                                                      (cartTotalAfterDiscountsForGst /
+                                                              105) *
+                                                          100;
+                                                  double gstAmount =
+                                                      cartTotalAfterDiscountsForGst -
+                                                          itemTotalForGst;
+
                                                   // Payment processing
 
                                                   if (paymentOption ==
@@ -3231,24 +3275,14 @@ class _CartPageState extends State<CartPage> {
                                                           .toString(),
                                                     };
 
+                                                    // Add gstAmount to payloadData for online payment
+                                                    payloadData['gstAmount'] =
+                                                        gstAmount
+                                                            .toStringAsFixed(2);
+
                                                     // Calculate the amount to be paid
-                                                    int cartTotal = int.parse(
-                                                        _addToCartModel
-                                                            .cartTotal
-                                                            .toString());
-                                                    int cartTotalAfterDiscounts =
-                                                        cartTotal -
-                                                            couponValue -
-                                                            useWalletPoint;
-                                                    // Calculate using new method: item total = cartTotalAfterDiscounts / 105 * 100
                                                     double itemTotal =
-                                                        (cartTotalAfterDiscounts /
-                                                                105) *
-                                                            100;
-                                                    // GST = Cart Total After Discounts - Item Total
-                                                    double gstAmount =
-                                                        cartTotalAfterDiscounts -
-                                                            itemTotal;
+                                                        itemTotalForGst;
                                                     double sgstAmount =
                                                         gstAmount / 2;
                                                     double cgstAmount =
@@ -3318,6 +3352,8 @@ class _CartPageState extends State<CartPage> {
                                                       'Cash on Delivery',
                                                       "deliveryMethod",
                                                       couponValue.toString(),
+                                                      gstAmount
+                                                          .toStringAsFixed(2),
                                                     );
 
                                                     if (response == true) {
