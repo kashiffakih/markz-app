@@ -84,17 +84,19 @@ class _WishlistPageState extends State<WishlistPage> {
                               ],
                             ),
                             child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  Color(0xFFEED056)),
                               strokeWidth: 3,
                             ),
                           ),
                           SizedBox(height: 20),
-                          Text('Loading...', style: MyGoogleFontStyle(
-                            fontFamily: 'Urbanist',
-                            fontSize: 16.0.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xff232323),
-                          )),
+                          Text('Loading...',
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 16.0.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xff232323),
+                              )),
                         ],
                       ),
                     )
@@ -180,25 +182,100 @@ class _WishlistPageState extends State<WishlistPage> {
     ConfigModel configModel,
   ) {
     if (wishListModel.wishLists?.isEmpty ?? true) {
-      return const Center(child: Text('Wishlist is empty'));
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Color(0xFFFFF8E1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.favorite_outline_rounded,
+                size: 60,
+                color: Color(0xFFC7B456),
+              ),
+            ),
+            SizedBox(height: 24),
+            Text(
+              'Your Wishlist is Empty',
+              style: TextStyle(
+                fontFamily: 'Urbanist',
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF1A1A1A),
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Save items you love to your wishlist',
+              style: TextStyle(
+                fontFamily: 'Urbanist',
+                fontSize: 14,
+                color: Color(0xFF888888),
+              ),
+            ),
+            SizedBox(height: 24),
+            InkWell(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFFD4C76A), Color(0xFFC7B456)],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'Start Shopping',
+                  style: TextStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
     }
 
     return SingleChildScrollView(
+      physics: BouncingScrollPhysics(),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 25.0.w),
-        child: ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: wishListModel.wishLists!.length,
-          separatorBuilder: (_, __) =>
-              const Divider(thickness: 2, color: Colors.black),
-          itemBuilder: (context, index) => _buildWishlistItem(
-            context,
-            wishListModel,
-            addToCartModel,
-            configModel,
-            index,
-          ),
+        padding: EdgeInsets.symmetric(horizontal: 16.0.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(bottom: 12),
+              child: Text(
+                '${wishListModel.wishLists!.length} items saved',
+                style: TextStyle(
+                  fontFamily: 'Urbanist',
+                  fontSize: 14,
+                  color: Color(0xFF888888),
+                ),
+              ),
+            ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: wishListModel.wishLists!.length,
+              itemBuilder: (context, index) => _buildWishlistItem(
+                context,
+                wishListModel,
+                addToCartModel,
+                configModel,
+                index,
+              ),
+            ),
+            SizedBox(height: 20),
+          ],
         ),
       ),
     );
@@ -217,39 +294,76 @@ class _WishlistPageState extends State<WishlistPage> {
         int.parse(product.productPrices![0].offerPrice.toString());
     final discountPrice = ((price - offerPrice) / price * 100).round();
 
-    return Column(
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildProductImage(configModel, product),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildProductDetails(context, wishListModel,
-                  addToCartModel, product, discountPrice, index),
-            ),
-            IconButton(
-              onPressed: () async {
-                await wishListModel.getWishLists(product.id);
-              },
-              icon: const Icon(Icons.close_rounded),
-            ),
-          ],
+    return Container(
+      margin: EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Colors.white, Color(0xFFFFFDF7)],
         ),
-        const SizedBox(height: 10),
-      ],
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0xFFEED056).withOpacity(0.12),
+            blurRadius: 15,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildProductImage(configModel, product),
+          SizedBox(width: 14),
+          Expanded(
+            child: _buildProductDetails(context, wishListModel, addToCartModel,
+                product, discountPrice, index),
+          ),
+          InkWell(
+            onTap: () async {
+              await wishListModel.getWishLists(product.id);
+            },
+            child: Container(
+              padding: EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.favorite_rounded,
+                color: Colors.red,
+                size: 18,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildProductImage(ConfigModel configModel, Product product) {
-    return SizedBox(
-      height: 90.0.w,
-      width: 80.0.w,
-      child: Image.network(
-        '${configModel.apiConfig['mediaURL']}${product.productImages!.first.imagepath}',
-        width: 80.0.w,
-        height: 100.0.w,
-        errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+    return Container(
+      width: 85.0.w,
+      height: 85.0.w,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: Color(0xFFF5F5F5),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.network(
+          '${configModel.apiConfig['mediaURL']}${product.productImages!.first.imagepath}',
+          width: 85.0.w,
+          height: 85.0.w,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => Icon(
+            Icons.image_rounded,
+            color: Colors.grey[400],
+            size: 30,
+          ),
+        ),
       ),
     );
   }
@@ -267,45 +381,58 @@ class _WishlistPageState extends State<WishlistPage> {
       children: [
         Text(
           product.name.toString(),
-          style: MyGoogleFontStyle(
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
             fontFamily: 'Urbanist',
-            fontWeight: FontWeight.w500,
-            color: const Color(0xff909090),
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF1A1A1A),
           ),
         ),
-        Text.rich(
-          TextSpan(
-            text: 'Total Price',
-            style: TextStyle(color: Colors.grey[500]),
-            children: [
-              const WidgetSpan(child: SizedBox(width: 10)),
-              TextSpan(
-                text: 'RS. ${product.productPrices![0].price}',
-                style: const TextStyle(
-                  color: Color(0xFFC7B456),
-                  decoration: TextDecoration.lineThrough,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
+        SizedBox(height: 6),
+        Row(
+          children: [
+            Text(
+              'RS.${product.productPrices![0].offerPrice}',
+              style: TextStyle(
+                fontFamily: 'Urbanist',
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFFC7B456),
               ),
-              const WidgetSpan(child: SizedBox(width: 10)),
-              TextSpan(
-                text: 'RS.${product.productPrices![0].offerPrice}',
-                style:
-                    const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(width: 8),
+            Text(
+              'RS.${product.productPrices![0].price}',
+              style: TextStyle(
+                fontFamily: 'Urbanist',
+                fontSize: 12,
+                color: Colors.grey,
+                decoration: TextDecoration.lineThrough,
               ),
-              if (discountPrice != 0)
-                const WidgetSpan(child: SizedBox(width: 10)),
-              if (discountPrice != 0)
-                TextSpan(
-                  text: '($discountPrice% Off)',
-                  style: const TextStyle(
-                      fontSize: 12, fontWeight: FontWeight.bold),
-                ),
-            ],
-          ),
+            ),
+          ],
         ),
-        const SizedBox(height: 10),
+        if (discountPrice != 0)
+          Container(
+            margin: EdgeInsets.only(top: 4),
+            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: Color(0xFF4CAF50).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              '$discountPrice% OFF',
+              style: TextStyle(
+                fontFamily: 'Urbanist',
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF4CAF50),
+              ),
+            ),
+          ),
+        SizedBox(height: 10),
         _buildAddToCartButton(context, wishListModel, addToCartModel, index),
       ],
     );
@@ -321,30 +448,26 @@ class _WishlistPageState extends State<WishlistPage> {
       onTap: () => _showAddToCartBottomSheet(
           context, wishListModel, addToCartModel, index),
       child: Container(
-        padding: EdgeInsets.fromLTRB(13.0.w, 4.0.w, 14.0.w, 6.0.w),
-        width: 100.0.w,
-        height: 30.0.w,
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: const Color(0xff000000),
-          borderRadius: BorderRadius.circular(5.0.r),
+          gradient: LinearGradient(
+            colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+          ),
+          borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
+            Icon(Icons.shopping_cart_outlined, color: Colors.white, size: 14),
+            SizedBox(width: 6),
             Text(
               'Add to Cart',
-              style: MyGoogleFontStyle(
-                fontFamily: 'Poppins',
-                fontSize: 9.0.w,
+              style: TextStyle(
+                fontFamily: 'Urbanist',
+                fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xffffffff),
+                color: Colors.white,
               ),
-            ),
-            const SizedBox(width: 5),
-            Image.asset(
-              'assets/images/shopping-bag-03-YoY.png',
-              width: 9.5.w,
-              height: 9.2.w,
             ),
           ],
         ),
@@ -361,6 +484,7 @@ class _WishlistPageState extends State<WishlistPage> {
     int activeIndex = -1;
     int sizeActiveIndex = -1;
     final product = wishListModel.wishLists![index].product!;
+    final configModel = locator<ConfigModel>();
     final Map<String, dynamic> cartData = {
       'kindOfFlower': '',
       'flavour': '',
@@ -370,6 +494,7 @@ class _WishlistPageState extends State<WishlistPage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, modalSetState) {
@@ -382,23 +507,91 @@ class _WishlistPageState extends State<WishlistPage> {
                 : product.productPacks!;
 
             return Container(
-              height: MediaQuery.sizeOf(context).height * 0.4,
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              padding: EdgeInsets.fromLTRB(20, 12, 20, 24),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 20),
-                  Text(
-                    'Select Variant:',
-                    style: MyGoogleFontStyle(
-                      fontFamily: 'Urbanist',
-                      fontSize: 15.0.w,
-                      fontWeight: FontWeight.w600,
-                      height: 1.2,
-                      letterSpacing: -0.36,
+                  // Handle bar
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 16),
+                  // Product header
+                  Row(
+                    children: [
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Color(0xFFF5F5F5),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.network(
+                            '${configModel.apiConfig['mediaURL']}${product.productImages!.first.imagepath}',
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Icon(Icons.image),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              product.name ?? '',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF1A1A1A),
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'RS.${product.productPrices![0].offerPrice}',
+                              style: TextStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFFC7B456),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Divider(color: Color(0xFFEEEEEE)),
+                  SizedBox(height: 16),
+                  // Variant selector
+                  Text(
+                    'Select Variant',
+                    style: TextStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1A1A1A),
+                    ),
+                  ),
+                  SizedBox(height: 12),
                   _buildVariantSelector(product, activeIndex, (index) {
                     modalSetState(() {
                       activeIndex = index;
@@ -408,18 +601,18 @@ class _WishlistPageState extends State<WishlistPage> {
                       cartData['pack'] = product.productImages![index].id;
                     });
                   }),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
+                  // Size selector
                   Text(
-                    'Select Size:',
-                    style: MyGoogleFontStyle(
+                    'Select Size',
+                    style: TextStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 15.0.w,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      height: 1.2,
-                      letterSpacing: -0.36,
+                      color: Color(0xFF1A1A1A),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 12),
                   _buildSizeSelector(filteredProductPacks, sizeActiveIndex,
                       (index) {
                     modalSetState(() {
@@ -429,7 +622,7 @@ class _WishlistPageState extends State<WishlistPage> {
                           filteredProductPacks[index].value.toString();
                     });
                   }),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 24),
                   _buildBottomSheetAddToCartButton(
                     context,
                     addToCartModel,
@@ -438,6 +631,7 @@ class _WishlistPageState extends State<WishlistPage> {
                     cartData,
                     activeIndex,
                     sizeActiveIndex,
+                    filteredProductPacks,
                   ),
                 ],
               ),
@@ -454,41 +648,34 @@ class _WishlistPageState extends State<WishlistPage> {
     Function(int) onSelect,
   ) {
     return SizedBox(
-      height: 50.0.w,
+      height: 42,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: product.productImages!.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 15),
+        separatorBuilder: (_, __) => SizedBox(width: 10),
         itemBuilder: (context, index) {
           final isActive = index == activeIndex;
-          return TextButton(
-            onPressed: () => onSelect(index),
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.zero,
-              backgroundColor: isActive ? Colors.black : null,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30.0.r),
-              ),
-            ),
-            child: Container(
-              width: MediaQuery.sizeOf(context).width * 0.3,
-              padding: EdgeInsets.symmetric(horizontal: 10.0.w),
-              decoration: ShapeDecoration(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0.r),
-                  side: const BorderSide(color: Colors.black, width: 1.0),
+          return GestureDetector(
+            onTap: () => onSelect(index),
+            child: AnimatedContainer(
+              duration: Duration(milliseconds: 200),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: isActive ? Color(0xFFC7B456) : Color(0xFFF5F5F5),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: isActive ? Color(0xFFC7B456) : Color(0xFFE0E0E0),
+                  width: 1.5,
                 ),
               ),
               child: Center(
                 child: Text(
                   product.productImages![index].unit!.name.toString(),
-                  style: MyGoogleFontStyle(
+                  style: TextStyle(
                     fontFamily: 'Urbanist',
-                    fontSize: 12.0.w,
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    height: 1.2,
-                    letterSpacing: -0.36,
-                    color: isActive ? Colors.white : Colors.black,
+                    color: isActive ? Colors.white : Color(0xFF666666),
                   ),
                 ),
               ),
@@ -505,43 +692,66 @@ class _WishlistPageState extends State<WishlistPage> {
     Function(int) onSelect,
   ) {
     return SizedBox(
-      height: 50.0.w,
+      height: 42,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: filteredProductPacks.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 15),
+        separatorBuilder: (_, __) => SizedBox(width: 10),
         itemBuilder: (context, index) {
           final isSizeActive = index == sizeActiveIndex;
-          return TextButton(
-            onPressed: () => onSelect(index),
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.zero,
-              backgroundColor: isSizeActive ? Colors.black : null,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30.0.r),
-              ),
-            ),
-            child: Container(
-              width: MediaQuery.sizeOf(context).width * 0.3,
-              padding: EdgeInsets.symmetric(horizontal: 10.0.w),
-              decoration: ShapeDecoration(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0.r),
-                  side: const BorderSide(color: Colors.black, width: 1.0),
+          final isOutOfStock = (filteredProductPacks[index].qty ?? 0) <= 0;
+
+          return GestureDetector(
+            onTap: () => onSelect(index),
+            child: AnimatedContainer(
+              duration: Duration(milliseconds: 200),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: isOutOfStock
+                    ? Color(0xFFEEEEEE)
+                    : (isSizeActive ? Color(0xFFC7B456) : Color(0xFFF5F5F5)),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: isOutOfStock
+                      ? Color(0xFFDDDDDD)
+                      : (isSizeActive ? Color(0xFFC7B456) : Color(0xFFE0E0E0)),
+                  width: 1.5,
                 ),
               ),
-              child: Center(
-                child: Text(
-                  filteredProductPacks[index].value.toString(),
-                  style: MyGoogleFontStyle(
-                    fontFamily: 'Urbanist',
-                    fontSize: 12.0.w,
-                    fontWeight: FontWeight.w600,
-                    height: 1.2,
-                    letterSpacing: -0.36,
-                    color: isSizeActive ? Colors.white : Colors.black,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    filteredProductPacks[index].value.toString(),
+                    style: TextStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: isOutOfStock
+                          ? Color(0xFFAAAAAA)
+                          : (isSizeActive ? Colors.white : Color(0xFF666666)),
+                    ),
                   ),
-                ),
+                  if (isOutOfStock) ...[
+                    SizedBox(width: 6),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                      child: Text(
+                        'OUT',
+                        style: TextStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 8,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
           );
@@ -558,6 +768,7 @@ class _WishlistPageState extends State<WishlistPage> {
     Map<String, dynamic> cartData,
     int activeIndex,
     int sizeActiveIndex,
+    List<ProductPack> filteredProductPacks,
   ) {
     bool isLoading = false;
 
@@ -573,6 +784,15 @@ class _WishlistPageState extends State<WishlistPage> {
             if (sizeActiveIndex == -1) {
               _showErrorDialog(
                   context, 'Please select a size before adding to cart.');
+              return;
+            }
+
+            // Check if selected pack is out of stock
+            final selectedPack = filteredProductPacks[sizeActiveIndex];
+            final availableQty = selectedPack.qty ?? 0;
+
+            if (availableQty <= 0) {
+              _showOutOfStockDialog(context, product.name ?? 'This item');
               return;
             }
 
@@ -596,6 +816,21 @@ class _WishlistPageState extends State<WishlistPage> {
               await wishListModel.getWishLists('');
               if (mounted) {
                 Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.white),
+                        SizedBox(width: 10),
+                        Text('Added to cart successfully!'),
+                      ],
+                    ),
+                    backgroundColor: Colors.green,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                );
               }
             } catch (e) {
               if (mounted) {
@@ -608,38 +843,127 @@ class _WishlistPageState extends State<WishlistPage> {
             }
           },
           child: Container(
-            padding: EdgeInsets.fromLTRB(13.0.w, 4.0.w, 14.0.w, 6.0.w),
-            width: 160.0.w,
-            height: 50.0.w,
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
             decoration: BoxDecoration(
-              color: const Color(0xff000000),
-              borderRadius: BorderRadius.circular(5.0.r),
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFFD4C76A),
+                  Color(0xFFC7B456),
+                  Color(0xFFAA9A40)
+                ],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xFFC7B456).withOpacity(0.4),
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
+              ],
             ),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : Text(
-                        'Add to Cart',
-                        style: MyGoogleFontStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 15.0.w,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xffffffff),
-                        ),
-                      ),
-                const SizedBox(width: 5),
-                Image.asset(
-                  'assets/images/shopping-bag-03-YoY.png',
-                  width: 18.0.w,
-                  height: 15.0.w,
-                ),
+                if (isLoading)
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                        color: Colors.white, strokeWidth: 2),
+                  )
+                else ...[
+                  Icon(Icons.shopping_bag_rounded,
+                      color: Colors.white, size: 18),
+                  SizedBox(width: 10),
+                  Text(
+                    'Add to Cart',
+                    style: TextStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
         );
       },
+    );
+  }
+
+  void _showOutOfStockDialog(BuildContext context, String productName) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child:
+                  Icon(Icons.inventory_2_outlined, color: Colors.red, size: 24),
+            ),
+            SizedBox(width: 12),
+            Text(
+              'Out of Stock',
+              style: TextStyle(
+                fontFamily: 'Urbanist',
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Sorry! This variant is currently unavailable.',
+              style: TextStyle(
+                fontFamily: 'Urbanist',
+                fontSize: 14,
+                color: Color(0xFF666666),
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Please select a different variant or check back later.',
+              style: TextStyle(
+                fontFamily: 'Urbanist',
+                fontSize: 13,
+                color: Color(0xFF888888),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(
+              backgroundColor: Color(0xFFF5F5F5),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: Text(
+              'OK',
+              style: TextStyle(
+                fontFamily: 'Urbanist',
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF333333),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
