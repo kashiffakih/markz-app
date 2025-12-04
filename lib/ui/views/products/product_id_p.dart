@@ -9,6 +9,7 @@ import 'package:aadab/core/providers/add_to_cart_pr.dart';
 import 'package:aadab/core/providers/config_pr.dart';
 import 'package:aadab/core/providers/product_pr.dart';
 import 'package:aadab/core/providers/wish_list_pr.dart';
+import 'package:aadab/core/services/product_s.dart';
 import 'package:aadab/locator.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 import 'package:aadab/ui/views/checkout/cart_p.dart';
@@ -43,6 +44,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
   bool _isLoading = true;
   String? _errorMessage;
   int currentPackQty = 0;
+  Map<String, dynamic>? _freshProductData; // Fresh product data from API
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
@@ -68,6 +70,10 @@ class _ProductIdPageState extends State<ProductIdPage> {
     });
   }
 
+  // Helper method to get product data (fresh from API or from arguments)
+  Map<String, dynamic> get _productData =>
+      _freshProductData ?? widget.arguments!['product'];
+
   Future<void> _fetchInitialData() async {
     setState(() {
       _isLoading = true;
@@ -79,12 +85,25 @@ class _ProductIdPageState extends State<ProductIdPage> {
     final addToCartModel = context.read<AddToCartModel>();
     final wishListModel = context.read<WishListModel>();
     final productModel = context.read<ProductModel>();
+    final productService = locator<ProductService>();
+
+    // Fetch fresh product data from API
+    try {
+      final freshProduct = await productService.getProductById(productId);
+      if (freshProduct != null) {
+        _freshProductData = freshProduct.toJson();
+      }
+    } catch (e) {
+      debugPrint('Error fetching fresh product data: $e');
+      // Fall back to arguments data if API fails
+    }
+
     await Future.wait<void>([
       if (configModel.user != null)
         addToCartModel.getAddToCart(productId, '', _cartData),
       if (configModel.user != null) wishListModel.getWishLists(''),
       productModel.getCategoryWiseProduct(
-          widget.arguments!['product']['category_id'] ?? '', ''),
+          _productData['category_id'] ?? '', ''),
     ]);
 
     setState(() {
@@ -94,14 +113,26 @@ class _ProductIdPageState extends State<ProductIdPage> {
   }
 
   void _initializeProductData() {
-    productDisplayImages = widget.arguments?['product_images']?.toList() ?? [];
+    // Use fresh product images if available, otherwise fall back to arguments
+    final freshImages = _productData['product_images'];
+    if (freshImages != null && freshImages is List && freshImages.isNotEmpty) {
+      productDisplayImages = freshImages;
+    } else {
+      productDisplayImages = widget.arguments?['product_images']?.toList() ?? [];
+    }
 
-    // Get all product packs
-    final allPacks = widget.arguments?['product']?['product_packs'] ?? [];
+    // Get all product packs from fresh data
+    final allPacks = _productData['product_packs'] ?? [];
 
     // Initialize unitName from product images or first pack
     if (productDisplayImages.isNotEmpty) {
-      unitName = productDisplayImages[0].unit?.name ?? '';
+      // Handle both Map and object types for product images
+      final firstImage = productDisplayImages[0];
+      if (firstImage is Map) {
+        unitName = firstImage['unit']?['name']?.toString() ?? '';
+      } else {
+        unitName = firstImage.unit?.name ?? '';
+      }
       _cartData['flavour'] = unitName;
     } else if (allPacks.isNotEmpty) {
       // If no product images, use the first pack's unit
@@ -120,10 +151,10 @@ class _ProductIdPageState extends State<ProductIdPage> {
       size = _sizes[0]['value']?.toString() ?? '';
       _productPoints = _sizes[0]['points']?.toString() ?? '';
       activeIndex = 0; // Pre-select the first size
-      currentPackQty = _sizes[0]['qty'] ?? 0; // Initialize quantity
+      currentPackQty = _sizes[0]['qty'] ?? 0; // Initialize quantity from fresh data
 
-      // Get prices for the selected pack
-      _prices = widget.arguments?['product']?['product_prices']
+      // Get prices for the selected pack from fresh data
+      _prices = _productData['product_prices']
               ?.where((price) => price['product_pack_id'] == _sizes[0]['id'])
               ?.toList() ??
           [];
@@ -171,9 +202,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
     final addToCartModel = context.watch<AddToCartModel>();
     final wishListModel = context.watch<WishListModel>();
 
-    final product = widget.arguments?['product'] != null
-        ? Product.fromJson(widget.arguments!['product'])
-        : null;
+    // Use fresh product data from API if available
+    final product = _freshProductData != null
+        ? Product.fromJson(_freshProductData!)
+        : (widget.arguments?['product'] != null
+            ? Product.fromJson(widget.arguments!['product'])
+            : null);
 
     if (_isLoading) {
       return Scaffold(

@@ -9,7 +9,9 @@ import 'package:aadab/core/providers/order_pr.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 import 'package:aadab/ui/widgets/multi_image_w.dart';
 import 'package:aadab/core/providers/config_pr.dart';
+import 'package:aadab/core/services/product_s.dart';
 import 'package:aadab/locator.dart';
+import 'package:aadab/ui/views/products/product_id_p.dart';
 
 class OrderDetailsPage extends StatefulWidget {
   final arguments;
@@ -292,17 +294,40 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     ),
                   ),
                   SizedBox(width: 50.w),
-                  Container(
-                    width: 60.w,
-                    height: 80.w,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: newImageDisplay != null
-                            ? NetworkImage(configModel.apiConfig['mediaURL'] +
-                                newImageDisplay)
-                            : const AssetImage(
-                                    'assets/images/aadab-logo-mini.png')
-                                as ImageProvider,
+                  InkWell(
+                    onTap: () async {
+                      // Fetch fresh product data from API and navigate to product detail
+                      final productId = detail['product_id'];
+                      if (productId != null) {
+                        final productService = locator<ProductService>();
+                        final product =
+                            await productService.getProductById(productId);
+                        if (product != null) {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ProductIdPage(
+                                arguments: {
+                                  'product': product.toJson(),
+                                  'product_images': product.productImages,
+                                },
+                              ),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    child: Container(
+                      width: 60.w,
+                      height: 80.w,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: newImageDisplay != null
+                              ? NetworkImage(configModel.apiConfig['mediaURL'] +
+                                  newImageDisplay)
+                              : const AssetImage(
+                                      'assets/images/aadab-logo-mini.png')
+                                  as ImageProvider,
+                        ),
                       ),
                     ),
                   ),
@@ -622,7 +647,14 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     ),
                   ),
                   TextSpan(
-                    text: detail['order_detail_cost'].toString() ?? '0',
+                    text: detail['product']['product_prices'][0]
+                                ['offer_price'] !=
+                            null
+                        ? detail['product']['product_prices'][0]['offer_price']
+                            .toString()
+                        : detail['product']['product_prices'][0]['price']
+                                .toString() ??
+                            '0',
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 12.sp,
@@ -636,7 +668,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             ),
             const Spacer(),
             Text(
-              'RS ${(int.parse(detail['quantity'].toString()) * int.parse(detail['order_detail_cost'].toString())).toString() ?? '0'}',
+              'RS ${(int.parse(detail['quantity'].toString()) * int.parse(detail['product']['product_prices'][0]['offer_price'] != null ? detail['product']['product_prices'][0]['offer_price'].toString() : detail['product']['product_prices'][0]['price'].toString() ?? '0'))}',
               style: MyGoogleFontStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 12.sp,
@@ -659,8 +691,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     // Parse order_cost to double (handles both String and num from API)
     final orderCost =
         double.tryParse(order['order_cost']?.toString() ?? '0') ?? 0.0;
-    final itemTotal = double.parse((orderCost / 105 * 100).toStringAsFixed(2));
-    String abc = (orderCost - itemTotal).toStringAsFixed(2);
+    final itemTotal = double.parse((orderCost).toStringAsFixed(2));
+    String abc = (order['tax_amount']).toStringAsFixed(2);
     return Column(
       children: [
         _buildCostRow('Item total', itemTotal.toStringAsFixed(2)),
