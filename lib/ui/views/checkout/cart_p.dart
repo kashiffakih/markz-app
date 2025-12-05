@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 // import 'package:get_ip_address/get_ip_address.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/models/user_address.dart';
+import 'package:aadab/core/models/add_to_cart.dart';
 import 'package:aadab/core/providers/add_to_cart_pr.dart';
 import 'package:aadab/core/providers/coupon_pr.dart';
 import 'package:aadab/core/providers/config_pr.dart';
@@ -59,6 +60,10 @@ class _CartPageState extends State<CartPage> {
 
   final PhonePeService _phonePeService = locator<PhonePeService>();
   String result = "";
+
+  // Selection state for cart items
+  Set<int> _selectedCartItemIds = {};
+  bool _selectAll = true;
 
   // Method to validate coupon against current cart total
   Future<void> _validateAppliedCoupon() async {
@@ -137,11 +142,154 @@ class _CartPageState extends State<CartPage> {
 
   Payment? payment;
 
+  // Initialize selection with all in-stock items selected
+  void _initializeSelection() {
+    final addToCartModel = Provider.of<AddToCartModel>(context, listen: false);
+    if (addToCartModel.addToCarts != null) {
+      _selectedCartItemIds.clear();
+      for (var item in addToCartModel.addToCarts!) {
+        if (item.id != null) {
+          _selectedCartItemIds.add(item.id!);
+        }
+      }
+      _updateSelectAllState();
+    }
+  }
+
+  // Update select all checkbox state based on current selections (async to check stock)
+  Future<void> _updateSelectAllStateAsync() async {
+    final addToCartModel = Provider.of<AddToCartModel>(context, listen: false);
+    if (addToCartModel.addToCarts != null &&
+        addToCartModel.addToCarts!.isNotEmpty) {
+      // Get only in-stock items
+      List<int> inStockItemIds = [];
+      for (var item in addToCartModel.addToCarts!) {
+        if (item.id != null) {
+          final availableQty = await _getAvailableQty(item);
+          if (availableQty > 0) {
+            inStockItemIds.add(item.id!);
+          }
+        }
+      }
+      setState(() {
+        _selectAll = inStockItemIds.isNotEmpty &&
+            inStockItemIds.every((id) => _selectedCartItemIds.contains(id));
+      });
+    } else {
+      setState(() {
+        _selectAll = false;
+      });
+    }
+  }
+
+  // Sync version for immediate UI updates
+  void _updateSelectAllState() {
+    final addToCartModel = Provider.of<AddToCartModel>(context, listen: false);
+    if (addToCartModel.addToCarts != null &&
+        addToCartModel.addToCarts!.isNotEmpty) {
+      final selectableItems =
+          addToCartModel.addToCarts!.where((item) => item.id != null).toList();
+      // Simple check - will be corrected by async version if needed
+      _selectAll = _selectedCartItemIds.isNotEmpty &&
+          _selectedCartItemIds.length >= selectableItems.length;
+    } else {
+      _selectAll = false;
+    }
+  }
+
+  // Toggle selection for a single item
+  void _toggleItemSelection(int itemId) {
+    setState(() {
+      if (_selectedCartItemIds.contains(itemId)) {
+        _selectedCartItemIds.remove(itemId);
+      } else {
+        _selectedCartItemIds.add(itemId);
+      }
+    });
+    // Update select all state asynchronously to check stock status
+    _updateSelectAllStateAsync();
+  }
+
+  // Toggle select all (only in-stock items)
+  Future<void> _toggleSelectAll(bool? value) async {
+    final addToCartModel = Provider.of<AddToCartModel>(context, listen: false);
+    if (addToCartModel.addToCarts == null) return;
+
+    if (value == true) {
+      // Select all in-stock items only
+      Set<int> newSelection = {};
+      for (var item in addToCartModel.addToCarts!) {
+        if (item.id != null) {
+          final availableQty = await _getAvailableQty(item);
+          if (availableQty > 0) {
+            newSelection.add(item.id!);
+          }
+        }
+      }
+      setState(() {
+        _selectedCartItemIds = newSelection;
+        _selectAll = true;
+      });
+    } else {
+      // Deselect all items
+      setState(() {
+        _selectedCartItemIds.clear();
+        _selectAll = false;
+      });
+    }
+  }
+
+  // Remove out-of-stock items from selection
+  Future<void> _removeOutOfStockFromSelection() async {
+    final addToCartModel = Provider.of<AddToCartModel>(context, listen: false);
+    if (addToCartModel.addToCarts == null) return;
+
+    for (var item in addToCartModel.addToCarts!) {
+      if (item.id != null) {
+        final availableQty = await _getAvailableQty(item);
+        if (availableQty <= 0) {
+          _selectedCartItemIds.remove(item.id!);
+        }
+      }
+    }
+    setState(() {
+      _updateSelectAllState();
+    });
+  }
+
+  // Get selected cart items
+  List<AddToCart> _getSelectedCartItems() {
+    final addToCartModel = Provider.of<AddToCartModel>(context, listen: false);
+    if (addToCartModel.addToCarts == null) return [];
+    return addToCartModel.addToCarts!
+        .where(
+            (item) => item.id != null && _selectedCartItemIds.contains(item.id))
+        .toList();
+  }
+
+  // Calculate total for selected items only
+  int _calculateSelectedItemsTotal() {
+    final addToCartModel = Provider.of<AddToCartModel>(context, listen: false);
+    if (addToCartModel.addToCarts == null) return 0;
+
+    int total = 0;
+    for (var item in addToCartModel.addToCarts!) {
+      if (item.id != null && _selectedCartItemIds.contains(item.id)) {
+        total += int.parse(item.productPrice ?? '0') * (item.qty ?? 1);
+      }
+    }
+    return total;
+  }
+
   @override
   void initState() {
     initializePhonePe();
     _loadData();
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeSelection();
+      _removeOutOfStockFromSelection();
+    });
   }
 
   void initializePhonePe() async {
@@ -197,16 +345,19 @@ class _CartPageState extends State<CartPage> {
     }
   }
 
-  // Helper method to get list of out of stock items
+  // Helper method to get list of out of stock items (checks only selected items)
   Future<List<String>> _getOutOfStockItems() async {
     List<String> outOfStockItems = [];
     final addToCartModel = Provider.of<AddToCartModel>(context, listen: false);
 
     if (addToCartModel.addToCarts != null) {
       for (var cartItem in addToCartModel.addToCarts!) {
-        final availableQty = await _getAvailableQty(cartItem);
-        if (availableQty <= 0) {
-          outOfStockItems.add(cartItem.product?.name ?? 'Unknown Product');
+        // Only check selected items
+        if (cartItem.id != null && _selectedCartItemIds.contains(cartItem.id)) {
+          final availableQty = await _getAvailableQty(cartItem);
+          if (availableQty <= 0) {
+            outOfStockItems.add(cartItem.product?.name ?? 'Unknown Product');
+          }
         }
       }
     }
@@ -249,8 +400,6 @@ class _CartPageState extends State<CartPage> {
       payload['utr'] = payment?.paymentInstrument?.utr.toString();
 
       // print(payload);
-      final AddToCartModel _addToCartModel =
-          Provider.of<AddToCartModel>(context, listen: false);
       final OrderModel _orderModel =
           Provider.of<OrderModel>(context, listen: false);
 
@@ -261,8 +410,11 @@ class _CartPageState extends State<CartPage> {
         paymentDetails += ', Order ID: ${payment!.transactionId}';
       }
 
+      // Use selected items only for the order
+      final selectedItems = _getSelectedCartItems();
+
       bool orderResponse = await _orderModel.placedOrder(
-        _addToCartModel.addToCarts!.toList(),
+        selectedItems,
         payload['cartTotal'],
         payload['addressId'],
         payload['isGift'],
@@ -1038,655 +1190,601 @@ class _CartPageState extends State<CartPage> {
                                     ),
                                   ],
                                 )
-                              : SizedBox(
-                                  height: 1.0.sh *
-                                      (0.23 *
-                                          (_addToCartModel.addToCarts!.length <
-                                                  2
-                                              ? _addToCartModel
-                                                  .addToCarts!.length
-                                              : 2)),
-                                  child: ListView.builder(
-                                    scrollDirection: Axis.vertical,
-                                    itemCount:
-                                        _addToCartModel.addToCarts!.length,
-                                    itemBuilder: (BuildContext context, index) {
-                                      // print(
-                                      //     'cart Count: ${_addToCartModel.addToCarts!.first.userId}');
-                                      double discountPrice = (int.parse(
-                                                  _addToCartModel
+                              : Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    // Select All Checkbox Row
+                                    Container(
+                                      margin: EdgeInsets.symmetric(
+                                          horizontal: 4.0.w, vertical: 8.0.w),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 12.0.w, vertical: 8.0.w),
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFFF5F0E0),
+                                        borderRadius:
+                                            BorderRadius.circular(12.0.r),
+                                        border: Border.all(
+                                          color: Color(0xFFC7B456)
+                                              .withOpacity(0.3),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 24,
+                                            height: 24,
+                                            child: Checkbox(
+                                              value: _selectAll,
+                                              onChanged: (value) =>
+                                                  _toggleSelectAll(value),
+                                              activeColor: Color(0xFFC7B456),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: 12),
+                                          Expanded(
+                                            child: Text(
+                                              'Select All Items',
+                                              style: TextStyle(
+                                                fontFamily: 'Urbanist',
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                color: Color(0xFF1A1A1A),
+                                              ),
+                                            ),
+                                          ),
+                                          Text(
+                                            '${_selectedCartItemIds.length}/${_addToCartModel.addToCarts!.length} selected',
+                                            style: TextStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xFF909090),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    // Cart Items List
+                                    SizedBox(
+                                      height: 1.0.sh *
+                                          (0.23 *
+                                              (_addToCartModel
+                                                          .addToCarts!.length <
+                                                      2
+                                                  ? _addToCartModel
+                                                      .addToCarts!.length
+                                                  : 2)),
+                                      child: ListView.builder(
+                                        scrollDirection: Axis.vertical,
+                                        itemCount:
+                                            _addToCartModel.addToCarts!.length,
+                                        itemBuilder:
+                                            (BuildContext context, index) {
+                                          // print(
+                                          //     'cart Count: ${_addToCartModel.addToCarts!.first.userId}');
+                                          double discountPrice = (int.parse(
+                                                      _addToCartModel
+                                                          .addToCarts![index]
+                                                          .product!
+                                                          .productPrices![0]
+                                                          .price
+                                                          .toString()) -
+                                                  int.parse(_addToCartModel
                                                       .addToCarts![index]
                                                       .product!
                                                       .productPrices![0]
-                                                      .price
-                                                      .toString()) -
+                                                      .offerPrice
+                                                      .toString())) /
                                               int.parse(_addToCartModel
                                                   .addToCarts![index]
                                                   .product!
                                                   .productPrices![0]
-                                                  .offerPrice
-                                                  .toString())) /
-                                          int.parse(_addToCartModel
-                                              .addToCarts![index]
-                                              .product!
-                                              .productPrices![0]
-                                              .price
-                                              .toString()) *
-                                          100;
-                                      // print(_addToCartModel
-                                      //     .addToCarts![index].product
-                                      //     .where((image) =>
-                                      //         image.unit!.name ==
-                                      //         _addToCartModel
-                                      //             .addToCarts![index].flavour)
-                                      //     .toList()
-                                      //     .first
-                                      //     .imagepath);
-                                      Map<String, dynamic> _cartData =
-                                          _addToCartModel.addToCarts![index]
-                                              .toJson();
-                                      return Container(
-                                        margin: EdgeInsets.symmetric(
-                                            vertical: 8.0.w, horizontal: 4.0.w),
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(20.0.r),
-                                          color: Colors.white,
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Color(0xFFEED056)
-                                                  .withOpacity(0.12),
-                                              blurRadius: 20,
-                                              spreadRadius: 2,
-                                              offset: const Offset(0, 6),
+                                                  .price
+                                                  .toString()) *
+                                              100;
+                                          // print(_addToCartModel
+                                          //     .addToCarts![index].product
+                                          //     .where((image) =>
+                                          //         image.unit!.name ==
+                                          //         _addToCartModel
+                                          //             .addToCarts![index].flavour)
+                                          //     .toList()
+                                          //     .first
+                                          //     .imagepath);
+                                          Map<String, dynamic> _cartData =
+                                              _addToCartModel.addToCarts![index]
+                                                  .toJson();
+                                          return Container(
+                                            margin: EdgeInsets.symmetric(
+                                                vertical: 8.0.w,
+                                                horizontal: 4.0.w),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(20.0.r),
+                                              color: Colors.white,
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Color(0xFFEED056)
+                                                      .withOpacity(0.12),
+                                                  blurRadius: 20,
+                                                  spreadRadius: 2,
+                                                  offset: const Offset(0, 6),
+                                                ),
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(0.05),
+                                                  blurRadius: 10,
+                                                  offset: const Offset(0, 2),
+                                                ),
+                                              ],
                                             ),
-                                            BoxShadow(
-                                              color: Colors.black
-                                                  .withOpacity(0.05),
-                                              blurRadius: 10,
-                                              offset: const Offset(0, 2),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Padding(
-                                          padding: EdgeInsets.all(12.0.w),
-                                          child: Row(
-                                            children: [
-                                              FutureBuilder<int>(
-                                                future: _getAvailableQty(
-                                                    _addToCartModel
-                                                        .addToCarts![index]),
-                                                builder:
-                                                    (context, stockSnapshot) {
-                                                  final isOutOfStock =
-                                                      stockSnapshot.hasData &&
-                                                          stockSnapshot.data! <=
-                                                              0;
-                                                  return InkWell(
-                                                    onTap: () {
-                                                      Navigator.of(context).push(
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  ProductIdPage(
-                                                                      arguments: {
-                                                                        'product': _addToCartModel
-                                                                            .addToCarts![index]
-                                                                            .product!
-                                                                            .toJson(),
-                                                                        'product_images': _addToCartModel
-                                                                            .addToCarts![index]
-                                                                            .product!
-                                                                            .productImages
-                                                                      })));
+                                            child: Padding(
+                                              padding: EdgeInsets.all(12.0.w),
+                                              child: Row(
+                                                children: [
+                                                  // Checkbox for item selection
+                                                  FutureBuilder<int>(
+                                                    future: _getAvailableQty(
+                                                        _addToCartModel
+                                                                .addToCarts![
+                                                            index]),
+                                                    builder: (context,
+                                                        checkboxStockSnapshot) {
+                                                      final isOutOfStockForCheckbox =
+                                                          checkboxStockSnapshot
+                                                                  .hasData &&
+                                                              checkboxStockSnapshot
+                                                                      .data! <=
+                                                                  0;
+                                                      final cartItemId =
+                                                          _addToCartModel
+                                                              .addToCarts![
+                                                                  index]
+                                                              .id;
+                                                      return SizedBox(
+                                                        width: 28,
+                                                        height: 28,
+                                                        child: Checkbox(
+                                                          value: cartItemId !=
+                                                                  null &&
+                                                              _selectedCartItemIds
+                                                                  .contains(
+                                                                      cartItemId) &&
+                                                              !isOutOfStockForCheckbox,
+                                                          onChanged: isOutOfStockForCheckbox ||
+                                                                  cartItemId ==
+                                                                      null
+                                                              ? null
+                                                              : (value) =>
+                                                                  _toggleItemSelection(
+                                                                      cartItemId),
+                                                          activeColor:
+                                                              Color(0xFFC7B456),
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        4),
+                                                          ),
+                                                        ),
+                                                      );
                                                     },
-                                                    child: Container(
-                                                      width: 100.0.w,
-                                                      height: 120.0.h,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(
-                                                                    15.0.r),
-                                                        color: const Color(
-                                                            0x0c000000),
-                                                      ),
-                                                      foregroundDecoration:
-                                                          isOutOfStock
-                                                              ? BoxDecoration(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
+                                                  ),
+                                                  SizedBox(width: 8.0.w),
+                                                  FutureBuilder<int>(
+                                                    future: _getAvailableQty(
+                                                        _addToCartModel
+                                                                .addToCarts![
+                                                            index]),
+                                                    builder: (context,
+                                                        stockSnapshot) {
+                                                      final isOutOfStock =
+                                                          stockSnapshot
+                                                                  .hasData &&
+                                                              stockSnapshot
+                                                                      .data! <=
+                                                                  0;
+                                                      return InkWell(
+                                                        onTap: () {
+                                                          Navigator.of(context).push(
+                                                              MaterialPageRoute(
+                                                                  builder: (context) =>
+                                                                      ProductIdPage(
+                                                                          arguments: {
+                                                                            'product':
+                                                                                _addToCartModel.addToCarts![index].product!.toJson(),
+                                                                            'product_images':
+                                                                                _addToCartModel.addToCarts![index].product!.productImages
+                                                                          })));
+                                                        },
+                                                        child: Container(
+                                                          width: 100.0.w,
+                                                          height: 120.0.h,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        15.0.r),
+                                                            color: const Color(
+                                                                0x0c000000),
+                                                          ),
+                                                          foregroundDecoration:
+                                                              isOutOfStock
+                                                                  ? BoxDecoration(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
                                                                               15.0.r),
-                                                                  color: Colors
-                                                                      .black
-                                                                      .withOpacity(
-                                                                          0.55),
-                                                                )
-                                                              : null,
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(
-                                                                    15.0.r),
-                                                        child: Builder(
-                                                          builder: (context) {
-                                                            final product =
-                                                                _addToCartModel
-                                                                    .addToCarts![
-                                                                        index]
-                                                                    .product!;
-                                                            final matchingImages = product
-                                                                .productImages!
-                                                                .where((image) =>
-                                                                    image.unit
-                                                                        ?.name ==
+                                                                      color: Colors
+                                                                          .black
+                                                                          .withOpacity(
+                                                                              0.55),
+                                                                    )
+                                                                  : null,
+                                                          child: ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        15.0.r),
+                                                            child: Builder(
+                                                              builder:
+                                                                  (context) {
+                                                                final product =
                                                                     _addToCartModel
                                                                         .addToCarts![
                                                                             index]
-                                                                        .flavour)
-                                                                .toList();
+                                                                        .product!;
+                                                                final matchingImages = product
+                                                                    .productImages!
+                                                                    .where((image) =>
+                                                                        image
+                                                                            .unit
+                                                                            ?.name ==
+                                                                        _addToCartModel
+                                                                            .addToCarts![index]
+                                                                            .flavour)
+                                                                    .toList();
 
-                                                            final imageUrl = matchingImages
-                                                                    .isNotEmpty
-                                                                ? _configModel
-                                                                            .apiConfig[
-                                                                        'mediaURL'] +
-                                                                    matchingImages[
-                                                                            0]
-                                                                        .imagepath
-                                                                        .toString()
-                                                                : (product
-                                                                        .productImages!
+                                                                final imageUrl = matchingImages
                                                                         .isNotEmpty
                                                                     ? _configModel.apiConfig[
                                                                             'mediaURL'] +
-                                                                        product
-                                                                            .productImages!
-                                                                            .first
+                                                                        matchingImages[0]
                                                                             .imagepath
                                                                             .toString()
-                                                                    : '');
+                                                                    : (product
+                                                                            .productImages!
+                                                                            .isNotEmpty
+                                                                        ? _configModel.apiConfig['mediaURL'] +
+                                                                            product.productImages!.first.imagepath.toString()
+                                                                        : '');
 
-                                                            return Image
-                                                                .network(
-                                                              imageUrl,
-                                                              fit: BoxFit.cover,
-                                                              width: double
-                                                                  .infinity,
-                                                              height: double
-                                                                  .infinity,
-                                                              errorBuilder: (context,
-                                                                      error,
-                                                                      stackTrace) =>
-                                                                  Icon(
-                                                                      Icons
-                                                                          .image,
-                                                                      size: 50,
-                                                                      color: Colors
-                                                                          .grey),
-                                                            );
-                                                          },
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                              SizedBox(width: 12.0.w),
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      _addToCartModel
-                                                          .addToCarts![index]
-                                                          .product!
-                                                          .name
-                                                          .toString(),
-                                                      maxLines: 2,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Urbanist',
-                                                        fontSize: 14.0.sp,
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                        color:
-                                                            Color(0xff000000),
-                                                      ),
-                                                    ),
-                                                    SizedBox(height: 4.0.h),
-                                                    if (_addToCartModel
-                                                        .addToCarts![index]
-                                                        .product!
-                                                        .productPrices!
-                                                        .isNotEmpty)
-                                                      _addToCartModel
-                                                                      .addToCarts![
-                                                                          index]
-                                                                      .product!
-                                                                      .productPrices![
-                                                                          0]
-                                                                      .offerPrice !=
-                                                                  null &&
-                                                              _addToCartModel
-                                                                      .addToCarts![
-                                                                          index]
-                                                                      .product!
-                                                                      .productPrices![
-                                                                          0]
-                                                                      .offerPrice !=
-                                                                  0
-                                                          ? Row(
-                                                              children: [
-                                                                Text.rich(
-                                                                  TextSpan(
-                                                                    children: [
-                                                                      TextSpan(
-                                                                        text:
-                                                                            '₹${_addToCartModel.addToCarts![index].product!.productPrices![0].price}',
-                                                                        style:
-                                                                            TextStyle(
+                                                                return Image
+                                                                    .network(
+                                                                  imageUrl,
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                  width: double
+                                                                      .infinity,
+                                                                  height: double
+                                                                      .infinity,
+                                                                  errorBuilder: (context,
+                                                                          error,
+                                                                          stackTrace) =>
+                                                                      Icon(
+                                                                          Icons
+                                                                              .image,
+                                                                          size:
+                                                                              50,
                                                                           color:
-                                                                              Colors.grey,
-                                                                          decoration:
-                                                                              TextDecoration.lineThrough,
-                                                                          fontSize:
-                                                                              13.0.sp,
+                                                                              Colors.grey),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                  SizedBox(width: 12.0.w),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          _addToCartModel
+                                                              .addToCarts![
+                                                                  index]
+                                                              .product!
+                                                              .name
+                                                              .toString(),
+                                                          maxLines: 2,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style:
+                                                              MyGoogleFontStyle(
+                                                            fontFamily:
+                                                                'Urbanist',
+                                                            fontSize: 14.0.sp,
+                                                            fontWeight:
+                                                                FontWeight.w700,
+                                                            color: Color(
+                                                                0xff000000),
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: 4.0.h),
+                                                        if (_addToCartModel
+                                                            .addToCarts![index]
+                                                            .product!
+                                                            .productPrices!
+                                                            .isNotEmpty)
+                                                          _addToCartModel
+                                                                          .addToCarts![
+                                                                              index]
+                                                                          .product!
+                                                                          .productPrices![
+                                                                              0]
+                                                                          .offerPrice !=
+                                                                      null &&
+                                                                  _addToCartModel
+                                                                          .addToCarts![
+                                                                              index]
+                                                                          .product!
+                                                                          .productPrices![
+                                                                              0]
+                                                                          .offerPrice !=
+                                                                      0
+                                                              ? Wrap(
+                                                                  spacing: 4.0,
+                                                                  runSpacing:
+                                                                      2.0,
+                                                                  children: [
+                                                                    Text.rich(
+                                                                      TextSpan(
+                                                                        children: [
+                                                                          TextSpan(
+                                                                            text:
+                                                                                '₹${_addToCartModel.addToCarts![index].product!.productPrices![0].price}',
+                                                                            style:
+                                                                                TextStyle(
+                                                                              color: Colors.grey,
+                                                                              decoration: TextDecoration.lineThrough,
+                                                                              fontSize: 13.0.sp,
+                                                                              fontFamily: 'Poppins',
+                                                                              fontWeight: FontWeight.w500,
+                                                                            ),
+                                                                          ),
+                                                                          TextSpan(
+                                                                            text:
+                                                                                ' ₹${_addToCartModel.addToCarts![index].product!.productPrices![0].offerPrice}',
+                                                                            style:
+                                                                                TextStyle(
+                                                                              color: const Color(0x99000000),
+                                                                              fontSize: 13.0.sp,
+                                                                              fontFamily: 'Poppins',
+                                                                              fontWeight: FontWeight.w500,
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                    if (discountPrice !=
+                                                                        0.0)
+                                                                      Text(
+                                                                        '(${discountPrice.round()}% Off)',
+                                                                        style:
+                                                                            MyGoogleFontStyle(
                                                                           fontFamily:
                                                                               'Poppins',
+                                                                          fontSize:
+                                                                              13.0.sp,
                                                                           fontWeight:
                                                                               FontWeight.w500,
-                                                                        ),
-                                                                      ),
-                                                                      TextSpan(
-                                                                        text:
-                                                                            ' ₹${_addToCartModel.addToCarts![index].product!.productPrices![0].offerPrice}',
-                                                                        style:
-                                                                            TextStyle(
                                                                           color:
                                                                               const Color(0x99000000),
-                                                                          fontSize:
-                                                                              13.0.sp,
-                                                                          fontFamily:
-                                                                              'Poppins',
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
                                                                         ),
                                                                       ),
-                                                                    ],
+                                                                  ],
+                                                                )
+                                                              : Text(
+                                                                  '₹${_addToCartModel.addToCarts![index].product!.productPrices![0].price}',
+                                                                  style:
+                                                                      MyGoogleFontStyle(
+                                                                    fontFamily:
+                                                                        'Poppins',
+                                                                    fontSize:
+                                                                        13.0.sp,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    color: const Color(
+                                                                        0x99000000),
                                                                   ),
                                                                 ),
-                                                                if (discountPrice !=
-                                                                    0.0) ...[
-                                                                  SizedBox(
-                                                                      width: 6.0
-                                                                          .w),
-                                                                  Text(
-                                                                    '(${discountPrice.round()}% Off)',
-                                                                    style:
-                                                                        MyGoogleFontStyle(
-                                                                      fontFamily:
-                                                                          'Poppins',
-                                                                      fontSize:
-                                                                          13.0.sp,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500,
-                                                                      color: const Color(
-                                                                          0x99000000),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ],
-                                                            )
-                                                          : Text(
-                                                              '₹${_addToCartModel.addToCarts![index].product!.productPrices![0].price}',
-                                                              style:
-                                                                  MyGoogleFontStyle(
-                                                                fontFamily:
-                                                                    'Poppins',
-                                                                fontSize:
-                                                                    13.0.sp,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                color: const Color(
-                                                                    0x99000000),
+                                                        SizedBox(height: 6.0.h),
+                                                        Wrap(
+                                                          spacing: 8.0.w,
+                                                          runSpacing: 4.0.h,
+                                                          children: [
+                                                            Container(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      horizontal:
+                                                                          8.0.w,
+                                                                      vertical:
+                                                                          4.0.h),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Color(
+                                                                    0xFFFFFEF9),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            6.0.r),
+                                                                border: Border.all(
+                                                                    color: Color(
+                                                                            0xFFEED056)
+                                                                        .withOpacity(
+                                                                            0.3)),
+                                                              ),
+                                                              child: Text(
+                                                                'Size: ${_addToCartModel.addToCarts![index].kindOfFlower}',
+                                                                style:
+                                                                    MyGoogleFontStyle(
+                                                                  fontFamily:
+                                                                      'Poppins',
+                                                                  fontSize:
+                                                                      11.0.sp,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  color: Color(
+                                                                      0xff606060),
+                                                                ),
                                                               ),
                                                             ),
-                                                    SizedBox(height: 6.0.h),
-                                                    Wrap(
-                                                      spacing: 8.0.w,
-                                                      runSpacing: 4.0.h,
-                                                      children: [
-                                                        Container(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  horizontal:
-                                                                      8.0.w,
-                                                                  vertical:
-                                                                      4.0.h),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: Color(
-                                                                0xFFFFFEF9),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        6.0.r),
-                                                            border: Border.all(
+                                                            Container(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      horizontal:
+                                                                          8.0.w,
+                                                                      vertical:
+                                                                          4.0.h),
+                                                              decoration:
+                                                                  BoxDecoration(
                                                                 color: Color(
-                                                                        0xFFEED056)
-                                                                    .withOpacity(
-                                                                        0.3)),
-                                                          ),
-                                                          child: Text(
-                                                            'Size: ${_addToCartModel.addToCarts![index].kindOfFlower}',
-                                                            style:
-                                                                MyGoogleFontStyle(
-                                                              fontFamily:
-                                                                  'Poppins',
-                                                              fontSize: 11.0.sp,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              color: Color(
-                                                                  0xff606060),
+                                                                    0xFFFFFEF9),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            6.0.r),
+                                                                border: Border.all(
+                                                                    color: Color(
+                                                                            0xFFEED056)
+                                                                        .withOpacity(
+                                                                            0.3)),
+                                                              ),
+                                                              child: Text(
+                                                                'Colour: ${_addToCartModel.addToCarts![index].flavour}',
+                                                                style:
+                                                                    MyGoogleFontStyle(
+                                                                  fontFamily:
+                                                                      'Poppins',
+                                                                  fontSize:
+                                                                      11.0.sp,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  color: Color(
+                                                                      0xff606060),
+                                                                ),
+                                                              ),
                                                             ),
-                                                          ),
+                                                          ],
                                                         ),
-                                                        Container(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  horizontal:
-                                                                      8.0.w,
-                                                                  vertical:
-                                                                      4.0.h),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: Color(
-                                                                0xFFFFFEF9),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        6.0.r),
-                                                            border: Border.all(
-                                                                color: Color(
-                                                                        0xFFEED056)
-                                                                    .withOpacity(
-                                                                        0.3)),
-                                                          ),
-                                                          child: Text(
-                                                            'Colour: ${_addToCartModel.addToCarts![index].flavour}',
-                                                            style:
-                                                                MyGoogleFontStyle(
-                                                              fontFamily:
-                                                                  'Poppins',
-                                                              fontSize: 11.0.sp,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              color: Color(
-                                                                  0xff606060),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    // Align(
-                                                    //   alignment:
-                                                    //       Alignment.centerLeft,
-                                                    //   child: Row(
-                                                    //     children: [
-                                                    //       Icon(
-                                                    //         Icons.star,
-                                                    //         color: Colors.amber,
-                                                    //       ),
-                                                    //       Text(
-                                                    //         ' ( ${(_addToCartModel.addToCarts![index].product!.reviews == null ? 0 : _addToCartModel.addToCarts![index].product!.reviews?.length)} ratings )',
-                                                    //         style: TextStyle(
-                                                    //             fontSize: 12),
-                                                    //       ),
-                                                    //     ],
-                                                    //   ),
-                                                    // ),
-                                                    SizedBox(height: 8.0.h),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        FutureBuilder<int>(
-                                                          future: _getAvailableQty(
-                                                              _addToCartModel
-                                                                      .addToCarts![
-                                                                  index]),
-                                                          builder: (context,
-                                                              stockSnapshot) {
-                                                            final isOutOfStock =
-                                                                stockSnapshot
-                                                                        .hasData &&
+                                                        // Align(
+                                                        //   alignment:
+                                                        //       Alignment.centerLeft,
+                                                        //   child: Row(
+                                                        //     children: [
+                                                        //       Icon(
+                                                        //         Icons.star,
+                                                        //         color: Colors.amber,
+                                                        //       ),
+                                                        //       Text(
+                                                        //         ' ( ${(_addToCartModel.addToCarts![index].product!.reviews == null ? 0 : _addToCartModel.addToCarts![index].product!.reviews?.length)} ratings )',
+                                                        //         style: TextStyle(
+                                                        //             fontSize: 12),
+                                                        //       ),
+                                                        //     ],
+                                                        //   ),
+                                                        // ),
+                                                        SizedBox(height: 8.0.h),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            FutureBuilder<int>(
+                                                              future: _getAvailableQty(
+                                                                  _addToCartModel
+                                                                          .addToCarts![
+                                                                      index]),
+                                                              builder: (context,
+                                                                  stockSnapshot) {
+                                                                final isOutOfStock =
                                                                     stockSnapshot
-                                                                            .data! <=
-                                                                        0;
-                                                            // Hide increment/decrement when out of stock
-                                                            if (isOutOfStock) {
-                                                              return Container(
-                                                                padding: EdgeInsets
-                                                                    .symmetric(
+                                                                            .hasData &&
+                                                                        stockSnapshot.data! <=
+                                                                            0;
+                                                                // Hide increment/decrement when out of stock
+                                                                if (isOutOfStock) {
+                                                                  return Container(
+                                                                    padding: EdgeInsets.symmetric(
                                                                         horizontal:
                                                                             12.0
                                                                                 .w,
                                                                         vertical:
                                                                             8.0.h),
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: Colors
-                                                                      .red
-                                                                      .withOpacity(
-                                                                          0.1),
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              8.0.r),
-                                                                  border: Border.all(
+                                                                    decoration:
+                                                                        BoxDecoration(
                                                                       color: Colors
                                                                           .red
                                                                           .withOpacity(
-                                                                              0.3)),
-                                                                ),
-                                                                child: Text(
-                                                                  'Out of Stock',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .red,
-                                                                    fontSize:
-                                                                        12.0.sp,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                  ),
-                                                                ),
-                                                              );
-                                                            }
-                                                            return Container(
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Color(
-                                                                    0xFFF5F5F5),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            8.0.r),
-                                                              ),
-                                                              child: Row(
-                                                                children: [
-                                                                  InkWell(
-                                                                    onTap: loadingItemIndex !=
-                                                                            null
-                                                                        ? null
-                                                                        : () async {
-                                                                            setState(() {
-                                                                              loadingItemIndex = index;
-                                                                              quantityLoadingAction = 'decrement';
-                                                                            });
-
-                                                                            bool
-                                                                                minus =
-                                                                                false;
-                                                                            _cartData['is_add_to_cart'] =
-                                                                                true;
-                                                                            await _addToCartModel.getAddToCart(
-                                                                                _addToCartModel.addToCarts![index].product!.id,
-                                                                                minus,
-                                                                                _cartData);
-                                                                            setState(() {});
-                                                                            await _validateAppliedCoupon();
-                                                                            await _recalculateRewards();
-
-                                                                            setState(() {
-                                                                              loadingItemIndex = null;
-                                                                              quantityLoadingAction = null;
-                                                                            });
-                                                                          },
-                                                                    child:
-                                                                        Container(
-                                                                      padding: EdgeInsets
-                                                                          .all(8.0
-                                                                              .w),
-                                                                      child: (loadingItemIndex == index &&
-                                                                              quantityLoadingAction ==
-                                                                                  'decrement')
-                                                                          ? SizedBox(
-                                                                              width: 16.0.w,
-                                                                              height: 16.0.w,
-                                                                              child: CircularProgressIndicator(
-                                                                                strokeWidth: 2,
-                                                                                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
-                                                                              ),
-                                                                            )
-                                                                          : Icon(
-                                                                              Icons.remove,
-                                                                              size: 18.0.sp,
-                                                                              color: Colors.black87),
+                                                                              0.1),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8.0.r),
+                                                                      border: Border.all(
+                                                                          color: Colors
+                                                                              .red
+                                                                              .withOpacity(0.3)),
                                                                     ),
-                                                                  ),
-                                                                  Container(
-                                                                    padding: EdgeInsets.symmetric(
-                                                                        horizontal:
-                                                                            12.0.w),
                                                                     child: Text(
-                                                                      _addToCartModel
-                                                                          .addToCarts![
-                                                                              index]
-                                                                          .qty
-                                                                          .toString(),
+                                                                      'Out of Stock',
                                                                       style:
-                                                                          MyGoogleFontStyle(
-                                                                        fontFamily:
-                                                                            'Urbanist',
+                                                                          TextStyle(
+                                                                        color: Colors
+                                                                            .red,
                                                                         fontSize:
-                                                                            14.0.sp,
+                                                                            12.0.sp,
                                                                         fontWeight:
                                                                             FontWeight.w600,
-                                                                        color: Colors
-                                                                            .black,
                                                                       ),
                                                                     ),
+                                                                  );
+                                                                }
+                                                                return Container(
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    color: Color(
+                                                                        0xFFF5F5F5),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0.r),
                                                                   ),
-                                                                  FutureBuilder<
-                                                                      int>(
-                                                                    future: _getAvailableQty(
-                                                                        _addToCartModel
-                                                                            .addToCarts![index]),
-                                                                    builder:
-                                                                        (context,
-                                                                            snapshot) {
-                                                                      final currentQty =
-                                                                          _addToCartModel.addToCarts![index].qty ??
-                                                                              0;
-                                                                      final availableQty =
-                                                                          snapshot.data ??
-                                                                              0;
-
-                                                                      debugPrint(
-                                                                          'FutureBuilder: currentQty=$currentQty, availableQty=$availableQty, snapshot.hasData=${snapshot.hasData}');
-
-                                                                      // Hide plus button if qty limit reached
-                                                                      if (availableQty >
-                                                                              0 &&
-                                                                          currentQty >=
-                                                                              availableQty) {
-                                                                        debugPrint(
-                                                                            'FutureBuilder: HIDING plus button (limit reached)');
-                                                                        return SizedBox(
-                                                                            width:
-                                                                                34.0.w); // Empty space to maintain layout
-                                                                      }
-
-                                                                      return InkWell(
+                                                                  child: Row(
+                                                                    children: [
+                                                                      InkWell(
                                                                         onTap: loadingItemIndex !=
                                                                                 null
                                                                             ? null
                                                                             : () async {
-                                                                                // Check available quantity before incrementing
-                                                                                final cartItem = _addToCartModel.addToCarts![index];
-                                                                                final currentQty = cartItem.qty ?? 0;
-
                                                                                 setState(() {
                                                                                   loadingItemIndex = index;
-                                                                                  quantityLoadingAction = 'increment';
+                                                                                  quantityLoadingAction = 'decrement';
                                                                                 });
 
-                                                                                // Fetch fresh product data with packs
-                                                                                final productService = locator<ProductService>();
-                                                                                final product = await productService.getProductById(cartItem.productId ?? 0);
-
-                                                                                int availableQty = 0;
-                                                                                if (product != null && product.productPacks != null && product.productPacks!.isNotEmpty) {
-                                                                                  // Find the matching pack based on cart item's pack ID
-                                                                                  try {
-                                                                                    final matchingPack = product.productPacks!.firstWhere(
-                                                                                      (pack) => pack.id.toString() == cartItem.pack,
-                                                                                    );
-                                                                                    availableQty = matchingPack.qty ?? 0;
-                                                                                  } catch (e) {
-                                                                                    // If no matching pack found, use first pack or product qty
-                                                                                    if (product.productPacks!.isNotEmpty) {
-                                                                                      availableQty = product.productPacks!.first.qty ?? 0;
-                                                                                    } else {
-                                                                                      availableQty = product.qty ?? 0;
-                                                                                    }
-                                                                                  }
-                                                                                } else {
-                                                                                  // Fallback to product qty if no packs
-                                                                                  availableQty = cartItem.product?.qty ?? 0;
-                                                                                }
-
-                                                                                debugPrint('Increment check: current=$currentQty, available=$availableQty, pack=${cartItem.pack}');
-
-                                                                                // Check if available quantity is set and if limit reached
-                                                                                if (availableQty > 0 && currentQty >= availableQty) {
-                                                                                  setState(() {
-                                                                                    loadingItemIndex = null;
-                                                                                    quantityLoadingAction = null;
-                                                                                  });
-                                                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                                                    SnackBar(
-                                                                                      content: Text('Maximum available quantity is $availableQty'),
-                                                                                      backgroundColor: Colors.orange,
-                                                                                      duration: Duration(seconds: 2),
-                                                                                    ),
-                                                                                  );
-                                                                                  return;
-                                                                                }
-
-                                                                                bool type = true;
+                                                                                bool minus = false;
                                                                                 _cartData['is_add_to_cart'] = true;
-                                                                                await _addToCartModel.getAddToCart(_addToCartModel.addToCarts![index].product!.id, type, _cartData);
+                                                                                await _addToCartModel.getAddToCart(_addToCartModel.addToCarts![index].product!.id, minus, _cartData);
                                                                                 setState(() {});
                                                                                 await _validateAppliedCoupon();
                                                                                 await _recalculateRewards();
@@ -1700,7 +1798,7 @@ class _CartPageState extends State<CartPage> {
                                                                             Container(
                                                                           padding:
                                                                               EdgeInsets.all(8.0.w),
-                                                                          child: (loadingItemIndex == index && quantityLoadingAction == 'increment')
+                                                                          child: (loadingItemIndex == index && quantityLoadingAction == 'decrement')
                                                                               ? SizedBox(
                                                                                   width: 16.0.w,
                                                                                   height: 16.0.w,
@@ -1709,27 +1807,156 @@ class _CartPageState extends State<CartPage> {
                                                                                     valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
                                                                                   ),
                                                                                 )
-                                                                              : Icon(Icons.add, size: 18.0.sp, color: Colors.black87),
+                                                                              : Icon(Icons.remove, size: 18.0.sp, color: Colors.black87),
                                                                         ),
-                                                                      );
-                                                                    },
+                                                                      ),
+                                                                      Container(
+                                                                        padding:
+                                                                            EdgeInsets.symmetric(horizontal: 12.0.w),
+                                                                        child:
+                                                                            Text(
+                                                                          _addToCartModel
+                                                                              .addToCarts![index]
+                                                                              .qty
+                                                                              .toString(),
+                                                                          style:
+                                                                              MyGoogleFontStyle(
+                                                                            fontFamily:
+                                                                                'Urbanist',
+                                                                            fontSize:
+                                                                                14.0.sp,
+                                                                            fontWeight:
+                                                                                FontWeight.w600,
+                                                                            color:
+                                                                                Colors.black,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      FutureBuilder<
+                                                                          int>(
+                                                                        future:
+                                                                            _getAvailableQty(_addToCartModel.addToCarts![index]),
+                                                                        builder:
+                                                                            (context,
+                                                                                snapshot) {
+                                                                          final currentQty =
+                                                                              _addToCartModel.addToCarts![index].qty ?? 0;
+                                                                          final availableQty =
+                                                                              snapshot.data ?? 0;
+
+                                                                          debugPrint(
+                                                                              'FutureBuilder: currentQty=$currentQty, availableQty=$availableQty, snapshot.hasData=${snapshot.hasData}');
+
+                                                                          // Hide plus button if qty limit reached
+                                                                          if (availableQty > 0 &&
+                                                                              currentQty >= availableQty) {
+                                                                            debugPrint('FutureBuilder: HIDING plus button (limit reached)');
+                                                                            return SizedBox(width: 34.0.w); // Empty space to maintain layout
+                                                                          }
+
+                                                                          return InkWell(
+                                                                            onTap: loadingItemIndex != null
+                                                                                ? null
+                                                                                : () async {
+                                                                                    // Check available quantity before incrementing
+                                                                                    final cartItem = _addToCartModel.addToCarts![index];
+                                                                                    final currentQty = cartItem.qty ?? 0;
+
+                                                                                    setState(() {
+                                                                                      loadingItemIndex = index;
+                                                                                      quantityLoadingAction = 'increment';
+                                                                                    });
+
+                                                                                    // Fetch fresh product data with packs
+                                                                                    final productService = locator<ProductService>();
+                                                                                    final product = await productService.getProductById(cartItem.productId ?? 0);
+
+                                                                                    int availableQty = 0;
+                                                                                    if (product != null && product.productPacks != null && product.productPacks!.isNotEmpty) {
+                                                                                      // Find the matching pack based on cart item's pack ID
+                                                                                      try {
+                                                                                        final matchingPack = product.productPacks!.firstWhere(
+                                                                                          (pack) => pack.id.toString() == cartItem.pack,
+                                                                                        );
+                                                                                        availableQty = matchingPack.qty ?? 0;
+                                                                                      } catch (e) {
+                                                                                        // If no matching pack found, use first pack or product qty
+                                                                                        if (product.productPacks!.isNotEmpty) {
+                                                                                          availableQty = product.productPacks!.first.qty ?? 0;
+                                                                                        } else {
+                                                                                          availableQty = product.qty ?? 0;
+                                                                                        }
+                                                                                      }
+                                                                                    } else {
+                                                                                      // Fallback to product qty if no packs
+                                                                                      availableQty = cartItem.product?.qty ?? 0;
+                                                                                    }
+
+                                                                                    debugPrint('Increment check: current=$currentQty, available=$availableQty, pack=${cartItem.pack}');
+
+                                                                                    // Check if available quantity is set and if limit reached
+                                                                                    if (availableQty > 0 && currentQty >= availableQty) {
+                                                                                      setState(() {
+                                                                                        loadingItemIndex = null;
+                                                                                        quantityLoadingAction = null;
+                                                                                      });
+                                                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                                                        SnackBar(
+                                                                                          content: Text('Maximum available quantity is $availableQty'),
+                                                                                          backgroundColor: Colors.orange,
+                                                                                          duration: Duration(seconds: 2),
+                                                                                        ),
+                                                                                      );
+                                                                                      return;
+                                                                                    }
+
+                                                                                    bool type = true;
+                                                                                    _cartData['is_add_to_cart'] = true;
+                                                                                    await _addToCartModel.getAddToCart(_addToCartModel.addToCarts![index].product!.id, type, _cartData);
+                                                                                    setState(() {});
+                                                                                    await _validateAppliedCoupon();
+                                                                                    await _recalculateRewards();
+
+                                                                                    setState(() {
+                                                                                      loadingItemIndex = null;
+                                                                                      quantityLoadingAction = null;
+                                                                                    });
+                                                                                  },
+                                                                            child:
+                                                                                Container(
+                                                                              padding: EdgeInsets.all(8.0.w),
+                                                                              child: (loadingItemIndex == index && quantityLoadingAction == 'increment')
+                                                                                  ? SizedBox(
+                                                                                      width: 16.0.w,
+                                                                                      height: 16.0.w,
+                                                                                      child: CircularProgressIndicator(
+                                                                                        strokeWidth: 2,
+                                                                                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
+                                                                                      ),
+                                                                                    )
+                                                                                  : Icon(Icons.add, size: 18.0.sp, color: Colors.black87),
+                                                                            ),
+                                                                          );
+                                                                        },
+                                                                      ),
+                                                                    ],
                                                                   ),
-                                                                ],
-                                                              ),
-                                                            );
-                                                          },
-                                                        ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ],
+                                                        )
                                                       ],
-                                                    )
-                                                  ],
-                                                ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
                                 ),
                         ),
                       ],
@@ -3245,12 +3472,12 @@ class _CartPageState extends State<CartPage> {
                                             height: 1,
                                             color: Color(0xFFEEEEEE)),
                                         SizedBox(height: 12),
-                                        // Item Total Row
+                                        // Item Total Row (Selected Items Only)
                                         Row(
                                           children: [
                                             Expanded(
                                               child: Text(
-                                                'Item Total',
+                                                'Item Total (${_selectedCartItemIds.length} selected)',
                                                 style: TextStyle(
                                                   fontFamily: 'Urbanist',
                                                   fontSize: 13,
@@ -3261,9 +3488,7 @@ class _CartPageState extends State<CartPage> {
                                             ),
                                             Text(
                                               'RS ' +
-                                                  (((int.parse(_addToCartModel
-                                                              .cartTotal
-                                                              .toString()) /
+                                                  (((_calculateSelectedItemsTotal() /
                                                           105 *
                                                           100))
                                                       .toStringAsFixed(2)),
@@ -3321,11 +3546,9 @@ class _CartPageState extends State<CartPage> {
                                                 'RS' +
                                                     ' ' +
                                                     (() {
-                                                      // Calculate SGST using reverse calculation (2.5%)
-                                                      int cartTotal = int.parse(
-                                                          _addToCartModel
-                                                              .cartTotal
-                                                              .toString());
+                                                      // Calculate SGST using selected items total
+                                                      int cartTotal =
+                                                          _calculateSelectedItemsTotal();
                                                       // Calculate GST on cart total after applying discounts
                                                       double
                                                           cartTotalAfterDiscounts =
@@ -3377,11 +3600,9 @@ class _CartPageState extends State<CartPage> {
                                                 'RS' +
                                                     ' ' +
                                                     (() {
-                                                      // Calculate CGST using reverse calculation (2.5%)
-                                                      int cartTotal = int.parse(
-                                                          _addToCartModel
-                                                              .cartTotal
-                                                              .toString());
+                                                      // Calculate CGST using selected items total
+                                                      int cartTotal =
+                                                          _calculateSelectedItemsTotal();
                                                       // Calculate GST on cart total after applying discounts
                                                       double
                                                           cartTotalAfterDiscounts =
@@ -3432,11 +3653,9 @@ class _CartPageState extends State<CartPage> {
                                                 'RS' +
                                                     ' ' +
                                                     (() {
-                                                      // Calculate IGST using reverse calculation (5%)
-                                                      int cartTotal = int.parse(
-                                                          _addToCartModel
-                                                              .cartTotal
-                                                              .toString());
+                                                      // Calculate IGST using selected items total
+                                                      int cartTotal =
+                                                          _calculateSelectedItemsTotal();
                                                       // Calculate GST on cart total after applying discounts
                                                       double
                                                           cartTotalAfterDiscounts =
@@ -3569,15 +3788,9 @@ class _CartPageState extends State<CartPage> {
                                                   await _userWaletModel
                                                       .getMyUserWallets();
                                                   setState(() {
-                                                    // Calculate 25% of item total after coupon discount
-                                                    final addToCartModel =
-                                                        Provider.of<
-                                                                AddToCartModel>(
-                                                            context,
-                                                            listen: false);
-                                                    final cartTotal = int.parse(
-                                                        addToCartModel.cartTotal
-                                                            .toString());
+                                                    // Calculate 25% of item total after coupon discount (using selected items)
+                                                    final cartTotal =
+                                                        _calculateSelectedItemsTotal();
                                                     // Calculate using new method: item total = cartTotal / 105 * 100
                                                     final itemTotal =
                                                         (cartTotal / 105) * 100;
@@ -3698,50 +3911,48 @@ class _CartPageState extends State<CartPage> {
                                   ),
 
                                   SizedBox(height: 6),
-                                  // Hide pay button if any item is out of stock
-                                  FutureBuilder<List<String>>(
-                                    future: _getOutOfStockItems(),
-                                    builder: (context, stockSnapshot) {
-                                      final hasOutOfStock =
-                                          stockSnapshot.hasData &&
-                                              stockSnapshot.data!.isNotEmpty;
-                                      if (hasOutOfStock) {
+                                  // Show pay button only if there are selected items (in-stock items)
+                                  Builder(
+                                    builder: (context) {
+                                      // If no items are selected, show warning
+                                      if (_selectedCartItemIds.isEmpty) {
                                         return Container(
                                           width: double.infinity,
                                           padding: EdgeInsets.all(16),
                                           margin: EdgeInsets.symmetric(
                                               horizontal: 16),
                                           decoration: BoxDecoration(
-                                            color: Colors.red.withOpacity(0.1),
+                                            color:
+                                                Colors.orange.withOpacity(0.1),
                                             borderRadius:
                                                 BorderRadius.circular(12),
                                             border: Border.all(
-                                                color: Colors.red
+                                                color: Colors.orange
                                                     .withOpacity(0.3)),
                                           ),
                                           child: Column(
                                             children: [
                                               Icon(
                                                 Icons.warning_amber_rounded,
-                                                color: Colors.red,
+                                                color: Colors.orange,
                                                 size: 32,
                                               ),
                                               SizedBox(height: 8),
                                               Text(
-                                                'Some items in your cart are out of stock',
+                                                'No items selected',
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
-                                                  color: Colors.red[700],
+                                                  color: Colors.orange[700],
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w600,
                                                 ),
                                               ),
                                               SizedBox(height: 4),
                                               Text(
-                                                'Please remove out of stock items to proceed',
+                                                'Please select at least one item to proceed with checkout',
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
-                                                  color: Colors.red[400],
+                                                  color: Colors.orange[400],
                                                   fontSize: 12,
                                                 ),
                                               ),
@@ -3749,6 +3960,7 @@ class _CartPageState extends State<CartPage> {
                                           ),
                                         );
                                       }
+                                      // Show proceed button when items are selected
                                       return address.id != null
                                           ? Align(
                                               alignment: Alignment.bottomCenter,
@@ -3777,6 +3989,24 @@ class _CartPageState extends State<CartPage> {
                                                         ),
                                                       );
                                                     } else {
+                                                      // Check if any items are selected
+                                                      if (_selectedCartItemIds
+                                                          .isEmpty) {
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                          SnackBar(
+                                                            content: Text(
+                                                                'Please select at least one item to proceed'),
+                                                            backgroundColor:
+                                                                Colors.orange,
+                                                            duration: Duration(
+                                                                seconds: 2),
+                                                          ),
+                                                        );
+                                                        return;
+                                                      }
+
                                                       // Check for out of stock items before placing order
                                                       List<String>
                                                           outOfStockItems =
@@ -3862,12 +4092,9 @@ class _CartPageState extends State<CartPage> {
                                                       var addressId =
                                                           address.id;
 
-                                                      // Calculate gstAmount before payment processing
+                                                      // Calculate gstAmount before payment processing (using selected items)
                                                       int cartTotalForGst =
-                                                          int.parse(
-                                                              _addToCartModel
-                                                                  .cartTotal
-                                                                  .toString());
+                                                          _calculateSelectedItemsTotal();
                                                       double
                                                           cartTotalAfterDiscountsForGst =
                                                           cartTotalForGst -
@@ -3884,17 +4111,19 @@ class _CartPageState extends State<CartPage> {
                                                       // Payment processing
 
                                                       if (paymentOption ==
-                                                          'UPI - Online') {
-                                                        // Prepare payload data for the transaction
+                                                          'UPI/PhonePe') {
+                                                        // Prepare payload data for the transaction - use selected items only
+                                                        final selectedItemsForPayment =
+                                                            _getSelectedCartItems();
+                                                        final selectedTotalForPayment =
+                                                            _calculateSelectedItemsTotal();
+
                                                         Map<String, dynamic>
                                                             payloadData = {
                                                           'cartItems':
-                                                              _addToCartModel
-                                                                  .addToCarts!
-                                                                  .toList(),
+                                                              selectedItemsForPayment,
                                                           'cartTotal':
-                                                              _addToCartModel
-                                                                  .cartTotal
+                                                              selectedTotalForPayment
                                                                   .toString(),
                                                           'addressId':
                                                               addressId,
@@ -3977,15 +4206,17 @@ class _CartPageState extends State<CartPage> {
                                                             payloadData,
                                                             context);
                                                       } else {
-                                                        // Cash on Delivery
+                                                        // Cash on Delivery - use selected items only
+                                                        final selectedItems =
+                                                            _getSelectedCartItems();
+                                                        final selectedTotal =
+                                                            _calculateSelectedItemsTotal();
+
                                                         bool response =
                                                             await _orderModel
                                                                 .placedOrder(
-                                                          _addToCartModel
-                                                              .addToCarts!
-                                                              .toList(),
-                                                          _addToCartModel
-                                                              .cartTotal
+                                                          selectedItems,
+                                                          selectedTotal
                                                               .toString(),
                                                           addressId,
                                                           isGift,
@@ -4054,7 +4285,7 @@ class _CartPageState extends State<CartPage> {
                                                             size: 20),
                                                         SizedBox(width: 10),
                                                         Text(
-                                                          'Proceed to Pay',
+                                                          'Proceed (${_selectedCartItemIds.length} items)',
                                                           style: TextStyle(
                                                             fontFamily:
                                                                 'Urbanist',

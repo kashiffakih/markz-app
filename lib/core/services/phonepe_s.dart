@@ -6,21 +6,21 @@ import 'package:http/http.dart' as http;
 import 'package:phonepe_payment_sdk/phonepe_payment_sdk.dart';
 
 class PhonePeService {
-  // Configuration - Using Sandbox for testing
-  final String merchantId = "M231CJCCQCTYF"; // Test merchant ID
+  // Configuration - Production
+  final String merchantId = "M231CJCCQCTYF"; // TODO: Replace with production merchant ID
   final String flowId = "com.crazzycode.aadab";
-  final String environmentValue =
-      'PRODUCTION'; // Use sandbox for testing to avoid signature issues
+  final String appSchema = "http://com.crazzycode.aadab"; // Callback schema
+  final String environmentValue = 'PRODUCTION';
   final bool enableLogs = true;
 
-  // V2 API credentials for testing
-  final String clientId = "SU2509112100302056472244"; // Test client ID
+  // V2 API credentials - TODO: Replace with production credentials
+  final String clientId = "SU2509112100302056472244"; // TODO: Replace with production client ID
   final String clientSecret =
-      "3455cebd-53ca-41b3-b9f9-24ed90290997"; // Test client secret
+      "3455cebd-53ca-41b3-b9f9-24ed90290997"; // TODO: Replace with production client secret
   final String clientVersion = "1";
 
-  // V2 API endpoints - Sandbox URLs
-  final String _baseUrl = "https://api.phonepe.com/apis"; // Using sandbox URL
+  // V2 API endpoints - Production
+  final String _baseUrl = "https://api.phonepe.com/apis"; // Production URL
   final String _authEndpoint = "/identity-manager/v1/oauth/token";
   final String _orderEndpoint = "/pg/checkout/v2/sdk/order";
   final String _statusEndpoint = "/pg/checkout/v2/order";
@@ -164,7 +164,7 @@ class PhonePeService {
         // Try with JSON first
         var response = await PhonePePaymentSdk.startTransaction(
           requestBody, // V2 token wrapped in JSON
-          "", // App schema for callbacks
+          appSchema, // App schema for callbacks
         );
 
         // If JSON fails with conversion error, try base64 encoding
@@ -182,7 +182,7 @@ class PhonePeService {
 
           response = await PhonePePaymentSdk.startTransaction(
             base64Request, // Base64 encoded V2 request
-            "",
+            appSchema,
           );
         }
 
