@@ -1,3 +1,4 @@
+import 'package:aadab/core/models/company.dart';
 import 'package:aadab/core/models/product.dart';
 
 class User {

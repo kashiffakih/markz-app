@@ -255,6 +255,64 @@ class ConfigModel with ChangeNotifier {
     notifyListeners();
   }
 
+  // New user welcome bonus tracking
+  bool _isNewUser = false;
+  bool _showWelcomeBonus = false;
+
+  bool get isNewUser => _isNewUser;
+  bool get showWelcomeBonus => _showWelcomeBonus;
+
+  set isNewUser(bool value) {
+    _isNewUser = value;
+    notifyListeners();
+  }
+
+  set showWelcomeBonus(bool value) {
+    _showWelcomeBonus = value;
+    notifyListeners();
+  }
+
+  Future<void> setNewUserFlag(bool isNewUser) async {
+    _isNewUser = isNewUser;
+    await _configService.setNewUserFlag(isNewUser);
+    notifyListeners();
+  }
+
+  Future<bool> getNewUserFlag() async {
+    _isNewUser = await _configService.getNewUserFlag();
+    return _isNewUser;
+  }
+
+  Future<void> setWelcomeBonusShown(bool shown) async {
+    _showWelcomeBonus = !shown;
+    await _configService.setWelcomeBonusShown(shown);
+    notifyListeners();
+  }
+
+  Future<bool> getWelcomeBonusShown() async {
+    return await _configService.getWelcomeBonusShown();
+  }
+
+  Future<void> checkAndSetNewUserStatus() async {
+    if (_user != null && _user!.id != null) {
+      final lastUserId = await _configService.getLastUserId();
+      final welcomeBonusShown = await _configService.getWelcomeBonusShown();
+
+      // If this is a different user or first time user, mark as new user
+      if (lastUserId == null || lastUserId != _user!.id) {
+        _isNewUser = true;
+        _showWelcomeBonus = true;
+        await _configService.setLastUserId(_user!.id!);
+        await _configService.setWelcomeBonusShown(false);
+      } else {
+        // Same user - check if welcome bonus was already shown
+        _isNewUser = await _configService.getNewUserFlag();
+        _showWelcomeBonus = !welcomeBonusShown && _isNewUser;
+      }
+      notifyListeners();
+    }
+  }
+
   // updateProfileImage(String newPath) {
   //   user?.imagepath = newPath; // Update the user's imagePath
   //   selectedImage = newPath; // Store the selected image path

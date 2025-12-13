@@ -21,6 +21,7 @@ class OrderService {
     deliveryMethod,
     couponValue,
     gstAmount,
+    platformFee,
   ) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
@@ -109,11 +110,16 @@ class OrderService {
         (double.tryParse(gstAmount?.toString() ?? '0') ?? 0.0)
             .toStringAsFixed(2));
 
-    // Calculate total amount: cartTotal + delivery + packaging - coupon - rewards
+    // Parse platform fee
+    final parsedPlatformFee =
+        double.tryParse(platformFee?.toString() ?? '0') ?? 0.0;
+
+    // Calculate total amount: cartTotal + delivery + packaging + platformFee - coupon - rewards
     // (matches cart_p.dart UI calculation)
     final totalAmount = double.parse((parsedCartTotal +
             parsedDeliveryAmount +
-            packagingCharges -
+            packagingCharges +
+            parsedPlatformFee -
             parsedCouponValue -
             parsedUserWalletUsed)
         .toStringAsFixed(2));
@@ -147,6 +153,7 @@ class OrderService {
         paymentmode: paymentOption.toString(),
         isGift: isGift,
         deliveryMethod: deliveryMethod.toString(),
+        platformFee: double.tryParse(platformFee?.toString() ?? '0') ?? 0.0,
         addressId: parsedAddressId);
 
     var _orderJson = order.toJson();

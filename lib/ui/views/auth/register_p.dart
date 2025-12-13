@@ -382,6 +382,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                   .register(registerData: _registerData);
                               print('Registration response: $response');
                               if (response['success'] == true) {
+                                // Mark user as new for welcome bonus
+                                await _configModel.setNewUserFlag(true);
                                 _showSuccessDialog();
                               } else if (response['error'] ==
                                   'EMAIL_ALREADY_EXISTS') {
@@ -476,6 +478,8 @@ class _RegisterPageState extends State<RegisterPage> {
                       Map<String, dynamic> loginResponse =
                           await authModel.login(loginData: _loginData);
                       if (_configModel.isLoggedIn) {
+                        // Mark as new user for welcome bonus (social registration)
+                        await _configModel.setNewUserFlag(true);
                         Navigator.pushReplacementNamed(
                           context,
                           '/',

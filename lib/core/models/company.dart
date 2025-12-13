@@ -4,20 +4,20 @@ class Company {
   String? email;
   int? phone;
   String? address;
-  Null logoPath;
-  Null contactPerson;
+  String? logoPath;
+  String? contactPerson;
   String? createdAt;
   String? updatedAt;
-  Null timeZone;
+  String? timeZone;
   int? isCashbackApplicable;
   int? isDineInAndDelivery;
   int? isReferralAmountUsability;
   String? ownerName;
-  Null add1;
-  Null add2;
-  Null add3;
+  String? add1;
+  String? add2;
+  String? add3;
   String? state;
-  Null city;
+  String? city;
   String? pincode;
   String? deliveryCharges;
   String? comissionType;
@@ -26,14 +26,14 @@ class Company {
   String? position;
   int? isEnabled;
   int? isApproved;
-  Null categoryId;
+  String? categoryId;
   int? cityId;
-  Null accNo;
-  Null accName;
-  Null bank;
-  Null branch;
-  Null ifscCode;
-  Null accType;
+  String? accNo;
+  String? accName;
+  String? bank;
+  String? branch;
+  String? ifscCode;
+  String? accType;
   String? deliveryDuration;
   String? shortAddress;
   String? openTimeHr;
@@ -47,6 +47,7 @@ class Company {
   String? shortCategory;
   int? isAvailable;
   String? imagepath;
+  num? platformFee;
 
   Company(
       {this.id,
@@ -96,7 +97,8 @@ class Company {
       this.dineInMinAmount,
       this.shortCategory,
       this.isAvailable,
-      this.imagepath});
+      this.imagepath,
+      this.platformFee});
 
   Company.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -126,7 +128,7 @@ class Company {
     position = json['position'];
     isEnabled = json['is_enabled'];
     isApproved = json['is_approved'];
-    categoryId = json['category_id'];
+    categoryId = json['category_id']?.toString();
     cityId = json['city_id'];
     accNo = json['acc_no'];
     accName = json['acc_name'];
@@ -147,6 +149,9 @@ class Company {
     shortCategory = json['short_category'];
     isAvailable = json['is_available'];
     imagepath = json['imagepath'];
+    platformFee = json['platform_fee'] != null
+        ? num.tryParse(json['platform_fee'].toString())
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -199,6 +204,7 @@ class Company {
     data['short_category'] = this.shortCategory;
     data['is_available'] = this.isAvailable;
     data['imagepath'] = this.imagepath;
+    data['platform_fee'] = this.platformFee;
     return data;
   }
 }

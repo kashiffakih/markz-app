@@ -18,6 +18,7 @@ import 'package:aadab/core/providers/config_pr.dart';
 import 'package:aadab/core/providers/order_pr.dart';
 import 'package:aadab/core/providers/product_pr.dart';
 import 'package:aadab/core/providers/user_wallet_pr.dart';
+import 'package:aadab/core/providers/user_address_pr.dart';
 import 'package:aadab/locator.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 import 'package:aadab/ui/views/products/shops_p.dart';
@@ -346,8 +347,10 @@ class _CartPageState extends State<CartPage> {
   }
 
   // Helper method to get list of out of stock items (checks only selected items)
-  Future<List<String>> _getOutOfStockItems() async {
-    List<String> outOfStockItems = [];
+  // Returns map with 'outOfStock' and 'insufficientStock' lists
+  Future<Map<String, List<Map<String, dynamic>>>> _getOutOfStockItems() async {
+    List<Map<String, dynamic>> outOfStockItems = [];
+    List<Map<String, dynamic>> insufficientStockItems = [];
     final addToCartModel = Provider.of<AddToCartModel>(context, listen: false);
 
     if (addToCartModel.addToCarts != null) {
@@ -355,13 +358,28 @@ class _CartPageState extends State<CartPage> {
         // Only check selected items
         if (cartItem.id != null && _selectedCartItemIds.contains(cartItem.id)) {
           final availableQty = await _getAvailableQty(cartItem);
+          final orderedQty = cartItem.qty ?? 1;
+
           if (availableQty <= 0) {
-            outOfStockItems.add(cartItem.product?.name ?? 'Unknown Product');
+            outOfStockItems.add({
+              'name': cartItem.product?.name ?? 'Unknown Product',
+              'orderedQty': orderedQty,
+              'availableQty': availableQty,
+            });
+          } else if (orderedQty > availableQty) {
+            insufficientStockItems.add({
+              'name': cartItem.product?.name ?? 'Unknown Product',
+              'orderedQty': orderedQty,
+              'availableQty': availableQty,
+            });
           }
         }
       }
     }
-    return outOfStockItems;
+    return {
+      'outOfStock': outOfStockItems,
+      'insufficientStock': insufficientStockItems,
+    };
   }
 
   Future<void> _startTransaction(int amount, String mobileNumber,
@@ -424,6 +442,7 @@ class _CartPageState extends State<CartPage> {
         payload['deliveryMethod'],
         payload['couponValue'],
         payload['gstAmount'],
+        payload['platformFee'],
       );
 
       setState(() {
@@ -534,10 +553,25 @@ class _CartPageState extends State<CartPage> {
       await Provider.of<WishListModel>(context, listen: false)
           .getWishLists(productId);
 
+      // Load user saved addresses
+      await Provider.of<UserAddressModel>(context, listen: false)
+          .getUserAddresses();
+
       // Update calculations after data is loaded
       if (mounted) {
         setState(() {
           _isLoading = false;
+
+          // Initialize address from saved addresses if user has any
+          final userAddressModel =
+              Provider.of<UserAddressModel>(context, listen: false);
+          // Only set address if not already set from arguments and user has saved addresses
+          if (address.id == null &&
+              widget.arguments?['address'] == null &&
+              userAddressModel.userAddresses != null &&
+              userAddressModel.userAddresses!.isNotEmpty) {
+            address = userAddressModel.userAddresses!.first;
+          }
           // Calculate 25% of item total after coupon discount
           final addToCartModel =
               Provider.of<AddToCartModel>(context, listen: false);
@@ -769,13 +803,11 @@ class _CartPageState extends State<CartPage> {
     final WishListModel _wishListModel =
         Provider.of<WishListModel>(context, listen: false);
 
-    // Initialize address data after loading is complete
-    if (_orderModel.orders.isNotEmpty && address.add1 == null) {
-      address = _orderModel.orders[0].address ?? UserAddress();
-    }
+    // Initialize address from arguments if provided (when user selects an address)
     if (widget.arguments != null && widget.arguments['address'] != null) {
       address = UserAddress.fromJson(widget.arguments['address']);
     }
+    // Note: User's saved addresses are loaded in _loadData() and set there if available
 
     double discountPrice = 0.0;
     return WillPopScope(
@@ -3502,33 +3534,46 @@ class _CartPageState extends State<CartPage> {
                                             )
                                           ],
                                         ),
-                                        SizedBox(height: 8),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                'Delivery',
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Urbanist',
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xff909090),
+                                        if ((double.tryParse(_configModel
+                                                        .user
+                                                        ?.companies?[0]
+                                                        .deliveryCharges
+                                                        ?.toString() ??
+                                                    '0') ??
+                                                0) >
+                                            0)
+                                          SizedBox(height: 8),
+                                        if ((double.tryParse(_configModel
+                                                        .user
+                                                        ?.companies?[0]
+                                                        .deliveryCharges
+                                                        ?.toString() ??
+                                                    '0') ??
+                                                0) >
+                                            0)
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  'Delivery',
+                                                  style: MyGoogleFontStyle(
+                                                    fontFamily: 'Urbanist',
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Color(0xff909090),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            Text(
-                                              'RS ${double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ?? '0')?.toStringAsFixed(2) ?? '0'}',
-                                              textAlign: TextAlign.right,
-                                              style: MyGoogleFontStyle(
-                                                fontFamily: 'Inter',
-                                                fontWeight: FontWeight.w700,
-                                                color: Color(0xff303030),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
+                                              Text(
+                                                'RS ${double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ?? '0')?.toStringAsFixed(2) ?? '0'}',
+                                                textAlign: TextAlign.right,
+                                                style: MyGoogleFontStyle(
+                                                  fontFamily: 'Inter',
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xff303030),
+                                                ),
+                                              )
+                                            ],
+                                          ),
                                         if (address.state == 'Maharashtra')
                                           Row(
                                             children: [
@@ -3633,9 +3678,8 @@ class _CartPageState extends State<CartPage> {
                                               )
                                             ],
                                           ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
+                                        if (address.state != 'Maharashtra')
+                                          SizedBox(height: 10),
                                         if (address.state != 'Maharashtra')
                                           Row(
                                             children: [
@@ -3691,9 +3735,10 @@ class _CartPageState extends State<CartPage> {
                                               )
                                             ],
                                           ),
-                                        if (_configModel.user?.companies?[0]
-                                                .packagingCharges !=
-                                            null)
+                                        if ((_configModel.user?.companies?[0]
+                                                    .packagingCharges ??
+                                                0) >
+                                            0)
                                           Row(
                                             children: [
                                               Expanded(
@@ -3717,45 +3762,63 @@ class _CartPageState extends State<CartPage> {
                                               )
                                             ],
                                           ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                'Coupon (-)',
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Urbanist',
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xff909090),
+                                        if ((_configModel.user?.companies?[0]
+                                                    .platformFee ??
+                                                0) >
+                                            0)
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  'Platform Fee',
+                                                  style: MyGoogleFontStyle(
+                                                    fontFamily: 'Urbanist',
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Color(0xff909090),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            Text(
-                                              'RS' +
-                                                  ' ' +
-                                                  couponValue
-                                                      .toStringAsFixed(2),
-                                              textAlign: TextAlign.right,
-                                              style: MyGoogleFontStyle(
-                                                fontFamily: 'Inter',
-                                                fontWeight: FontWeight.w700,
-                                                color: Color(0xff303030),
+                                              Text(
+                                                'RS ${_configModel.user?.companies?[0].platformFee?.toStringAsFixed(2) ?? '0.00'}',
+                                                textAlign: TextAlign.right,
+                                                style: MyGoogleFontStyle(
+                                                  fontFamily: 'Inter',
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xff303030),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        if (couponValue > 0)
+                                          SizedBox(height: 10),
+                                        if (couponValue > 0)
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  'Coupon (-)',
+                                                  style: MyGoogleFontStyle(
+                                                    fontFamily: 'Urbanist',
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Color(0xff909090),
+                                                  ),
+                                                ),
                                               ),
-                                            )
-                                          ],
-                                        ),
-                                        // if (_userWaletModel
-                                        //         .totaRemainingPoint !=
-                                        //     0)
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        // if (_userWaletModel
-                                        //         .totaRemainingPoint !=
-                                        //     0)
-
+                                              Text(
+                                                'RS' +
+                                                    ' ' +
+                                                    couponValue
+                                                        .toStringAsFixed(2),
+                                                textAlign: TextAlign.right,
+                                                style: MyGoogleFontStyle(
+                                                  fontFamily: 'Inter',
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xff303030),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        SizedBox(height: 10),
                                         Row(
                                           children: [
                                             Expanded(
@@ -3887,9 +3950,19 @@ class _CartPageState extends State<CartPage> {
                                                                       ?.toString() ??
                                                                   '0') ??
                                                               0;
+                                                      double platformFeeValue =
+                                                          double.tryParse(_configModel
+                                                                      .user
+                                                                      ?.companies?[
+                                                                          0]
+                                                                      .platformFee
+                                                                      ?.toString() ??
+                                                                  '0') ??
+                                                              0;
                                                       double total = cartTotal +
                                                           deliveryCharges +
-                                                          packagingCharges -
+                                                          packagingCharges +
+                                                          platformFeeValue -
                                                           couponValue -
                                                           useWalletPoint;
                                                       return total
@@ -4007,67 +4080,143 @@ class _CartPageState extends State<CartPage> {
                                                         return;
                                                       }
 
-                                                      // Check for out of stock items before placing order
-                                                      List<String>
-                                                          outOfStockItems =
+                                                      // Check for out of stock and insufficient stock items before placing order
+                                                      Map<
+                                                              String,
+                                                              List<
+                                                                  Map<String,
+                                                                      dynamic>>>
+                                                          stockCheckResult =
                                                           await _getOutOfStockItems();
+                                                      List<Map<String, dynamic>>
+                                                          outOfStockItems =
+                                                          stockCheckResult[
+                                                                  'outOfStock'] ??
+                                                              [];
+                                                      List<Map<String, dynamic>>
+                                                          insufficientStockItems =
+                                                          stockCheckResult[
+                                                                  'insufficientStock'] ??
+                                                              [];
+
                                                       if (outOfStockItems
-                                                          .isNotEmpty) {
+                                                              .isNotEmpty ||
+                                                          insufficientStockItems
+                                                              .isNotEmpty) {
                                                         showDialog(
                                                           context: context,
                                                           builder: (BuildContext
                                                                   context) =>
                                                               AlertDialog(
                                                             title: Text(
-                                                                'Items Out of Stock'),
-                                                            content: Column(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .min,
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(
-                                                                  'The following items are currently out of stock:',
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          14),
-                                                                ),
-                                                                SizedBox(
-                                                                    height: 10),
-                                                                ...outOfStockItems
-                                                                    .map((item) =>
-                                                                        Padding(
-                                                                          padding:
-                                                                              EdgeInsets.symmetric(vertical: 4),
-                                                                          child:
-                                                                              Row(
-                                                                            children: [
-                                                                              Icon(Icons.error_outline, color: Colors.red, size: 18),
-                                                                              SizedBox(width: 8),
-                                                                              Expanded(
-                                                                                child: Text(
-                                                                                  item,
-                                                                                  style: TextStyle(fontSize: 13),
-                                                                                ),
+                                                                'Stock Issue'),
+                                                            content:
+                                                                SingleChildScrollView(
+                                                              child: Column(
+                                                                mainAxisSize:
+                                                                    MainAxisSize
+                                                                        .min,
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  if (outOfStockItems
+                                                                      .isNotEmpty) ...[
+                                                                    Text(
+                                                                      'Out of Stock:',
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              14,
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          color:
+                                                                              Colors.red),
+                                                                    ),
+                                                                    SizedBox(
+                                                                        height:
+                                                                            8),
+                                                                    ...outOfStockItems
+                                                                        .map((item) =>
+                                                                            Padding(
+                                                                              padding: EdgeInsets.symmetric(vertical: 4),
+                                                                              child: Row(
+                                                                                children: [
+                                                                                  Icon(Icons.error_outline, color: Colors.red, size: 18),
+                                                                                  SizedBox(width: 8),
+                                                                                  Expanded(
+                                                                                    child: Text(
+                                                                                      '${item['name']}',
+                                                                                      style: TextStyle(fontSize: 13),
+                                                                                    ),
+                                                                                  ),
+                                                                                ],
                                                                               ),
-                                                                            ],
-                                                                          ),
-                                                                        ))
-                                                                    .toList(),
-                                                                SizedBox(
-                                                                    height: 10),
-                                                                Text(
-                                                                  'Please remove these items from your cart to proceed.',
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          12,
-                                                                      color: Colors
-                                                                              .grey[
-                                                                          600]),
-                                                                ),
-                                                              ],
+                                                                            ))
+                                                                        .toList(),
+                                                                    SizedBox(
+                                                                        height:
+                                                                            12),
+                                                                  ],
+                                                                  if (insufficientStockItems
+                                                                      .isNotEmpty) ...[
+                                                                    Text(
+                                                                      'Insufficient Stock:',
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              14,
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          color:
+                                                                              Colors.orange),
+                                                                    ),
+                                                                    SizedBox(
+                                                                        height:
+                                                                            8),
+                                                                    ...insufficientStockItems
+                                                                        .map((item) =>
+                                                                            Padding(
+                                                                              padding: EdgeInsets.symmetric(vertical: 4),
+                                                                              child: Row(
+                                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                children: [
+                                                                                  Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 18),
+                                                                                  SizedBox(width: 8),
+                                                                                  Expanded(
+                                                                                    child: Column(
+                                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                      children: [
+                                                                                        Text(
+                                                                                          '${item['name']}',
+                                                                                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                                                                                        ),
+                                                                                        Text(
+                                                                                          'Ordered: ${item['orderedQty']} | Available: ${item['availableQty']}',
+                                                                                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                            ))
+                                                                        .toList(),
+                                                                    SizedBox(
+                                                                        height:
+                                                                            12),
+                                                                  ],
+                                                                  Text(
+                                                                    outOfStockItems
+                                                                            .isNotEmpty
+                                                                        ? 'Please remove out of stock items or reduce quantity for insufficient stock items to proceed.'
+                                                                        : 'Please reduce the quantity to available stock to proceed.',
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            12,
+                                                                        color: Colors
+                                                                            .grey[600]),
+                                                                  ),
+                                                                ],
+                                                              ),
                                                             ),
                                                             actions: [
                                                               TextButton(
@@ -4145,6 +4294,14 @@ class _CartPageState extends State<CartPage> {
                                                             gstAmount
                                                                 .toStringAsFixed(
                                                                     2);
+                                                        payloadData[
+                                                                'platformFee'] =
+                                                            _configModel
+                                                                    .user
+                                                                    ?.companies?[
+                                                                        0]
+                                                                    .platformFee ??
+                                                                0;
 
                                                         // Calculate the amount to be paid
                                                         double itemTotal =
@@ -4186,10 +4343,21 @@ class _CartPageState extends State<CartPage> {
                                                         double taxAmount =
                                                             sgstAmount +
                                                                 cgstAmount;
+                                                        double
+                                                            platformFeeAmount =
+                                                            double.tryParse(_configModel
+                                                                        .user
+                                                                        ?.companies?[
+                                                                            0]
+                                                                        .platformFee
+                                                                        ?.toString() ??
+                                                                    '0') ??
+                                                                0;
                                                         double totalAmount =
                                                             amountAfterDiscounts +
                                                                 deliveryCharges +
                                                                 packagingCharges +
+                                                                platformFeeAmount +
                                                                 taxAmount;
 
                                                         int minumumPayable =
@@ -4229,6 +4397,12 @@ class _CartPageState extends State<CartPage> {
                                                           gstAmount
                                                               .toStringAsFixed(
                                                                   2),
+                                                          _configModel
+                                                                  .user
+                                                                  ?.companies?[
+                                                                      0]
+                                                                  .platformFee ??
+                                                              0,
                                                         );
 
                                                         if (response == true) {
@@ -4302,40 +4476,93 @@ class _CartPageState extends State<CartPage> {
                                               ),
                                             )
                                           : Center(
-                                              child: Container(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 20,
-                                                    vertical: 12),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.red
-                                                      .withOpacity(0.1),
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  border: Border.all(
-                                                      color: Colors.red
-                                                          .withOpacity(0.3)),
-                                                ),
-                                                child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    Icon(
-                                                        Icons
-                                                            .location_off_rounded,
-                                                        color: Colors.red,
-                                                        size: 20),
-                                                    SizedBox(width: 8),
-                                                    Text(
-                                                      'Please add a delivery address',
-                                                      style: TextStyle(
-                                                        fontFamily: 'Urbanist',
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        color: Colors.red,
+                                              child: InkWell(
+                                                onTap: () async {
+                                                  final result =
+                                                      await Navigator.of(
+                                                              context)
+                                                          .push(
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          AddressPage(
+                                                        arguments: {
+                                                          'cartTotal':
+                                                              _addToCartModel
+                                                                  .cartTotal
+                                                                  .toString(),
+                                                          'cartItems':
+                                                              _addToCartModel
+                                                                  .addToCarts,
+                                                          'couponValue':
+                                                              couponValue,
+                                                          'isAddress': true
+                                                        },
                                                       ),
                                                     ),
-                                                  ],
+                                                  );
+                                                  if (result != null &&
+                                                      result['address'] !=
+                                                          null) {
+                                                    setState(() {
+                                                      address =
+                                                          UserAddress.fromJson(
+                                                              result[
+                                                                  'address']);
+                                                    });
+                                                  }
+                                                },
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                child: Container(
+                                                  width: double.infinity,
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 14),
+                                                  margin: EdgeInsets.symmetric(
+                                                      horizontal: 16),
+                                                  decoration: BoxDecoration(
+                                                    gradient: LinearGradient(
+                                                      colors: [
+                                                        Color(0xFF2A2A2A),
+                                                        Color(0xFF1A1A1A)
+                                                      ],
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black
+                                                            .withOpacity(0.2),
+                                                        blurRadius: 8,
+                                                        offset: Offset(0, 4),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Icon(
+                                                          Icons
+                                                              .add_location_alt_rounded,
+                                                          color: Colors.white,
+                                                          size: 20),
+                                                      SizedBox(width: 10),
+                                                      Text(
+                                                        'Add Delivery Address to Continue',
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             );

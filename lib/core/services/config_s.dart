@@ -60,4 +60,36 @@ class ConfigService {
     await _prefs.clear();
     print('All stored data cleared from device');
   }
+
+  // New user welcome bonus tracking
+  Future<void> setNewUserFlag(bool isNewUser) async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    await _prefs.setBool('is_new_user', isNewUser);
+  }
+
+  Future<bool> getNewUserFlag() async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    return _prefs.getBool('is_new_user') ?? false;
+  }
+
+  Future<void> setWelcomeBonusShown(bool shown) async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    await _prefs.setBool('welcome_bonus_shown', shown);
+  }
+
+  Future<bool> getWelcomeBonusShown() async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    return _prefs.getBool('welcome_bonus_shown') ?? false;
+  }
+
+  // Store the user ID to track if it's the same user
+  Future<void> setLastUserId(int userId) async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    await _prefs.setInt('last_user_id', userId);
+  }
+
+  Future<int?> getLastUserId() async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    return _prefs.getInt('last_user_id');
+  }
 }

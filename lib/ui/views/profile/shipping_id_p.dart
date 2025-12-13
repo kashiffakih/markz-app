@@ -1,737 +1,3 @@
-// import 'package:csc_picker/csc_picker.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
-// import 'package:provider/provider.dart';
-// import 'package:aadab/core/models/user_address.dart';
-// import 'package:aadab/core/providers/user_address_pr.dart';
-// import 'package:aadab/ui/shared/font_sh.dart';
-// import 'package:aadab/ui/views/profile/address_p.dart';
-
-// class ShippingUpdatePage extends StatefulWidget {
-//   final arguments;
-// const ShippingUpdatePage({Key? key, required this.arguments})
-//     : super(key: key);
-
-//   @override
-//   State<ShippingUpdatePage> createState() => _ShippingUpdatePageState();
-// }
-
-// class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
-//   UserAddress _userAddress = UserAddress();
-
-//   final _formKey = GlobalKey<FormState>();
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _userAddress =
-//         UserAddress.fromJson(widget.arguments['userAddress'].toJson());
-//   }
-
-//   String selectedChip = '';
-//   bool isAltPhone = false;
-
-//   String countryValue = "INDIA";
-//   String stateValue = "";
-//   String cityValue = "";
-//   String address = "";
-
-//   bool _loading = false;
-//   @override
-//   Widget build(BuildContext context) {
-//     setState(() {
-//       if (stateValue == "" && cityValue == "") {
-//         stateValue = widget.arguments['userAddress'].state.toString();
-//         cityValue = widget.arguments['userAddress'].city.toString();
-//       }
-//     });
-//     UserAddressModel _userAddressModel =
-//         Provider.of<UserAddressModel>(context, listen: false);
-
-//     return Scaffold(
-//       body: SafeArea(
-//         child: SingleChildScrollView(
-//           child: Container(
-//             child: Column(
-//               children: [
-//                 // Title
-//                 Container(
-//                   margin: EdgeInsets.all(20),
-//                   width: double.infinity,
-//                   child: Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       InkWell(
-//                         onTap: () {
-//                           Navigator.pop(context);
-//                         },
-//                         child: Row(
-//                           children: [
-//                             Container(
-//                               child: Image.asset(
-//                                 'assets/images/vector-GJ4.png',
-//                                 height: 15,
-//                               ),
-//                             ),
-//                             Expanded(
-//                               child: Text(
-//                                 'Update Shipping Address',
-//                                 textAlign: TextAlign.center,
-//                                 style: MyGoogleFontStyle(
-//                                   fontFamily: 'Urbanist',
-//                                   fontSize: 18,
-//                                   fontWeight: FontWeight.bold,
-//                                   color: Color(0xff1e232c),
-//                                 ),
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//                 // Body
-//                 Container(
-//                   padding: EdgeInsets.all(15),
-//                   child: Form(
-//                     key: _formKey,
-//                     child: Column(
-//                       children: [
-//                         Container(
-//                           decoration: BoxDecoration(
-//                             borderRadius: BorderRadius.circular(10),
-//                             border: Border.all(color: Color(0xffe3e3e3)),
-//                             color: Color(0xfffbfbfb),
-//                           ),
-//                           child: TextFormField(
-//                             initialValue: _userAddress.add1,
-//                             decoration: InputDecoration(
-//                               border: InputBorder.none,
-//                               focusedBorder: InputBorder.none,
-//                               enabledBorder: InputBorder.none,
-//                               errorBorder: InputBorder.none,
-//                               disabledBorder: InputBorder.none,
-//                               contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-//                               hintText: 'House No, Building no',
-//                               hintStyle: TextStyle(color: Color(0x3f000000)),
-//                             ),
-//                             style: MyGoogleFontStyle(
-//                               fontFamily: 'Urbanist',
-//                               fontWeight: FontWeight.w500,
-//                               color: Color(0xff000000),
-//                             ),
-//                             validator: (value) {
-//                               if (value!.isEmpty) {
-//                                 return "House No, Building no Cannot be empty.";
-//                               }
-//                               return null;
-//                             },
-//                             onSaved: (value) {
-//                               _userAddress.add1 = value;
-//                             },
-//                           ),
-//                         ),
-//                         SizedBox(
-//                           height: 20,
-//                         ),
-//                         // Address
-//                         Container(
-//                           decoration: BoxDecoration(
-//                             borderRadius: BorderRadius.circular(10),
-//                             border: Border.all(color: Color(0xffe3e3e3)),
-//                             color: Color(0xfffbfbfb),
-//                           ),
-//                           child: TextFormField(
-//                             initialValue: _userAddress.add2,
-//                             decoration: InputDecoration(
-//                               border: InputBorder.none,
-//                               focusedBorder: InputBorder.none,
-//                               enabledBorder: InputBorder.none,
-//                               errorBorder: InputBorder.none,
-//                               disabledBorder: InputBorder.none,
-//                               contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-//                               hintText: 'Road, Colony, Area',
-//                               hintStyle: TextStyle(color: Color(0x3f000000)),
-//                             ),
-//                             style: MyGoogleFontStyle(
-//                               fontFamily: 'Urbanist',
-//                               fontWeight: FontWeight.w500,
-//                               color: Color(0xff000000),
-//                             ),
-//                             validator: (value) {
-//                               if (value!.isEmpty) {
-//                                 return "Road, Colony, Area Cannot be empty.";
-//                               }
-//                               return null;
-//                             },
-//                             onSaved: (value) {
-//                               _userAddress.add2 = value;
-//                             },
-//                           ),
-//                         ),
-
-//                         SizedBox(
-//                           height: 20,
-//                         ),
-//                         Container(
-//                           decoration: BoxDecoration(
-//                             borderRadius: BorderRadius.circular(10),
-//                             border: Border.all(color: Color(0xffe3e3e3)),
-//                             color: Color(0xfffbfbfb),
-//                           ),
-//                           child: TextFormField(
-//                             initialValue: _userAddress.add3,
-//                             decoration: InputDecoration(
-//                               border: InputBorder.none,
-//                               focusedBorder: InputBorder.none,
-//                               enabledBorder: InputBorder.none,
-//                               errorBorder: InputBorder.none,
-//                               disabledBorder: InputBorder.none,
-//                               contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-//                               hintText: 'Landmark',
-//                               hintStyle: TextStyle(color: Color(0x3f000000)),
-//                             ),
-//                             style: MyGoogleFontStyle(
-//                               fontFamily: 'Urbanist',
-//                               fontWeight: FontWeight.w500,
-//                               color: Color(0xff000000),
-//                             ),
-//                             validator: (value) {
-//                               if (value!.isEmpty) {
-//                                 return "Landmark Cannot be empty.";
-//                               }
-//                               return null;
-//                             },
-//                             onSaved: (value) {
-//                               _userAddress.add3 = value;
-//                             },
-//                           ),
-//                         ),
-
-//                         SizedBox(
-//                           height: 20,
-//                         ),
-//                         Column(
-//                           crossAxisAlignment: CrossAxisAlignment.start,
-//                           children: [
-//                             Align(
-//                               alignment: Alignment.centerLeft,
-//                               child: Text('Country: India'),
-//                             ),
-//                             Align(
-//                               alignment: Alignment.centerLeft,
-//                               child: Text('State: ' +
-//                                   widget.arguments['userAddress'].state),
-//                             ),
-//                             Text('City: ' +
-//                                 widget.arguments['userAddress'].city),
-//                           ],
-//                         ),
-
-//                         SizedBox(
-//                           height: 20,
-//                         ),
-
-//                         Container(
-//                             // padding: EdgeInsets.symmetric(horizontal: 20),
-//                             // height: 600,
-//                             child: Column(
-//                           children: [
-//                             CSCPicker(
-//                               layout: Layout.vertical,
-//                               showStates: true,
-//                               showCities: true,
-//                               flagState: CountryFlag.DISABLE,
-//                               dropdownDecoration: BoxDecoration(
-//                                   borderRadius:
-//                                       BorderRadius.all(Radius.circular(10)),
-//                                   color: Colors.white,
-//                                   border: Border.all(
-//                                       color: Colors.grey.shade300, width: 1)),
-//                               disabledDropdownDecoration: BoxDecoration(
-//                                   borderRadius:
-//                                       BorderRadius.all(Radius.circular(10)),
-//                                   color: Colors.grey.shade300,
-//                                   border: Border.all(
-//                                       color: Colors.grey.shade300, width: 1)),
-//                               countrySearchPlaceholder: "Country",
-//                               stateSearchPlaceholder: "State",
-//                               citySearchPlaceholder: "City",
-//                               countryDropdownLabel: "Country",
-//                               stateDropdownLabel: "State",
-//                               cityDropdownLabel: "City",
-//                               defaultCountry: CscCountry.India,
-//                               disableCountry: true,
-//                               selectedItemStyle: TextStyle(
-//                                 color: Colors.black,
-//                                 fontSize: 14,
-//                               ),
-//                               dropdownHeadingStyle: TextStyle(
-//                                   color: Colors.black,
-//                                   fontSize: 17,
-//                                   fontWeight: FontWeight.bold),
-//                               dropdownItemStyle: TextStyle(
-//                                 color: Colors.black,
-//                                 fontSize: 14,
-//                               ),
-//                               dropdownDialogRadius: 10.0,
-//                               searchBarRadius: 10.0,
-//                               onCountryChanged: (value) {
-//                                 setState(() {
-//                                   countryValue = value;
-//                                 });
-//                               },
-//                               onStateChanged: (value) {
-//                                 setState(() {
-//                                   stateValue = value.toString();
-//                                   _userAddress.state = stateValue;
-//                                 });
-//                               },
-//                               onCityChanged: (value) {
-//                                 setState(() {
-//                                   cityValue = value.toString();
-//                                   _userAddress.city = cityValue;
-//                                 });
-//                               },
-//                             ),
-//                           ],
-//                         )),
-//                         SizedBox(
-//                           height: 20,
-//                         ),
-//                         Container(
-//                           decoration: BoxDecoration(
-//                             borderRadius: BorderRadius.circular(10),
-//                             border: Border.all(color: Color(0xffe3e3e3)),
-//                             color: Color(0xfffbfbfb),
-//                           ),
-//                           child: TextFormField(
-//                             initialValue: _userAddress.pincode,
-//                             keyboardType: TextInputType.number,
-//                             decoration: InputDecoration(
-//                               border: InputBorder.none,
-//                               focusedBorder: InputBorder.none,
-//                               enabledBorder: InputBorder.none,
-//                               errorBorder: InputBorder.none,
-//                               disabledBorder: InputBorder.none,
-//                               contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-//                               hintText: 'Pincode',
-//                               hintStyle: TextStyle(color: Color(0x3f000000)),
-//                             ),
-//                             style: MyGoogleFontStyle(
-//                               fontFamily: 'Urbanist',
-//                               fontWeight: FontWeight.w500,
-//                               color: Color(0xff000000),
-//                             ),
-//                             validator: (value) {
-//                               if (value!.isEmpty) {
-//                                 return "Pincode Cannot be empty.";
-//                               }
-//                               return null;
-//                             },
-//                             onSaved: (value) {
-//                               _userAddress.pincode = value;
-//                             },
-//                           ),
-//                         ),
-//                         SizedBox(
-//                           height: 20,
-//                         ),
-
-//                         // Full Name
-//                         Container(
-//                           decoration: BoxDecoration(
-//                             borderRadius: BorderRadius.circular(10),
-//                             border: Border.all(color: Color(0xffe3e3e3)),
-//                             color: Color(0xfffbfbfb),
-//                           ),
-//                           child: TextFormField(
-//                             initialValue: _userAddress.fullName,
-//                             decoration: InputDecoration(
-//                               border: InputBorder.none,
-//                               focusedBorder: InputBorder.none,
-//                               enabledBorder: InputBorder.none,
-//                               errorBorder: InputBorder.none,
-//                               disabledBorder: InputBorder.none,
-//                               contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-//                               hintText: 'Full Name',
-//                               hintStyle: TextStyle(color: Color(0x3f000000)),
-//                             ),
-//                             style: MyGoogleFontStyle(
-//                               fontFamily: 'Urbanist',
-//                               fontWeight: FontWeight.w500,
-//                               color: Color(0xff000000),
-//                             ),
-//                             validator: (value) {
-//                               if (value!.isEmpty) {
-//                                 return "Full Name Cannot be empty.";
-//                               }
-//                               return null;
-//                             },
-//                             onSaved: (value) {
-//                               _userAddress.fullName = value;
-//                             },
-//                           ),
-//                         ),
-
-//                         SizedBox(
-//                           height: 20,
-//                         ),
-//                         // Phone
-//                         Container(
-//                           decoration: BoxDecoration(
-//                             borderRadius: BorderRadius.circular(10),
-//                             border: Border.all(color: Color(0xffe3e3e3)),
-//                             color: Color(0xfffbfbfb),
-//                           ),
-//                           child: TextFormField(
-//                             initialValue: _userAddress.phone,
-//                             keyboardType: TextInputType.number,
-//                             inputFormatters: [
-//                               FilteringTextInputFormatter.digitsOnly,
-//                               LengthLimitingTextInputFormatter(10),
-//                             ],
-//                             decoration: InputDecoration(
-//                               border: InputBorder.none,
-//                               focusedBorder: InputBorder.none,
-//                               enabledBorder: InputBorder.none,
-//                               errorBorder: InputBorder.none,
-//                               disabledBorder: InputBorder.none,
-//                               contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-//                               hintText: 'Phone',
-//                               hintStyle: TextStyle(color: Color(0x3f000000)),
-//                             ),
-//                             style: MyGoogleFontStyle(
-//                               fontFamily: 'Urbanist',
-//                               fontWeight: FontWeight.w500,
-//                               color: Color(0xff000000),
-//                             ),
-//                             validator: (value) {
-//                               if (value!.isEmpty) {
-//                                 return "Phone Cannot be empty.";
-//                               }
-//                               if (value.length != 10) {
-//                                 return 'Number should be 10 digits';
-//                               }
-//                               return null;
-//                             },
-//                             onSaved: (value) {
-//                               _userAddress.phone = value;
-//                             },
-//                           ),
-//                         ),
-//                         SizedBox(
-//                           height: 20,
-//                         ),
-//                         if (isAltPhone == false)
-//                           InkWell(
-//                             onTap: () {
-//                               setState(() {
-//                                 isAltPhone = true;
-//                               });
-//                             },
-//                             child: Row(
-//                               children: [
-//                                 Icon(Icons.add),
-//                                 Text('Add Alternate Phone Number'),
-//                               ],
-//                             ),
-//                           ),
-//                         if (isAltPhone == true)
-//                           Container(
-//                             decoration: BoxDecoration(
-//                               borderRadius: BorderRadius.circular(10),
-//                               border: Border.all(color: Color(0xffe3e3e3)),
-//                               color: Color(0xfffbfbfb),
-//                             ),
-//                             child: TextFormField(
-//                               initialValue: _userAddress.altPhone,
-//                               keyboardType: TextInputType.number,
-//                               inputFormatters: [
-//                                 FilteringTextInputFormatter.digitsOnly,
-//                                 LengthLimitingTextInputFormatter(10),
-//                               ],
-//                               decoration: InputDecoration(
-//                                 border: InputBorder.none,
-//                                 focusedBorder: InputBorder.none,
-//                                 enabledBorder: InputBorder.none,
-//                                 errorBorder: InputBorder.none,
-//                                 disabledBorder: InputBorder.none,
-//                                 contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-//                                 hintText: 'Alternate Phone Number',
-//                                 hintStyle: TextStyle(color: Color(0x3f000000)),
-//                               ),
-//                               style: MyGoogleFontStyle(
-//                                 fontFamily: 'Urbanist',
-//                                 fontWeight: FontWeight.w500,
-//                                 color: Color(0xff000000),
-//                               ),
-//                               validator: (value) {
-//                                 if (value == null || value.isEmpty) {
-//                                   return 'Please enter a phone number';
-//                                 }
-//                                 if (value.length != 10) {
-//                                   return 'Number should be 10 digits';
-//                                 }
-//                                 return null;
-//                               },
-//                               onSaved: (value) {
-//                                 _userAddress.altPhone = value!;
-//                               },
-//                             ),
-//                           ),
-//                         SizedBox(
-//                           height: 20,
-//                         ),
-//                         if (isAltPhone == true)
-//                           InkWell(
-//                             onTap: () {
-//                               setState(() {
-//                                 isAltPhone = false;
-//                                 _userAddress.altPhone = '';
-//                               });
-//                             },
-//                             child: Row(
-//                               children: [
-//                                 Icon(Icons.remove),
-//                                 Text('Remove Alternate Phone Number'),
-//                               ],
-//                             ),
-//                           ),
-//                         if (isAltPhone == true)
-//                           SizedBox(
-//                             height: 20,
-//                           ),
-
-//                         Wrap(
-//                           spacing: 8.0,
-//                           children: [
-//                             ChoiceChip(
-//                               selected: _userAddress.label == 'Home',
-//                               onSelected: (bool selected) {
-//                                 setState(() {
-//                                   selectedChip = selected ? 'Home' : '';
-//                                   _userAddress.label = selectedChip;
-//                                 });
-//                               },
-//                               selectedColor: Colors.green,
-//                               label: SizedBox(
-//                                 width: 80,
-//                                 child: Row(
-//                                   children: [
-//                                     Icon(Icons.home),
-//                                     SizedBox(
-//                                       width: 10,
-//                                     ),
-//                                     Text('Home'),
-//                                   ],
-//                                 ),
-//                               ),
-//                             ),
-//                             ChoiceChip(
-//                               selected: _userAddress.label == 'Work',
-//                               onSelected: (bool selected) {
-//                                 setState(() {
-//                                   selectedChip = selected ? 'Work' : '';
-//                                   _userAddress.label = selectedChip;
-//                                 });
-//                               },
-//                               selectedColor: Colors.blue,
-//                               label: SizedBox(
-//                                 width: 80,
-//                                 child: Row(
-//                                   children: [
-//                                     Icon(Icons.work),
-//                                     SizedBox(
-//                                       width: 10,
-//                                     ),
-//                                     Text('Work'),
-//                                   ],
-//                                 ),
-//                               ),
-//                             ),
-//                             // ChoiceChip(
-//                             //   selected: selectedChip == 'Other',
-//                             //   onSelected: (bool selected) {
-//                             //     setState(() {
-//                             //       selectedChip = selected ? 'Other' : '';
-//                             //       _userAddress.label = selectedChip;
-//                             //     });
-//                             //   },
-//                             //   selectedColor: Colors.orange,
-//                             //   label: Text('Other'),
-//                             // ),
-//                             // Add more ChoiceChip widgets here as needed
-//                           ],
-//                         ),
-//                         SizedBox(
-//                           height: 20,
-//                         ),
-
-//                         // Save address
-//                         Container(
-//                           // primaryXwC (318:2628)
-//                           margin: EdgeInsets.fromLTRB(5, 0, 6.34, 0),
-//                           child: TextButton(
-//                             onPressed: () async {
-//                               if (_formKey.currentState!.validate()) {
-//                                 _formKey.currentState!.save();
-
-//                                 if (_userAddress.label == null ||
-//                                     _userAddress.label == '') {
-//                                   showDialog(
-//                                     context: context,
-//                                     builder: (BuildContext context) =>
-//                                         AlertDialog(
-//                                       title:
-//                                           Text('Please select address type.'),
-//                                       actions: [
-//                                         TextButton(
-//                                           onPressed: () {
-//                                             Navigator.pop(context);
-//                                           },
-//                                           child: Text('Ok'),
-//                                         )
-//                                       ],
-//                                     ),
-//                                   );
-//                                 } else {
-//                                   setState(() {
-//                                     _loading = true;
-//                                   });
-//                                   print('city : ${_userAddress.city}');
-//                                   print('state : ${_userAddress.state}');
-
-//                                   _userAddress.city = _userAddress.city != null
-//                                       ? _userAddress.city.toString()
-//                                       : widget.arguments['userAddress'].city
-//                                           .toString();
-//                                   _userAddress.state = _userAddress.state !=
-//                                           null
-//                                       ? _userAddress.state.toString()
-//                                       : widget.arguments['userAddress'].state
-//                                           .toString();
-//                                   print(_userAddress.city);
-//                                   bool response =
-//                                       await _userAddressModel.updateUserAddress(
-//                                           userAddress: _userAddress);
-//                                   if (response == true) {
-//                                     // Navigator.of(context).pop();
-//                                     Navigator.of(context).push(
-//                                         MaterialPageRoute(
-//                                             builder: (context) =>
-//                                                 AddressPage(arguments: {
-//                                                   'cartItems': [],
-//                                                   'cartTotal': '',
-//                                                   'couponValue': 0,
-//                                                   'isAddress': false,
-//                                                 })));
-//                                   }
-//                                   setState(() {
-//                                     _loading = false;
-//                                   });
-//                                 }
-//                               }
-//                             },
-//                             style: TextButton.styleFrom(
-//                               padding: EdgeInsets.zero,
-//                             ),
-//                             child: Container(
-//                               width: double.infinity,
-//                               height: 53,
-//                               decoration: BoxDecoration(
-//                                 color: Color(0xff1e1e1e),
-//                                 borderRadius: BorderRadius.circular(10),
-//                               ),
-//                               child: Center(
-//                                 child: _loading
-//                                     ? SizedBox(
-//                                         child: CircularProgressIndicator(
-//                                           backgroundColor: Colors.white,
-//                                         ),
-//                                         height: 20,
-//                                         width: 20,
-//                                       )
-//                                     : Text(
-//                                         'Update address',
-//                                         textAlign: TextAlign.center,
-//                                         style: MyGoogleFontStyle(
-//                                           fontFamily: 'Urbanist',
-//                                           fontSize: 15.1428556442,
-//                                           fontWeight: FontWeight.w700,
-//                                           height: 1.4999999685,
-//                                           color: Color(0xffffffff),
-//                                         ),
-//                                       ),
-//                               ),
-//                             ),
-//                           ),
-//                         )
-//                       ],
-//                     ),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//       // bottomNavigationBar: BottomNavigationBar(
-//       //   elevation: 10,
-//       //   iconSize: 30,
-//       //   type: BottomNavigationBarType.fixed,
-//       //   backgroundColor: Colors.white,
-//       //   selectedItemColor: Colors.black,
-//       //   unselectedItemColor: Colors.black,
-//       //   selectedFontSize: 14,
-//       //   unselectedFontSize: 14,
-//       //   onTap: (value) async {
-//       //     if (value == 0) {
-//       //       Navigator.pushNamed(context, '/homePage');
-//       //     }
-//       //     if (value == 1) {
-//       //       Navigator.pushNamed(context, '/wishlistPage');
-//       //     }
-
-//       //     if (value == 2) {
-//       //       Map<String, dynamic> _CartData = {
-//       //         'kindOfFlower': '',
-//       //         'flavour': '',
-//       //         'writeOnCake': '',
-//       //         'pack': ''
-//       //       };
-//       //       await _addToCartModel.getAddToCart('', '', _CartData);
-//       //       Navigator.pushNamed(context, '/cartPage');
-//       //     }
-//       //     if (value == 3) {
-//       //       Navigator.pushNamed(context, '/profilePage');
-//       //     }
-//       //   },
-//       //   items: const [
-//       //     BottomNavigationBarItem(
-//       //       label: 'Home',
-//       //       icon: Iconoir(Iconoir.home_simple),
-//       //       // icon: Icon(DonIcons.wap_home, size: 23),
-//       //     ),
-//       //     BottomNavigationBarItem(label: 'Saved', icon: Iconoir(Iconoir.heart)),
-//       //     BottomNavigationBarItem(
-//       //       label: 'Cart',
-//       //       icon: Iconoir(Iconoir.shopping_bag),
-//       //     ),
-//       //     BottomNavigationBarItem(
-//       //       label: 'Profile',
-//       //       icon: Icon(
-//       //         DonIcons.user_o,
-//       //         size: 23,
-//       //       ),
-//       //     ),
-//       //   ],
-//       // ),
-//     );
-//   }
-// }
 import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -757,7 +23,7 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
   String selectedChip = '';
   bool isAltPhone = false;
   String countryValue = "India";
-  bool _isLoading = false;
+  bool _loading = false;
 
   @override
   void initState() {
@@ -765,207 +31,74 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
     _userAddress =
         UserAddress.fromJson(widget.arguments['userAddress'].toJson());
     selectedChip = _userAddress.label ?? '';
+    isAltPhone = _userAddress.altPhone?.isNotEmpty == true;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final userAddressModel =
-        Provider.of<UserAddressModel>(context, listen: false);
-
-    return WillPopScope(
-      onWillPop: () async {
-        if (widget.arguments['isAddress'] == true) {
-          Navigator.pop(context);
-        } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AddressPage(
-                arguments: {
-                  'cartItems': widget.arguments['cartItems'] ?? [],
-                  'cartTotal': widget.arguments['cartTotal'] ?? '',
-                  'couponValue': widget.arguments['couponValue'] ?? 0,
-                  'isAddress': widget.arguments['isAddress'] ?? false,
-                },
-              ),
-            ),
-          );
-        }
-        return false;
-      },
-      child: Scaffold(
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(),
-                const SizedBox(height: 16),
-                _buildForm(userAddressModel),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Row(
-      children: [
-        IconButton(
-          icon: Image.asset(
-            'assets/images/vector-GJ4.png',
-            height: 15,
-          ),
-          onPressed: () {
-            if (widget.arguments['isAddress'] == true) {
-              Navigator.pop(context);
-            } else {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AddressPage(
-                    arguments: {
-                      'cartItems': widget.arguments['cartItems'] ?? [],
-                      'cartTotal': widget.arguments['cartTotal'] ?? '',
-                      'couponValue': widget.arguments['couponValue'] ?? 0,
-                      'isAddress': widget.arguments['isAddress'] ?? false,
-                    },
-                  ),
-                ),
-              );
-            }
-          },
-        ),
-        Expanded(
-          child: Text(
-            'Update Shipping Address',
-            textAlign: TextAlign.center,
-            style: MyGoogleFontStyle(
-              fontFamily: 'Urbanist',
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF1E232C),
-            ),
-          ),
-        ),
-        const SizedBox(width: 40),
-      ],
-    );
-  }
-
-  Widget _buildForm(UserAddressModel userAddressModel) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: [
-          _buildTextField(
-            initialValue: _userAddress.add1,
-            hintText: 'House No, Building No',
-            validator: (value) =>
-                value!.isEmpty ? 'House No cannot be empty' : null,
-            onSaved: (value) => _userAddress.add1 = value,
-          ),
-          const SizedBox(height: 16),
-          _buildTextField(
-            initialValue: _userAddress.add2,
-            hintText: 'Road, Colony, Area',
-            validator: (value) =>
-                value!.isEmpty ? 'Road, Colony, Area cannot be empty' : null,
-            onSaved: (value) => _userAddress.add2 = value,
-          ),
-          const SizedBox(height: 16),
-          _buildTextField(
-            initialValue: _userAddress.add3,
-            hintText: 'Landmark',
-            validator: (value) =>
-                value!.isEmpty ? 'Landmark cannot be empty' : null,
-            onSaved: (value) => _userAddress.add3 = value,
-          ),
-          const SizedBox(height: 16),
-          _buildCSCPicker(),
-          const SizedBox(height: 16),
-          _buildTextField(
-            initialValue: _userAddress.pincode,
-            hintText: 'Pincode',
-            keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
-              LengthLimitingTextInputFormatter(6),
-            ],
-            validator: (value) {
-              if (value!.isEmpty) return 'Pincode cannot be empty';
-              if (value.length != 6) return 'Pincode must be 6 digits';
-              return null;
-            },
-            onSaved: (value) => _userAddress.pincode = value,
-          ),
-          const SizedBox(height: 16),
-          _buildTextField(
-            initialValue: _userAddress.fullName,
-            hintText: 'Full Name',
-            validator: (value) =>
-                value!.isEmpty ? 'Full Name cannot be empty' : null,
-            onSaved: (value) => _userAddress.fullName = value,
-          ),
-          const SizedBox(height: 16),
-          _buildTextField(
-            initialValue: _userAddress.phone,
-            hintText: 'Phone',
-            keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
-              LengthLimitingTextInputFormatter(10),
-            ],
-            validator: (value) {
-              if (value!.isEmpty) return 'Phone cannot be empty';
-              if (value.length != 10) return 'Phone must be 10 digits';
-              return null;
-            },
-            onSaved: (value) => _userAddress.phone = value,
-          ),
-          const SizedBox(height: 16),
-          _buildAlternatePhoneField(),
-          const SizedBox(height: 16),
-          _buildAddressTypeChips(),
-          const SizedBox(height: 24),
-          _buildSaveButton(userAddressModel),
-        ],
-      ),
-    );
-  }
-
+  // Build styled text field
   Widget _buildTextField({
-    required String? initialValue,
     required String hintText,
-    TextInputType? keyboardType,
+    required String? initialValue,
+    required Function(String?) onSaved,
+    required String? Function(String?) validator,
+    IconData? prefixIcon,
+    TextInputType keyboardType = TextInputType.text,
     List<TextInputFormatter>? inputFormatters,
-    String? Function(String?)? validator,
-    void Function(String?)? onSaved,
   }) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE3E3E3)),
-        color: const Color(0xFFFBFBFB),
+        borderRadius: BorderRadius.circular(14),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: TextFormField(
         initialValue: initialValue,
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,
         decoration: InputDecoration(
-          border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          prefixIcon: prefixIcon != null
+              ? Icon(prefixIcon, color: Color(0xFFC7B456), size: 20)
+              : null,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide(color: Color(0xFFE8E8E8)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide(color: Color(0xFFE8E8E8)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide(color: Color(0xFFC7B456), width: 1.5),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide(color: Colors.red.shade300),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide(color: Colors.red.shade300, width: 1.5),
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           hintText: hintText,
-          hintStyle: const TextStyle(color: Color(0x3F000000)),
+          hintStyle: TextStyle(
+            color: Color(0xFF9E9E9E),
+            fontFamily: 'Urbanist',
+            fontSize: 14,
+          ),
+          filled: true,
+          fillColor: Colors.white,
         ),
         style: MyGoogleFontStyle(
           fontFamily: 'Urbanist',
           fontWeight: FontWeight.w500,
-          color: const Color(0xFF000000),
+          fontSize: 14,
+          color: Color(0xff1A1A1A),
         ),
         validator: validator,
         onSaved: onSaved,
@@ -973,277 +106,919 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
     );
   }
 
-  Widget _buildCSCPicker() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Country: $countryValue',
-          style: MyGoogleFontStyle(
-            fontFamily: 'Urbanist',
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: const Color(0xFF1E232C),
+  // Build section header
+  Widget _buildSectionHeader(String title, IconData icon) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Color(0xFFC7B456).withOpacity(0.15),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: Color(0xFFC7B456), size: 18),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'State: ${_userAddress.state?.isNotEmpty == true ? _userAddress.state : "Not selected"}',
-          style: MyGoogleFontStyle(
-            fontFamily: 'Urbanist',
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: const Color(0xFF1E232C),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'City: ${_userAddress.city?.isNotEmpty == true ? _userAddress.city : "Not selected"}',
-          style: MyGoogleFontStyle(
-            fontFamily: 'Urbanist',
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: const Color(0xFF1E232C),
-          ),
-        ),
-        const SizedBox(height: 16),
-        CSCPicker(
-          layout: Layout.vertical,
-          showStates: true,
-          showCities: true,
-          flagState: CountryFlag.DISABLE,
-          dropdownDecoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.white,
-            border: Border.all(color: Colors.grey.shade300, width: 1),
-          ),
-          disabledDropdownDecoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.grey.shade300,
-            border: Border.all(color: Colors.grey.shade300, width: 1),
-          ),
-          countrySearchPlaceholder: 'Country',
-          stateSearchPlaceholder: 'State',
-          citySearchPlaceholder: 'City',
-          countryDropdownLabel: 'Country',
-          stateDropdownLabel: 'State',
-          cityDropdownLabel: 'City',
-          defaultCountry: CscCountry.India,
-          disableCountry: true,
-          selectedItemStyle: const TextStyle(color: Colors.black, fontSize: 14),
-          dropdownHeadingStyle: const TextStyle(
-            color: Colors.black,
-            fontSize: 17,
-            fontWeight: FontWeight.bold,
-          ),
-          dropdownItemStyle: const TextStyle(color: Colors.black, fontSize: 14),
-          dropdownDialogRadius: 10.0,
-          searchBarRadius: 10.0,
-          onCountryChanged: (value) {
-            setState(() {
-              countryValue = value;
-            });
-          },
-          onStateChanged: (value) {
-            setState(() {
-              _userAddress.state =
-                  value?.isNotEmpty == true ? value : _userAddress.state;
-            });
-          },
-          onCityChanged: (value) {
-            setState(() {
-              _userAddress.city =
-                  value?.isNotEmpty == true ? value : _userAddress.city;
-            });
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAlternatePhoneField() {
-    return Column(
-      children: [
-        if (!isAltPhone)
-          ListTile(
-            leading: const Icon(Icons.add),
-            title: const Text('Add Alternate Phone Number'),
-            onTap: () {
-              setState(() {
-                isAltPhone = true;
-              });
-            },
-          ),
-        if (isAltPhone) ...[
-          _buildTextField(
-            initialValue: _userAddress.altPhone,
-            hintText: 'Alternate Phone Number',
-            keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
-              LengthLimitingTextInputFormatter(10),
-            ],
-            validator: (value) {
-              if (value != null && value.isNotEmpty && value.length != 10) {
-                return 'Alternate Phone must be 10 digits';
-              }
-              return null;
-            },
-            onSaved: (value) => _userAddress.altPhone = value,
-          ),
-          const SizedBox(height: 16),
-          ListTile(
-            leading: const Icon(Icons.remove),
-            title: const Text('Remove Alternate Phone Number'),
-            onTap: () {
-              setState(() {
-                isAltPhone = false;
-                _userAddress.altPhone = null;
-              });
-            },
+          SizedBox(width: 10),
+          Text(
+            title,
+            style: TextStyle(
+              fontFamily: 'Urbanist',
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF1A1A1A),
+            ),
           ),
         ],
-      ],
+      ),
     );
   }
 
-  Widget _buildAddressTypeChips() {
-    return Wrap(
-      spacing: 8.0,
-      children: [
-        ChoiceChip(
-          selected: selectedChip == 'Home',
-          onSelected: (selected) {
-            setState(() {
-              selectedChip = selected ? 'Home' : '';
-              _userAddress.label =
-                  selectedChip.isNotEmpty ? selectedChip : null;
-            });
-          },
-          selectedColor: Colors.green,
-          label: const SizedBox(
-            width: 80,
-            child: Row(
-              children: [
-                Icon(Icons.home),
-                SizedBox(width: 10),
-                Text('Home'),
-              ],
-            ),
+  void _navigateBack() {
+    if (widget.arguments['isAddress'] == true) {
+      Navigator.pop(context);
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AddressPage(
+            arguments: {
+              'cartItems': widget.arguments['cartItems'] ?? [],
+              'cartTotal': widget.arguments['cartTotal'] ?? '',
+              'couponValue': widget.arguments['couponValue'] ?? 0,
+              'isAddress': widget.arguments['isAddress'] ?? false,
+            },
           ),
         ),
-        ChoiceChip(
-          selected: selectedChip == 'Work',
-          onSelected: (selected) {
-            setState(() {
-              selectedChip = selected ? 'Work' : '';
-              _userAddress.label =
-                  selectedChip.isNotEmpty ? selectedChip : null;
-            });
-          },
-          selectedColor: Colors.blue,
-          label: const SizedBox(
-            width: 80,
-            child: Row(
-              children: [
-                Icon(Icons.work),
-                SizedBox(width: 10),
-                Text('Work'),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
+      );
+    }
   }
 
-  Widget _buildSaveButton(UserAddressModel userAddressModel) {
-    return SizedBox(
-      width: double.infinity,
-      height: 50,
-      child: TextButton(
-        onPressed: _isLoading
-            ? null
-            : () async {
-                if (_formKey.currentState!.validate()) {
-                  _formKey.currentState!.save();
-                  if (selectedChip.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Please select address type')),
-                    );
-                    return;
-                  }
-                  setState(() => _isLoading = true);
-                  try {
-                    final success = await userAddressModel.updateUserAddress(
-                        userAddress: _userAddress);
-                    if (success && mounted) {
-                      // Refresh the addresses list
-                      await userAddressModel.getUserAddresses();
+  @override
+  Widget build(BuildContext context) {
+    final UserAddressModel _userAddressModel =
+        Provider.of<UserAddressModel>(context, listen: false);
 
-                      // Navigate back based on where we came from
-                      if (widget.arguments['isAddress'] == true) {
-                        // If coming from checkout flow, go back to address selection
-                        Navigator.pop(context);
-                      } else {
-                        // If coming from profile, replace with AddressPage
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AddressPage(
-                              arguments: {
-                                'cartItems':
-                                    widget.arguments['cartItems'] ?? [],
-                                'cartTotal':
-                                    widget.arguments['cartTotal'] ?? '',
-                                'couponValue':
-                                    widget.arguments['couponValue'] ?? 0,
-                                'isAddress':
-                                    widget.arguments['isAddress'] ?? false,
-                              },
+    return WillPopScope(
+      onWillPop: () async {
+        _navigateBack();
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: Color(0xFFF8F9FA),
+        body: SafeArea(
+          child: Column(
+            children: [
+              // Header
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    InkWell(
+                      onTap: _navigateBack,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFF5F5F5),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          size: 18,
+                          color: Color(0xFF1A1A1A),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Update Address',
+                            style: TextStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF1A1A1A),
                             ),
                           ),
-                        );
-                      }
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Failed to update address')),
-                      );
-                    }
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error: $e')),
-                    );
-                  } finally {
-                    if (mounted) setState(() => _isLoading = false);
-                  }
-                }
-              },
-        style: TextButton.styleFrom(
-          backgroundColor: const Color(0xFF1E1E1E),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        ),
-        child: _isLoading
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              )
-            : Text(
-                'Update Address',
-                style: MyGoogleFontStyle(
-                  fontFamily: 'Urbanist',
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                          SizedBox(height: 2),
+                          Text(
+                            'Edit your delivery details',
+                            style: TextStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF888888),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Color(0xFFD4C76A), Color(0xFFC7B456)],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.edit_location_rounded,
+                        size: 20,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
               ),
+
+              // Form Content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(16),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Address Details Section
+                        Container(
+                          padding: EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.04),
+                                blurRadius: 10,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildSectionHeader(
+                                  'Address Details', Icons.home_rounded),
+                              SizedBox(height: 4),
+                              _buildTextField(
+                                hintText: 'House No, Building Name',
+                                initialValue: _userAddress.add1,
+                                prefixIcon: Icons.apartment_rounded,
+                                onSaved: (value) => _userAddress.add1 = value,
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return "House No, Building name is required";
+                                  }
+                                  return null;
+                                },
+                              ),
+                              SizedBox(height: 14),
+                              _buildTextField(
+                                hintText: 'Road, Colony, Area',
+                                initialValue: _userAddress.add2,
+                                prefixIcon: Icons.route_rounded,
+                                onSaved: (value) => _userAddress.add2 = value,
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return "Road, Colony, Area is required";
+                                  }
+                                  return null;
+                                },
+                              ),
+                              SizedBox(height: 14),
+                              _buildTextField(
+                                hintText: 'Landmark (Near...)',
+                                initialValue: _userAddress.add3,
+                                prefixIcon: Icons.place_rounded,
+                                onSaved: (value) => _userAddress.add3 = value,
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return "Landmark is required";
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(height: 16),
+
+                        // Current Location Info
+                        Container(
+                          padding: EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFC7B456).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Color(0xFFC7B456).withOpacity(0.3),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.info_outline_rounded,
+                                      color: Color(0xFFC7B456), size: 18),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Current Location',
+                                    style: TextStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFFC7B456),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  _buildInfoChip(
+                                      'Country', countryValue, Icons.flag_rounded),
+                                  SizedBox(width: 8),
+                                  _buildInfoChip(
+                                      'State',
+                                      _userAddress.state ?? 'Not set',
+                                      Icons.map_rounded),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              _buildInfoChip(
+                                  'City',
+                                  _userAddress.city ?? 'Not set',
+                                  Icons.location_city_rounded),
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(height: 16),
+
+                        // Location Section
+                        Container(
+                          padding: EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.04),
+                                blurRadius: 10,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildSectionHeader(
+                                  'Update Location', Icons.my_location_rounded),
+                              SizedBox(height: 4),
+                              CSCPicker(
+                                layout: Layout.vertical,
+                                showStates: true,
+                                showCities: true,
+                                flagState: CountryFlag.DISABLE,
+                                dropdownDecoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(14),
+                                  color: Colors.white,
+                                  border: Border.all(color: Color(0xFFE8E8E8)),
+                                ),
+                                disabledDropdownDecoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(14),
+                                  color: Color(0xFFF5F5F5),
+                                  border: Border.all(color: Color(0xFFE8E8E8)),
+                                ),
+                                countrySearchPlaceholder: "Search Country",
+                                stateSearchPlaceholder: "Search State",
+                                citySearchPlaceholder: "Search City",
+                                countryDropdownLabel: "Select Country",
+                                stateDropdownLabel: "Select State",
+                                cityDropdownLabel: "Select City",
+                                defaultCountry: CscCountry.India,
+                                disableCountry: true,
+                                selectedItemStyle: TextStyle(
+                                  color: Color(0xFF1A1A1A),
+                                  fontSize: 14,
+                                  fontFamily: 'Urbanist',
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                dropdownHeadingStyle: TextStyle(
+                                  color: Color(0xFF1A1A1A),
+                                  fontSize: 17,
+                                  fontFamily: 'Urbanist',
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                dropdownItemStyle: TextStyle(
+                                  color: Color(0xFF1A1A1A),
+                                  fontSize: 14,
+                                  fontFamily: 'Urbanist',
+                                ),
+                                dropdownDialogRadius: 16.0,
+                                searchBarRadius: 14.0,
+                                onCountryChanged: (value) {
+                                  setState(() {
+                                    countryValue = value;
+                                  });
+                                },
+                                onStateChanged: (value) {
+                                  setState(() {
+                                    if (value != null && value.isNotEmpty) {
+                                      _userAddress.state = value;
+                                    }
+                                  });
+                                },
+                                onCityChanged: (value) {
+                                  setState(() {
+                                    if (value != null && value.isNotEmpty) {
+                                      _userAddress.city = value;
+                                    }
+                                  });
+                                },
+                              ),
+                              SizedBox(height: 14),
+                              _buildTextField(
+                                hintText: 'Pincode',
+                                initialValue: _userAddress.pincode,
+                                prefixIcon: Icons.pin_drop_rounded,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(6),
+                                ],
+                                onSaved: (value) => _userAddress.pincode = value,
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return "Pincode is required";
+                                  }
+                                  if (value.length != 6) {
+                                    return "Pincode must be 6 digits";
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(height: 16),
+
+                        // Contact Details Section
+                        Container(
+                          padding: EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.04),
+                                blurRadius: 10,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildSectionHeader(
+                                  'Contact Details', Icons.contact_phone_rounded),
+                              SizedBox(height: 4),
+                              _buildTextField(
+                                hintText: 'Full Name',
+                                initialValue: _userAddress.fullName,
+                                prefixIcon: Icons.person_rounded,
+                                onSaved: (value) =>
+                                    _userAddress.fullName = value,
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return "Full name is required";
+                                  }
+                                  return null;
+                                },
+                              ),
+                              SizedBox(height: 14),
+                              _buildTextField(
+                                hintText: 'Phone Number',
+                                initialValue: _userAddress.phone,
+                                prefixIcon: Icons.phone_rounded,
+                                keyboardType: TextInputType.phone,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(10),
+                                ],
+                                onSaved: (value) => _userAddress.phone = value,
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return "Phone number is required";
+                                  }
+                                  if (value.length != 10) {
+                                    return "Phone number must be 10 digits";
+                                  }
+                                  return null;
+                                },
+                              ),
+                              SizedBox(height: 14),
+
+                              // Alternate Phone Toggle
+                              if (!isAltPhone)
+                                InkWell(
+                                  onTap: () =>
+                                      setState(() => isAltPhone = true),
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFFC7B456).withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(
+                                        color:
+                                            Color(0xFFC7B456).withOpacity(0.3),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.add_circle_outline_rounded,
+                                            color: Color(0xFFC7B456), size: 18),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Add Alternate Phone',
+                                          style: TextStyle(
+                                            fontFamily: 'Urbanist',
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFFC7B456),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+
+                              if (isAltPhone) ...[
+                                _buildTextField(
+                                  hintText: 'Alternate Phone Number',
+                                  initialValue: _userAddress.altPhone,
+                                  prefixIcon: Icons.phone_android_rounded,
+                                  keyboardType: TextInputType.phone,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    LengthLimitingTextInputFormatter(10),
+                                  ],
+                                  onSaved: (value) =>
+                                      _userAddress.altPhone = value,
+                                  validator: (value) {
+                                    if (value != null &&
+                                        value.isNotEmpty &&
+                                        value.length != 10) {
+                                      return "Phone number must be 10 digits";
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                SizedBox(height: 10),
+                                InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      isAltPhone = false;
+                                      _userAddress.altPhone = '';
+                                    });
+                                  },
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(
+                                        color: Colors.red.withOpacity(0.3),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.remove_circle_outline_rounded,
+                                            color: Colors.red, size: 18),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Remove Alternate Phone',
+                                          style: TextStyle(
+                                            fontFamily: 'Urbanist',
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.red,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(height: 16),
+
+                        // Address Type Section
+                        Container(
+                          padding: EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.04),
+                                blurRadius: 10,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildSectionHeader(
+                                  'Address Type', Icons.label_rounded),
+                              SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          selectedChip = 'Home';
+                                          _userAddress.label = selectedChip;
+                                        });
+                                      },
+                                      child: AnimatedContainer(
+                                        duration: Duration(milliseconds: 200),
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 16, horizontal: 16),
+                                        decoration: BoxDecoration(
+                                          gradient: selectedChip == 'Home'
+                                              ? LinearGradient(
+                                                  colors: [
+                                                    Color(0xFF4CAF50),
+                                                    Color(0xFF66BB6A)
+                                                  ],
+                                                )
+                                              : null,
+                                          color: selectedChip != 'Home'
+                                              ? Color(0xFFF5F5F5)
+                                              : null,
+                                          borderRadius:
+                                              BorderRadius.circular(14),
+                                          border: Border.all(
+                                            color: selectedChip == 'Home'
+                                                ? Colors.transparent
+                                                : Color(0xFFE8E8E8),
+                                          ),
+                                          boxShadow: selectedChip == 'Home'
+                                              ? [
+                                                  BoxShadow(
+                                                    color: Color(0xFF4CAF50)
+                                                        .withOpacity(0.3),
+                                                    blurRadius: 8,
+                                                    offset: Offset(0, 4),
+                                                  ),
+                                                ]
+                                              : null,
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.home_rounded,
+                                              color: selectedChip == 'Home'
+                                                  ? Colors.white
+                                                  : Color(0xFF666666),
+                                              size: 22,
+                                            ),
+                                            SizedBox(width: 10),
+                                            Text(
+                                              'Home',
+                                              style: TextStyle(
+                                                fontFamily: 'Urbanist',
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w600,
+                                                color: selectedChip == 'Home'
+                                                    ? Colors.white
+                                                    : Color(0xFF666666),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 12),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          selectedChip = 'Work';
+                                          _userAddress.label = selectedChip;
+                                        });
+                                      },
+                                      child: AnimatedContainer(
+                                        duration: Duration(milliseconds: 200),
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 16, horizontal: 16),
+                                        decoration: BoxDecoration(
+                                          gradient: selectedChip == 'Work'
+                                              ? LinearGradient(
+                                                  colors: [
+                                                    Color(0xFF2196F3),
+                                                    Color(0xFF42A5F5)
+                                                  ],
+                                                )
+                                              : null,
+                                          color: selectedChip != 'Work'
+                                              ? Color(0xFFF5F5F5)
+                                              : null,
+                                          borderRadius:
+                                              BorderRadius.circular(14),
+                                          border: Border.all(
+                                            color: selectedChip == 'Work'
+                                                ? Colors.transparent
+                                                : Color(0xFFE8E8E8),
+                                          ),
+                                          boxShadow: selectedChip == 'Work'
+                                              ? [
+                                                  BoxShadow(
+                                                    color: Color(0xFF2196F3)
+                                                        .withOpacity(0.3),
+                                                    blurRadius: 8,
+                                                    offset: Offset(0, 4),
+                                                  ),
+                                                ]
+                                              : null,
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.work_rounded,
+                                              color: selectedChip == 'Work'
+                                                  ? Colors.white
+                                                  : Color(0xFF666666),
+                                              size: 22,
+                                            ),
+                                            SizedBox(width: 10),
+                                            Text(
+                                              'Work',
+                                              style: TextStyle(
+                                                fontFamily: 'Urbanist',
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w600,
+                                                color: selectedChip == 'Work'
+                                                    ? Colors.white
+                                                    : Color(0xFF666666),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(height: 24),
+
+                        // Update Button
+                        GestureDetector(
+                          onTap: _loading
+                              ? null
+                              : () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    _formKey.currentState!.save();
+                                    if (_userAddress.label == null ||
+                                        _userAddress.label == '') {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) =>
+                                            AlertDialog(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                          ),
+                                          title: Row(
+                                            children: [
+                                              Icon(Icons.warning_amber_rounded,
+                                                  color: Colors.orange),
+                                              SizedBox(width: 10),
+                                              Text(
+                                                'Address Type Required',
+                                                style: TextStyle(
+                                                  fontFamily: 'Urbanist',
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          content: Text(
+                                            'Please select whether this is a Home or Work address.',
+                                            style: TextStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontSize: 14,
+                                              color: Color(0xFF666666),
+                                            ),
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context),
+                                              child: Text(
+                                                'OK',
+                                                style: TextStyle(
+                                                  fontFamily: 'Urbanist',
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Color(0xFFC7B456),
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      );
+                                    } else {
+                                      setState(() => _loading = true);
+                                      bool response = await _userAddressModel
+                                          .updateUserAddress(
+                                              userAddress: _userAddress);
+                                      if (response == true) {
+                                        await _userAddressModel
+                                            .getUserAddresses();
+
+                                        if (widget.arguments['isAddress'] ==
+                                            true) {
+                                          Navigator.pop(context);
+                                        } else {
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => AddressPage(
+                                                arguments: {
+                                                  'cartItems':
+                                                      widget.arguments[
+                                                              'cartItems'] ??
+                                                          [],
+                                                  'cartTotal':
+                                                      widget.arguments[
+                                                              'cartTotal'] ??
+                                                          '',
+                                                  'couponValue':
+                                                      widget.arguments[
+                                                              'couponValue'] ??
+                                                          0,
+                                                  'isAddress':
+                                                      widget.arguments[
+                                                              'isAddress'] ??
+                                                          false,
+                                                },
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      }
+                                      setState(() => _loading = false);
+                                    }
+                                  }
+                                },
+                          child: Container(
+                            width: double.infinity,
+                            height: 56,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Color(0xFFD4C76A),
+                                  Color(0xFFC7B456),
+                                  Color(0xFFAA9A40)
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0xFFC7B456).withOpacity(0.4),
+                                  blurRadius: 12,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Center(
+                              child: _loading
+                                  ? SizedBox(
+                                      height: 24,
+                                      width: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                Colors.white),
+                                      ),
+                                    )
+                                  : Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.check_circle_rounded,
+                                            color: Colors.white, size: 22),
+                                        SizedBox(width: 10),
+                                        Text(
+                                          'Update Address',
+                                          style: TextStyle(
+                                            fontFamily: 'Urbanist',
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(String label, String value, IconData icon) {
+    return Expanded(
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: Color(0xFFC7B456), size: 16),
+            SizedBox(width: 6),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF888888),
+                    ),
+                  ),
+                  Text(
+                    value,
+                    style: TextStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1A1A1A),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

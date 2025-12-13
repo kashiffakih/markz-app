@@ -707,6 +707,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             'Delivery charge', order['delivery_amount']?.toString() ?? '0'),
         _buildCostRow(
             'Packing charge', order['packaging_amount']?.toString() ?? '0'),
+        if ((double.tryParse(order['platform_fee']?.toString() ?? '0') ?? 0) >
+            0)
+          _buildCostRow(
+              'Platform Fee', order['platform_fee']?.toString() ?? '0'),
         _buildCostRow('Coupon Value', order['coupon_amount']?.toString() ?? '0',
             isNegative: true),
         _buildCostRow('Reward', order['wallet_amount_used']?.toString() ?? '0',
@@ -965,7 +969,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   void _showCancelConfirmation(BuildContext context, int? orderId) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -990,7 +994,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(dialogContext).pop(),
               child: Text(
                 'No',
                 style: MyGoogleFontStyle(
@@ -1002,16 +1006,11 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _cancelOrder(context, orderId);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        OrdersPage(isProfile: {'isProfile': true}),
-                  ),
-                );
+              onPressed: () async {
+                // Close the dialog first
+                Navigator.of(dialogContext).pop();
+                // Wait for cancel operation to complete
+                await _cancelOrder(context, orderId);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
@@ -1037,12 +1036,14 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
 
   Future<void> _cancelOrder(BuildContext context, int? orderId) async {
     if (orderId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Invalid order ID'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Invalid order ID'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
       return;
     }
 
@@ -1054,34 +1055,45 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       final orderModel = Provider.of<OrderModel>(context, listen: false);
       bool success = await orderModel.cancelOrder(orderId);
 
-      if (success) {
+      if (mounted) {
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Order cancelled successfully'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          // Navigate to Orders page after successful cancellation
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OrdersPage(isProfile: {'isProfile': true}),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to cancel order. Please try again.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Order cancelled successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        // Navigate back to refresh the previous screen
-        Navigator.of(context).pop(true);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to cancel order. Please try again.'),
+            content: Text('Error cancelling order: $e'),
             backgroundColor: Colors.red,
           ),
         );
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error cancelling order: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 }

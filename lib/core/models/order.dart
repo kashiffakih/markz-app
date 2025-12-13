@@ -49,6 +49,7 @@ class Order {
   String? rpyMessage;
   bool? isGift;
   String? deliveryMethod;
+  num? platformFee;
   User? user;
   List<OrderDetails>? orderDetails;
   List<OrderStatuses>? orderStatuses;
@@ -102,6 +103,7 @@ class Order {
       this.rpyMessage,
       this.isGift,
       this.deliveryMethod,
+      this.platformFee,
       this.user,
       this.orderDetails,
       this.orderStatuses,
@@ -155,6 +157,9 @@ class Order {
     rpyCode = json['rpy_code'];
     rpyMessage = json['rpy_message'];
     deliveryMethod = json['delivery_method'];
+    platformFee = json['platform_fee'] != null
+        ? num.tryParse(json['platform_fee'].toString())
+        : null;
     // Convert is_gift from int (0/1) to bool
     isGift = json['is_gift'] == 1 || json['is_gift'] == true;
 
@@ -264,6 +269,7 @@ class Order {
     data['rpy_message'] = this.rpyMessage;
     data['is_gift'] = this.isGift;
     data['delivery_method'] = this.deliveryMethod;
+    data['platform_fee'] = this.platformFee;
     if (this.user != null) {
       data['user'] = this.user!.toJson();
     }
@@ -611,6 +617,7 @@ class Company {
   String? shortCategory;
   int? isAvailable;
   String? imagepath;
+  num? platformFee;
 
   Company(
       {this.id,
@@ -658,6 +665,7 @@ class Company {
       this.freeDeliveryApplicable,
       this.freeDeliveryMinAmount,
       this.dineInMinAmount,
+      this.platformFee,
       this.shortCategory,
       this.isAvailable,
       this.imagepath});
@@ -711,6 +719,9 @@ class Company {
     shortCategory = json['short_category'];
     isAvailable = json['is_available'];
     imagepath = json['imagepath'];
+    platformFee = json['platform_fee'] != null
+        ? num.tryParse(json['platform_fee'].toString())
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -763,6 +774,7 @@ class Company {
     data['short_category'] = this.shortCategory;
     data['is_available'] = this.isAvailable;
     data['imagepath'] = this.imagepath;
+    data['platform_fee'] = this.platformFee;
     return data;
   }
 }

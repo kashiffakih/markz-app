@@ -20,7 +20,13 @@ class AuthModel with ChangeNotifier {
   bool get loading => _loading;
   Future<Map<String, dynamic>> login(
       {required Map<String, dynamic> loginData}) async {
-    String? token = await _firebaseMessaging.getToken();
+    String? token;
+    try {
+      token = await _firebaseMessaging.getToken();
+    } catch (e) {
+      debugPrint('Failed to get FCM token: $e');
+      token = null;
+    }
     loginData['fcm_token'] = token;
     print(token);
     return await _authService.getLoggedInUser(

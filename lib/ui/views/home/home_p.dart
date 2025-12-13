@@ -19,6 +19,7 @@ import 'package:aadab/ui/widgets/drawer_w.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:aadab/ui/widgets/image_zoom_w.dart';
 import 'package:aadab/ui/widgets/login_required_popup.dart';
+import 'package:aadab/ui/widgets/welcome_bonus_popup.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
@@ -61,10 +62,72 @@ class _HomePageState extends State<HomePage>
     'is_add_to_cart': false
   };
 
+  bool _welcomePopupShownThisSession = false;
+
   @override
   void initState() {
     super.initState();
     _initializeData();
+    _checkAndShowWelcomeBonus();
+  }
+
+  Future<void> _checkAndShowWelcomeBonus() async {
+    final configModel = locator<ConfigModel>();
+
+    // Wait for user data to be available
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    if (!mounted) return;
+
+    // TODO: Remove this testing block after testing
+    // ============ TESTING: Always show popup ============
+    if (!_welcomePopupShownThisSession) {
+      _welcomePopupShownThisSession = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _showWelcomeBonusDialog(configModel);
+        }
+      });
+      return;
+    }
+    // ============ END TESTING ============
+
+    // Check if user is logged in and is a new user
+    if (configModel.user != null) {
+      await configModel.checkAndSetNewUserStatus();
+
+      // Show welcome bonus popup for new users
+      if (configModel.showWelcomeBonus && !_welcomePopupShownThisSession) {
+        _welcomePopupShownThisSession = true;
+
+        // Show the popup after the page has loaded
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _showWelcomeBonusDialog(configModel);
+          }
+        });
+      }
+    }
+  }
+
+  void _showWelcomeBonusDialog(ConfigModel configModel) {
+    final userName = configModel.user?.firstName ?? 'User';
+    final productModel = context.read<ProductModel>();
+
+    // Get register bonus from settings, default to 100 if not available
+    int bonusPoints = 100;
+    if (productModel.banners != null && productModel.banners!['register_bonus'] != null) {
+      bonusPoints = int.tryParse(productModel.banners!['register_bonus'].toString()) ?? 100;
+    }
+
+    showWelcomeBonusPopup(
+      context: context,
+      userName: userName,
+      bonusPoints: bonusPoints,
+    );
+
+    // Mark welcome bonus as shown after displaying
+    configModel.setWelcomeBonusShown(true);
   }
 
   Future<void> _initializeData() async {
