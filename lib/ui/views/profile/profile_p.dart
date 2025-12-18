@@ -18,6 +18,9 @@ import 'package:aadab/core/providers/wish_list_pr.dart';
 import 'package:aadab/locator.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 import 'package:aadab/ui/views/profile/widgets/photo_picker_w.dart';
+import 'package:aadab/ui/views/products/shops_p.dart';
+import 'package:aadab/ui/widgets/login_required_popup.dart';
+import 'package:badges/badges.dart' as badges;
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -27,51 +30,18 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  bool _isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    setState(() => _isLoading = true);
-    try {
-      final productId = '';
-      final cartData = {
-        'kindOfFlower': '',
-        'flavour': '',
-        'writeOnCake': '',
-        'pack': '',
-      };
-      await Future.wait<void>([
-        Provider.of<ReviewModel>(context, listen: false)
-            .getMyReviews('', productId, '', '', []),
-        Provider.of<WishListModel>(context, listen: false)
-            .getWishLists(productId),
-        Provider.of<OrderModel>(context, listen: false).getOrder(),
-        Provider.of<AddToCartModel>(context, listen: false)
-            .getAddToCart(productId, '', cartData),
-        Provider.of<UserAddressModel>(context, listen: false)
-            .getUserAddresses(),
-        Provider.of<UserWalletModel>(context, listen: false).getMyUserWallets(),
-      ]);
-    } catch (e) {
-      if (mounted) {
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(content: Text('Failed to load data: $e')),
-        // );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
+  static const double _bottomNavBarHeight = 70.0;
+  static const int _bottomNavIconSize = 23;
 
   @override
   Widget build(BuildContext context) {
     final configModel = locator<ConfigModel>();
+    final addToCartModel = Provider.of<AddToCartModel>(context);
+    final cartCount = addToCartModel.addToCarts?.length ?? 0;
+
     return Scaffold(
+      bottomNavigationBar: _buildBottomNavigationBar(
+          context, configModel, addToCartModel, cartCount),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -92,52 +62,17 @@ class _ProfilePageState extends State<ProfilePage> {
             }
           },
           child: SafeArea(
-            child: _isLoading
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xFFEED056).withOpacity(0.15),
-                                blurRadius: 20,
-                                offset: Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
-                            strokeWidth: 3,
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Text(
-                          'Loading Profile...',
-                          style: MyGoogleFontStyle(
-                            fontFamily: 'Urbanist',
-                            fontSize: 16.0.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xff232323),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : SingleChildScrollView(
-                    child: Container(
-                      child: Column(
-                        children: [
-                          _buildHeader(context, configModel),
-                          _buildBody(context),
-                        ],
-                      ),
-                    ),
-                  ),
+            child: SingleChildScrollView(
+              child: Container(
+                child: Column(
+                  children: [
+                    _buildHeader(context, configModel),
+                    _buildQuickLinks(context, configModel),
+                    _buildBody(context, configModel),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),
@@ -146,130 +81,135 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildHeader(BuildContext context, ConfigModel configModel) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 20.0.w, vertical: 10.0.w),
       width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFFEED056),
+            Color(0xFFF6E27F),
+          ],
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(30.r),
+          bottomRight: Radius.circular(30.r),
+        ),
+      ),
+      padding: EdgeInsets.fromLTRB(20.w, 10.w, 20.w, 30.w),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              InkWell(
-                onTap: () =>
-                    Navigator.pushReplacementNamed(context, '/homePage'),
-                child: Container(
-                  padding: EdgeInsets.all(8.0.w),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color(0xFFEED056).withOpacity(0.15),
-                        blurRadius: 8,
-                        offset: Offset(0, 2),
+          SafeArea(
+            bottom: false,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InkWell(
+                  onTap: () =>
+                      Navigator.pushReplacementNamed(context, '/homePage'),
+                  child: Container(
+                    padding: EdgeInsets.all(8.0.w),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.3),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.arrow_back,
+                      size: 20.0.sp,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Text(
+                        'Hello,',
+                        style: MyGoogleFontStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 16.0.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ),
+                      Text(
+                        configModel.user?.firstName?.toString() ?? 'Guest',
+                        style: MyGoogleFontStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 22.0.sp,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
                       ),
                     ],
                   ),
-                  child: Icon(
-                    Icons.arrow_back_ios_new,
-                    size: 16.0.sp,
-                    color: const Color(0xffEED056),
-                  ),
                 ),
-              ),
-              Expanded(
-                child: Text(
-                  'My Profile',
-                  textAlign: TextAlign.center,
-                  style: MyGoogleFontStyle(
-                    fontFamily: 'Urbanist',
-                    fontSize: 20.0.sp,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xff1e232c),
-                  ),
-                ),
-              ),
-              SizedBox(width: 48.0.w),
-            ],
+                // Placeholder for balance spacing or slight offset
+                SizedBox(width: 40.w),
+              ],
+            ),
           ),
-          Row(
+          SizedBox(height: 20.w),
+          Stack(
+            alignment: Alignment.center,
             children: [
-              PhotoPickerWidget(),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      configModel.user?.firstName?.toString() ?? 'Anonymous',
-                      style: MyGoogleFontStyle(
-                        fontFamily: 'Urbanist',
-                        fontSize: 16.0.sp,
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xff303030),
-                      ),
-                    ),
-                    Text(
-                      configModel.user?.email?.toString() ?? 'No email',
-                      style: MyGoogleFontStyle(
-                        fontFamily: 'Urbanist',
-                        fontSize: 14.0.sp,
-                        fontWeight: FontWeight.w400,
-                        color: const Color(0xff808080),
-                      ),
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 3),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      spreadRadius: 2,
                     ),
                   ],
                 ),
-              ),
-              TextButton(
-                onPressed: () => _showLogoutDialog(context, configModel),
-                style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                child: Container(
-                  width: 80.0.w,
-                  height: 35.0.w,
-                  decoration: BoxDecoration(
-                    color: const Color(0xff1e1e1e),
-                    borderRadius: BorderRadius.circular(10.0.r),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Logout',
-                      style: MyGoogleFontStyle(
-                        fontFamily: 'Urbanist',
-                        fontSize: 15.0.sp,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
+                child: PhotoPickerWidget(),
               ),
             ],
+          ),
+          SizedBox(height: 10.w),
+          Text(
+            configModel.user?.email?.toString() ?? '',
+            style: MyGoogleFontStyle(
+              fontFamily: 'Urbanist',
+              fontSize: 14.0.sp,
+              fontWeight: FontWeight.w500,
+              color: Colors.white.withOpacity(0.9),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildBody(BuildContext context) {
-    final orderModel = Provider.of<OrderModel>(context, listen: false);
-    final userWalletModel =
-        Provider.of<UserWalletModel>(context, listen: false);
-    final wishListModel = Provider.of<WishListModel>(context, listen: false);
-    final addToCartModel = Provider.of<AddToCartModel>(context, listen: false);
-    final reviewModel = Provider.of<ReviewModel>(context, listen: false);
-    final userAddressModel =
-        Provider.of<UserAddressModel>(context, listen: false);
-
+  Widget _buildQuickLinks(BuildContext context, ConfigModel configModel) {
+    // Flipkart/Amazon style grid row
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 20.0.w, vertical: 20.0.w),
-      child: Column(
+      margin: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 10.w),
+      padding: EdgeInsets.symmetric(vertical: 20.w, horizontal: 10.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 15,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildProfileItem(
-            context: context,
-            title: 'My Orders',
-            subtitle: orderModel.orders.isEmpty
-                ? 'My Order is empty'
-                : 'Already have ${orderModel.orders.length} orders',
-            onTap: () => Navigator.push(
+          _buildQuickLinkItem(
+            context,
+            'Orders',
+            Icons.move_to_inbox_rounded,
+            Colors.blue,
+            () => Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) =>
@@ -277,149 +217,235 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
           ),
-          _buildProfileItem(
-            context: context,
-            title: 'Rewards',
-            subtitle:
-                'Total earn ${userWalletModel.totalEarnPoint.toString()} points',
-            onTap: () => Navigator.pushNamed(context, '/rewardsPage'),
+          _buildQuickLinkItem(
+            context,
+            'Wishlist',
+            Icons.favorite_rounded,
+            Colors.pink,
+            () => Navigator.pushNamed(context, '/wishlistPage'),
           ),
-          _buildProfileItem(
-            context: context,
-            title: 'Wishlist',
-            subtitle: wishListModel.wishLists?.isEmpty ?? true
-                ? 'Wishlist is empty'
-                : 'Already have ${wishListModel.wishLists!.length} items',
-            onTap: () => Navigator.pushNamed(context, '/wishlistPage'),
+          _buildQuickLinkItem(
+            context,
+            'Wallet',
+            Icons.account_balance_wallet_rounded,
+            Colors.orange,
+            () => Navigator.pushNamed(context, '/rewardsPage'),
           ),
-          _buildProfileItem(
-            context: context,
-            title: 'My Cart',
-            subtitle: addToCartModel.addToCartLoader ||
-                    (addToCartModel.addToCarts?.isEmpty ?? true)
-                ? 'My Cart is empty'
-                : 'Already have ${addToCartModel.addToCarts!.length} products',
-            onTap: () async {
-              final cartData = {
-                'kindOfFlower': '',
-                'flavour': '',
-                'writeOnCake': '',
-                'pack': '',
-              };
-              await addToCartModel.getAddToCart('', '', cartData);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      CartPage(isProfile: {'isProfile': true}),
-                ),
-              );
-            },
-          ),
-          _buildProfileItem(
-            context: context,
-            title: 'My Reviews',
-            subtitle: reviewModel.reviewLoader ||
-                    (reviewModel.reviews?.isEmpty ?? true)
-                ? 'My review is empty'
-                : 'Already have ${reviewModel.reviews!.length} reviews',
-            onTap: () =>
-                Navigator.pushNamed(context, '/reviewsPage', arguments: {
-              'is_edit': true,
-              'is_popup': true,
-            }),
-          ),
-          _buildProfileItem(
-            context: context,
-            title: 'Shipping Addresses',
-            subtitle: userAddressModel.userAddressesLoader ||
-                    (userAddressModel.userAddresses?.isEmpty ?? true)
-                ? 'Shipping address is empty'
-                : 'Already have ${userAddressModel.userAddresses!.length} addresses',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AddressPage(arguments: {
-                  'cartItems': [],
-                  'cartTotal': '',
-                  'couponValue': 0,
-                  'isAddress': false,
-                }),
-              ),
-            ),
-          ),
-          _buildProfileItem(
-            context: context,
-            title: 'Contact Us',
-            subtitle: 'Email & Whatsapp',
-            onTap: () => Navigator.pushNamed(context, '/contactPage'),
-          ),
-          _buildProfileItem(
-            context: context,
-            title: 'Settings',
-            subtitle: 'Update your profile',
-            onTap: () => Navigator.pushNamed(context, '/settingsPage'),
+          _buildQuickLinkItem(
+            context,
+            'Help',
+            Icons.headset_mic_rounded,
+            Colors.teal,
+            () => Navigator.pushNamed(context, '/contactPage'),
           ),
         ],
       ),
     );
   }
 
+  Widget _buildQuickLinkItem(BuildContext context, String title, IconData icon,
+      Color color, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 24.sp),
+          ),
+          SizedBox(height: 8.w),
+          Text(
+            title,
+            style: MyGoogleFontStyle(
+              fontFamily: 'Urbanist',
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w600,
+              color: Color(0xff232323),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBody(BuildContext context, ConfigModel configModel) {
+    // Grouped List for "Amazon/Flipkart" feel
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 20.0.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle('Account Settings'),
+          Container(
+            decoration: _boxDecoration(),
+            child: Column(
+              children: [
+                _buildProfileItem(
+                  context: context,
+                  title: 'Edit Profile',
+                  icon: Icons.person_outline_rounded,
+                  onTap: () => Navigator.pushNamed(context, '/settingsPage'),
+                ),
+                _buildDivider(),
+                _buildProfileItem(
+                  context: context,
+                  title: 'Saved Addresses',
+                  icon: Icons.location_on_outlined,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddressPage(arguments: {
+                        'cartItems': [],
+                        'cartTotal': '',
+                        'couponValue': 0,
+                        'isAddress': false,
+                      }),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 20.w),
+          _buildSectionTitle('My Activity'),
+          Container(
+            decoration: _boxDecoration(),
+            child: Column(
+              children: [
+                _buildProfileItem(
+                  context: context,
+                  title: 'My Reviews',
+                  icon: Icons.rate_review_outlined,
+                  onTap: () =>
+                      Navigator.pushNamed(context, '/reviewsPage', arguments: {
+                    'is_edit': true,
+                    'is_popup': true,
+                  }),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 20.w),
+          _buildSectionTitle('Feedback & Information'),
+          Container(
+            decoration: _boxDecoration(),
+            child: Column(
+              children: [
+                _buildProfileItem(
+                  context: context,
+                  title: 'Contact Us',
+                  icon: Icons.support_agent_outlined,
+                  onTap: () => Navigator.pushNamed(context, '/contactPage'),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 20.w),
+          InkWell(
+            onTap: () => _showLogoutDialog(context, configModel),
+            borderRadius: BorderRadius.circular(10.r),
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 15.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10.r),
+                border: Border.all(color: Colors.red.withOpacity(0.2)),
+              ),
+              child: Center(
+                child: Text(
+                  'Log Out',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 16.0.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 30.w),
+        ],
+      ),
+    );
+  }
+
+  BoxDecoration _boxDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(10.r),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.03),
+          blurRadius: 10,
+          offset: Offset(0, 4),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 10.w, left: 5.w),
+      child: Text(
+        title,
+        style: MyGoogleFontStyle(
+          fontFamily: 'Urbanist',
+          fontSize: 16.0.sp,
+          fontWeight: FontWeight.w700,
+          color: const Color(0xff1e232c),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Divider(
+      height: 1,
+      thickness: 1,
+      color: Colors.grey.withOpacity(0.1),
+      indent: 50.w,
+      endIndent: 20.w,
+    );
+  }
+
   Widget _buildProfileItem(
       {required BuildContext context,
       required String title,
-      required String subtitle,
+      required IconData icon,
       required VoidCallback onTap,
-      required}) {
+      bool isDestructive = false}) {
     return InkWell(
       onTap: onTap,
-      child: Container(
-        margin: EdgeInsets.only(bottom: 10.0.w),
-        padding: EdgeInsets.all(10.0.w),
-        decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xffc7b456)),
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(5.0.w)),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0x338a959e),
-              offset: Offset(0, 7.6690645218.w),
-              blurRadius: 19.1726608276.w,
-            ),
-          ],
-        ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.w),
         child: Row(
           children: [
+            Icon(
+              icon,
+              size: 22.sp,
+              color: isDestructive ? Colors.red : Color(0xff909090),
+            ),
+            SizedBox(width: 15.w),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: MyGoogleFontStyle(
-                      fontFamily: 'Urbanist',
-                      fontSize: 16.0.sp,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xff232323),
-                    ),
-                  ),
-                  SizedBox(height: 5.0.w),
-                  Text(
-                    subtitle,
-                    style: MyGoogleFontStyle(
-                      fontFamily: 'Urbanist',
-                      fontSize: 11.0.sp,
-                      fontWeight: FontWeight.w400,
-                      color: const Color(0xff909090),
-                    ),
-                  ),
-                ],
+              child: Text(
+                title,
+                style: MyGoogleFontStyle(
+                  fontFamily: 'Urbanist',
+                  fontSize: 15.0.sp,
+                  fontWeight: FontWeight.w600,
+                  color: isDestructive ? Colors.red : const Color(0xff1e232c),
+                ),
               ),
             ),
             Icon(
               Icons.arrow_forward_ios,
-              size: 12.0.w,
-              color: const Color(0xff232323),
+              size: 12.0.sp,
+              color: const Color(0xff909090),
             ),
           ],
         ),
@@ -533,6 +559,148 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       ),
     );
+  }
+
+  Widget _buildBottomNavigationBar(
+    BuildContext context,
+    ConfigModel configModel,
+    AddToCartModel addToCartModel,
+    int cartCount,
+  ) {
+    return Container(
+      height: _bottomNavBarHeight,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0xFFEED056).withOpacity(0.15),
+            blurRadius: 25,
+            spreadRadius: 0,
+            offset: Offset(0, -8),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
+            offset: Offset(0, -4),
+          ),
+        ],
+        border: Border(
+          top: BorderSide(
+            color: Color(0xFFEED056).withOpacity(0.2),
+            width: 1.5,
+          ),
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        child: BottomNavigationBar(
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          selectedItemColor: Color(0xFFEED056),
+          unselectedItemColor: Color(0xFF909090),
+          selectedFontSize: 11,
+          unselectedFontSize: 11,
+          selectedLabelStyle: TextStyle(
+            fontFamily: 'Urbanist',
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.5,
+          ),
+          unselectedLabelStyle: TextStyle(
+            fontFamily: 'Urbanist',
+            fontWeight: FontWeight.w500,
+          ),
+          currentIndex: 3, // Set to Profile tab
+          onTap: (value) =>
+              _handleBottomNavTap(context, value, configModel, addToCartModel),
+          items: [
+            BottomNavigationBarItem(
+              label: 'Home',
+              icon: Image.asset('assets/images/home-icon.png',
+                  width: _bottomNavIconSize.toDouble(),
+                  height: _bottomNavIconSize.toDouble(),
+                  color: Color(0xFF909090)),
+            ),
+            BottomNavigationBarItem(
+              label: 'Category',
+              icon: Image.asset('assets/images/category-icon.png',
+                  width: _bottomNavIconSize.toDouble(),
+                  height: _bottomNavIconSize.toDouble(),
+                  color: Color(0xFF909090)),
+            ),
+            BottomNavigationBarItem(
+              label: 'Cart',
+              icon: badges.Badge(
+                badgeContent: Text('$cartCount',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold)),
+                badgeStyle: badges.BadgeStyle(
+                  badgeColor: Color(0xFFEED056),
+                  padding: EdgeInsets.all(6),
+                ),
+                child: Image.asset('assets/images/cart-icon.png',
+                    width: _bottomNavIconSize.toDouble(),
+                    height: _bottomNavIconSize.toDouble(),
+                    color: Color(0xFF909090)),
+              ),
+            ),
+            BottomNavigationBarItem(
+              label: 'Profile',
+              icon: Image.asset('assets/images/user-profile-icon.png',
+                  width: _bottomNavIconSize.toDouble(),
+                  height: _bottomNavIconSize.toDouble(),
+                  color: Color(0xFFEED056)), // Highlight the profile icon
+            ),
+            BottomNavigationBarItem(
+              label: 'Notifs',
+              icon: Image.asset('assets/images/notification-icon.png',
+                  width: _bottomNavIconSize.toDouble(),
+                  height: _bottomNavIconSize.toDouble(),
+                  color: Color(0xFF909090)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _handleBottomNavTap(
+    BuildContext context,
+    int value,
+    ConfigModel configModel,
+    AddToCartModel addToCartModel,
+  ) async {
+    if (value == 0) {
+      Navigator.pushNamed(context, '/homePage');
+    } else if (value == 1) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const ShopsPage(initialText: '')));
+    } else if (value == 2) {
+      if (configModel.user == null) {
+        showDialog(
+            context: context, builder: (context) => LoginRequiredPopupWidget());
+      } else {
+        await addToCartModel.getAddToCart('', '', {});
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  const CartPage(isProfile: {'isProfile': false})),
+        );
+      }
+    } else if (value == 3 && configModel.user != null) {
+      // Already on profile page
+    } else if (value == 4 && configModel.user != null) {
+      Navigator.pushNamed(context, '/notificationPage');
+    } else {
+      showDialog(
+          context: context, builder: (context) => LoginRequiredPopupWidget());
+    }
   }
 }
 

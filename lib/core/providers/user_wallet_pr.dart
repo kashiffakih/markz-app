@@ -23,6 +23,9 @@ class UserWalletModel with ChangeNotifier {
   var totaRemainingPoint = 0;
 
   getMyUserWallets() async {
+    userWalletLoader = true;
+    notifyListeners();
+
     Map<String, dynamic> _response =
         await _userWalletService.getMyUserWallets();
     // print(_response['data']);
@@ -31,9 +34,13 @@ class UserWalletModel with ChangeNotifier {
     totalEarnPoint = _response['total_earn_points'];
     totalUsedPoint = _response['total_used_points'];
     totaRemainingPoint = _response['remaining_points'];
+
+    userWalletLoader = false;
+    notifyListeners();
   }
 
-  Future<Map<String, dynamic>> mapRedeemReferralCode(String referralCode) async {
+  Future<Map<String, dynamic>> mapRedeemReferralCode(
+      String referralCode) async {
     return await _userWalletService.mapRedeemReferralCode(referralCode);
   }
 }

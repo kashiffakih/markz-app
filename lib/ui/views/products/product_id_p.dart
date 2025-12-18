@@ -15,7 +15,9 @@ import 'package:aadab/ui/shared/font_sh.dart';
 import 'package:aadab/ui/views/checkout/cart_p.dart';
 import 'package:aadab/ui/views/products/shops_p.dart';
 import 'package:aadab/ui/widgets/image_zoom_w.dart';
+import 'package:aadab/core/providers/product_notification_pr.dart';
 import 'package:aadab/ui/widgets/login_required_popup.dart';
+import 'package:aadab/ui/widgets/common_product_card.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'dart:async';
@@ -87,24 +89,27 @@ class _ProductIdPageState extends State<ProductIdPage> {
     final productModel = context.read<ProductModel>();
     final productService = locator<ProductService>();
 
-    // Fetch fresh product data from API
-    try {
-      final freshProduct = await productService.getProductById(productId);
-      if (freshProduct != null) {
-        _freshProductData = freshProduct.toJson();
-      }
-    } catch (e) {
-      debugPrint('Error fetching fresh product data: $e');
-      // Fall back to arguments data if API fails
-    }
-
     await Future.wait<void>([
+      // Fetch fresh product data from API in parallel
+      productService.getProductById(productId).then((freshProduct) {
+        if (freshProduct != null) {
+          _freshProductData = freshProduct.toJson();
+        }
+      }).catchError((e) {
+        debugPrint('Error fetching fresh product data: $e');
+      }),
+
       if (configModel.user != null)
         addToCartModel.getAddToCart(productId, '', _cartData),
       if (configModel.user != null) wishListModel.getWishLists(''),
-      productModel.getCategoryWiseProduct(
-          _productData['category_id'] ?? '', ''),
     ]);
+
+    // Fetch related products in background
+    productModel
+        .getCategoryWiseProduct(_productData['category_id'] ?? '', '')
+        .catchError((e) {
+      debugPrint('Error fetching category wise product: $e');
+    });
 
     setState(() {
       _initializeProductData();
@@ -118,7 +123,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
     if (freshImages != null && freshImages is List && freshImages.isNotEmpty) {
       productDisplayImages = freshImages;
     } else {
-      productDisplayImages = widget.arguments?['product_images']?.toList() ?? [];
+      productDisplayImages =
+          widget.arguments?['product_images']?.toList() ?? [];
     }
 
     // Get all product packs from fresh data
@@ -151,7 +157,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
       size = _sizes[0]['value']?.toString() ?? '';
       _productPoints = _sizes[0]['points']?.toString() ?? '';
       activeIndex = 0; // Pre-select the first size
-      currentPackQty = _sizes[0]['qty'] ?? 0; // Initialize quantity from fresh data
+      currentPackQty =
+          _sizes[0]['qty'] ?? 0; // Initialize quantity from fresh data
 
       // Get prices for the selected pack from fresh data
       _prices = _productData['product_prices']
@@ -186,6 +193,153 @@ class _ProductIdPageState extends State<ProductIdPage> {
 
     // Use totalReviews if available from API, otherwise calculate
     return product.totalReviews ?? packReviews;
+  }
+
+  void _handleNotifyMe() async {
+    final ProductNotificationModel _notificationModel =
+        context.read<ProductNotificationModel>();
+    final _configModel = locator<ConfigModel>();
+    final _qtyController = TextEditingController(text: "1");
+    // Form key for validation
+    final _notifyFormKey = GlobalKey<FormState>();
+
+    // Check if user is logged in
+    if (_configModel.user == null) {
+      showDialog(
+        context: context,
+        builder: (context) => LoginRequiredPopupWidget(),
+      );
+      return;
+    }
+
+    // Input Dialog
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0.r)),
+        title: Text('Notify me when available',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('How many quantity required?',
+                style: TextStyle(fontSize: 14.sp)),
+            SizedBox(height: 10.h),
+            Form(
+              key: _notifyFormKey,
+              child: TextFormField(
+                controller: _qtyController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Qty',
+                  border: OutlineInputBorder(),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Enter qty';
+                  }
+                  if (int.tryParse(value) == null || int.parse(value) <= 0) {
+                    return 'Invalid qty';
+                  }
+                  return null;
+                },
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text('Cancel',
+                style: TextStyle(color: Colors.grey, fontSize: 14.sp)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFFC7B456),
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () async {
+              if (_notifyFormKey.currentState!.validate()) {
+                Navigator.pop(dialogContext); // Close input dialog
+
+                int qty = int.parse(_qtyController.text);
+                int productId = widget.arguments!['product']['id'];
+                int productPackId = int.tryParse(_cartData['pack'] ?? '0') ?? 0;
+
+                if (productPackId == 0 && _sizes.isNotEmpty) {
+                  productPackId = _sizes[0]['id'] ?? 0;
+                }
+
+                // Call provider method
+                final result = await _notificationModel.storeNotification(
+                  productId: productId,
+                  productPackId: productPackId,
+                  qty: qty,
+                );
+
+                if (mounted) {
+                  if (result['success']) {
+                    // Success "Thank You" Popup
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0.r)),
+                        title: Text('Thank You',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 18.sp)),
+                        content: Text(
+                            'We will notify you when this product is back in stock.',
+                            style: TextStyle(fontSize: 14.sp)),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text('OK',
+                                style: TextStyle(
+                                    color: Color(0xFFC7B456),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16.sp)),
+                          )
+                        ],
+                      ),
+                    );
+                  } else {
+                    // Error Popup
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0.r)),
+                        title: Text('Error',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 18.sp)),
+                        content: Text(result['message'],
+                            style: TextStyle(fontSize: 14.sp)),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text('OK',
+                                style: TextStyle(
+                                    color: Color(0xFFC7B456),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16.sp)),
+                          )
+                        ],
+                      ),
+                    );
+                  }
+                }
+              }
+            },
+            child: Text('Submit'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -338,132 +492,53 @@ class _ProductIdPageState extends State<ProductIdPage> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Header
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 20.0.w, vertical: 16.0.w),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(0xFFEED056),
+                              Color(0xFFF6E27F),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(30.r),
+                            bottomRight: Radius.circular(30.r),
+                          ),
+                        ),
+                        padding: EdgeInsets.fromLTRB(20.w, 10.w, 20.w, 25.w),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Center(
-                              child: Text(
-                                'Product Details',
-                                style: MyGoogleFontStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontSize: 18.0.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color(0xff1e232c),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 15.0.w),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
                                 InkWell(
                                   onTap: () => Navigator.pop(context),
                                   child: Container(
                                     padding: EdgeInsets.all(8.0.w),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: Colors.white.withOpacity(0.2),
                                       shape: BoxShape.circle,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Color(0xFFEED056)
-                                              .withOpacity(0.15),
-                                          blurRadius: 8,
-                                          offset: Offset(0, 2),
-                                        ),
-                                      ],
                                     ),
                                     child: Icon(
                                       Icons.arrow_back_ios_new,
                                       size: 16.0.sp,
-                                      color: const Color(0xffEED056),
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ),
                                 SizedBox(width: 12.0.w),
-                                Expanded(
-                                  child: Container(
-                                    height: 45.0.w,
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 16.0.w, vertical: 4.0.w),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius:
-                                          BorderRadius.circular(16.0.r),
-                                      border: Border.all(
-                                        color:
-                                            Color(0xFFEED056).withOpacity(0.3),
-                                        width: 1.5,
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Color(0xFFEED056)
-                                              .withOpacity(0.08),
-                                          blurRadius: 15,
-                                          offset: Offset(0, 4),
-                                        ),
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.03),
-                                          blurRadius: 8,
-                                          offset: Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.search,
-                                          color: Color(0xFFEED056),
-                                          size: 20.0.sp,
-                                        ),
-                                        SizedBox(width: 10.0.w),
-                                        Expanded(
-                                          child: TextFormField(
-                                            controller: _searchController,
-                                            onChanged: (value) {
-                                              if (_debounce?.isActive ?? false)
-                                                _debounce!.cancel();
-                                              _debounce = Timer(
-                                                  const Duration(
-                                                      milliseconds: 500), () {
-                                                if (value.length % 3 == 0 &&
-                                                    value.isNotEmpty) {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ShopsPage(
-                                                              initialText:
-                                                                  value),
-                                                    ),
-                                                  );
-                                                }
-                                              });
-                                            },
-                                            decoration: InputDecoration(
-                                              hintText: 'Search products...',
-                                              hintStyle: TextStyle(
-                                                color: Color(0xFF909090),
-                                                fontSize: 14.0.sp,
-                                                fontFamily: 'Urbanist',
-                                                fontWeight: FontWeight.w400,
-                                              ),
-                                              border: InputBorder.none,
-                                              contentPadding: EdgeInsets.zero,
-                                            ),
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 14.0.sp,
-                                              fontFamily: 'Urbanist',
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                Text(
+                                  'Product Details',
+                                  textAlign: TextAlign.center,
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontSize: 20.0.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
                                   ),
                                 ),
                                 SizedBox(width: 12.0.w),
@@ -488,43 +563,107 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                   child: Container(
                                     padding: EdgeInsets.all(10.0.w),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: Colors.white.withOpacity(0.2),
                                       shape: BoxShape.circle,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Color(0xFFEED056)
-                                              .withOpacity(0.15),
-                                          blurRadius: 8,
-                                          offset: Offset(0, 2),
-                                        ),
-                                      ],
                                     ),
                                     child: badges.Badge(
                                       badgeContent: Text(
                                         cartCount.toString(),
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          color: Color(0xFFEED056),
                                           fontSize: 10.0.sp,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                       badgeStyle: badges.BadgeStyle(
-                                        badgeColor: Color(0xFFEED056),
-                                        padding: EdgeInsets.all(4.0.w),
+                                        badgeColor: Colors.white,
+                                        padding: EdgeInsets.all(6),
                                       ),
                                       child: Icon(
                                         Icons.shopping_cart_outlined,
-                                        color: Color(0xFF232323),
-                                        size: 22.0.sp,
+                                        size: 20.0.sp,
+                                        color: Colors.white,
                                       ),
                                     ),
                                   ),
                                 ),
                               ],
                             ),
+                            SizedBox(height: 30.0.w),
+                            Container(
+                              height: 45.0.w,
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 16.0.w, vertical: 4.0.w),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12.0.r),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 10,
+                                    offset: Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.search,
+                                    color: Color(0xFF909090),
+                                    size: 20.0.sp,
+                                  ),
+                                  SizedBox(width: 10.0.w),
+                                  Expanded(
+                                    child: TextFormField(
+                                      textAlignVertical:
+                                          TextAlignVertical.center,
+                                      controller: _searchController,
+                                      onChanged: (value) {
+                                        if (_debounce?.isActive ?? false)
+                                          _debounce!.cancel();
+                                        _debounce = Timer(
+                                            const Duration(milliseconds: 500),
+                                            () {
+                                          if (value.length % 3 == 0 &&
+                                              value.isNotEmpty) {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => ShopsPage(
+                                                    initialText: value),
+                                              ),
+                                            );
+                                          }
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        isCollapsed: true,
+                                        hintText: 'Search products...',
+                                        hintStyle: TextStyle(
+                                          color: Color(0xFFAAAAAA),
+                                          fontSize: 14.0.sp,
+                                          fontFamily: 'Urbanist',
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                        border: InputBorder.none,
+                                        contentPadding: EdgeInsets.zero,
+                                      ),
+                                      style: TextStyle(
+                                        color: Color(0xff232323),
+                                        fontSize: 14.0.sp,
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ),
+                      SizedBox(height: 10.0.h),
+
                       // Product Content
                       Form(
                         key: _formKey,
@@ -706,30 +845,17 @@ class _ProductIdPageState extends State<ProductIdPage> {
                               ],
                             ),
                             Center(
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 12.0.w, vertical: 8.0.w),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.9),
-                                  borderRadius: BorderRadius.circular(20.0.r),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xFFEED056).withOpacity(0.1),
-                                      blurRadius: 10,
-                                      offset: Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 10.0.w),
                                 child: SmoothPageIndicator(
                                   controller: sliderController,
                                   count: imageProduct.length,
                                   effect: ExpandingDotsEffect(
-                                    dotHeight: 8.0.w,
-                                    dotWidth: 28.0.w,
-                                    activeDotColor: Color(0xFFEED056),
-                                    dotColor:
-                                        Color(0xFFEED056).withOpacity(0.3),
-                                    expansionFactor: 3.5,
+                                    dotHeight: 6.0.w,
+                                    dotWidth: 6.0.w,
+                                    activeDotColor: Color(0xFFC7B456),
+                                    dotColor: Color(0xFFE0E0E0),
+                                    expansionFactor: 4,
                                     spacing: 6.0.w,
                                   ),
                                 ),
@@ -737,351 +863,161 @@ class _ProductIdPageState extends State<ProductIdPage> {
                             ),
                             SizedBox(height: 15.0.w),
                             // Thumbnail Images
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 8.0.w),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    flex: 1,
-                                    child: IconButton(
-                                      icon:
-                                          Icon(Icons.arrow_left, size: 24.0.sp),
-                                      onPressed: () {
-                                        if (productDisplayImages.isNotEmpty) {
-                                          final currentIndex =
-                                              productDisplayImages.indexWhere(
-                                                  (image) =>
-                                                      image.unit?.name ==
-                                                      unitName);
-                                          final newIndex = (currentIndex - 1)
-                                              .clamp(
-                                                  0,
-                                                  productDisplayImages.length -
-                                                      1);
-                                          setState(() {
-                                            unitName =
-                                                productDisplayImages[newIndex]
-                                                        .unit
-                                                        ?.name
-                                                        ?.toString() ??
-                                                    '';
-                                            _cartData['flavour'] = unitName;
-                                            updateProductDisplayImages = widget
-                                                    .arguments?[
-                                                        'product_images']
-                                                    ?.where((image) =>
-                                                        image.unit?.name ==
-                                                        unitName)
-                                                    ?.toList() ??
-                                                [];
-                                            _sizes = widget
-                                                    .arguments?['product']
-                                                        ?['product_packs']
-                                                    ?.where((pack) =>
-                                                        pack['unit']?['name'] ==
-                                                        unitName)
-                                                    ?.toList() ??
-                                                [];
-                                            activeIndex =
-                                                0; // Pre-select first size
-                                            _cartData['kindOfFlower'] =
-                                                _sizes.isNotEmpty
-                                                    ? _sizes[0]['value']
-                                                            ?.toString() ??
-                                                        ''
-                                                    : '';
-                                            _cartData['pack'] = _sizes
-                                                    .isNotEmpty
-                                                ? _sizes[0]['id']?.toString() ??
-                                                    ''
-                                                : '';
-                                            currentPackQty = _sizes.isNotEmpty
-                                                ? _sizes[0]['qty'] ?? 0
-                                                : 0;
-                                            _prices = widget
-                                                    .arguments?['product']
-                                                        ?['product_prices']
-                                                    ?.where((price) =>
-                                                        price[
-                                                            'product_pack_id'] ==
-                                                        _sizes[0]['id'])
-                                                    ?.toList() ??
-                                                [];
-                                            _productPoints = _sizes.isNotEmpty
-                                                ? _sizes[0]['points']
-                                                        ?.toString() ??
-                                                    ''
-                                                : '';
+                            SizedBox(
+                              height: 90.0.w,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                padding:
+                                    EdgeInsets.symmetric(horizontal: 20.0.w),
+                                itemCount: productDisplayImages.length,
+                                itemBuilder: (context, index) {
+                                  final imageItem = productDisplayImages[index];
+                                  String? name;
+                                  String? imagePath;
 
-                                            // Calculate discount price safely
-                                            discountPrice = 0.0;
-                                            if (_prices.isNotEmpty) {
-                                              final price = int.tryParse(
-                                                      _prices[0]['price']
-                                                              ?.toString() ??
-                                                          '0') ??
-                                                  0;
-                                              final offerPrice = int.tryParse(
-                                                      _prices[0]['offer_price']
-                                                              ?.toString() ??
-                                                          '0') ??
-                                                  0;
+                                  if (imageItem is Map) {
+                                    name =
+                                        imageItem['unit']?['name']?.toString();
+                                    imagePath = imageItem['imagepath'];
+                                  } else {
+                                    name = (imageItem as dynamic)
+                                        .unit
+                                        ?.name
+                                        ?.toString();
+                                    imagePath =
+                                        (imageItem as dynamic).imagepath;
+                                  }
 
-                                              if (price > 0 &&
-                                                  offerPrice > 0 &&
-                                                  offerPrice < price) {
-                                                discountPrice =
-                                                    ((price - offerPrice) /
-                                                        price *
-                                                        100);
-                                              }
-                                            }
-                                          });
+                                  final isSelected = unitName == name;
+
+                                  return InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        unitName = name ?? '';
+                                        _cartData['flavour'] = unitName;
+
+                                        // Helper for filtering logic
+                                        bool filterImage(dynamic img) {
+                                          String? n;
+                                          if (img is Map) {
+                                            n = img['unit']?['name']
+                                                ?.toString();
+                                          } else {
+                                            n = (img as dynamic)
+                                                .unit
+                                                ?.name
+                                                ?.toString();
+                                          }
+                                          return n == unitName;
                                         }
-                                      },
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 10,
-                                    child: SizedBox(
-                                      height: 100.0.w,
-                                      child: ListView.builder(
-                                        scrollDirection: Axis.horizontal,
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 5.0.w),
-                                        itemCount: productDisplayImages.length,
-                                        itemBuilder: (context, index) {
-                                          final isSelected = unitName ==
-                                              productDisplayImages[index]
-                                                  .unit
-                                                  ?.name;
-                                          return InkWell(
-                                            onTap: () {
-                                              setState(() {
-                                                unitName =
-                                                    productDisplayImages[index]
-                                                            .unit
-                                                            ?.name
-                                                            ?.toString() ??
-                                                        '';
-                                                _cartData['flavour'] = unitName;
-                                                updateProductDisplayImages =
-                                                    widget.arguments?[
-                                                                'product_images']
-                                                            ?.where((image) =>
-                                                                image.unit
-                                                                    ?.name ==
-                                                                unitName)
-                                                            ?.toList() ??
-                                                        [];
-                                                _sizes = widget
-                                                        .arguments?['product']
-                                                            ?['product_packs']
-                                                        ?.where((pack) =>
-                                                            pack['unit']
-                                                                ?['name'] ==
-                                                            unitName)
-                                                        ?.toList() ??
-                                                    [];
-                                                activeIndex =
-                                                    0; // Pre-select first size
-                                                _cartData['kindOfFlower'] =
-                                                    _sizes.isNotEmpty
-                                                        ? _sizes[0]['value']
-                                                                ?.toString() ??
-                                                            ''
-                                                        : '';
-                                                _cartData['pack'] =
-                                                    _sizes.isNotEmpty
-                                                        ? _sizes[0]['id']
-                                                                ?.toString() ??
-                                                            ''
-                                                        : '';
-                                                currentPackQty =
-                                                    _sizes.isNotEmpty
-                                                        ? _sizes[0]['qty'] ?? 0
-                                                        : 0;
-                                                _prices = widget
-                                                        .arguments?['product']
-                                                            ?['product_prices']
-                                                        ?.where((price) =>
-                                                            price[
-                                                                'product_pack_id'] ==
-                                                            _sizes[0]['id'])
-                                                        ?.toList() ??
-                                                    [];
-                                                _productPoints =
-                                                    _sizes.isNotEmpty
-                                                        ? _sizes[0]['points']
-                                                                ?.toString() ??
-                                                            ''
-                                                        : '';
-                                                // Calculate discount price safely
-                                                discountPrice = 0.0;
-                                                if (_prices.isNotEmpty) {
-                                                  final price = int.tryParse(
-                                                          _prices[0]['price']
-                                                                  ?.toString() ??
-                                                              '0') ??
-                                                      0;
-                                                  final offerPrice =
-                                                      int.tryParse(_prices[0][
-                                                                      'offer_price']
-                                                                  ?.toString() ??
-                                                              '0') ??
-                                                          0;
 
-                                                  if (price > 0 &&
-                                                      offerPrice > 0 &&
-                                                      offerPrice < price) {
-                                                    discountPrice =
-                                                        ((price - offerPrice) /
-                                                            price *
-                                                            100);
-                                                  }
-                                                }
-                                              });
-                                            },
-                                            child: Container(
-                                              margin:
-                                                  EdgeInsets.only(right: 8.0.w),
-                                              width: 60.0.w,
-                                              height: 80.0.w,
-                                              padding: EdgeInsets.all(2),
-                                              decoration: BoxDecoration(
-                                                border: isSelected
-                                                    ? Border.all(
-                                                        color: Colors.black,
-                                                        width: 2.0.w)
-                                                    : Border.all(
-                                                        color:
-                                                            Colors.grey[300]!),
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        8.0.w),
-                                              ),
-                                              child: productDisplayImages[index]
-                                                          .imagepath !=
-                                                      null
-                                                  ? Image.network(
-                                                      '${configModel.apiConfig['mediaURL']}${productDisplayImages[index].imagepath}',
-                                                      fit: BoxFit.cover,
-                                                      errorBuilder: (context,
-                                                              error,
-                                                              stackTrace) =>
-                                                          const Icon(
-                                                              Icons.error),
-                                                    )
-                                                  : const Center(
-                                                      child: Text('No Image')),
-                                            ),
-                                          );
-                                        },
+                                        updateProductDisplayImages = widget
+                                                .arguments?['product_images']
+                                                ?.where(filterImage)
+                                                .toList() ??
+                                            [];
+
+                                        _sizes = widget.arguments?['product']
+                                                    ?['product_packs']
+                                                ?.where((pack) =>
+                                                    pack['unit']?['name'] ==
+                                                    unitName)
+                                                ?.toList() ??
+                                            [];
+                                        activeIndex = 0;
+                                        _cartData['kindOfFlower'] = _sizes
+                                                .isNotEmpty
+                                            ? _sizes[0]['value']?.toString() ??
+                                                ''
+                                            : '';
+                                        _cartData['pack'] = _sizes.isNotEmpty
+                                            ? _sizes[0]['id']?.toString() ?? ''
+                                            : '';
+                                        currentPackQty = _sizes.isNotEmpty
+                                            ? _sizes[0]['qty'] ?? 0
+                                            : 0;
+                                        _prices = widget.arguments?['product']
+                                                    ?['product_prices']
+                                                ?.where((price) =>
+                                                    price['product_pack_id'] ==
+                                                    _sizes[0]['id'])
+                                                ?.toList() ??
+                                            [];
+                                        _productPoints = _sizes.isNotEmpty
+                                            ? _sizes[0]['points']?.toString() ??
+                                                ''
+                                            : '';
+
+                                        discountPrice = 0.0;
+                                        if (_prices.isNotEmpty) {
+                                          final price = int.tryParse(_prices[0]
+                                                          ['price']
+                                                      ?.toString() ??
+                                                  '0') ??
+                                              0;
+                                          final offerPrice = int.tryParse(
+                                                  _prices[0]['offer_price']
+                                                          ?.toString() ??
+                                                      '0') ??
+                                              0;
+
+                                          if (price > 0 &&
+                                              offerPrice > 0 &&
+                                              offerPrice < price) {
+                                            discountPrice =
+                                                ((price - offerPrice) /
+                                                    price *
+                                                    100);
+                                          }
+                                        }
+                                      });
+                                    },
+                                    child: Container(
+                                      margin: EdgeInsets.only(right: 12.0.w),
+                                      width: 70.0.w,
+                                      height: 90.0.w,
+                                      padding: EdgeInsets.all(3),
+                                      decoration: BoxDecoration(
+                                        border: isSelected
+                                            ? Border.all(
+                                                color: Color(0xFFC7B456),
+                                                width: 2.0.w)
+                                            : Border.all(
+                                                color: Colors.transparent),
+                                        borderRadius:
+                                            BorderRadius.circular(12.0.w),
+                                        boxShadow: isSelected
+                                            ? [
+                                                BoxShadow(
+                                                  color: Color(0xFFEED056)
+                                                      .withOpacity(0.3),
+                                                  blurRadius: 8,
+                                                  offset: Offset(0, 4),
+                                                )
+                                              ]
+                                            : [],
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(9.0.w),
+                                        child: imagePath != null
+                                            ? Image.network(
+                                                '${configModel.apiConfig['mediaURL']}$imagePath',
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error,
+                                                        stackTrace) =>
+                                                    const Icon(Icons.error),
+                                              )
+                                            : const Center(
+                                                child: Text('No Image')),
                                       ),
                                     ),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: IconButton(
-                                      icon: Icon(Icons.arrow_right,
-                                          size: 24.0.sp),
-                                      onPressed: () {
-                                        if (productDisplayImages.isNotEmpty) {
-                                          final currentIndex =
-                                              productDisplayImages.indexWhere(
-                                                  (image) =>
-                                                      image.unit?.name ==
-                                                      unitName);
-                                          final newIndex = (currentIndex + 1)
-                                              .clamp(
-                                                  0,
-                                                  productDisplayImages.length -
-                                                      1);
-                                          setState(() {
-                                            unitName =
-                                                productDisplayImages[newIndex]
-                                                        .unit
-                                                        ?.name
-                                                        ?.toString() ??
-                                                    '';
-                                            _cartData['flavour'] = unitName;
-                                            updateProductDisplayImages = widget
-                                                    .arguments?[
-                                                        'product_images']
-                                                    ?.where((image) =>
-                                                        image.unit?.name ==
-                                                        unitName)
-                                                    ?.toList() ??
-                                                [];
-                                            _sizes = widget
-                                                    .arguments?['product']
-                                                        ?['product_packs']
-                                                    ?.where((pack) =>
-                                                        pack['unit']?['name'] ==
-                                                        unitName)
-                                                    ?.toList() ??
-                                                [];
-                                            activeIndex =
-                                                0; // Pre-select first size
-                                            _cartData['kindOfFlower'] =
-                                                _sizes.isNotEmpty
-                                                    ? _sizes[0]['value']
-                                                            ?.toString() ??
-                                                        ''
-                                                    : '';
-                                            _cartData['pack'] = _sizes
-                                                    .isNotEmpty
-                                                ? _sizes[0]['id']?.toString() ??
-                                                    ''
-                                                : '';
-                                            currentPackQty = _sizes.isNotEmpty
-                                                ? _sizes[0]['qty'] ?? 0
-                                                : 0;
-                                            _prices = widget
-                                                    .arguments?['product']
-                                                        ?['product_prices']
-                                                    ?.where((price) =>
-                                                        price[
-                                                            'product_pack_id'] ==
-                                                        _sizes[0]['id'])
-                                                    ?.toList() ??
-                                                [];
-                                            _productPoints = _sizes.isNotEmpty
-                                                ? _sizes[0]['points']
-                                                        ?.toString() ??
-                                                    ''
-                                                : '';
-
-                                            // Calculate discount price safely
-                                            discountPrice = 0.0;
-                                            if (_prices.isNotEmpty) {
-                                              final price = int.tryParse(
-                                                      _prices[0]['price']
-                                                              ?.toString() ??
-                                                          '0') ??
-                                                  0;
-                                              final offerPrice = int.tryParse(
-                                                      _prices[0]['offer_price']
-                                                              ?.toString() ??
-                                                          '0') ??
-                                                  0;
-
-                                              if (price > 0 &&
-                                                  offerPrice > 0 &&
-                                                  offerPrice < price) {
-                                                discountPrice =
-                                                    ((price - offerPrice) /
-                                                        price *
-                                                        100);
-                                              }
-                                            }
-                                          });
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                ],
+                                  );
+                                },
                               ),
+                            ),
+                            SizedBox(
+                              height: 10.h,
                             ),
                             // Product Details
                             Padding(
@@ -1140,6 +1076,103 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 ),
                                               ],
                                             ),
+                                            SizedBox(height: 10.w),
+                                            // [MOVED PRICE SECTION]
+                                            _prices.isNotEmpty &&
+                                                    (_prices[0]['offer_price'] !=
+                                                            null &&
+                                                        _prices[0][
+                                                                'offer_price'] !=
+                                                            0)
+                                                ? Wrap(
+                                                    crossAxisAlignment:
+                                                        WrapCrossAlignment.end,
+                                                    children: [
+                                                      Text(
+                                                        '₹${_prices[0]['offer_price'] ?? '0'}',
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontSize: 24.0.sp,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.black,
+                                                        ),
+                                                      ),
+                                                      SizedBox(width: 8.w),
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                bottom: 4.h),
+                                                        child: Text(
+                                                          '₹${_prices[0]['price'] ?? '0'}',
+                                                          style: TextStyle(
+                                                            color: Colors
+                                                                .grey[500],
+                                                            decoration:
+                                                                TextDecoration
+                                                                    .lineThrough,
+                                                            fontSize: 14.0.sp,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      if (discountPrice !=
+                                                          0.0) ...[
+                                                        SizedBox(width: 8.w),
+                                                        Container(
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      6.w,
+                                                                  vertical:
+                                                                      2.h),
+                                                          margin:
+                                                              EdgeInsets.only(
+                                                                  bottom: 4.h),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            gradient:
+                                                                LinearGradient(
+                                                              colors: [
+                                                                Color(
+                                                                    0xFF4CAF50),
+                                                                Color(
+                                                                    0xFF388E3C)
+                                                              ],
+                                                            ),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        4.r),
+                                                          ),
+                                                          child: Text(
+                                                            '${discountPrice.round()}% OFF',
+                                                            style: TextStyle(
+                                                              fontSize: 10.0.sp,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ],
+                                                  )
+                                                : Text(
+                                                    _prices.isNotEmpty
+                                                        ? '₹${_prices[0]['price'] ?? '0'}'
+                                                        : 'Price not available',
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Urbanist',
+                                                      fontSize: 24.0.sp,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
                                           ],
                                         ),
                                       ),
@@ -1616,99 +1649,104 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 ),
                                               ],
                                             ),
-                                          Text(
-                                            currentPackQty > 0
-                                                ? 'Available in stock ($currentPackQty)'
-                                                : 'Out of stock',
-                                            style: MyGoogleFontStyle(
-                                              fontFamily: 'Urbanist',
-                                              fontSize: 12.0.sp,
-                                              fontWeight: FontWeight.w600,
-                                              color: currentPackQty > 0
-                                                  ? const Color(0xff000000)
-                                                  : Colors.red,
-                                            ),
-                                          ),
+                                          currentPackQty > 0
+                                              ? Text(
+                                                  'Available in stock ($currentPackQty)',
+                                                  style: MyGoogleFontStyle(
+                                                    fontFamily: 'Urbanist',
+                                                    fontSize: 12.0.sp,
+                                                    fontWeight: FontWeight.w600,
+                                                    color:
+                                                        const Color(0xff000000),
+                                                  ),
+                                                )
+                                              : Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    InkWell(
+                                                      onTap: _handleNotifyMe,
+                                                      child: Container(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal:
+                                                                    12.w,
+                                                                vertical: 6.h),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          gradient:
+                                                              LinearGradient(
+                                                            colors: [
+                                                              Color(0xFFEED056),
+                                                              Color(0xFFC7B456),
+                                                            ],
+                                                            begin: Alignment
+                                                                .topLeft,
+                                                            end: Alignment
+                                                                .bottomRight,
+                                                          ),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      20.r),
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              color: Colors
+                                                                  .black
+                                                                  .withOpacity(
+                                                                      0.1),
+                                                              blurRadius: 4,
+                                                              offset:
+                                                                  Offset(0, 2),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        child: Row(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            Icon(
+                                                              Icons
+                                                                  .notifications_active_outlined,
+                                                              size: 14.sp,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                            SizedBox(
+                                                                width: 5.w),
+                                                            Text(
+                                                              'Notify Me',
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 12.sp,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 8.h),
+                                                    Text(
+                                                      'Out of Stock',
+                                                      style: TextStyle(
+                                                        color: Colors.red,
+                                                        fontSize: 12.sp,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontFamily: 'Urbanist',
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                         ],
                                       ),
                                     ],
                                   ),
-                                  // Price
-                                  Padding(
-                                    padding: EdgeInsets.only(
-                                        left: 25.0.w, top: 10.0.w),
-                                    child: _prices.isNotEmpty &&
-                                            (_prices[0]['offer_price'] !=
-                                                    null &&
-                                                _prices[0]['offer_price'] != 0)
-                                        ? Text.rich(
-                                            TextSpan(
-                                              children: [
-                                                TextSpan(
-                                                  text: 'Total Price',
-                                                  style: TextStyle(
-                                                      color: Colors.grey[500],
-                                                      fontSize: 14.0.sp),
-                                                ),
-                                                WidgetSpan(
-                                                    child: SizedBox(
-                                                        width: 20.0.w)),
-                                                TextSpan(
-                                                  text:
-                                                      '₹${_prices[0]['price'] ?? '0'}',
-                                                  style: TextStyle(
-                                                    color:
-                                                        const Color(0xFFC7B456),
-                                                    decoration: TextDecoration
-                                                        .lineThrough,
-                                                    fontSize: 18.0.sp,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                WidgetSpan(
-                                                    child: SizedBox(
-                                                        width: 20.0.w)),
-                                                TextSpan(
-                                                  text:
-                                                      '₹${_prices[0]['offer_price'] ?? '0'}',
-                                                  style: TextStyle(
-                                                    fontSize: 18.0.sp,
-                                                    fontWeight: FontWeight.bold,
-                                                    color:
-                                                        const Color(0xff000000),
-                                                  ),
-                                                ),
-                                                if (discountPrice != 0.0) ...[
-                                                  WidgetSpan(
-                                                      child: SizedBox(
-                                                          width: 10.0.w)),
-                                                  TextSpan(
-                                                    text:
-                                                        '(${discountPrice.round()}% Off)',
-                                                    style: TextStyle(
-                                                      fontSize: 16.0.sp,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: const Color(
-                                                          0xff000000),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ],
-                                            ),
-                                          )
-                                        : Text(
-                                            _prices.isNotEmpty
-                                                ? '₹${_prices[0]['price'] ?? '0'}'
-                                                : 'Price not available',
-                                            style: MyGoogleFontStyle(
-                                              fontFamily: 'Poppins',
-                                              fontSize: 18.0.sp,
-                                              fontWeight: FontWeight.w500,
-                                              color: const Color(0x99000000),
-                                            ),
-                                          ),
-                                  ),
+
                                   // Size Selection
                                   Padding(
                                     padding: EdgeInsets.only(
@@ -1734,12 +1772,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                             Expanded(
                                               flex: 8,
                                               child: SizedBox(
-                                                height: 60.0.w,
+                                                height: 45.0.w,
                                                 child: ListView.builder(
                                                   scrollDirection:
                                                       Axis.horizontal,
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 10.0.w),
+                                                  // padding: EdgeInsets.symmetric(
+                                                  //     horizontal: 5.0.w),
                                                   itemCount: _sizes.length,
                                                   itemBuilder:
                                                       (context, index) {
@@ -1749,9 +1787,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       padding:
                                                           EdgeInsets.symmetric(
                                                               horizontal:
-                                                                  8.0.w),
-                                                      child: TextButton(
-                                                        onPressed: () {
+                                                                  5.0.w),
+                                                      child: InkWell(
+                                                        onTap: () {
                                                           setState(() {
                                                             activeIndex = index;
                                                             _cartData[
@@ -1835,34 +1873,66 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                             }
                                                           });
                                                         },
-                                                        style: TextButton
-                                                            .styleFrom(
-                                                          padding:
-                                                              EdgeInsets.zero,
-                                                          backgroundColor:
-                                                              isActive
-                                                                  ? Colors.black
-                                                                  : Colors
-                                                                      .white,
-                                                          shape:
-                                                              RoundedRectangleBorder(
+                                                        child:
+                                                            AnimatedContainer(
+                                                          duration: Duration(
+                                                              milliseconds:
+                                                                  200),
+                                                          constraints:
+                                                              BoxConstraints(
+                                                                  minWidth:
+                                                                      45.w),
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      12.w,
+                                                                  vertical:
+                                                                      8.h),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            gradient: isActive
+                                                                ? LinearGradient(
+                                                                    colors: [
+                                                                      Color(
+                                                                          0xFFEED056),
+                                                                      Color(
+                                                                          0xFFC7B456),
+                                                                    ],
+                                                                    begin: Alignment
+                                                                        .topLeft,
+                                                                    end: Alignment
+                                                                        .bottomRight,
+                                                                  )
+                                                                : null,
+                                                            color: isActive
+                                                                ? null
+                                                                : Colors.white,
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
-                                                                        30.0.w),
-                                                          ),
-                                                        ),
-                                                        child: Container(
-                                                          width: 50.0.w,
-                                                          height: 50.0.w,
-                                                          decoration:
-                                                              ShapeDecoration(
-                                                            shape: OvalBorder(
-                                                              side: BorderSide(
-                                                                  width: 0.95.w,
-                                                                  color: const Color(
-                                                                      0xFFDDDDDD)),
-                                                            ),
+                                                                        12.r),
+                                                            border: isActive
+                                                                ? null
+                                                                : Border.all(
+                                                                    color: Colors
+                                                                        .grey
+                                                                        .shade300),
+                                                            boxShadow: isActive
+                                                                ? [
+                                                                    BoxShadow(
+                                                                      color: Color(
+                                                                              0xFFC7B456)
+                                                                          .withOpacity(
+                                                                              0.4),
+                                                                      blurRadius:
+                                                                          6,
+                                                                      offset:
+                                                                          Offset(
+                                                                              0,
+                                                                              3),
+                                                                    )
+                                                                  ]
+                                                                : null,
                                                           ),
                                                           child: Center(
                                                             child: Text(
@@ -1875,15 +1945,17 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                 fontFamily:
                                                                     'Urbanist',
                                                                 fontSize:
-                                                                    15.0.sp,
-                                                                fontWeight:
-                                                                    FontWeight
+                                                                    14.0.sp,
+                                                                fontWeight: isActive
+                                                                    ? FontWeight
+                                                                        .bold
+                                                                    : FontWeight
                                                                         .w600,
                                                                 color: isActive
                                                                     ? Colors
                                                                         .white
-                                                                    : const Color(
-                                                                        0x99000000),
+                                                                    : Colors
+                                                                        .black87,
                                                               ),
                                                             ),
                                                           ),
@@ -2164,262 +2236,18 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                             }
                                                           }
                                                         }
-                                                        return InkWell(
-                                                          onTap: () {
-                                                            Navigator.of(
-                                                                    context)
-                                                                .push(
-                                                              MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        ProductIdPage(
-                                                                  arguments: {
-                                                                    'product':
-                                                                        relatedProduct
-                                                                            .toJson(),
-                                                                    'product_images':
-                                                                        relatedProduct
-                                                                            .productImages,
-                                                                  },
-                                                                ),
-                                                              ),
-                                                            );
-                                                          },
-                                                          child: Container(
-                                                            width: 145.0.w,
-                                                            margin:
-                                                                EdgeInsets.only(
-                                                                    right:
-                                                                        12.0.w),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          15.0.w),
-                                                              color:
-                                                                  Colors.white,
-                                                              boxShadow: [
-                                                                BoxShadow(
-                                                                  color: Colors
-                                                                      .black
-                                                                      .withOpacity(
-                                                                          0.1),
-                                                                  blurRadius: 5,
-                                                                  offset:
-                                                                      const Offset(
-                                                                          0, 2),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                Stack(
-                                                                  children: [
-                                                                    Container(
-                                                                      width:
-                                                                          145.0
-                                                                              .w,
-                                                                      height:
-                                                                          140.0
-                                                                              .w,
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(15.0.r),
-                                                                        image:
-                                                                            DecorationImage(
-                                                                          fit: BoxFit
-                                                                              .cover,
-                                                                          image: relatedProduct.productImages?.isNotEmpty ?? false
-                                                                              ? NetworkImage('${configModel.apiConfig['mediaURL']}${relatedProduct.productImages!.first.imagepath}')
-                                                                              : const AssetImage('assets/images/placeholder.png') as ImageProvider,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                    Positioned(
-                                                                      top:
-                                                                          8.0.w,
-                                                                      right:
-                                                                          8.0.w,
-                                                                      child:
-                                                                          InkWell(
-                                                                        onTap:
-                                                                            () async {
-                                                                          if (configModel.user ==
-                                                                              null) {
-                                                                            showDialog(
-                                                                              context: context,
-                                                                              builder: (context) => LoginRequiredPopupWidget(),
-                                                                            );
-                                                                          } else {
-                                                                            await wishListModel.getWishLists(relatedProduct.id);
-                                                                            setState(() {});
-                                                                          }
-                                                                        },
-                                                                        child: wishListModel.wishListLoader
-                                                                            ? SizedBox(
-                                                                                width: 20.0.sp,
-                                                                                height: 20.0.sp,
-                                                                                child: const CircularProgressIndicator(strokeWidth: 2),
-                                                                              )
-                                                                            : Icon(
-                                                                                wishListModel.wishLists?.any((wishList) => wishList.productId == relatedProduct.id && wishList.userId == configModel.user?.id) ?? false ? Icons.favorite_outlined : Icons.favorite_border_outlined,
-                                                                                color: wishListModel.wishLists?.any((wishList) => wishList.productId == relatedProduct.id && wishList.userId == configModel.user?.id) ?? false ? Colors.red : null,
-                                                                                size: 20.0.sp,
-                                                                              ),
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                                Padding(
-                                                                  padding: EdgeInsets.symmetric(
-                                                                      horizontal:
-                                                                          10.0
-                                                                              .w,
-                                                                      vertical:
-                                                                          8.0.w),
-                                                                  child: Text(
-                                                                    relatedProduct
-                                                                            .name ??
-                                                                        'Unnamed Product',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                    maxLines: 2,
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
-                                                                    style:
-                                                                        MyGoogleFontStyle(
-                                                                      fontFamily:
-                                                                          'Urbanist',
-                                                                      fontSize:
-                                                                          15.0.sp,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w700,
-                                                                      color: const Color(
-                                                                          0xff000000),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                if (relatedProduct
-                                                                        .productPrices
-                                                                        ?.isNotEmpty ??
-                                                                    false)
-                                                                  Padding(
-                                                                    padding: EdgeInsets.only(
-                                                                        bottom:
-                                                                            4.0.w),
-                                                                    child: relatedProduct.productPrices![0].offerPrice !=
-                                                                                null &&
-                                                                            relatedProduct.productPrices![0].offerPrice !=
-                                                                                0
-                                                                        ? Text
-                                                                            .rich(
-                                                                            TextSpan(
-                                                                              children: [
-                                                                                TextSpan(
-                                                                                  text: '₹${relatedProduct.productPrices![0].price ?? '0'}',
-                                                                                  style: TextStyle(
-                                                                                    color: Colors.grey,
-                                                                                    decoration: TextDecoration.lineThrough,
-                                                                                    fontSize: 13.0.sp,
-                                                                                    fontFamily: 'Poppins',
-                                                                                    fontWeight: FontWeight.w500,
-                                                                                  ),
-                                                                                ),
-                                                                                TextSpan(
-                                                                                  text: ' ₹${relatedProduct.productPrices![0].offerPrice ?? '0'}',
-                                                                                  style: TextStyle(
-                                                                                    fontSize: 13.0.sp,
-                                                                                    fontFamily: 'Poppins',
-                                                                                    fontWeight: FontWeight.w500,
-                                                                                    color: const Color(0x99000000),
-                                                                                  ),
-                                                                                ),
-                                                                              ],
-                                                                            ),
-                                                                          )
-                                                                        : Text(
-                                                                            '₹${relatedProduct.productPrices![0].price ?? '0'}',
-                                                                            style:
-                                                                                MyGoogleFontStyle(
-                                                                              fontFamily: 'Poppins',
-                                                                              fontSize: 13.0.sp,
-                                                                              fontWeight: FontWeight.w500,
-                                                                              color: const Color(0x99000000),
-                                                                            ),
-                                                                          ),
-                                                                  ),
-                                                                if (relatedDiscount !=
-                                                                    0.0)
-                                                                  Text(
-                                                                    '(${relatedDiscount.round()}% Off)',
-                                                                    style:
-                                                                        MyGoogleFontStyle(
-                                                                      fontFamily:
-                                                                          'Poppins',
-                                                                      fontSize:
-                                                                          13.0.sp,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500,
-                                                                      color: const Color(
-                                                                          0x99000000),
-                                                                    ),
-                                                                  ),
-                                                                // Rating and Reviews
-                                                                Padding(
-                                                                  padding: EdgeInsets
-                                                                      .only(
-                                                                          top: 4.0
-                                                                              .w),
-                                                                  child: Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      relatedProduct.rating == null ||
-                                                                              relatedProduct.rating ==
-                                                                                  '0'
-                                                                          ? Text(
-                                                                              "No Rating",
-                                                                              style: TextStyle(fontSize: 10.0.sp),
-                                                                            )
-                                                                          : RatingBar
-                                                                              .builder(
-                                                                              itemSize: 15.0.sp,
-                                                                              initialRating: double.tryParse(relatedProduct.rating ?? '0.0') ?? 0.0,
-                                                                              direction: Axis.horizontal,
-                                                                              itemCount: 5,
-                                                                              allowHalfRating: true,
-                                                                              ignoreGestures: true,
-                                                                              itemBuilder: (context, _) => const Icon(Icons.star, color: Colors.amber),
-                                                                              onRatingUpdate: (double value) {},
-                                                                            ),
-                                                                      if (relatedProduct
-                                                                              .rating !=
-                                                                          '0')
-                                                                        Padding(
-                                                                          padding:
-                                                                              EdgeInsets.only(left: 4.0.w),
-                                                                          child:
-                                                                              Text(
-                                                                            '(${relatedProduct.totalReviews ?? 0})',
-                                                                            style:
-                                                                                TextStyle(fontSize: 10.0.sp),
-                                                                          ),
-                                                                        ),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
+
+                                                        return Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  right:
+                                                                      12.0.w),
+                                                          child:
+                                                              CommonProductCard(
+                                                            product:
+                                                                relatedProduct,
+                                                            discountPrice:
+                                                                relatedDiscount,
                                                           ),
                                                         );
                                                       },
@@ -2512,317 +2340,338 @@ class _ProductIdPageState extends State<ProductIdPage> {
                   ),
                   SizedBox(width: 8.0.w),
                   Expanded(
-                    child: TextButton(
-                      onPressed: () async {
-                        if (currentPackQty <= 0) {
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20.0.r)),
-                              title: Row(
+                    child: currentPackQty <= 0
+                        ? TextButton(
+                            onPressed: _handleNotifyMe,
+                            style:
+                                TextButton.styleFrom(padding: EdgeInsets.zero),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20.0.w, vertical: 10.0.w),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFC7B456),
+                                borderRadius: BorderRadius.circular(10.0.r),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.info_outline,
-                                      color: Colors.orange, size: 24.0.sp),
+                                  Icon(
+                                    Icons.notifications_active_outlined,
+                                    color: Colors.white,
+                                    size: 18.sp,
+                                  ),
                                   SizedBox(width: 10.0.w),
-                                  Expanded(
-                                    child: Text(
-                                      'Out of Stock',
-                                      style: TextStyle(
-                                        fontSize: 18.0.sp,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                  Text(
+                                    'Notify Me',
+                                    style: MyGoogleFontStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontSize: 14.0.sp,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ],
                               ),
-                              content: Text(
-                                'Sorry, this product is currently out of stock. Please try selecting a different size or check back later.',
-                                style: TextStyle(fontSize: 14.0.sp),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text(
-                                    'OK',
-                                    style: TextStyle(
-                                        color: const Color(0xFFC7B456),
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16.0.sp),
-                                  ),
-                                ),
-                              ],
                             ),
-                          );
-                        } else if (_cartData['kindOfFlower'] == '' ||
-                            _cartData['flavour'] == '') {
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20.0.r)),
-                              title: Text(
-                                _cartData['kindOfFlower'] == '' &&
-                                        _cartData['flavour'] != ''
-                                    ? 'Kindly choose size.'
-                                    : _cartData['flavour'] == '' &&
-                                            _cartData['kindOfFlower'] != ''
-                                        ? 'Kindly choose colour.'
-                                        : 'Kindly choose colour and size.',
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text(
-                                    'Ok',
-                                    style: TextStyle(
-                                        color: Colors.black, fontSize: 16.0.sp),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        } else {
-                          // Check if the selected item is already in cart
-                          AddToCart? existingCartItem;
-                          try {
-                            existingCartItem =
-                                addToCartModel.addToCarts?.firstWhere(
-                              (cart) =>
-                                  cart.productId ==
-                                      widget.arguments!['product']['id'] &&
-                                  cart.flavour == _cartData['flavour'] &&
-                                  cart.kindOfFlower ==
-                                      _cartData['kindOfFlower'],
-                            );
-                          } catch (e) {
-                            existingCartItem = null;
-                          }
-
-                          if (existingCartItem == null) {
-                            // Item not in cart, show dialog to add
-                            int tempQuantity = 1;
-                            final BuildContext parentContext = context;
-                            showDialog(
-                              context: context,
-                              builder: (dialogContext) => StatefulBuilder(
-                                builder: (dialogContext, setDialogState) =>
-                                    AlertDialog(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(20.0.r)),
-                                  title: Text('Add to Cart'),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                          'This item is not in your cart. Please select quantity:'),
-                                      SizedBox(height: 10),
-                                      Text('Maximum available: $currentPackQty',
+                          )
+                        : TextButton(
+                            onPressed: () async {
+                              // Removed currentPackQty <= 0 check as it's handled by parent ternary
+                              if (_cartData['kindOfFlower'] == '' ||
+                                  _cartData['flavour'] == '') {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(20.0.r)),
+                                    title: Text(
+                                      _cartData['kindOfFlower'] == '' &&
+                                              _cartData['flavour'] != ''
+                                          ? 'Kindly choose size.'
+                                          : _cartData['flavour'] == '' &&
+                                                  _cartData['kindOfFlower'] !=
+                                                      ''
+                                              ? 'Kindly choose colour.'
+                                              : 'Kindly choose colour and size.',
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: Text(
+                                          'Ok',
                                           style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 12.0.sp,
-                                          )),
-                                      SizedBox(height: 20),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          IconButton(
-                                            onPressed: () {
-                                              if (tempQuantity > 1) {
-                                                setDialogState(() {
-                                                  tempQuantity--;
-                                                });
-                                              }
-                                            },
-                                            icon: Container(
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    color: Colors.grey),
-                                                borderRadius:
-                                                    BorderRadius.circular(5),
-                                              ),
-                                              child:
-                                                  Icon(Icons.remove, size: 20),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 20),
-                                            child: Text(
-                                              tempQuantity.toString(),
-                                              style: TextStyle(
-                                                fontSize: 18.0.sp,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                          // Hide plus button when quantity reaches available stock
-                                          if (tempQuantity < currentPackQty)
-                                            IconButton(
-                                              onPressed: () {
-                                                if (tempQuantity <
-                                                    currentPackQty) {
-                                                  setDialogState(() {
-                                                    tempQuantity++;
-                                                  });
-                                                }
-                                              },
-                                              icon: Container(
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      color: Colors.grey),
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                ),
-                                                child:
-                                                    Icon(Icons.add, size: 20),
-                                              ),
-                                            ),
-                                        ],
+                                              color: Colors.black,
+                                              fontSize: 16.0.sp),
+                                        ),
                                       ),
                                     ],
                                   ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(dialogContext),
-                                      child: Text(
-                                        'Cancel',
-                                        style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 16.0.sp),
+                                );
+                              } else {
+                                // Check if the selected item is already in cart
+                                AddToCart? existingCartItem;
+                                try {
+                                  existingCartItem =
+                                      addToCartModel.addToCarts?.firstWhere(
+                                    (cart) =>
+                                        cart.productId ==
+                                            widget.arguments!['product']
+                                                ['id'] &&
+                                        cart.flavour == _cartData['flavour'] &&
+                                        cart.kindOfFlower ==
+                                            _cartData['kindOfFlower'],
+                                  );
+                                } catch (e) {
+                                  existingCartItem = null;
+                                }
+
+                                if (existingCartItem == null) {
+                                  // Item not in cart, show dialog to add
+                                  int tempQuantity = 1;
+                                  final BuildContext parentContext = context;
+                                  showDialog(
+                                    context: context,
+                                    builder: (dialogContext) => StatefulBuilder(
+                                      builder:
+                                          (dialogContext, setDialogState) =>
+                                              AlertDialog(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0.r)),
+                                        title: Text('Add to Cart'),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                                'This item is not in your cart. Please select quantity:'),
+                                            SizedBox(height: 10),
+                                            Text(
+                                                'Maximum available: $currentPackQty',
+                                                style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 12.0.sp,
+                                                )),
+                                            SizedBox(height: 20),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                IconButton(
+                                                  onPressed: () {
+                                                    if (tempQuantity > 1) {
+                                                      setDialogState(() {
+                                                        tempQuantity--;
+                                                      });
+                                                    }
+                                                  },
+                                                  icon: Container(
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: Colors.grey),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5),
+                                                    ),
+                                                    child: Icon(Icons.remove,
+                                                        size: 20),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 20),
+                                                  child: Text(
+                                                    tempQuantity.toString(),
+                                                    style: TextStyle(
+                                                      fontSize: 18.0.sp,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                                // Hide plus button when quantity reaches available stock
+                                                if (tempQuantity <
+                                                    currentPackQty)
+                                                  IconButton(
+                                                    onPressed: () {
+                                                      if (tempQuantity <
+                                                          currentPackQty) {
+                                                        setDialogState(() {
+                                                          tempQuantity++;
+                                                        });
+                                                      }
+                                                    },
+                                                    icon: Container(
+                                                      decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                            color: Colors.grey),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5),
+                                                      ),
+                                                      child: Icon(Icons.add,
+                                                          size: 20),
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(dialogContext),
+                                            child: Text(
+                                              'Cancel',
+                                              style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 16.0.sp),
+                                            ),
+                                          ),
+                                          TextButton(
+                                            onPressed: () async {
+                                              // Check if quantity exceeds available stock
+                                              if (currentPackQty > 0 &&
+                                                  tempQuantity >
+                                                      currentPackQty) {
+                                                ScaffoldMessenger.of(
+                                                        parentContext)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                        'Only $currentPackQty items available in stock'),
+                                                    backgroundColor:
+                                                        Colors.orange,
+                                                    duration:
+                                                        Duration(seconds: 2),
+                                                  ),
+                                                );
+                                                return;
+                                              }
+
+                                              Navigator.pop(
+                                                  dialogContext); // Close dialog
+
+                                              // Add to cart with selected quantity
+                                              _cartData['points'] =
+                                                  _productPoints;
+
+                                              // Set product price safely
+                                              if (_prices.isNotEmpty) {
+                                                final offerPrice =
+                                                    _prices[0]['offer_price'];
+                                                final price =
+                                                    _prices[0]['price'];
+
+                                                _cartData['product_price'] =
+                                                    (offerPrice != null &&
+                                                            offerPrice != 0)
+                                                        ? offerPrice.toString()
+                                                        : (price?.toString() ??
+                                                            '0');
+                                              } else {
+                                                _cartData['product_price'] =
+                                                    '0';
+                                              }
+                                              _cartData['is_add_to_cart'] =
+                                                  true;
+
+                                              // Pass available quantity for validation
+                                              _cartData['available_qty'] =
+                                                  currentPackQty;
+
+                                              // Add item to cart with quantity
+                                              // First add the item to cart
+                                              await addToCartModel.getAddToCart(
+                                                  widget.arguments!['product']
+                                                      ['id'],
+                                                  true,
+                                                  _cartData);
+
+                                              // If user selected more than 1, add additional quantities
+                                              if (tempQuantity > 1) {
+                                                // Add the remaining quantity by calling the API multiple times
+                                                // The API increments by 1 each time when type=true
+                                                for (int i = 1;
+                                                    i < tempQuantity;
+                                                    i++) {
+                                                  await addToCartModel
+                                                      .getAddToCart(
+                                                          widget.arguments![
+                                                              'product']['id'],
+                                                          true,
+                                                          _cartData);
+                                                }
+                                              }
+
+                                              // Navigate to cart using the parent context
+                                              if (mounted) {
+                                                Navigator.push(
+                                                  parentContext,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        CartPage(isProfile: {
+                                                      'isProfile': false
+                                                    }),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                            child: Text(
+                                              'Add & Proceed',
+                                              style: TextStyle(
+                                                  color: Color(0xFFC7B456),
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16.0.sp),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    TextButton(
-                                      onPressed: () async {
-                                        // Check if quantity exceeds available stock
-                                        if (currentPackQty > 0 && tempQuantity > currentPackQty) {
-                                          ScaffoldMessenger.of(parentContext).showSnackBar(
-                                            SnackBar(
-                                              content: Text('Only $currentPackQty items available in stock'),
-                                              backgroundColor: Colors.orange,
-                                              duration: Duration(seconds: 2),
-                                            ),
-                                          );
-                                          return;
-                                        }
-
-                                        Navigator.pop(
-                                            dialogContext); // Close dialog
-
-                                        // Add to cart with selected quantity
-                                        _cartData['points'] = _productPoints;
-
-                                        // Set product price safely
-                                        if (_prices.isNotEmpty) {
-                                          final offerPrice =
-                                              _prices[0]['offer_price'];
-                                          final price = _prices[0]['price'];
-
-                                          _cartData['product_price'] =
-                                              (offerPrice != null &&
-                                                      offerPrice != 0)
-                                                  ? offerPrice.toString()
-                                                  : (price?.toString() ?? '0');
-                                        } else {
-                                          _cartData['product_price'] = '0';
-                                        }
-                                        _cartData['is_add_to_cart'] = true;
-
-                                        // Pass available quantity for validation
-                                        _cartData['available_qty'] = currentPackQty;
-
-                                        // Add item to cart with quantity
-                                        // First add the item to cart
-                                        await addToCartModel.getAddToCart(
-                                            widget.arguments!['product']['id'],
-                                            true,
-                                            _cartData);
-
-                                        // If user selected more than 1, add additional quantities
-                                        if (tempQuantity > 1) {
-                                          // Add the remaining quantity by calling the API multiple times
-                                          // The API increments by 1 each time when type=true
-                                          for (int i = 1;
-                                              i < tempQuantity;
-                                              i++) {
-                                            await addToCartModel.getAddToCart(
-                                                widget.arguments!['product']
-                                                    ['id'],
-                                                true,
-                                                _cartData);
-                                          }
-                                        }
-
-                                        // Navigate to cart using the parent context
-                                        if (mounted) {
-                                          Navigator.push(
-                                            parentContext,
-                                            MaterialPageRoute(
-                                              builder: (context) => CartPage(
-                                                  isProfile: {
-                                                    'isProfile': false
-                                                  }),
-                                            ),
-                                          );
-                                        }
-                                      },
-                                      child: Text(
-                                        'Add & Proceed',
-                                        style: TextStyle(
-                                            color: Color(0xFFC7B456),
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16.0.sp),
-                                      ),
+                                  );
+                                } else {
+                                  // Item already in cart, navigate directly
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CartPage(
+                                          isProfile: {'isProfile': false}),
                                     ),
-                                  ],
-                                ),
+                                  );
+                                }
+                              }
+                            },
+                            style:
+                                TextButton.styleFrom(padding: EdgeInsets.zero),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20.0.w, vertical: 10.0.w),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFC7B456),
+                                borderRadius: BorderRadius.circular(10.0.r),
                               ),
-                            );
-                          } else {
-                            // Item already in cart, navigate directly
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    CartPage(isProfile: {'isProfile': false}),
-                              ),
-                            );
-                          }
-                        }
-                      },
-                      style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 20.0.w, vertical: 10.0.w),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFC7B456),
-                          borderRadius: BorderRadius.circular(10.0.r),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              'assets/images/shopping-bag-03.png',
-                              width: 18.0.w,
-                              height: 17.0.w,
-                            ),
-                            SizedBox(width: 10.0.w),
-                            Text(
-                              'Buy Now',
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Urbanist',
-                                fontSize: 14.0.sp,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    'assets/images/shopping-bag-03.png',
+                                    width: 18.0.w,
+                                    height: 17.0.w,
+                                  ),
+                                  SizedBox(width: 10.0.w),
+                                  Text(
+                                    'Buy Now',
+                                    style: MyGoogleFontStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontSize: 14.0.sp,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
+                          ),
                   ),
                 ],
               ),
@@ -2832,7 +2681,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
 }
 
 // Isolated widget for product descriptions that won't rebuild on parent state changes
-class ProductDescriptionSection extends StatelessWidget {
+class ProductDescriptionSection extends StatefulWidget {
   final Product product;
   final GlobalKey smallDescKey;
   final GlobalKey descKey;
@@ -2849,98 +2698,282 @@ class ProductDescriptionSection extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<ProductDescriptionSection> createState() =>
+      _ProductDescriptionSectionState();
+}
+
+class _ProductDescriptionSectionState extends State<ProductDescriptionSection> {
+  // Track expanded state for each section
+  bool _highlightsExpanded = true;
+  bool _descriptionExpanded = false;
+  bool _specificationsExpanded = false;
+  bool _additionalInfoExpanded = false;
+
+  @override
   Widget build(BuildContext context) {
+    final product = widget.product;
+    final hasAnyDescription = product.smallDescription != null ||
+        product.description != null ||
+        product.description1 != null ||
+        product.description2 != null;
+
+    if (!hasAnyDescription) return SizedBox.shrink();
+
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Section Header
+        Padding(
+          padding: EdgeInsets.only(bottom: 16.w),
+          child: Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(10.w),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFFEED056), Color(0xFFF6E27F)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0xFFEED056).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.description_outlined,
+                  color: Colors.white,
+                  size: 20.sp,
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Product Details',
+                    style: TextStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xff232323),
+                    ),
+                  ),
+                  SizedBox(height: 2.w),
+                  Container(
+                    height: 3.w,
+                    width: 50.w,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFFEED056),
+                          Color(0xFFEED056).withOpacity(0.3),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(2.r),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+
+        // Small Description (Highlights)
         if (product.smallDescription != null)
-          RepaintBoundary(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 10.0.w),
-              child: Card(
-                elevation: 4,
-                color: Colors.white,
-                margin: EdgeInsets.zero,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0.r),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(16.0.w),
-                  child: PreservedHtmlWidget(
-                    key: smallDescKey,
-                    uniqueKey: 'small_desc_${product.id}',
-                    data: product.smallDescription.toString(),
-                  ),
-                ),
-              ),
-            ),
+          _buildCollapsibleCard(
+            globalKey: widget.smallDescKey,
+            uniqueKey: 'small_desc_${product.id}',
+            data: product.smallDescription.toString(),
+            icon: Icons.auto_awesome,
+            title: 'Highlights',
+            gradientColors: [Color(0xFFFFF8E1), Colors.white],
+            isExpanded: _highlightsExpanded,
+            onToggle: () =>
+                setState(() => _highlightsExpanded = !_highlightsExpanded),
           ),
+
+        // Main Description
         if (product.description != null)
-          RepaintBoundary(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 10.0.w),
-              child: Card(
-                elevation: 4,
-                color: Colors.white,
-                margin: EdgeInsets.zero,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0.r),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(16.0.w),
-                  child: PreservedHtmlWidget(
-                    key: descKey,
-                    uniqueKey: 'desc_${product.id}',
-                    data: product.description.toString(),
-                  ),
-                ),
-              ),
-            ),
+          _buildCollapsibleCard(
+            globalKey: widget.descKey,
+            uniqueKey: 'desc_${product.id}',
+            data: product.description.toString(),
+            icon: Icons.info_outline,
+            title: 'Description',
+            gradientColors: [Color(0xFFFFFEF9), Colors.white],
+            isExpanded: _descriptionExpanded,
+            onToggle: () =>
+                setState(() => _descriptionExpanded = !_descriptionExpanded),
           ),
+
+        // Description 1 (Specifications)
         if (product.description1 != null)
-          RepaintBoundary(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 10.0.w),
-              child: Card(
-                elevation: 4,
-                color: Colors.white,
-                margin: EdgeInsets.zero,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0.r),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(16.0.w),
-                  child: PreservedHtmlWidget(
-                    key: desc1Key,
-                    uniqueKey: 'desc1_${product.id}',
-                    data: product.description1.toString(),
-                  ),
-                ),
-              ),
-            ),
+          _buildCollapsibleCard(
+            globalKey: widget.desc1Key,
+            uniqueKey: 'desc1_${product.id}',
+            data: product.description1.toString(),
+            icon: Icons.settings_outlined,
+            title: 'Specifications',
+            gradientColors: [Color(0xFFF5F5F5), Colors.white],
+            isExpanded: _specificationsExpanded,
+            onToggle: () => setState(
+                () => _specificationsExpanded = !_specificationsExpanded),
           ),
+
+        // Description 2 (Additional Info)
         if (product.description2 != null)
-          RepaintBoundary(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 10.0.w),
-              child: Card(
-                elevation: 4,
-                color: Colors.white,
-                margin: EdgeInsets.zero,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0.r),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(16.0.w),
-                  child: PreservedHtmlWidget(
-                    key: desc2Key,
-                    uniqueKey: 'desc2_${product.id}',
-                    data: product.description2.toString(),
-                  ),
-                ),
-              ),
-            ),
+          _buildCollapsibleCard(
+            globalKey: widget.desc2Key,
+            uniqueKey: 'desc2_${product.id}',
+            data: product.description2.toString(),
+            icon: Icons.add_circle_outline,
+            title: 'Additional Information',
+            gradientColors: [Color(0xFFFFFEF9), Colors.white],
+            isExpanded: _additionalInfoExpanded,
+            onToggle: () => setState(
+                () => _additionalInfoExpanded = !_additionalInfoExpanded),
           ),
       ],
+    );
+  }
+
+  Widget _buildCollapsibleCard({
+    required GlobalKey globalKey,
+    required String uniqueKey,
+    required String data,
+    required IconData icon,
+    required String title,
+    required List<Color> gradientColors,
+    required bool isExpanded,
+    required VoidCallback onToggle,
+  }) {
+    return RepaintBoundary(
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        margin: EdgeInsets.only(bottom: 12.w),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: gradientColors,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color: isExpanded
+                ? Color(0xFFEED056).withOpacity(0.3)
+                : Color(0xFFEED056).withOpacity(0.15),
+            width: isExpanded ? 1.5 : 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Color(0xFFEED056).withOpacity(isExpanded ? 0.12 : 0.08),
+              blurRadius: isExpanded ? 20 : 16,
+              offset: Offset(0, isExpanded ? 8 : 6),
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 8,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Card Header (Tappable)
+            InkWell(
+              onTap: onToggle,
+              borderRadius: isExpanded
+                  ? BorderRadius.only(
+                      topLeft: Radius.circular(16.r),
+                      topRight: Radius.circular(16.r),
+                    )
+                  : BorderRadius.circular(16.r),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.w),
+                decoration: BoxDecoration(
+                  border: isExpanded
+                      ? Border(
+                          bottom: BorderSide(
+                            color: Color(0xFFEED056).withOpacity(0.2),
+                            width: 1,
+                          ),
+                        )
+                      : null,
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8.w),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFEED056)
+                            .withOpacity(isExpanded ? 0.18 : 0.12),
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                      child: Icon(
+                        icon,
+                        color: Color(0xFFD4A840),
+                        size: 18.sp,
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: TextStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff232323),
+                        ),
+                      ),
+                    ),
+                    AnimatedRotation(
+                      duration: Duration(milliseconds: 300),
+                      turns: isExpanded ? 0.5 : 0,
+                      child: Container(
+                        padding: EdgeInsets.all(6.w),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFEED056).withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.keyboard_arrow_down,
+                          color: Color(0xFFD4A840),
+                          size: 20.sp,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Card Content (Collapsible)
+            AnimatedCrossFade(
+              duration: Duration(milliseconds: 300),
+              crossFadeState: isExpanded
+                  ? CrossFadeState.showFirst
+                  : CrossFadeState.showSecond,
+              firstChild: Padding(
+                padding: EdgeInsets.all(16.w),
+                child: PreservedHtmlWidget(
+                  key: globalKey,
+                  uniqueKey: uniqueKey,
+                  data: data,
+                ),
+              ),
+              secondChild: SizedBox.shrink(),
+              sizeCurve: Curves.easeInOut,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

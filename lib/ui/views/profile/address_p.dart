@@ -435,6 +435,27 @@ class _AddressPageState extends State<AddressPage> {
                           ],
                         ),
                       ),
+                      if (address.isDefault == 1) ...[
+                        SizedBox(width: 8),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFC7B456),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            'DEFAULT',
+                            style: TextStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
                       Spacer(),
                       // Edit button
                       Container(

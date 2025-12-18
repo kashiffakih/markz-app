@@ -652,6 +652,7 @@ class Tags {
   String? createdAt;
   String? updatedAt;
   String? imagepath;
+  List<Product>? products;
 
   Tags({
     this.id,
@@ -659,6 +660,7 @@ class Tags {
     this.createdAt,
     this.updatedAt,
     this.imagepath,
+    this.products,
   });
 
   Tags.fromJson(Map<String, dynamic> json) {
@@ -667,6 +669,12 @@ class Tags {
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     imagepath = json['imagepath'];
+    if (json['products'] != null) {
+      products = <Product>[];
+      json['products'].forEach((v) {
+        products!.add(new Product.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -676,10 +684,14 @@ class Tags {
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
     data['imagepath'] = this.imagepath;
+    if (this.products != null) {
+      data['products'] = this.products!.map((v) => v.toJson()).toList();
+    }
 
     return data;
   }
 }
+
 
 class ProductImages {
   int? id;

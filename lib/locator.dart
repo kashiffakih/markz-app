@@ -12,6 +12,8 @@ import 'package:aadab/core/services/user_wallet_s.dart';
 import 'package:aadab/core/services/wish_list_s.dart';
 import 'package:aadab/core/services/coupon_s.dart';
 import 'package:aadab/core/services/phonepe_s.dart';
+import 'package:aadab/core/services/product_notification_s.dart';
+import 'package:aadab/core/services/invoice_service.dart';
 
 GetIt locator = GetIt.instance;
 
@@ -29,4 +31,6 @@ void setupLocator() {
   locator.registerLazySingleton(() => UserWalletService());
   locator.registerLazySingleton(() => NotificationService());
   locator.registerLazySingleton(() => PhonePeService());
+  locator.registerLazySingleton(() => ProductNotificationService());
+  locator.registerLazySingleton(() => InvoiceService());
 }

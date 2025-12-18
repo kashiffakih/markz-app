@@ -105,7 +105,23 @@ class ProductService {
     return _banners;
   }
 
-  // Get product by ID with full details including packs
+  List<Tags> _tags = [];
+  getTags() async {
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    http.Response _response = await http.get(
+      Uri.parse('${_apiConfig['baseURL']}/tags'),
+      headers: _apiConfig['headers'],
+    );
+    Map<String, dynamic> _responseData = json.decode(_response.body);
+    if (_responseData['success']) {
+      _tags = [];
+      _responseData['data'].forEach((data) {
+        _tags.add(Tags.fromJson(data));
+      });
+    }
+    return _tags;
+  }
+
   Future<Product?> getProductById(int productId) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
     try {
@@ -124,5 +140,28 @@ class ProductService {
       print('Error fetching product by ID: $e');
     }
     return null;
+  }
+
+  List<Product> _randomProducts = [];
+  getRandomProducts() async {
+    try {
+      Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+      http.Response _response = await http.get(
+        Uri.parse('${_apiConfig['baseURL']}/random_products'),
+        headers: _apiConfig['headers'],
+      );
+      if (_response.statusCode == 200) {
+        Map<String, dynamic> _responseData = json.decode(_response.body);
+        if (_responseData['success']) {
+          _randomProducts = [];
+          _responseData['data'].forEach((data) {
+            _randomProducts.add(Product.fromJson(data));
+          });
+        }
+      }
+    } catch (e) {
+      print('Error fetching random products: $e');
+    }
+    return _randomProducts;
   }
 }

@@ -23,7 +23,9 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
     city: null,
     state: null,
     nationality: 'INDIA',
+
     pincode: '',
+    isDefault: 0,
   );
   String countryValue = "INDIA";
   String stateValue = "";
@@ -748,6 +750,44 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                           ],
                         ),
                       ),
+
+                      SizedBox(height: 24),
+                      
+                      // Set as Default Checkbox
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                             BoxShadow(
+                              color: Colors.black.withOpacity(0.04),
+                              blurRadius: 10,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: CheckboxListTile(
+                          value: _userAddress.isDefault == 1,
+                          onChanged: (value) {
+                            setState(() {
+                              _userAddress.isDefault = value == true ? 1 : 0;
+                            });
+                          },
+                          activeColor: Color(0xFFC7B456),
+                          title: Text(
+                            "Set as Default Address",
+                             style: TextStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF1A1A1A),
+                            ),
+                          ),
+                          controlAffinity: ListTileControlAffinity.leading,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                        ),
+                      ),
+
 
                       SizedBox(height: 24),
 

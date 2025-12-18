@@ -75,4 +75,28 @@ class ProductModel with ChangeNotifier {
   getBanners() async {
     banners = await _productService.getBanners();
   }
+
+  List<Tags>? _tags;
+  set tags(List<Tags>? newTags) {
+    _tags = newTags;
+    notifyListeners();
+  }
+
+  List<Tags>? get tags => _tags;
+
+  getTags() async {
+    tags = await _productService.getTags();
+  }
+
+  List<Product>? _randomProducts;
+  set randomProducts(List<Product>? newProducts) {
+    _randomProducts = newProducts;
+    notifyListeners();
+  }
+
+  List<Product>? get randomProducts => _randomProducts;
+
+  getRandomProducts() async {
+    randomProducts = await _productService.getRandomProducts();
+  }
 }

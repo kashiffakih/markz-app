@@ -19,7 +19,11 @@ class UserAddressModel with ChangeNotifier {
   List<UserAddress>? get userAddresses => _userAddresses;
 
   getUserAddresses() async {
-    userAddresses = await _userAddressService.getUserAddresses();
+    List<UserAddress>? fetchedAddresses = await _userAddressService.getUserAddresses();
+    if (fetchedAddresses != null) {
+      fetchedAddresses.sort((a, b) => (b.isDefault ?? 0).compareTo(a.isDefault ?? 0));
+    }
+    userAddresses = fetchedAddresses;
   }
 
   Future<bool> saveUserAddress({@required UserAddress? userAddress}) async {

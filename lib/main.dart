@@ -15,6 +15,7 @@ import 'package:aadab/core/providers/coupon_pr.dart';
 import 'package:aadab/core/providers/user_address_pr.dart';
 import 'package:aadab/core/providers/user_wallet_pr.dart';
 import 'package:aadab/core/providers/wish_list_pr.dart';
+import 'package:aadab/core/providers/product_notification_pr.dart'; // [NEW]
 import 'package:aadab/locator.dart';
 import 'package:aadab/ui/root_p.dart';
 import 'package:aadab/ui/routing/router.dart';
@@ -133,6 +134,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => NotificationModel()),
         ChangeNotifierProvider(create: (_) => CouponModel()),
         ChangeNotifierProvider(create: (_) => UserWalletModel()),
+        ChangeNotifierProvider(create: (_) => ProductNotificationModel()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(360, 690),

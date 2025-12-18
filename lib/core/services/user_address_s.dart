@@ -49,17 +49,19 @@ class UserAddressService {
         headers: apiConfig['headers']);
 
     Map<String, dynamic> _responseData = json.decode(_response.body);
-    return _responseData['success'];
+    return _responseData['success'] ?? false;
   }
 
   Future<bool> updateUserAddress({@required UserAddress? userAddress}) async {
     Map<String, dynamic> apiConfig = _configModel.apiConfig;
+    print(userAddress!.toJson());
     http.Response _response = await http.patch(
         Uri.parse(apiConfig['baseURL'] + '/user_addresses/${userAddress!.id}'),
         body: json.encode(userAddress.toJson()),
         headers: apiConfig['headers']);
 
     Map<String, dynamic> _responseData = json.decode(_response.body);
-    return _responseData['success'];
+    print(_responseData);
+    return _responseData['success'] ?? false;
   }
 }

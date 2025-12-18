@@ -12,6 +12,8 @@ import 'package:aadab/core/providers/config_pr.dart';
 import 'package:aadab/core/services/product_s.dart';
 import 'package:aadab/locator.dart';
 import 'package:aadab/ui/views/products/product_id_p.dart';
+import 'package:aadab/core/services/invoice_service.dart';
+import 'package:printing/printing.dart';
 
 class OrderDetailsPage extends StatefulWidget {
   final arguments;
@@ -239,6 +241,35 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   ),
                 ),
               ),
+              Spacer(),
+              if (status == 'Delivered')
+                InkWell(
+                  onTap: () => _downloadInvoice(context),
+                  child: Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.w),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black12),
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.download_rounded,
+                            size: 16.sp, color: Colors.black87),
+                        SizedBox(width: 4.w),
+                        Text(
+                          'Invoice',
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
             ],
           ),
           SizedBox(height: 12.w),
@@ -1094,6 +1125,26 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           _isLoading = false;
         });
       }
+    }
+  }
+
+  Future<void> _downloadInvoice(BuildContext context) async {
+    try {
+      setState(() => _isLoading = true);
+      final invoiceService = locator<InvoiceService>();
+      final order = widget.arguments?['order'];
+
+      if (order != null) {
+        final pdfBytes = await invoiceService.generateInvoice(order);
+        await Printing.sharePdf(
+            bytes: pdfBytes, filename: 'invoice_${order['id']}.pdf');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to download invoice: $e')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 }

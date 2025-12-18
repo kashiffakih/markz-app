@@ -8,9 +8,10 @@ import 'package:aadab/core/providers/product_pr.dart';
 import 'package:aadab/core/providers/wish_list_pr.dart';
 import 'package:aadab/locator.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
-import 'package:aadab/ui/views/products/product_id_p.dart';
+
 import 'package:aadab/ui/views/checkout/cart_p.dart';
 import 'package:aadab/ui/widgets/login_required_popup.dart';
+import 'package:aadab/ui/widgets/common_product_card.dart';
 import 'package:badges/badges.dart' as badges;
 import 'dart:async';
 
@@ -133,6 +134,8 @@ class ShopsPageState extends State<ShopsPage> {
     final cartCount = addToCartModel.addToCarts?.length ?? 0;
 
     return Scaffold(
+      bottomNavigationBar: _buildBottomNavigationBar(
+          context, configModel, addToCartModel, cartCount),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -219,15 +222,14 @@ class ShopsPageState extends State<ShopsPage> {
                         child: SingleChildScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
                           child: Container(
-                            padding: EdgeInsets.fromLTRB(
-                                9.0.w, 16.0.w, 9.0.w, 22.0.w),
+                            padding: EdgeInsets.fromLTRB(0.w, 0.w, 0.w, 22.0.w),
                             width: 1.0.sw,
                             constraints: BoxConstraints(minHeight: 1.0.sh),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildTopSection(context, cartCount),
-                                SizedBox(height: 2.0.w),
+                                SizedBox(height: 20.0.w),
                                 _buildCategoriesSection(context, productModel),
                                 if (_isSearching)
                                   Container(
@@ -256,114 +258,52 @@ class ShopsPageState extends State<ShopsPage> {
 
   Widget _buildTopSection(BuildContext context, int cartCount) {
     return Container(
-      margin: EdgeInsets.only(left: 10.0.w, bottom: 20.0.w, right: 10.0.w),
       width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFFEED056),
+            Color(0xFFF6E27F),
+          ],
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(30.r),
+          bottomRight: Radius.circular(30.r),
+        ),
+      ),
+      padding: EdgeInsets.fromLTRB(20.w, 10.w, 20.w, 25.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(
-            child: Text(
-              'Browse Products',
-              textAlign: TextAlign.center,
-              style: MyGoogleFontStyle(
-                fontFamily: 'Urbanist',
-                fontSize: 20.0.sp,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xff1e232c),
-              ),
-            ),
-          ),
-          SizedBox(height: 15.0.w),
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               InkWell(
                 onTap: () => Navigator.pop(context),
                 child: Container(
                   padding: EdgeInsets.all(8.0.w),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Colors.white.withOpacity(0.2),
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color(0xFFEED056).withOpacity(0.15),
-                        blurRadius: 8,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
                   ),
                   child: Icon(
                     Icons.arrow_back_ios_new,
                     size: 16.0.sp,
-                    color: const Color(0xffEED056),
+                    color: Colors.white,
                   ),
                 ),
               ),
               SizedBox(width: 12.0.w),
-              Expanded(
-                child: Container(
-                  height: 45.0.w,
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 16.0.w, vertical: 4.0.w),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16.0.r),
-                    border: Border.all(
-                      color: Color(0xFFEED056).withOpacity(0.3),
-                      width: 1.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color(0xFFEED056).withOpacity(0.08),
-                        blurRadius: 15,
-                        offset: Offset(0, 4),
-                      ),
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
-                        blurRadius: 8,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Positioned(
-                        left: 0,
-                        child: Icon(
-                          Icons.search,
-                          color: Color(0xFFEED056),
-                          size: 20.0.sp,
-                        ),
-                      ),
-                      Center(
-                        child: TextFormField(
-                          controller: _controller,
-                          textAlign: TextAlign.center,
-                          onChanged: (value) {
-                            _searchProducts(value);
-                          },
-                          decoration: InputDecoration(
-                            hintText: 'Search products...',
-                            hintStyle: TextStyle(
-                              color: Color(0xFF909090),
-                              fontSize: 14.0.sp,
-                              fontFamily: 'Urbanist',
-                              fontWeight: FontWeight.w400,
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14.0.sp,
-                            fontFamily: 'Urbanist',
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+              Text(
+                'Browse Products',
+                textAlign: TextAlign.center,
+                style: MyGoogleFontStyle(
+                  fontFamily: 'Urbanist',
+                  fontSize: 20.0.sp,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
                 ),
               ),
               SizedBox(width: 12.0.w),
@@ -389,38 +329,84 @@ class ShopsPageState extends State<ShopsPage> {
                 child: Container(
                   padding: EdgeInsets.all(10.0.w),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Colors.white.withOpacity(0.2),
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color(0xFFEED056).withOpacity(0.15),
-                        blurRadius: 8,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
                   ),
                   child: badges.Badge(
                     badgeContent: Text(
                       cartCount.toString(),
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Color(0xFFEED056),
                         fontSize: 10.0.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     badgeStyle: badges.BadgeStyle(
-                      badgeColor: Color(0xFFEED056),
-                      padding: EdgeInsets.all(4),
+                      badgeColor: Colors.white,
+                      padding: EdgeInsets.all(6),
                     ),
                     child: Icon(
                       Icons.shopping_cart_outlined,
-                      color: Color(0xFFEED056),
                       size: 20.0.sp,
+                      color: Colors.white,
                     ),
                   ),
                 ),
               ),
             ],
+          ),
+          SizedBox(height: 30.0.w),
+          Container(
+            height: 45.0.w,
+            padding: EdgeInsets.symmetric(horizontal: 16.0.w, vertical: 2.0.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12.0.r),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.search,
+                  color: Color(0xFF909090),
+                  size: 20.0.sp,
+                ),
+                SizedBox(width: 12.0.w),
+                Expanded(
+                  child: TextFormField(
+                    controller: _controller,
+                    textAlign: TextAlign.start, // Left aligned
+                    onChanged: (value) {
+                      _searchProducts(value);
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Search products...',
+                      hintStyle: TextStyle(
+                        color: Color(0xFFAAAAAA),
+                        fontSize: 14.0.sp,
+                        fontFamily: 'Urbanist',
+                        fontWeight: FontWeight.w400,
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(vertical: 0),
+                      isDense: true,
+                    ),
+                    style: TextStyle(
+                      color: Color(0xff232323),
+                      fontSize: 14.0.sp,
+                      fontFamily: 'Urbanist',
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -581,8 +567,9 @@ class ShopsPageState extends State<ShopsPage> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                childAspectRatio: 1 / 1.5,
-                maxCrossAxisExtent: 200.0.w,
+                childAspectRatio:
+                    0.52, // Matches home page card ratio (width/height ≈ 145w/0.35sh)
+                maxCrossAxisExtent: 180.0.w,
                 mainAxisSpacing: 12.0.w,
                 crossAxisSpacing: 12.0.w,
               ),
@@ -605,8 +592,10 @@ class ShopsPageState extends State<ShopsPage> {
                   }
                 }
 
-                return _buildProductCard(context, configModel, wishListModel,
-                    product, discountPrice);
+                return CommonProductCard(
+                  product: product,
+                  discountPrice: discountPrice,
+                );
               },
             )
           : SizedBox(
@@ -616,243 +605,144 @@ class ShopsPageState extends State<ShopsPage> {
     );
   }
 
-  Widget _buildProductCard(
+  Widget _buildBottomNavigationBar(
     BuildContext context,
     ConfigModel configModel,
-    WishListModel wishListModel,
-    Product product,
-    double discountPrice,
+    AddToCartModel addToCartModel,
+    int cartCount,
   ) {
-    final isInWishlist = wishListModel.wishLists!
-        .where((wishList) =>
-            wishList.productId == product.id &&
-            wishList.userId == configModel.user?.id)
-        .isNotEmpty;
-
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => ProductIdPage(
-              arguments: {
-                'product': product.toJson(),
-                'product_images': product.productImages,
-              },
-            ),
+    const double _bottomNavBarHeight = 90.0;
+    const double _bottomNavIconSize = 24.0;
+    return Container(
+      height: _bottomNavBarHeight,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0xFFEED056).withOpacity(0.15),
+            blurRadius: 25,
+            spreadRadius: 0,
+            offset: Offset(0, -8),
           ),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Colors.white, Color(0xFFFFFDF7)],
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
+            offset: Offset(0, -4),
           ),
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: Color(0xFFEED056).withOpacity(0.12),
-              blurRadius: 15,
-              offset: Offset(0, 6),
-            ),
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
-              offset: Offset(0, 2),
-            ),
-          ],
+        ],
+        border: Border(
+          top: BorderSide(
+            color: Color(0xFFEED056).withOpacity(0.2),
+            width: 1.5,
+          ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Product Image
-            Expanded(
-              flex: 6,
-              child: Container(
-                margin: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  color: Color(0xFFF8F8F8),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        child: BottomNavigationBar(
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          selectedItemColor: Color(0xFFEED056),
+          unselectedItemColor: Color(0xFF909090),
+          selectedFontSize: 11,
+          unselectedFontSize: 11,
+          currentIndex: 1, // Set 'Category' as active (Index 1)
+          selectedLabelStyle: TextStyle(
+            fontFamily: 'Urbanist',
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.5,
+          ),
+          unselectedLabelStyle: TextStyle(
+            fontFamily: 'Urbanist',
+            fontWeight: FontWeight.w500,
+          ),
+          onTap: (value) =>
+              _handleBottomNavTap(context, value, configModel, addToCartModel),
+          items: [
+            BottomNavigationBarItem(
+              label: 'Home',
+              icon: Image.asset('assets/images/home-icon.png',
+                  width: _bottomNavIconSize,
+                  height: _bottomNavIconSize,
+                  color: Color(0xFF909090)), // Explicitly grey
+            ),
+            BottomNavigationBarItem(
+              label: 'Category',
+              icon: Image.asset('assets/images/category-icon.png',
+                  width: _bottomNavIconSize,
+                  height: _bottomNavIconSize,
+                  color: Color(0xFFEED056)), // Active (Yellow)
+            ),
+            BottomNavigationBarItem(
+              label: 'Cart',
+              icon: badges.Badge(
+                badgeContent: Text('$cartCount',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold)),
+                badgeStyle: badges.BadgeStyle(
+                  badgeColor: Color(0xFFEED056),
+                  padding: EdgeInsets.all(6),
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      product.productImages?.isNotEmpty ?? false
-                          ? Image.network(
-                              '${configModel.apiConfig['mediaURL']}${product.productImages!.first.imagepath}',
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Center(
-                                child: Icon(Icons.image_rounded,
-                                    color: Colors.grey[300], size: 40),
-                              ),
-                            )
-                          : Center(
-                              child: Icon(Icons.image_rounded,
-                                  color: Colors.grey[300], size: 40),
-                            ),
-                      // Wishlist button
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: GestureDetector(
-                          onTap: () async {
-                            await wishListModel.getWishLists(product.id);
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 8,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Icon(
-                              isInWishlist
-                                  ? Icons.favorite_rounded
-                                  : Icons.favorite_border_rounded,
-                              color:
-                                  isInWishlist ? Colors.red : Color(0xFF888888),
-                              size: 18,
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Discount badge
-                      if (discountPrice > 0)
-                        Positioned(
-                          top: 8,
-                          left: 8,
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [Color(0xFF4CAF50), Color(0xFF388E3C)],
-                              ),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              '${discountPrice.round()}% OFF',
-                              style: TextStyle(
-                                fontFamily: 'Urbanist',
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
+                child: Image.asset('assets/images/cart-icon.png',
+                    width: _bottomNavIconSize,
+                    height: _bottomNavIconSize,
+                    color: Color(0xFF909090)), // Explicitly grey
               ),
             ),
-            // Product Details
-            Expanded(
-              flex: 4,
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(12, 4, 12, 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Product Name
-                    Text(
-                      product.name ?? 'Unnamed Product',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontFamily: 'Urbanist',
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF1A1A1A),
-                        height: 1.3,
-                      ),
-                    ),
-                    Spacer(),
-                    // Price Row
-                    if (product.productPrices?.isNotEmpty ?? false)
-                      Row(
-                        children: [
-                          Text(
-                            '₹${product.productPrices![0].offerPrice ?? product.productPrices![0].price}',
-                            style: TextStyle(
-                              fontFamily: 'Urbanist',
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFFC7B456),
-                            ),
-                          ),
-                          if (product.productPrices![0].offerPrice != null &&
-                              product.productPrices![0].offerPrice != 0 &&
-                              product.productPrices![0].price !=
-                                  product.productPrices![0].offerPrice) ...[
-                            SizedBox(width: 6),
-                            Text(
-                              '₹${product.productPrices![0].price}',
-                              style: TextStyle(
-                                fontFamily: 'Urbanist',
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey,
-                                decoration: TextDecoration.lineThrough,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    SizedBox(height: 6),
-                    // Rating Row
-                    Row(
-                      children: [
-                        if (product.rating != null &&
-                            product.rating != '0') ...[
-                          Icon(Icons.star_rounded,
-                              color: Colors.amber, size: 14),
-                          SizedBox(width: 4),
-                          Text(
-                            product.rating ?? '0',
-                            style: TextStyle(
-                              fontFamily: 'Urbanist',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF666666),
-                            ),
-                          ),
-                          SizedBox(width: 4),
-                          Text(
-                            '(${product.totalReviews ?? 0})',
-                            style: TextStyle(
-                              fontFamily: 'Urbanist',
-                              fontSize: 11,
-                              color: Color(0xFF999999),
-                            ),
-                          ),
-                        ] else
-                          Text(
-                            'No reviews yet',
-                            style: TextStyle(
-                              fontFamily: 'Urbanist',
-                              fontSize: 11,
-                              color: Color(0xFFAAAAAA),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+            BottomNavigationBarItem(
+              label: 'Profile',
+              icon: Image.asset('assets/images/user-profile-icon.png',
+                  width: _bottomNavIconSize,
+                  height: _bottomNavIconSize,
+                  color: Color(0xFF909090)), // Explicitly grey
+            ),
+            BottomNavigationBarItem(
+              label: 'Notifs',
+              icon: Image.asset('assets/images/notification-icon.png',
+                  width: _bottomNavIconSize,
+                  height: _bottomNavIconSize,
+                  color: Color(0xFF909090)), // Explicitly grey
             ),
           ],
         ),
       ),
     );
+  }
+
+  void _handleBottomNavTap(
+    BuildContext context,
+    int value,
+    ConfigModel configModel,
+    AddToCartModel addToCartModel,
+  ) async {
+    if (value == 0) {
+      Navigator.pushNamed(context, '/homePage');
+    } else if (value == 1) {
+      // Already on Category/Shop page
+    } else if (value == 2) {
+      if (configModel.user == null) {
+        showDialog(
+            context: context, builder: (context) => LoginRequiredPopupWidget());
+      } else {
+        await addToCartModel.getAddToCart('', '', {});
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  const CartPage(isProfile: {'isProfile': false})),
+        );
+      }
+    } else if (value == 3 && configModel.user != null) {
+      Navigator.pushNamed(context, '/profilePage');
+    } else if (value == 4 && configModel.user != null) {
+      Navigator.pushNamed(context, '/notificationPage');
+    } else {
+      showDialog(
+          context: context, builder: (context) => LoginRequiredPopupWidget());
+    }
   }
 }

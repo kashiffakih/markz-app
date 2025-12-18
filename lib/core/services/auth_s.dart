@@ -285,6 +285,45 @@ class AuthService {
     };
   }
 
+  Future<Map<String, dynamic>> mapReferrer({
+    required String referralCode,
+    required int userId,
+  }) async {
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+
+    try {
+      // Using GET request with query parameters as per API definition check
+      final String url =
+          '${_apiConfig['baseURL']}/map_referrer?referral_code=$referralCode&user_id=$userId';
+
+      http.Response _response = await http.get(
+        Uri.parse(url),
+        headers: _apiConfig['headers'],
+      );
+
+      Map<String, dynamic> _responseData = json.decode(_response.body);
+
+      if (_response.statusCode == 200 && _responseData['success'] == true) {
+        return {
+          'success': true,
+          'message': _responseData['message'] ?? 'Referral code applied!',
+          'data': _responseData['data']
+        };
+      } else {
+        return {
+          'success': false,
+          'message': _responseData['message'] ?? 'Failed to apply referral code'
+        };
+      }
+    } catch (e) {
+      print('Error mapping referrer: $e');
+      return {
+        'success': false,
+        'message': 'Network error: Failed to apply referral code'
+      };
+    }
+  }
+
   Future<Map<String, dynamic>> updateUser(
       {@required Map<String, dynamic>? updateUserData}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;

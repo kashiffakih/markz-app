@@ -17,6 +17,7 @@ class AuthModel with ChangeNotifier {
 
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
+  AuthService get authService => _authService;
   bool get loading => _loading;
   Future<Map<String, dynamic>> login(
       {required Map<String, dynamic> loginData}) async {

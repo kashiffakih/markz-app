@@ -1,7 +1,10 @@
 import 'dart:io';
+import 'package:aadab/ui/widgets/login_required_popup.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:aadab/core/models/product.dart';
 import 'package:aadab/core/models/payment_response.dart';
+
 import 'package:aadab/core/services/phonepe_s.dart';
 import 'package:aadab/core/services/product_s.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -24,9 +27,12 @@ import 'package:aadab/ui/shared/font_sh.dart';
 import 'package:aadab/ui/views/products/shops_p.dart';
 import 'package:aadab/ui/views/profile/address_p.dart';
 import 'package:aadab/ui/views/promocodes/promocodes_p.dart';
+import 'package:aadab/ui/widgets/common_product_card.dart';
 
 import '../../../core/providers/wish_list_pr.dart';
 import '../products/product_id_p.dart';
+
+import 'package:badges/badges.dart' as badges;
 
 class CartPage extends StatefulWidget {
   final isProfile;
@@ -285,6 +291,10 @@ class _CartPageState extends State<CartPage> {
   @override
   void initState() {
     initializePhonePe();
+    // Initialize address from arguments if provided
+    if (widget.arguments != null && widget.arguments['address'] != null) {
+      address = UserAddress.fromJson(widget.arguments['address']);
+    }
     _loadData();
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -537,25 +547,18 @@ class _CartPageState extends State<CartPage> {
       var productId = '';
 
       // Load all required data
-      await Provider.of<AddToCartModel>(context, listen: false)
-          .getAddToCart('', '', _CartData);
-
-      debugPrint('Category Id ${widget.arguments?['product']}');
-
-      await Provider.of<ProductModel>(context, listen: false)
-          .getAllProducts('');
-
-      await Provider.of<OrderModel>(context, listen: false).getOrder();
-
-      await Provider.of<UserWalletModel>(context, listen: false)
-          .getMyUserWallets();
-
-      await Provider.of<WishListModel>(context, listen: false)
-          .getWishLists(productId);
-
-      // Load user saved addresses
-      await Provider.of<UserAddressModel>(context, listen: false)
-          .getUserAddresses();
+      // Load all required data in parallel
+      await Future.wait(<Future<dynamic>>[
+        Provider.of<AddToCartModel>(context, listen: false)
+            .getAddToCart('', '', _CartData),
+        Provider.of<ProductModel>(context, listen: false).getRandomProducts(),
+        // Provider.of<OrderModel>(context, listen: false).getOrder(), // Unused call removed
+        Provider.of<UserWalletModel>(context, listen: false).getMyUserWallets(),
+        Provider.of<WishListModel>(context, listen: false)
+            .getWishLists(productId),
+        Provider.of<UserAddressModel>(context, listen: false)
+            .getUserAddresses(),
+      ]);
 
       // Update calculations after data is loaded
       if (mounted) {
@@ -565,12 +568,32 @@ class _CartPageState extends State<CartPage> {
           // Initialize address from saved addresses if user has any
           final userAddressModel =
               Provider.of<UserAddressModel>(context, listen: false);
+
+          debugPrint('Debug: Address ID before check: ${address.id}');
+          debugPrint(
+              'Debug: User Addresses count: ${userAddressModel.userAddresses?.length}');
+
           // Only set address if not already set from arguments and user has saved addresses
           if (address.id == null &&
-              widget.arguments?['address'] == null &&
               userAddressModel.userAddresses != null &&
               userAddressModel.userAddresses!.isNotEmpty) {
-            address = userAddressModel.userAddresses!.first;
+            // Debug the raw addresses
+            for (var addr in userAddressModel.userAddresses!) {
+              debugPrint(
+                  'Debug: Address ID: ${addr.id}, isDefault: ${addr.isDefault} (Type: ${addr.isDefault.runtimeType})');
+            }
+
+            // Check for default address
+            final defaultAddresses = userAddressModel.userAddresses!
+                .where((element) => element.isDefault == 1);
+
+            debugPrint(
+                'Debug: Found ${defaultAddresses.length} default addresses');
+
+            if (defaultAddresses.isNotEmpty) {
+              address = defaultAddresses.first;
+              debugPrint('Debug: Set default address: ${address.id}');
+            }
           }
           // Calculate 25% of item total after coupon discount
           final addToCartModel =
@@ -800,13 +823,7 @@ class _CartPageState extends State<CartPage> {
         Provider.of<UserWalletModel>(context, listen: false);
     final ProductModel _productModel =
         Provider.of<ProductModel>(context, listen: false);
-    final WishListModel _wishListModel =
-        Provider.of<WishListModel>(context, listen: false);
 
-    // Initialize address from arguments if provided (when user selects an address)
-    if (widget.arguments != null && widget.arguments['address'] != null) {
-      address = UserAddress.fromJson(widget.arguments['address']);
-    }
     // Note: User's saved addresses are loaded in _loadData() and set there if available
 
     double discountPrice = 0.0;
@@ -820,6 +837,8 @@ class _CartPageState extends State<CartPage> {
         return false;
       },
       child: Scaffold(
+        bottomNavigationBar: _buildBottomNavigationBar(context, _configModel,
+            _addToCartModel, _addToCartModel.addToCarts?.length ?? 0),
         body: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -835,32 +854,29 @@ class _CartPageState extends State<CartPage> {
                   Container(
                     child: Column(
                       children: [
-                        // Title
                         Container(
-                          margin: EdgeInsets.all(20),
                           width: double.infinity,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xFFEED056),
+                                Color(0xFFF6E27F),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(30.r),
+                              bottomRight: Radius.circular(30.r),
+                            ),
+                          ),
+                          padding: EdgeInsets.fromLTRB(20.w, 10.w, 20.w, 25.w),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              InkWell(
-                                onTap: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Center(
-                                  child: Text(
-                                    'My Cart',
-                                    textAlign: TextAlign.center,
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontSize: 20.0.sp,
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xff1e232c),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 15),
                               Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   InkWell(
                                     onTap: () {
@@ -876,96 +892,92 @@ class _CartPageState extends State<CartPage> {
                                     child: Container(
                                       padding: EdgeInsets.all(8.0.w),
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
+                                        color: Colors.white.withOpacity(0.2),
                                         shape: BoxShape.circle,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Color(0xFFEED056)
-                                                .withOpacity(0.15),
-                                            blurRadius: 8,
-                                            offset: Offset(0, 2),
-                                          ),
-                                        ],
                                       ),
                                       child: Icon(
                                         Icons.arrow_back_ios_new,
                                         size: 16.0.sp,
-                                        color: const Color(0xffEED056),
+                                        color: Colors.white,
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(width: 5),
-                                  Container(
-                                    width: 268,
-                                    height: 38,
-                                    padding: const EdgeInsets.only(
-                                      left: 21,
-                                      right: 20.70,
-                                    ),
-                                    clipBehavior: Clip.antiAlias,
-                                    decoration: ShapeDecoration(
-                                      shape: RoundedRectangleBorder(
-                                        side: BorderSide(
-                                            width: 0.50,
-                                            color: Color(0xFFC7B456)),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment
-                                          .center, // Center vertically
-                                      children: [
-                                        Expanded(
-                                          child: Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 1.0),
-                                            child: TextFormField(
-                                              controller: _controller,
-                                              onChanged: (value) {
-                                                // if (value.length % 3 == 0) {
-                                                // Call your API here
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) => ShopsPage(
-                                                        initialText: value
-                                                            .toString()), // Pass initialText if needed
-                                                  ),
-                                                );
-                                                _controller.clear();
-                                              },
-                                              decoration: InputDecoration(
-                                                hintText: 'Search',
-                                                border: InputBorder.none,
-                                              ),
-                                              style: TextStyle(
-                                                color: Colors.black
-                                                    .withOpacity(0.6),
-                                                fontSize: 18,
-                                                fontFamily: 'Urbanist',
-                                                fontWeight: FontWeight.w600,
-                                                // letterSpacing: -0.36,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          width: 20,
-                                          height: 20,
-                                          child: Image.asset(
-                                            'assets/images/Search-1.png',
-                                            height: 20,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ],
+                                  // SizedBox(width: 12.0.w),
+                                  Text(
+                                    'My Cart',
+                                    textAlign: TextAlign.center,
+                                    style: MyGoogleFontStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontSize: 20.0.sp,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
                                     ),
                                   ),
+                                  Text(''),
                                 ],
-                              )
+                              ),
+                              SizedBox(height: 30.0.w),
+                              Container(
+                                height: 45.0.w,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16.0.w, vertical: 2.0.w),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12.0.r),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.05),
+                                      blurRadius: 10,
+                                      offset: Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.search,
+                                      color: Color(0xFF909090),
+                                      size: 20.0.sp,
+                                    ),
+                                    SizedBox(width: 12.0.w),
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: _controller,
+                                        onChanged: (value) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => ShopsPage(
+                                                  initialText:
+                                                      value.toString()),
+                                            ),
+                                          );
+                                          _controller.clear();
+                                        },
+                                        decoration: InputDecoration(
+                                          hintText: 'Search',
+                                          hintStyle: TextStyle(
+                                            color: Color(0xFFAAAAAA),
+                                            fontSize: 14.0.sp,
+                                            fontFamily: 'Urbanist',
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                          border: InputBorder.none,
+                                          contentPadding:
+                                              EdgeInsets.symmetric(vertical: 0),
+                                          isDense: true,
+                                        ),
+                                        style: TextStyle(
+                                          color: Color(0xff232323),
+                                          fontSize: 14.0.sp,
+                                          fontFamily: 'Urbanist',
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -982,242 +994,126 @@ class _CartPageState extends State<CartPage> {
                                           Center(child: Text('Cart is empty')),
                                     ),
                                     Container(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10.0),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            SizedBox(
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height -
-                                                  530,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          SizedBox(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height -
+                                                530,
+                                          ),
+                                          Text(
+                                            'Add More Items',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontWeight: FontWeight.w700,
+                                              color: Color(0xff000000),
                                             ),
-                                            Text(
-                                              'Add More Items',
-                                              style: MyGoogleFontStyle(
-                                                fontFamily: 'Urbanist',
-                                                fontWeight: FontWeight.w700,
-                                                color: Color(0xff000000),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: 10,
-                                            ),
-                                            Container(
-                                              width: MediaQuery.of(context)
-                                                  .size
-                                                  .width,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.4,
-                                              child: Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: _productModel
-                                                            .productsLoader
-                                                        ? Center(
-                                                            child:
-                                                                LinearProgressIndicator())
-                                                        : (_productModel.allProducts ==
-                                                                    null ||
-                                                                _productModel
-                                                                    .allProducts!
-                                                                    .isEmpty)
-                                                            ? Center(
-                                                                child: Text(
-                                                                  'No products available',
-                                                                  style:
-                                                                      MyGoogleFontStyle(
-                                                                    fontFamily:
-                                                                        'Urbanist',
-                                                                    fontSize:
-                                                                        14,
-                                                                    color: Colors
-                                                                        .grey,
-                                                                  ),
+                                          ),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.35,
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: _productModel
+                                                          .productsLoader
+                                                      ? Center(
+                                                          child:
+                                                              LinearProgressIndicator())
+                                                      : (_productModel.randomProducts ==
+                                                                  null ||
+                                                              _productModel
+                                                                  .randomProducts!
+                                                                  .isEmpty)
+                                                          ? Center(
+                                                              child: Text(
+                                                                'No products available',
+                                                                style:
+                                                                    MyGoogleFontStyle(
+                                                                  fontFamily:
+                                                                      'Urbanist',
+                                                                  fontSize: 14,
+                                                                  color: Colors
+                                                                      .grey,
                                                                 ),
-                                                              )
-                                                            : ListView.builder(
-                                                                // padding:
-                                                                //     const EdgeInsets.only(left: 5, right: 8),
-                                                                scrollDirection:
-                                                                    Axis.horizontal,
-                                                                shrinkWrap:
-                                                                    true,
-                                                                itemCount: _productModel
-                                                                        .allProducts
-                                                                        ?.length ??
-                                                                    0,
-                                                                itemBuilder:
-                                                                    (context,
-                                                                        index) {
-                                                                  return Padding(
-                                                                    padding: const EdgeInsets
-                                                                        .symmetric(
-                                                                        horizontal:
-                                                                            10),
-                                                                    child:
-                                                                        Container(
-                                                                      width: MediaQuery.of(context)
-                                                                              .size
-                                                                              .width *
-                                                                          0.4,
-                                                                      height: MediaQuery.of(context)
-                                                                              .size
-                                                                              .height *
-                                                                          0.45,
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(15),
-                                                                      ),
-                                                                      child:
-                                                                          Column(
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.center,
-                                                                        children: [
-                                                                          InkWell(
-                                                                            onTap:
-                                                                                () {
-                                                                              Navigator.of(context).push(
-                                                                                MaterialPageRoute(
-                                                                                  builder: (context) => ProductIdPage(arguments: {
-                                                                                    'product': _productModel.allProducts?[index].toJson(),
-                                                                                    'product_images': _productModel.allProducts?[index].productImages
-                                                                                  }),
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                            child:
-                                                                                Container(
-                                                                              margin: EdgeInsets.fromLTRB(0.0.w, 0.0.w, 0.0.w, 5.0.w),
-                                                                              padding: EdgeInsets.fromLTRB(106.0.w, 13.0.w, 14.0.w, 15.0.w),
-                                                                              width: 0.4.sw,
-                                                                              height: 0.26.sh,
-                                                                              decoration: BoxDecoration(
-                                                                                borderRadius: BorderRadius.circular(15),
-                                                                                image: DecorationImage(
-                                                                                  fit: BoxFit.contain,
-                                                                                  image: NetworkImage(_configModel.apiConfig['mediaURL'] + ((_productModel.allProducts?[index].productImages?.isNotEmpty ?? false) ? _productModel.allProducts![index].productImages!.first.imagepath?.toString() ?? '' : '')),
-                                                                                ),
-                                                                              ),
-                                                                              child: InkWell(
-                                                                                onTap: () async {
-                                                                                  if (_configModel.user != null) {
-                                                                                    await _wishListModel.getWishLists(_productModel.allProducts?[index].id);
-                                                                                    setState(() {});
-                                                                                  } else {
-                                                                                    // Show login required dialog
-                                                                                    showDialog(
-                                                                                      context: context,
-                                                                                      builder: (context) => AlertDialog(
-                                                                                        title: Text('Login Required'),
-                                                                                        content: Text('Please login to add items to wishlist'),
-                                                                                        actions: [
-                                                                                          TextButton(
-                                                                                            onPressed: () => Navigator.pop(context),
-                                                                                            child: Text('OK'),
-                                                                                          ),
-                                                                                        ],
-                                                                                      ),
-                                                                                    );
-                                                                                  }
-                                                                                },
-                                                                                child: _wishListModel.wishListLoader
-                                                                                    ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
-                                                                                    : _wishListModel.wishLists?.where((wishList) => wishList.productId == _productModel.allProducts?[index].id && wishList.userId == _configModel.user?.id).toList().length == 0
-                                                                                        ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
-                                                                                        : Align(
-                                                                                            alignment: Alignment.topRight,
-                                                                                            child: Icon(
-                                                                                              Icons.favorite_outlined,
-                                                                                              color: Colors.red,
-                                                                                            )),
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                          SizedBox(
-                                                                            height:
-                                                                                10,
-                                                                          ),
-                                                                          InkWell(
-                                                                            onTap:
-                                                                                () {
-                                                                              Navigator.of(context).push(MaterialPageRoute(
-                                                                                  builder: (context) => ProductIdPage(arguments: {
-                                                                                        'product': _productModel.allProducts?[index].toJson(),
-                                                                                        'category': _productModel.allProducts?[index].category?.name?.toString() ?? '',
-                                                                                      })));
-                                                                            },
-                                                                            child:
-                                                                                Container(
-                                                                              child: Text(
-                                                                                _productModel.allProducts?[index].name ?? ''.toString(),
-                                                                                textAlign: TextAlign.center,
-                                                                                style: MyGoogleFontStyle(
-                                                                                  fontFamily: 'Urbanist',
-                                                                                  fontSize: 15,
-                                                                                  fontWeight: FontWeight.w700,
-                                                                                  color: Color(0xff000000),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                          Container(
-                                                                            child: (_productModel.allProducts?[index].productPrices?[0].offerPrice ?? 0) != 0
-                                                                                ? Text.rich(TextSpan(children: [
-                                                                                    new TextSpan(
-                                                                                      text: 'RS. ${_productModel.allProducts?[index].productPrices?[0].price?.toString() ?? '0'}',
-                                                                                      style: new TextStyle(
-                                                                                        color: Colors.grey,
-                                                                                        decoration: TextDecoration.lineThrough,
-                                                                                      ),
-                                                                                    ),
-                                                                                    new TextSpan(
-                                                                                      text: ' RS.${_productModel.allProducts?[index].productPrices?[0].offerPrice?.toString() ?? '0'}',
-                                                                                    ),
-                                                                                  ]))
-                                                                                : Text(
-                                                                                    (_productModel.allProducts?[index].productPrices?[0].price?.toString() ?? '0') + " " + 'RS',
-                                                                                    style: MyGoogleFontStyle(
-                                                                                      fontFamily: 'Poppins',
-                                                                                      fontSize: 13,
-                                                                                      fontWeight: FontWeight.w500,
-                                                                                      height: 1.5,
-                                                                                      letterSpacing: -0.2190869331,
-                                                                                      color: Color(0x99000000),
-                                                                                    ),
-                                                                                  ),
-                                                                          ),
-                                                                          if (discountPrice !=
-                                                                              0.0)
-                                                                            Center(
-                                                                              child: Text(
-                                                                                '( ${discountPrice.round()}% Off)',
-                                                                                style: MyGoogleFontStyle(
-                                                                                  fontFamily: 'Poppins',
-                                                                                  fontSize: 12,
-                                                                                  fontWeight: FontWeight.bold,
-                                                                                  color: Color(0x99000000),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  );
-                                                                },
                                                               ),
-                                                  )
-                                                ],
-                                              ),
+                                                            )
+                                                          : ListView.builder(
+                                                              // padding:
+                                                              //     const EdgeInsets.only(left: 5, right: 8),
+                                                              scrollDirection:
+                                                                  Axis.horizontal,
+                                                              shrinkWrap: true,
+                                                              itemCount: _productModel
+                                                                      .randomProducts
+                                                                      ?.length ??
+                                                                  0,
+                                                              itemBuilder:
+                                                                  (context,
+                                                                      index) {
+                                                                return Padding(
+                                                                  padding: EdgeInsets
+                                                                      .only(
+                                                                          right:
+                                                                              12.0),
+                                                                  child: () {
+                                                                    final product =
+                                                                        _productModel
+                                                                            .randomProducts![index];
+                                                                    double
+                                                                        discountPrice =
+                                                                        0.0;
+                                                                    if (product
+                                                                            .productPrices
+                                                                            ?.isNotEmpty ??
+                                                                        false) {
+                                                                      final price =
+                                                                          int.tryParse(product.productPrices![0].price?.toString() ?? '0') ??
+                                                                              0;
+                                                                      final offerPrice =
+                                                                          int.tryParse(product.productPrices![0].offerPrice?.toString() ?? '0') ??
+                                                                              0;
+
+                                                                      if (price > 0 &&
+                                                                          offerPrice >
+                                                                              0 &&
+                                                                          offerPrice <
+                                                                              price) {
+                                                                        discountPrice = ((price -
+                                                                                offerPrice) /
+                                                                            price *
+                                                                            100);
+                                                                      }
+                                                                    }
+                                                                    return CommonProductCard(
+                                                                      product:
+                                                                          product,
+                                                                      discountPrice:
+                                                                          discountPrice,
+                                                                    );
+                                                                  }(),
+                                                                );
+                                                              },
+                                                            ),
+                                                )
+                                              ],
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                          SizedBox(
+                                            height: 40,
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
@@ -1230,21 +1126,28 @@ class _CartPageState extends State<CartPage> {
                                       margin: EdgeInsets.symmetric(
                                           horizontal: 4.0.w, vertical: 8.0.w),
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 12.0.w, vertical: 8.0.w),
+                                          horizontal: 16.0.w, vertical: 10.0.w),
                                       decoration: BoxDecoration(
-                                        color: Color(0xFFF5F0E0),
+                                        color: Colors.white,
                                         borderRadius:
-                                            BorderRadius.circular(12.0.r),
+                                            BorderRadius.circular(16.0.r),
                                         border: Border.all(
-                                          color: Color(0xFFC7B456)
-                                              .withOpacity(0.3),
+                                          color: Color(0xFFEED056),
+                                          width: 1,
                                         ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Color(0xFFEED056)
+                                                .withOpacity(0.1),
+                                            blurRadius: 12,
+                                            offset: Offset(0, 4),
+                                          ),
+                                        ],
                                       ),
                                       child: Row(
                                         children: [
                                           SizedBox(
                                             width: 24,
-                                            height: 24,
                                             child: Checkbox(
                                               value: _selectAll,
                                               onChanged: (value) =>
@@ -1281,249 +1184,847 @@ class _CartPageState extends State<CartPage> {
                                       ),
                                     ),
                                     // Cart Items List
-                                    SizedBox(
-                                      height: 1.0.sh *
-                                          (0.23 *
-                                              (_addToCartModel
-                                                          .addToCarts!.length <
-                                                      2
-                                                  ? _addToCartModel
-                                                      .addToCarts!.length
-                                                  : 2)),
-                                      child: ListView.builder(
-                                        scrollDirection: Axis.vertical,
-                                        itemCount:
-                                            _addToCartModel.addToCarts!.length,
-                                        itemBuilder:
-                                            (BuildContext context, index) {
-                                          // print(
-                                          //     'cart Count: ${_addToCartModel.addToCarts!.first.userId}');
-                                          double discountPrice = (int.parse(
-                                                      _addToCartModel
-                                                          .addToCarts![index]
-                                                          .product!
-                                                          .productPrices![0]
-                                                          .price
-                                                          .toString()) -
-                                                  int.parse(_addToCartModel
-                                                      .addToCarts![index]
-                                                      .product!
-                                                      .productPrices![0]
-                                                      .offerPrice
-                                                      .toString())) /
-                                              int.parse(_addToCartModel
-                                                  .addToCarts![index]
-                                                  .product!
-                                                  .productPrices![0]
-                                                  .price
-                                                  .toString()) *
-                                              100;
-                                          // print(_addToCartModel
-                                          //     .addToCarts![index].product
-                                          //     .where((image) =>
-                                          //         image.unit!.name ==
-                                          //         _addToCartModel
-                                          //             .addToCarts![index].flavour)
-                                          //     .toList()
-                                          //     .first
-                                          //     .imagepath);
-                                          Map<String, dynamic> _cartData =
-                                              _addToCartModel.addToCarts![index]
-                                                  .toJson();
-                                          return Container(
-                                            margin: EdgeInsets.symmetric(
-                                                vertical: 8.0.w,
-                                                horizontal: 4.0.w),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(20.0.r),
-                                              color: Colors.white,
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Color(0xFFEED056)
-                                                      .withOpacity(0.12),
-                                                  blurRadius: 20,
-                                                  spreadRadius: 2,
-                                                  offset: const Offset(0, 6),
-                                                ),
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withOpacity(0.05),
-                                                  blurRadius: 10,
-                                                  offset: const Offset(0, 2),
-                                                ),
+                                    ListView.builder(
+                                      physics: NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      padding: EdgeInsets.only(bottom: 20),
+                                      scrollDirection: Axis.vertical,
+                                      itemCount:
+                                          _addToCartModel.addToCarts!.length,
+                                      itemBuilder:
+                                          (BuildContext context, index) {
+                                        // Find the correct price based on the selected pack
+                                        final cartItem =
+                                            _addToCartModel.addToCarts![index];
+                                        final product = cartItem.product!;
+
+                                        ProductPrices? correctPrice;
+                                        if (cartItem.pack != null &&
+                                            product.productPrices != null) {
+                                          try {
+                                            correctPrice = product
+                                                .productPrices!
+                                                .firstWhere(
+                                              (price) =>
+                                                  price.productPackId
+                                                      .toString() ==
+                                                  cartItem.pack.toString(),
+                                              orElse: () =>
+                                                  product.productPrices![0],
+                                            );
+                                          } catch (e) {
+                                            correctPrice = product
+                                                    .productPrices!.isNotEmpty
+                                                ? product.productPrices![0]
+                                                : null;
+                                          }
+                                        } else if (product.productPrices !=
+                                                null &&
+                                            product.productPrices!.isNotEmpty) {
+                                          correctPrice =
+                                              product.productPrices![0];
+                                        }
+
+                                        double discountPrice = 0.0;
+                                        if (correctPrice != null) {
+                                          final price = int.tryParse(
+                                                  correctPrice.price
+                                                          ?.toString() ??
+                                                      '0') ??
+                                              0;
+                                          final offerPrice = int.tryParse(
+                                                  correctPrice.offerPrice
+                                                          ?.toString() ??
+                                                      '0') ??
+                                              0;
+
+                                          if (price > 0 &&
+                                              offerPrice > 0 &&
+                                              offerPrice < price) {
+                                            discountPrice =
+                                                ((price - offerPrice) /
+                                                    price *
+                                                    100);
+                                          }
+                                        }
+
+                                        Map<String, dynamic> _cartData =
+                                            cartItem.toJson();
+                                        return Container(
+                                          margin: EdgeInsets.symmetric(
+                                              vertical: 8.0.w,
+                                              horizontal: 4.0.w),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(24.0.r),
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: [
+                                                Colors.white,
+                                                Color(0xFFFFFDF7)
                                               ],
                                             ),
-                                            child: Padding(
-                                              padding: EdgeInsets.all(12.0.w),
-                                              child: Row(
-                                                children: [
-                                                  // Checkbox for item selection
-                                                  FutureBuilder<int>(
-                                                    future: _getAvailableQty(
-                                                        _addToCartModel
-                                                                .addToCarts![
-                                                            index]),
-                                                    builder: (context,
-                                                        checkboxStockSnapshot) {
-                                                      final isOutOfStockForCheckbox =
-                                                          checkboxStockSnapshot
-                                                                  .hasData &&
-                                                              checkboxStockSnapshot
-                                                                      .data! <=
-                                                                  0;
-                                                      final cartItemId =
-                                                          _addToCartModel
-                                                              .addToCarts![
-                                                                  index]
-                                                              .id;
-                                                      return SizedBox(
-                                                        width: 28,
-                                                        height: 28,
-                                                        child: Checkbox(
-                                                          value: cartItemId !=
-                                                                  null &&
-                                                              _selectedCartItemIds
-                                                                  .contains(
-                                                                      cartItemId) &&
-                                                              !isOutOfStockForCheckbox,
-                                                          onChanged: isOutOfStockForCheckbox ||
-                                                                  cartItemId ==
-                                                                      null
-                                                              ? null
-                                                              : (value) =>
-                                                                  _toggleItemSelection(
-                                                                      cartItemId),
-                                                          activeColor:
-                                                              Color(0xFFC7B456),
-                                                          shape:
-                                                              RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        4),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Color(0xFFEED056)
+                                                    .withOpacity(0.15),
+                                                blurRadius: 15,
+                                                offset: const Offset(0, 8),
+                                              ),
+                                              BoxShadow(
+                                                color: Colors.black
+                                                    .withOpacity(0.03),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Padding(
+                                            padding: EdgeInsets.all(12.0.w),
+                                            child: Row(
+                                              children: [
+                                                // Checkbox for item selection
+                                                FutureBuilder<int>(
+                                                  future: _getAvailableQty(
+                                                      cartItem),
+                                                  builder: (context,
+                                                      checkboxStockSnapshot) {
+                                                    final isOutOfStockForCheckbox =
+                                                        checkboxStockSnapshot
+                                                                .hasData &&
+                                                            checkboxStockSnapshot
+                                                                    .data! <=
+                                                                0;
+                                                    final cartItemId =
+                                                        cartItem.id;
+                                                    return SizedBox(
+                                                      width: 28,
+                                                      height: 28,
+                                                      child: Checkbox(
+                                                        value: cartItemId !=
+                                                                null &&
+                                                            _selectedCartItemIds
+                                                                .contains(
+                                                                    cartItemId) &&
+                                                            !isOutOfStockForCheckbox,
+                                                        onChanged: isOutOfStockForCheckbox ||
+                                                                cartItemId ==
+                                                                    null
+                                                            ? null
+                                                            : (value) =>
+                                                                _toggleItemSelection(
+                                                                    cartItemId),
+                                                        activeColor:
+                                                            Color(0xFFC7B456),
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(4),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                                SizedBox(width: 8.0.w),
+                                                FutureBuilder<int>(
+                                                  future: _getAvailableQty(
+                                                      cartItem),
+                                                  builder:
+                                                      (context, stockSnapshot) {
+                                                    final isOutOfStock =
+                                                        stockSnapshot.hasData &&
+                                                            stockSnapshot
+                                                                    .data! <=
+                                                                0;
+                                                    return InkWell(
+                                                      onTap: () {
+                                                        Navigator.of(context).push(
+                                                            MaterialPageRoute(
+                                                                builder: (context) =>
+                                                                    ProductIdPage(
+                                                                        arguments: {
+                                                                          'product':
+                                                                              product.toJson(),
+                                                                          'product_images':
+                                                                              product.productImages
+                                                                        })));
+                                                      },
+                                                      child: Container(
+                                                        width: 100.0.w,
+                                                        height: 120.0.h,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      15.0.r),
+                                                          color: const Color(
+                                                              0x0c000000),
+                                                        ),
+                                                        foregroundDecoration:
+                                                            isOutOfStock
+                                                                ? BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            15.0.r),
+                                                                    color: Colors
+                                                                        .black
+                                                                        .withOpacity(
+                                                                            0.55),
+                                                                  )
+                                                                : null,
+                                                        child: ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      15.0.r),
+                                                          child: Builder(
+                                                            builder: (context) {
+                                                              final matchingImages = product
+                                                                  .productImages!
+                                                                  .where((image) =>
+                                                                      image.unit
+                                                                          ?.name ==
+                                                                      cartItem
+                                                                          .flavour)
+                                                                  .toList();
+
+                                                              final mediaUrl =
+                                                                  _configModel
+                                                                          .apiConfig[
+                                                                      'mediaURL'];
+                                                              String imageUrl =
+                                                                  '';
+
+                                                              if (mediaUrl !=
+                                                                  null) {
+                                                                if (matchingImages
+                                                                    .isNotEmpty) {
+                                                                  imageUrl =
+                                                                      '$mediaUrl${matchingImages[0].imagepath}';
+                                                                } else if (product
+                                                                    .productImages!
+                                                                    .isNotEmpty) {
+                                                                  imageUrl =
+                                                                      '$mediaUrl${product.productImages!.first.imagepath}';
+                                                                }
+                                                              }
+
+                                                              if (imageUrl
+                                                                  .isEmpty) {
+                                                                return const Icon(
+                                                                    Icons.image,
+                                                                    size: 50,
+                                                                    color: Colors
+                                                                        .grey);
+                                                              }
+
+                                                              return Image
+                                                                  .network(
+                                                                imageUrl,
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                                width: double
+                                                                    .infinity,
+                                                                height: double
+                                                                    .infinity,
+                                                                errorBuilder: (context,
+                                                                        error,
+                                                                        stackTrace) =>
+                                                                    Icon(
+                                                                        Icons
+                                                                            .image,
+                                                                        size:
+                                                                            50,
+                                                                        color: Colors
+                                                                            .grey),
+                                                              );
+                                                            },
                                                           ),
                                                         ),
-                                                      );
-                                                    },
-                                                  ),
-                                                  SizedBox(width: 8.0.w),
-                                                  FutureBuilder<int>(
-                                                    future: _getAvailableQty(
-                                                        _addToCartModel
-                                                                .addToCarts![
-                                                            index]),
-                                                    builder: (context,
-                                                        stockSnapshot) {
-                                                      final isOutOfStock =
-                                                          stockSnapshot
-                                                                  .hasData &&
-                                                              stockSnapshot
-                                                                      .data! <=
-                                                                  0;
-                                                      return InkWell(
-                                                        onTap: () {
-                                                          Navigator.of(context).push(
-                                                              MaterialPageRoute(
-                                                                  builder: (context) =>
-                                                                      ProductIdPage(
-                                                                          arguments: {
-                                                                            'product':
-                                                                                _addToCartModel.addToCarts![index].product!.toJson(),
-                                                                            'product_images':
-                                                                                _addToCartModel.addToCarts![index].product!.productImages
-                                                                          })));
-                                                        },
-                                                        child: Container(
-                                                          width: 100.0.w,
-                                                          height: 120.0.h,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        15.0.r),
-                                                            color: const Color(
-                                                                0x0c000000),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                                SizedBox(width: 12.0.w),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        product.name.toString(),
+                                                        maxLines: 2,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontSize: 14.0.sp,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                          color:
+                                                              Color(0xff000000),
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: 4.0.h),
+                                                      if (correctPrice != null)
+                                                        correctPrice.offerPrice !=
+                                                                    null &&
+                                                                correctPrice
+                                                                        .offerPrice !=
+                                                                    0
+                                                            ? Wrap(
+                                                                spacing: 4.0,
+                                                                runSpacing: 2.0,
+                                                                children: [
+                                                                  Text.rich(
+                                                                    TextSpan(
+                                                                      children: [
+                                                                        TextSpan(
+                                                                          text:
+                                                                              '₹${correctPrice.price}',
+                                                                          style:
+                                                                              TextStyle(
+                                                                            color:
+                                                                                Colors.grey,
+                                                                            decoration:
+                                                                                TextDecoration.lineThrough,
+                                                                            fontSize:
+                                                                                13.0.sp,
+                                                                            fontFamily:
+                                                                                'Poppins',
+                                                                            fontWeight:
+                                                                                FontWeight.w500,
+                                                                          ),
+                                                                        ),
+                                                                        TextSpan(
+                                                                          text:
+                                                                              ' ₹${correctPrice.offerPrice}',
+                                                                          style:
+                                                                              TextStyle(
+                                                                            color:
+                                                                                const Color(0x99000000),
+                                                                            fontSize:
+                                                                                13.0.sp,
+                                                                            fontFamily:
+                                                                                'Poppins',
+                                                                            fontWeight:
+                                                                                FontWeight.w500,
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                  if (discountPrice >
+                                                                      0.0)
+                                                                    Text(
+                                                                      '(${discountPrice.round()}% Off)',
+                                                                      style:
+                                                                          MyGoogleFontStyle(
+                                                                        fontFamily:
+                                                                            'Poppins',
+                                                                        fontSize:
+                                                                            13.0.sp,
+                                                                        fontWeight:
+                                                                            FontWeight.w500,
+                                                                        color: const Color(
+                                                                            0x99000000),
+                                                                      ),
+                                                                    ),
+                                                                ],
+                                                              )
+                                                            : Text(
+                                                                '₹${correctPrice.price}',
+                                                                style:
+                                                                    MyGoogleFontStyle(
+                                                                  fontFamily:
+                                                                      'Poppins',
+                                                                  fontSize:
+                                                                      13.0.sp,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  color: const Color(
+                                                                      0x99000000),
+                                                                ),
+                                                              ),
+                                                      SizedBox(height: 6.0.h),
+                                                      Wrap(
+                                                        spacing: 8.0.w,
+                                                        runSpacing: 4.0.h,
+                                                        children: [
+                                                          Container(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        8.0.w,
+                                                                    vertical:
+                                                                        4.0.h),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Color(
+                                                                  0xFFFFFEF9),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          6.0.r),
+                                                              border: Border.all(
+                                                                  color: Color(
+                                                                          0xFFEED056)
+                                                                      .withOpacity(
+                                                                          0.3)),
+                                                            ),
+                                                            child: Text(
+                                                              'Size: ${_addToCartModel.addToCarts![index].kindOfFlower}',
+                                                              style:
+                                                                  MyGoogleFontStyle(
+                                                                fontFamily:
+                                                                    'Poppins',
+                                                                fontSize:
+                                                                    11.0.sp,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                color: Color(
+                                                                    0xff606060),
+                                                              ),
+                                                            ),
                                                           ),
-                                                          foregroundDecoration:
-                                                              isOutOfStock
-                                                                  ? BoxDecoration(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              15.0.r),
-                                                                      color: Colors
-                                                                          .black
-                                                                          .withOpacity(
-                                                                              0.55),
-                                                                    )
-                                                                  : null,
-                                                          child: ClipRRect(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        15.0.r),
-                                                            child: Builder(
-                                                              builder:
-                                                                  (context) {
-                                                                final product =
+                                                          Container(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        8.0.w,
+                                                                    vertical:
+                                                                        4.0.h),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Color(
+                                                                  0xFFFFFEF9),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          6.0.r),
+                                                              border: Border.all(
+                                                                  color: Color(
+                                                                          0xFFEED056)
+                                                                      .withOpacity(
+                                                                          0.3)),
+                                                            ),
+                                                            child: Text(
+                                                              'Colour: ${_addToCartModel.addToCarts![index].flavour}',
+                                                              style:
+                                                                  MyGoogleFontStyle(
+                                                                fontFamily:
+                                                                    'Poppins',
+                                                                fontSize:
+                                                                    11.0.sp,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                color: Color(
+                                                                    0xff606060),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      // Align(
+                                                      //   alignment:
+                                                      //       Alignment.centerLeft,
+                                                      //   child: Row(
+                                                      //     children: [
+                                                      //       Icon(
+                                                      //         Icons.star,
+                                                      //         color: Colors.amber,
+                                                      //       ),
+                                                      //       Text(
+                                                      //         ' ( ${(_addToCartModel.addToCarts![index].product!.reviews == null ? 0 : _addToCartModel.addToCarts![index].product!.reviews?.length)} ratings )',
+                                                      //         style: TextStyle(
+                                                      //             fontSize: 12),
+                                                      //       ),
+                                                      //     ],
+                                                      //   ),
+                                                      // ),
+                                                      SizedBox(height: 8.0.h),
+                                                      FutureBuilder<int>(
+                                                        future: _getAvailableQty(
+                                                            _addToCartModel
+                                                                    .addToCarts![
+                                                                index]),
+                                                        builder: (context,
+                                                            stockSnapshot) {
+                                                          final isOutOfStock =
+                                                              stockSnapshot
+                                                                      .hasData &&
+                                                                  stockSnapshot
+                                                                          .data! <=
+                                                                      0;
+                                                          // Hide increment/decrement when out of stock
+                                                          if (isOutOfStock) {
+                                                            return Container(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      horizontal:
+                                                                          12.0
+                                                                              .w,
+                                                                      vertical:
+                                                                          8.0.h),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Colors
+                                                                    .red
+                                                                    .withOpacity(
+                                                                        0.1),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            8.0.r),
+                                                                border: Border.all(
+                                                                    color: Colors
+                                                                        .red
+                                                                        .withOpacity(
+                                                                            0.3)),
+                                                              ),
+                                                              child: Text(
+                                                                'Out of Stock',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .red,
+                                                                  fontSize:
+                                                                      12.0.sp,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                ),
+                                                              ),
+                                                            );
+                                                          }
+                                                          return Container(
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color:
+                                                                  Colors.white,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          24.0.r),
+                                                              border: Border.all(
+                                                                  color: Color(
+                                                                      0xFFF0F0F0)),
+                                                              boxShadow: [
+                                                                BoxShadow(
+                                                                  color: Colors
+                                                                      .black
+                                                                      .withOpacity(
+                                                                          0.03),
+                                                                  blurRadius: 4,
+                                                                  offset:
+                                                                      Offset(
+                                                                          0, 2),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            child: Row(
+                                                              children: [
+                                                                InkWell(
+                                                                  onTap: loadingItemIndex !=
+                                                                          null
+                                                                      ? null
+                                                                      : () async {
+                                                                          setState(
+                                                                              () {
+                                                                            loadingItemIndex =
+                                                                                index;
+                                                                            quantityLoadingAction =
+                                                                                'decrement';
+                                                                          });
+
+                                                                          bool
+                                                                              minus =
+                                                                              false;
+                                                                          _cartData['is_add_to_cart'] =
+                                                                              true;
+                                                                          await _addToCartModel.getAddToCart(
+                                                                              _addToCartModel.addToCarts![index].product!.id,
+                                                                              minus,
+                                                                              _cartData);
+                                                                          setState(
+                                                                              () {});
+                                                                          await _validateAppliedCoupon();
+                                                                          await _recalculateRewards();
+
+                                                                          setState(
+                                                                              () {
+                                                                            loadingItemIndex =
+                                                                                null;
+                                                                            quantityLoadingAction =
+                                                                                null;
+                                                                          });
+                                                                        },
+                                                                  child:
+                                                                      Container(
+                                                                    padding: EdgeInsets
+                                                                        .all(8.0
+                                                                            .w),
+                                                                    child: (loadingItemIndex ==
+                                                                                index &&
+                                                                            quantityLoadingAction ==
+                                                                                'decrement')
+                                                                        ? SizedBox(
+                                                                            width:
+                                                                                16.0.w,
+                                                                            height:
+                                                                                16.0.w,
+                                                                            child:
+                                                                                CircularProgressIndicator(
+                                                                              strokeWidth: 2,
+                                                                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
+                                                                            ),
+                                                                          )
+                                                                        : Icon(
+                                                                            Icons
+                                                                                .remove,
+                                                                            size:
+                                                                                18.0.sp,
+                                                                            color: Colors.black87),
+                                                                  ),
+                                                                ),
+                                                                Container(
+                                                                  padding: EdgeInsets
+                                                                      .symmetric(
+                                                                          horizontal:
+                                                                              12.0.w),
+                                                                  child: Text(
                                                                     _addToCartModel
                                                                         .addToCarts![
                                                                             index]
-                                                                        .product!;
-                                                                final matchingImages = product
-                                                                    .productImages!
-                                                                    .where((image) =>
-                                                                        image
-                                                                            .unit
-                                                                            ?.name ==
-                                                                        _addToCartModel
-                                                                            .addToCarts![index]
-                                                                            .flavour)
-                                                                    .toList();
+                                                                        .qty
+                                                                        .toString(),
+                                                                    style:
+                                                                        MyGoogleFontStyle(
+                                                                      fontFamily:
+                                                                          'Urbanist',
+                                                                      fontSize:
+                                                                          14.0.sp,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
+                                                                      color: Colors
+                                                                          .black,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                FutureBuilder<
+                                                                    int>(
+                                                                  future: _getAvailableQty(
+                                                                      _addToCartModel
+                                                                              .addToCarts![
+                                                                          index]),
+                                                                  builder: (context,
+                                                                      snapshot) {
+                                                                    final currentQty =
+                                                                        _addToCartModel.addToCarts![index].qty ??
+                                                                            0;
+                                                                    final availableQty =
+                                                                        snapshot.data ??
+                                                                            0;
 
-                                                                final imageUrl = matchingImages
-                                                                        .isNotEmpty
-                                                                    ? _configModel.apiConfig[
-                                                                            'mediaURL'] +
-                                                                        matchingImages[0]
-                                                                            .imagepath
-                                                                            .toString()
-                                                                    : (product
-                                                                            .productImages!
-                                                                            .isNotEmpty
-                                                                        ? _configModel.apiConfig['mediaURL'] +
-                                                                            product.productImages!.first.imagepath.toString()
-                                                                        : '');
+                                                                    debugPrint(
+                                                                        'FutureBuilder: currentQty=$currentQty, availableQty=$availableQty, snapshot.hasData=${snapshot.hasData}');
 
-                                                                return Image
-                                                                    .network(
-                                                                  imageUrl,
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                  width: double
-                                                                      .infinity,
-                                                                  height: double
-                                                                      .infinity,
-                                                                  errorBuilder: (context,
-                                                                          error,
-                                                                          stackTrace) =>
-                                                                      Icon(
-                                                                          Icons
-                                                                              .image,
-                                                                          size:
-                                                                              50,
-                                                                          color:
-                                                                              Colors.grey),
-                                                                );
-                                                              },
+                                                                    // Hide plus button if qty limit reached
+                                                                    if (availableQty >
+                                                                            0 &&
+                                                                        currentQty >=
+                                                                            availableQty) {
+                                                                      debugPrint(
+                                                                          'FutureBuilder: HIDING plus button (limit reached)');
+                                                                      return SizedBox(
+                                                                          width:
+                                                                              34.0.w); // Empty space to maintain layout
+                                                                    }
+
+                                                                    return InkWell(
+                                                                      onTap: loadingItemIndex !=
+                                                                              null
+                                                                          ? null
+                                                                          : () async {
+                                                                              // Check available quantity before incrementing
+                                                                              final cartItem = _addToCartModel.addToCarts![index];
+                                                                              final currentQty = cartItem.qty ?? 0;
+
+                                                                              setState(() {
+                                                                                loadingItemIndex = index;
+                                                                                quantityLoadingAction = 'increment';
+                                                                              });
+
+                                                                              // Fetch fresh product data with packs
+                                                                              final productService = locator<ProductService>();
+                                                                              final product = await productService.getProductById(cartItem.productId ?? 0);
+
+                                                                              int availableQty = 0;
+                                                                              if (product != null && product.productPacks != null && product.productPacks!.isNotEmpty) {
+                                                                                // Find the matching pack based on cart item's pack ID
+                                                                                try {
+                                                                                  final matchingPack = product.productPacks!.firstWhere(
+                                                                                    (pack) => pack.id.toString() == cartItem.pack,
+                                                                                  );
+                                                                                  availableQty = matchingPack.qty ?? 0;
+                                                                                } catch (e) {
+                                                                                  // If no matching pack found, use first pack or product qty
+                                                                                  if (product.productPacks!.isNotEmpty) {
+                                                                                    availableQty = product.productPacks!.first.qty ?? 0;
+                                                                                  } else {
+                                                                                    availableQty = product.qty ?? 0;
+                                                                                  }
+                                                                                }
+                                                                              } else {
+                                                                                // Fallback to product qty if no packs
+                                                                                availableQty = cartItem.product?.qty ?? 0;
+                                                                              }
+
+                                                                              debugPrint('Increment check: current=$currentQty, available=$availableQty, pack=${cartItem.pack}');
+
+                                                                              // Check if available quantity is set and if limit reached
+                                                                              if (availableQty > 0 && currentQty >= availableQty) {
+                                                                                setState(() {
+                                                                                  loadingItemIndex = null;
+                                                                                  quantityLoadingAction = null;
+                                                                                });
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  SnackBar(
+                                                                                    content: Text('Maximum available quantity is $availableQty'),
+                                                                                    backgroundColor: Colors.orange,
+                                                                                    duration: Duration(seconds: 2),
+                                                                                  ),
+                                                                                );
+                                                                                return;
+                                                                              }
+
+                                                                              bool type = true;
+                                                                              _cartData['is_add_to_cart'] = true;
+                                                                              await _addToCartModel.getAddToCart(_addToCartModel.addToCarts![index].product!.id, type, _cartData);
+                                                                              setState(() {});
+                                                                              await _validateAppliedCoupon();
+                                                                              await _recalculateRewards();
+
+                                                                              setState(() {
+                                                                                loadingItemIndex = null;
+                                                                                quantityLoadingAction = null;
+                                                                              });
+                                                                            },
+                                                                      child:
+                                                                          Container(
+                                                                        padding:
+                                                                            EdgeInsets.all(8.0.w),
+                                                                        child: (loadingItemIndex == index &&
+                                                                                quantityLoadingAction == 'increment')
+                                                                            ? SizedBox(
+                                                                                width: 16.0.w,
+                                                                                height: 16.0.w,
+                                                                                child: CircularProgressIndicator(
+                                                                                  strokeWidth: 2,
+                                                                                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
+                                                                                ),
+                                                                              )
+                                                                            : Icon(Icons.add, size: 18.0.sp, color: Colors.black87),
+                                                                      ),
+                                                                      // ),
+                                                                    );
+                                                                  },
+                                                                ),
+                                                              ],
                                                             ),
-                                                          ),
-                                                        ),
-                                                      );
-                                                    },
+                                                          );
+                                                        },
+                                                      ),
+                                                    ],
                                                   ),
-                                                  SizedBox(width: 12.0.w),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                        ),
+                        if (_addToCartModel.addToCarts!.length != 0)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 8),
+                            child: Container(
+                              width: 1.0.sw - 50,
+                              child: Column(
+                                children: [
+                                  // Beautiful Coupon Section
+                                  Container(
+                                    padding: EdgeInsets.all(14),
+                                    decoration: BoxDecoration(
+                                      gradient: usedCoupon.isNotEmpty
+                                          ? LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: [
+                                                Color(0xFFE8F5E9),
+                                                Color(0xFFC8E6C9)
+                                              ],
+                                            )
+                                          : LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: [
+                                                Colors.white,
+                                                Color(0xFFF8F9FA)
+                                              ],
+                                            ),
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(
+                                        color: usedCoupon.isNotEmpty
+                                            ? Color(0xFF4CAF50)
+                                            : Color(0xFFE0E0E0),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.04),
+                                          blurRadius: 8,
+                                          offset: Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        Column(
+                                          children: [
+                                            // Applied Coupon Display
+                                            if (usedCoupon.isNotEmpty)
+                                              Row(
+                                                children: [
+                                                  Container(
+                                                    padding: EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(
+                                                      color: Color(0xFF4CAF50)
+                                                          .withOpacity(0.2),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
+                                                    ),
+                                                    child: Icon(
+                                                        Icons
+                                                            .local_offer_rounded,
+                                                        color:
+                                                            Color(0xFF4CAF50),
+                                                        size: 20),
+                                                  ),
+                                                  SizedBox(width: 12),
                                                   Expanded(
                                                     child: Column(
                                                       crossAxisAlignment:
@@ -1531,2921 +2032,1014 @@ class _CartPageState extends State<CartPage> {
                                                               .start,
                                                       children: [
                                                         Text(
-                                                          _addToCartModel
-                                                              .addToCarts![
-                                                                  index]
-                                                              .product!
-                                                              .name
-                                                              .toString(),
-                                                          maxLines: 2,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style:
-                                                              MyGoogleFontStyle(
+                                                          usedCoupon,
+                                                          style: TextStyle(
                                                             fontFamily:
                                                                 'Urbanist',
-                                                            fontSize: 14.0.sp,
+                                                            fontSize: 15,
                                                             fontWeight:
                                                                 FontWeight.w700,
                                                             color: Color(
-                                                                0xff000000),
+                                                                0xFF2E7D32),
                                                           ),
                                                         ),
-                                                        SizedBox(height: 4.0.h),
-                                                        if (_addToCartModel
-                                                            .addToCarts![index]
-                                                            .product!
-                                                            .productPrices!
-                                                            .isNotEmpty)
-                                                          _addToCartModel
-                                                                          .addToCarts![
-                                                                              index]
-                                                                          .product!
-                                                                          .productPrices![
-                                                                              0]
-                                                                          .offerPrice !=
+                                                        Text(
+                                                          'You saved RS ${couponValue.toStringAsFixed(2)}',
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Urbanist',
+                                                            fontSize: 12,
+                                                            color: Color(
+                                                                0xFF388E3C),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  InkWell(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        usedCoupon = '';
+                                                        couponValue = 0;
+                                                        couponId = '';
+                                                        coupon = '';
+                                                      });
+                                                    },
+                                                    child: Container(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10,
+                                                              vertical: 6),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.red
+                                                            .withOpacity(0.1),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(6),
+                                                      ),
+                                                      child: Text(
+                                                        'Remove',
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color: Colors.red,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            // Coupon Input Form
+                                            if (usedCoupon.isEmpty)
+                                              Form(
+                                                key: _formKey,
+                                                child: Row(
+                                                  children: [
+                                                    Container(
+                                                      padding:
+                                                          EdgeInsets.all(8),
+                                                      decoration: BoxDecoration(
+                                                        color:
+                                                            Color(0xFFF5F5F5),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8),
+                                                      ),
+                                                      child: Icon(
+                                                          Icons
+                                                              .discount_rounded,
+                                                          color:
+                                                              Color(0xFFC7B456),
+                                                          size: 20),
+                                                    ),
+                                                    SizedBox(width: 10),
+                                                    Expanded(
+                                                      child: Container(
+                                                        height: 44,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color:
+                                                              Color(0xFFF8F9FA),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                          border: Border.all(
+                                                              color: Color(
+                                                                  0xFFE0E0E0)),
+                                                        ),
+                                                        child: TextFormField(
+                                                          decoration:
+                                                              InputDecoration(
+                                                            border: InputBorder
+                                                                .none,
+                                                            contentPadding:
+                                                                EdgeInsets
+                                                                    .symmetric(
+                                                                        horizontal:
+                                                                            12,
+                                                                        vertical:
+                                                                            10),
+                                                            hintText:
+                                                                'Enter promo code',
+                                                            hintStyle:
+                                                                TextStyle(
+                                                              fontFamily:
+                                                                  'Urbanist',
+                                                              fontSize: 13,
+                                                              color: Color(
+                                                                  0xFFAAAAAA),
+                                                            ),
+                                                          ),
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Urbanist',
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: Color(
+                                                                0xFF1A1A1A),
+                                                          ),
+                                                          onSaved: (value) {
+                                                            coupon = value
+                                                                .toString();
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 10),
+                                                    InkWell(
+                                                      onTap: buttonLoading
+                                                          ? null
+                                                          : () async {
+                                                              setState(() {
+                                                                buttonLoading =
+                                                                    true;
+                                                              });
+                                                              _formKey
+                                                                  .currentState!
+                                                                  .save();
+
+                                                              await _couponModel
+                                                                  .verifyCoupon(
+                                                                      coupon);
+                                                              // print(_couponModel.coupons![0].minOrderValue);
+                                                              if (_couponModel
+                                                                          .coupons !=
                                                                       null &&
-                                                                  _addToCartModel
-                                                                          .addToCarts![
-                                                                              index]
-                                                                          .product!
-                                                                          .productPrices![
-                                                                              0]
-                                                                          .offerPrice !=
-                                                                      0
-                                                              ? Wrap(
-                                                                  spacing: 4.0,
-                                                                  runSpacing:
-                                                                      2.0,
-                                                                  children: [
-                                                                    Text.rich(
-                                                                      TextSpan(
-                                                                        children: [
-                                                                          TextSpan(
-                                                                            text:
-                                                                                '₹${_addToCartModel.addToCarts![index].product!.productPrices![0].price}',
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: Colors.grey,
-                                                                              decoration: TextDecoration.lineThrough,
-                                                                              fontSize: 13.0.sp,
-                                                                              fontFamily: 'Poppins',
-                                                                              fontWeight: FontWeight.w500,
-                                                                            ),
-                                                                          ),
-                                                                          TextSpan(
-                                                                            text:
-                                                                                ' ₹${_addToCartModel.addToCarts![index].product!.productPrices![0].offerPrice}',
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: const Color(0x99000000),
-                                                                              fontSize: 13.0.sp,
-                                                                              fontFamily: 'Poppins',
-                                                                              fontWeight: FontWeight.w500,
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
+                                                                  _couponModel
+                                                                      .coupons!
+                                                                      .isNotEmpty) {
+                                                                final firstCoupon =
+                                                                    _couponModel
+                                                                        .coupons![0];
+                                                                final cartTotal =
+                                                                    int.parse(_addToCartModel
+                                                                        .cartTotal
+                                                                        .toString());
+
+                                                                // Check coupon usage count
+                                                                final orderModel =
+                                                                    Provider.of<
+                                                                            OrderModel>(
+                                                                        context,
+                                                                        listen:
+                                                                            false);
+                                                                final usageCount =
+                                                                    await orderModel.getCouponUsageCount(
+                                                                        firstCoupon
+                                                                            .id
+                                                                            .toString());
+
+                                                                if (firstCoupon
+                                                                            .noPerUser !=
+                                                                        null &&
+                                                                    firstCoupon
+                                                                            .noPerUser! >
+                                                                        0 &&
+                                                                    usageCount >=
+                                                                        firstCoupon
+                                                                            .noPerUser!) {
+                                                                  showDialog(
+                                                                    context:
+                                                                        context,
+                                                                    builder: (BuildContext
+                                                                            context) =>
+                                                                        AlertDialog(
+                                                                      shape: RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(20)),
+                                                                      title: Text(
+                                                                          "Coupon Usage Limit Reached"),
+                                                                      content: Text(
+                                                                          "You have already used this coupon ${firstCoupon.noPerUser} time${firstCoupon.noPerUser! > 1 ? 's' : ''}. This is the maximum allowed per user."),
+                                                                      actions: <Widget>[
+                                                                        TextButton(
+                                                                          onPressed:
+                                                                              () {
+                                                                            Navigator.pop(context);
+                                                                          },
+                                                                          child:
+                                                                              Text('Ok'),
+                                                                        ),
+                                                                      ],
                                                                     ),
-                                                                    if (discountPrice !=
-                                                                        0.0)
-                                                                      Text(
-                                                                        '(${discountPrice.round()}% Off)',
+                                                                  );
+                                                                } else if (firstCoupon
+                                                                        .minOrderValue! <
+                                                                    cartTotal) {
+                                                                  setState(() {
+                                                                    // Calculate item total (cart total without GST)
+                                                                    final itemTotal =
+                                                                        (cartTotal /
+                                                                                105) *
+                                                                            100;
+
+                                                                    // Check coupon type and calculate value accordingly
+                                                                    final couponType = firstCoupon
+                                                                        .type
+                                                                        ?.toLowerCase()
+                                                                        .trim();
+                                                                    final isPercentage = couponType == 'percentage' ||
+                                                                        couponType ==
+                                                                            'percent' ||
+                                                                        couponType ==
+                                                                            '%';
+
+                                                                    if (isPercentage) {
+                                                                      // Calculate percentage of item total
+                                                                      final percentageValue =
+                                                                          double.parse(firstCoupon.value.toString()) /
+                                                                              100;
+                                                                      couponValue =
+                                                                          itemTotal *
+                                                                              percentageValue;
+                                                                    } else {
+                                                                      // Flat discount - use value directly
+                                                                      couponValue = double.parse(firstCoupon
+                                                                          .value
+                                                                          .toString());
+                                                                    }
+                                                                    couponId =
+                                                                        firstCoupon
+                                                                            .id
+                                                                            .toString();
+                                                                    usedCoupon =
+                                                                        firstCoupon
+                                                                            .name
+                                                                            .toString();
+                                                                  });
+                                                                } else {
+                                                                  showDialog(
+                                                                    context:
+                                                                        context,
+                                                                    builder: (BuildContext
+                                                                            context) =>
+                                                                        AlertDialog(
+                                                                      shape: RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(20)),
+                                                                      title:
+                                                                          Text(
+                                                                        "Coupon Cannot Be Applied",
                                                                         style:
-                                                                            MyGoogleFontStyle(
-                                                                          fontFamily:
-                                                                              'Poppins',
-                                                                          fontSize:
-                                                                              13.0.sp,
+                                                                            TextStyle(
                                                                           fontWeight:
-                                                                              FontWeight.w500,
-                                                                          color:
-                                                                              const Color(0x99000000),
+                                                                              FontWeight.bold,
+                                                                          fontSize:
+                                                                              18,
                                                                         ),
                                                                       ),
-                                                                  ],
-                                                                )
-                                                              : Text(
-                                                                  '₹${_addToCartModel.addToCarts![index].product!.productPrices![0].price}',
-                                                                  style:
-                                                                      MyGoogleFontStyle(
-                                                                    fontFamily:
-                                                                        'Poppins',
-                                                                    fontSize:
-                                                                        13.0.sp,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    color: const Color(
-                                                                        0x99000000),
-                                                                  ),
-                                                                ),
-                                                        SizedBox(height: 6.0.h),
-                                                        Wrap(
-                                                          spacing: 8.0.w,
-                                                          runSpacing: 4.0.h,
-                                                          children: [
-                                                            Container(
-                                                              padding: EdgeInsets
-                                                                  .symmetric(
-                                                                      horizontal:
-                                                                          8.0.w,
-                                                                      vertical:
-                                                                          4.0.h),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Color(
-                                                                    0xFFFFFEF9),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            6.0.r),
-                                                                border: Border.all(
-                                                                    color: Color(
-                                                                            0xFFEED056)
-                                                                        .withOpacity(
-                                                                            0.3)),
-                                                              ),
-                                                              child: Text(
-                                                                'Size: ${_addToCartModel.addToCarts![index].kindOfFlower}',
-                                                                style:
-                                                                    MyGoogleFontStyle(
-                                                                  fontFamily:
-                                                                      'Poppins',
-                                                                  fontSize:
-                                                                      11.0.sp,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  color: Color(
-                                                                      0xff606060),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Container(
-                                                              padding: EdgeInsets
-                                                                  .symmetric(
-                                                                      horizontal:
-                                                                          8.0.w,
-                                                                      vertical:
-                                                                          4.0.h),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Color(
-                                                                    0xFFFFFEF9),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            6.0.r),
-                                                                border: Border.all(
-                                                                    color: Color(
-                                                                            0xFFEED056)
-                                                                        .withOpacity(
-                                                                            0.3)),
-                                                              ),
-                                                              child: Text(
-                                                                'Colour: ${_addToCartModel.addToCarts![index].flavour}',
-                                                                style:
-                                                                    MyGoogleFontStyle(
-                                                                  fontFamily:
-                                                                      'Poppins',
-                                                                  fontSize:
-                                                                      11.0.sp,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  color: Color(
-                                                                      0xff606060),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        // Align(
-                                                        //   alignment:
-                                                        //       Alignment.centerLeft,
-                                                        //   child: Row(
-                                                        //     children: [
-                                                        //       Icon(
-                                                        //         Icons.star,
-                                                        //         color: Colors.amber,
-                                                        //       ),
-                                                        //       Text(
-                                                        //         ' ( ${(_addToCartModel.addToCarts![index].product!.reviews == null ? 0 : _addToCartModel.addToCarts![index].product!.reviews?.length)} ratings )',
-                                                        //         style: TextStyle(
-                                                        //             fontSize: 12),
-                                                        //       ),
-                                                        //     ],
-                                                        //   ),
-                                                        // ),
-                                                        SizedBox(height: 8.0.h),
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            FutureBuilder<int>(
-                                                              future: _getAvailableQty(
-                                                                  _addToCartModel
-                                                                          .addToCarts![
-                                                                      index]),
-                                                              builder: (context,
-                                                                  stockSnapshot) {
-                                                                final isOutOfStock =
-                                                                    stockSnapshot
-                                                                            .hasData &&
-                                                                        stockSnapshot.data! <=
-                                                                            0;
-                                                                // Hide increment/decrement when out of stock
-                                                                if (isOutOfStock) {
-                                                                  return Container(
-                                                                    padding: EdgeInsets.symmetric(
-                                                                        horizontal:
-                                                                            12.0
-                                                                                .w,
-                                                                        vertical:
-                                                                            8.0.h),
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      color: Colors
-                                                                          .red
-                                                                          .withOpacity(
-                                                                              0.1),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8.0.r),
-                                                                      border: Border.all(
-                                                                          color: Colors
-                                                                              .red
-                                                                              .withOpacity(0.3)),
-                                                                    ),
-                                                                    child: Text(
-                                                                      'Out of Stock',
-                                                                      style:
-                                                                          TextStyle(
-                                                                        color: Colors
-                                                                            .red,
-                                                                        fontSize:
-                                                                            12.0.sp,
-                                                                        fontWeight:
-                                                                            FontWeight.w600,
+                                                                      content:
+                                                                          Text(
+                                                                        "This coupon requires a minimum cart total of RS ${firstCoupon.minOrderValue.toString()}. Your current cart total is RS ${cartTotal.toString()}. Please add more items to use this coupon.",
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                14),
                                                                       ),
+                                                                      actions: <Widget>[
+                                                                        TextButton(
+                                                                          onPressed:
+                                                                              () {
+                                                                            Navigator.pop(context);
+                                                                          },
+                                                                          child:
+                                                                              Text('Understood'),
+                                                                        ),
+                                                                      ],
                                                                     ),
                                                                   );
                                                                 }
-                                                                return Container(
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    color: Color(
-                                                                        0xFFF5F5F5),
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            8.0.r),
-                                                                  ),
-                                                                  child: Row(
-                                                                    children: [
-                                                                      InkWell(
-                                                                        onTap: loadingItemIndex !=
-                                                                                null
-                                                                            ? null
-                                                                            : () async {
-                                                                                setState(() {
-                                                                                  loadingItemIndex = index;
-                                                                                  quantityLoadingAction = 'decrement';
-                                                                                });
-
-                                                                                bool minus = false;
-                                                                                _cartData['is_add_to_cart'] = true;
-                                                                                await _addToCartModel.getAddToCart(_addToCartModel.addToCarts![index].product!.id, minus, _cartData);
-                                                                                setState(() {});
-                                                                                await _validateAppliedCoupon();
-                                                                                await _recalculateRewards();
-
-                                                                                setState(() {
-                                                                                  loadingItemIndex = null;
-                                                                                  quantityLoadingAction = null;
-                                                                                });
-                                                                              },
-                                                                        child:
-                                                                            Container(
-                                                                          padding:
-                                                                              EdgeInsets.all(8.0.w),
-                                                                          child: (loadingItemIndex == index && quantityLoadingAction == 'decrement')
-                                                                              ? SizedBox(
-                                                                                  width: 16.0.w,
-                                                                                  height: 16.0.w,
-                                                                                  child: CircularProgressIndicator(
-                                                                                    strokeWidth: 2,
-                                                                                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
-                                                                                  ),
-                                                                                )
-                                                                              : Icon(Icons.remove, size: 18.0.sp, color: Colors.black87),
-                                                                        ),
-                                                                      ),
-                                                                      Container(
-                                                                        padding:
-                                                                            EdgeInsets.symmetric(horizontal: 12.0.w),
-                                                                        child:
-                                                                            Text(
-                                                                          _addToCartModel
-                                                                              .addToCarts![index]
-                                                                              .qty
-                                                                              .toString(),
-                                                                          style:
-                                                                              MyGoogleFontStyle(
-                                                                            fontFamily:
-                                                                                'Urbanist',
-                                                                            fontSize:
-                                                                                14.0.sp,
-                                                                            fontWeight:
-                                                                                FontWeight.w600,
-                                                                            color:
-                                                                                Colors.black,
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                      FutureBuilder<
-                                                                          int>(
-                                                                        future:
-                                                                            _getAvailableQty(_addToCartModel.addToCarts![index]),
-                                                                        builder:
-                                                                            (context,
-                                                                                snapshot) {
-                                                                          final currentQty =
-                                                                              _addToCartModel.addToCarts![index].qty ?? 0;
-                                                                          final availableQty =
-                                                                              snapshot.data ?? 0;
-
-                                                                          debugPrint(
-                                                                              'FutureBuilder: currentQty=$currentQty, availableQty=$availableQty, snapshot.hasData=${snapshot.hasData}');
-
-                                                                          // Hide plus button if qty limit reached
-                                                                          if (availableQty > 0 &&
-                                                                              currentQty >= availableQty) {
-                                                                            debugPrint('FutureBuilder: HIDING plus button (limit reached)');
-                                                                            return SizedBox(width: 34.0.w); // Empty space to maintain layout
-                                                                          }
-
-                                                                          return InkWell(
-                                                                            onTap: loadingItemIndex != null
-                                                                                ? null
-                                                                                : () async {
-                                                                                    // Check available quantity before incrementing
-                                                                                    final cartItem = _addToCartModel.addToCarts![index];
-                                                                                    final currentQty = cartItem.qty ?? 0;
-
-                                                                                    setState(() {
-                                                                                      loadingItemIndex = index;
-                                                                                      quantityLoadingAction = 'increment';
-                                                                                    });
-
-                                                                                    // Fetch fresh product data with packs
-                                                                                    final productService = locator<ProductService>();
-                                                                                    final product = await productService.getProductById(cartItem.productId ?? 0);
-
-                                                                                    int availableQty = 0;
-                                                                                    if (product != null && product.productPacks != null && product.productPacks!.isNotEmpty) {
-                                                                                      // Find the matching pack based on cart item's pack ID
-                                                                                      try {
-                                                                                        final matchingPack = product.productPacks!.firstWhere(
-                                                                                          (pack) => pack.id.toString() == cartItem.pack,
-                                                                                        );
-                                                                                        availableQty = matchingPack.qty ?? 0;
-                                                                                      } catch (e) {
-                                                                                        // If no matching pack found, use first pack or product qty
-                                                                                        if (product.productPacks!.isNotEmpty) {
-                                                                                          availableQty = product.productPacks!.first.qty ?? 0;
-                                                                                        } else {
-                                                                                          availableQty = product.qty ?? 0;
-                                                                                        }
-                                                                                      }
-                                                                                    } else {
-                                                                                      // Fallback to product qty if no packs
-                                                                                      availableQty = cartItem.product?.qty ?? 0;
-                                                                                    }
-
-                                                                                    debugPrint('Increment check: current=$currentQty, available=$availableQty, pack=${cartItem.pack}');
-
-                                                                                    // Check if available quantity is set and if limit reached
-                                                                                    if (availableQty > 0 && currentQty >= availableQty) {
-                                                                                      setState(() {
-                                                                                        loadingItemIndex = null;
-                                                                                        quantityLoadingAction = null;
-                                                                                      });
-                                                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                                                        SnackBar(
-                                                                                          content: Text('Maximum available quantity is $availableQty'),
-                                                                                          backgroundColor: Colors.orange,
-                                                                                          duration: Duration(seconds: 2),
-                                                                                        ),
-                                                                                      );
-                                                                                      return;
-                                                                                    }
-
-                                                                                    bool type = true;
-                                                                                    _cartData['is_add_to_cart'] = true;
-                                                                                    await _addToCartModel.getAddToCart(_addToCartModel.addToCarts![index].product!.id, type, _cartData);
-                                                                                    setState(() {});
-                                                                                    await _validateAppliedCoupon();
-                                                                                    await _recalculateRewards();
-
-                                                                                    setState(() {
-                                                                                      loadingItemIndex = null;
-                                                                                      quantityLoadingAction = null;
-                                                                                    });
-                                                                                  },
-                                                                            child:
-                                                                                Container(
-                                                                              padding: EdgeInsets.all(8.0.w),
-                                                                              child: (loadingItemIndex == index && quantityLoadingAction == 'increment')
-                                                                                  ? SizedBox(
-                                                                                      width: 16.0.w,
-                                                                                      height: 16.0.w,
-                                                                                      child: CircularProgressIndicator(
-                                                                                        strokeWidth: 2,
-                                                                                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
-                                                                                      ),
-                                                                                    )
-                                                                                  : Icon(Icons.add, size: 18.0.sp, color: Colors.black87),
-                                                                            ),
-                                                                          );
+                                                              } else {
+                                                                showDialog(
+                                                                  context:
+                                                                      context,
+                                                                  builder: (BuildContext
+                                                                          context) =>
+                                                                      AlertDialog(
+                                                                    shape: RoundedRectangleBorder(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(20)),
+                                                                    title: Text(
+                                                                        "Invalid coupon."),
+                                                                    actions: <Widget>[
+                                                                      TextButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                          Navigator.pop(
+                                                                              context);
                                                                         },
+                                                                        child: Text(
+                                                                            'Ok'),
                                                                       ),
                                                                     ],
                                                                   ),
                                                                 );
-                                                              },
-                                                            ),
-                                                          ],
-                                                        )
-                                                      ],
+                                                              }
+
+                                                              setState(() {
+                                                                buttonLoading =
+                                                                    false;
+                                                              });
+                                                            },
+                                                      child: Container(
+                                                        height: 44,
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 16),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          gradient:
+                                                              LinearGradient(
+                                                            colors: [
+                                                              Color(0xFFC7B456),
+                                                              Color(0xFFAA9A40)
+                                                            ],
+                                                          ),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                        ),
+                                                        child: Center(
+                                                          child: buttonLoading
+                                                              ? SizedBox(
+                                                                  width: 18,
+                                                                  height: 18,
+                                                                  child:
+                                                                      CircularProgressIndicator(
+                                                                    strokeWidth:
+                                                                        2,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
+                                                                )
+                                                              : Text(
+                                                                  'Apply',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontFamily:
+                                                                        'Urbanist',
+                                                                    fontSize:
+                                                                        13,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w700,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
+                                                                ),
+                                                        ),
+                                                      ),
                                                     ),
+                                                  ],
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                        if (couponValidationLoading)
+                                          Positioned.fill(
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: Colors.white
+                                                    .withOpacity(0.7),
+                                                borderRadius:
+                                                    BorderRadius.circular(14),
+                                              ),
+                                              child: Center(
+                                                child: SizedBox(
+                                                  width: 24,
+                                                  height: 24,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    strokeWidth: 2,
+                                                    color: Color(0xFFC7B456),
                                                   ),
-                                                ],
+                                                ),
                                               ),
                                             ),
-                                          );
-                                        },
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                  // View Promocodes Link
+                                  InkWell(
+                                    onTap: () async {
+                                      try {
+                                        final result = await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  PromocodesPage()),
+                                        );
+
+                                        if (result != null &&
+                                            result['name'] != null) {
+                                          setState(() {
+                                            couponValidationLoading = true;
+                                          });
+
+                                          await _couponModel
+                                              .verifyCoupon(result['name']);
+
+                                          if (_couponModel.coupons != null &&
+                                              _couponModel
+                                                  .coupons!.isNotEmpty) {
+                                            final firstCoupon =
+                                                _couponModel.coupons![0];
+                                            final cartTotal = int.parse(
+                                                _addToCartModel.cartTotal
+                                                    .toString());
+
+                                            // Check coupon usage count
+                                            final orderModel =
+                                                Provider.of<OrderModel>(context,
+                                                    listen: false);
+                                            final usageCount = await orderModel
+                                                .getCouponUsageCount(
+                                                    firstCoupon.id.toString());
+
+                                            if (firstCoupon.noPerUser != null &&
+                                                firstCoupon.noPerUser! > 0 &&
+                                                usageCount >=
+                                                    firstCoupon.noPerUser!) {
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) =>
+                                                        AlertDialog(
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20)),
+                                                  title: Text(
+                                                      "Coupon Usage Limit Reached"),
+                                                  content: Text(
+                                                      "You have already used this coupon ${firstCoupon.noPerUser} time${firstCoupon.noPerUser! > 1 ? 's' : ''}. This is the maximum allowed per user."),
+                                                  actions: <Widget>[
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text('Ok'),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            } else if (firstCoupon
+                                                    .minOrderValue! <
+                                                cartTotal) {
+                                              // Combine all setState calls into one
+                                              setState(() {
+                                                usedCoupon =
+                                                    firstCoupon.name.toString();
+
+                                                // Calculate item total (cart total without GST)
+                                                final itemTotal =
+                                                    (cartTotal / 105) * 100;
+
+                                                // Check coupon type and calculate value accordingly
+                                                final couponType = firstCoupon
+                                                    .type
+                                                    ?.toLowerCase()
+                                                    .trim();
+                                                final isPercentage =
+                                                    couponType ==
+                                                            'percentage' ||
+                                                        couponType ==
+                                                            'percent' ||
+                                                        couponType == '%';
+
+                                                if (isPercentage) {
+                                                  // Calculate percentage of item total
+                                                  final percentageValue =
+                                                      double.parse(firstCoupon
+                                                              .value
+                                                              .toString()) /
+                                                          100;
+                                                  couponValue = itemTotal *
+                                                      percentageValue;
+                                                } else {
+                                                  // Flat discount - use value directly
+                                                  couponValue = double.parse(
+                                                      firstCoupon.value
+                                                          .toString());
+                                                }
+                                                couponId =
+                                                    firstCoupon.id.toString();
+                                              });
+                                            } else {
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) =>
+                                                        AlertDialog(
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20)),
+                                                  title: Text(
+                                                    "Coupon Cannot Be Applied",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 18,
+                                                    ),
+                                                  ),
+                                                  content: Text(
+                                                    "This coupon requires a minimum cart total of RS ${firstCoupon.minOrderValue.toString()}. Your current cart total is RS ${cartTotal.toString()}. Please add more items to use this coupon.",
+                                                    style:
+                                                        TextStyle(fontSize: 14),
+                                                  ),
+                                                  actions: <Widget>[
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text('Understood'),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            }
+                                          } else {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    'No valid coupon found'),
+                                                backgroundColor: Colors.orange,
+                                              ),
+                                            );
+                                          }
+                                        }
+                                      } catch (e) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                'Error applying coupon: $e'),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      }
+
+                                      setState(() {
+                                        couponValidationLoading = false;
+                                      });
+                                      // });
+                                      // print(result);
+                                    },
+                                    child: Container(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 10),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.local_offer_outlined,
+                                              size: 16,
+                                              color: Color(0xFFC7B456)),
+                                          SizedBox(width: 6),
+                                          Text(
+                                            'Browse All Promo Codes',
+                                            style: TextStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xFFC7B456),
+                                            ),
+                                          ),
+                                          SizedBox(width: 4),
+                                          Icon(Icons.arrow_forward_ios,
+                                              size: 12,
+                                              color: Color(0xFFC7B456)),
+                                        ],
                                       ),
                                     ),
-                                  ],
-                                ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (_addToCartModel.addToCarts!.length != 0)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 8),
-                      child: Container(
-                        width: 1.0.sw - 50,
-                        child: Column(
-                          children: [
-                            // Beautiful Coupon Section
-                            Container(
-                              padding: EdgeInsets.all(14),
-                              decoration: BoxDecoration(
-                                gradient: usedCoupon.isNotEmpty
-                                    ? LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          Color(0xFFE8F5E9),
-                                          Color(0xFFC8E6C9)
-                                        ],
-                                      )
-                                    : LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          Colors.white,
-                                          Color(0xFFF8F9FA)
-                                        ],
-                                      ),
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(
-                                  color: usedCoupon.isNotEmpty
-                                      ? Color(0xFF4CAF50)
-                                      : Color(0xFFE0E0E0),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.04),
-                                    blurRadius: 8,
-                                    offset: Offset(0, 2),
                                   ),
-                                ],
-                              ),
-                              child: Column(
-                                children: [
-                                  // Applied Coupon Display
-                                  if (usedCoupon.isNotEmpty)
-                                    Row(
+                                  // SizedBox(
+                                  //   height: 10,
+                                  // ),
+                                  // if (_addToCartModel.addToCarts!.length != 0)
+                                  //   Row(
+                                  //     children: [
+                                  //       Text(
+                                  //         'Total:',
+                                  //         style: MyGoogleFontStyle(
+                                  //           fontFamily: 'Urbanist',
+                                  //           fontWeight: FontWeight.w700,
+                                  //           color: Color(0xff808080),
+                                  //         ),
+                                  //       ),
+                                  //       Expanded(
+                                  //         child: Text(
+                                  //           _addToCartModel.cartTotal.toString() != null
+                                  //               ? 'RS' +
+                                  //                   ' ' +
+                                  //                   (int.parse(_addToCartModel.cartTotal
+                                  //                               .toString()) -
+                                  //                           int.parse(
+                                  //                               couponValue.toString()))
+                                  //                       .toString()
+                                  //               : 'RS' + '0',
+                                  //           textAlign: TextAlign.right,
+                                  //           style: MyGoogleFontStyle(
+                                  //             fontFamily: 'Inter',
+                                  //             fontWeight: FontWeight.w700,
+                                  //             color: Color(0xff303030),
+                                  //           ),
+                                  //         ),
+                                  //       )
+                                  //     ],
+                                  //   ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  // _addToCartModel.addToCarts!.length != 0
+                                  //     ? Container(
+                                  //         margin: EdgeInsets.fromLTRB(0.89, 0, 0, 0),
+                                  //         child: TextButton(
+                                  //           onPressed: () {
+                                  //             Navigator.of(context).push(
+                                  //                 MaterialPageRoute(
+                                  //                     builder: (context) =>
+                                  //                         CheckoutPage(arguments: {
+                                  //                           'cartTotal': _addToCartModel
+                                  //                               .cartTotal
+                                  //                               .toString(),
+                                  //                           'cartItems': _addToCartModel
+                                  //                               .addToCarts,
+                                  //                           'address': _orderModel
+                                  //                                   .orders.isNotEmpty
+                                  //                               ? _orderModel
+                                  //                                   .orders[0].address!
+                                  //                                   .toJson()
+                                  //                               : null,
+                                  //                           'couponValue': couponValue,
+                                  //                           'couponId': couponId
+                                  //                         })));
+                                  //           },
+                                  //           style: TextButton.styleFrom(
+                                  //             padding: EdgeInsets.zero,
+                                  //           ),
+                                  //           child: Container(
+                                  //             width: 321,
+                                  //             height: 53,
+                                  //             decoration: BoxDecoration(
+                                  //               color: Color(0xff1e1e1e),
+                                  //               borderRadius: BorderRadius.circular(10),
+                                  //             ),
+                                  //             child: Center(
+                                  //               child: Text(
+                                  //                 'Checkout',
+                                  //                 style: MyGoogleFontStyle(
+                                  //                   fontFamily: 'Urbanist',
+                                  //                   fontWeight: FontWeight.w700,
+                                  //                   color: Color(0xffffffff),
+                                  //                 ),
+                                  //               ),
+                                  //             ),
+                                  //           ),
+                                  //         ),
+                                  //       )
+                                  //     : Text(''),
+                                  Container(
+                                    margin: EdgeInsets.only(top: 20),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
+                                        // Shipping Address - Beautiful Card Design
                                         Container(
-                                          padding: EdgeInsets.all(8),
+                                          margin: EdgeInsets.only(bottom: 16),
+                                          padding: EdgeInsets.all(16),
                                           decoration: BoxDecoration(
-                                            color: Color(0xFF4CAF50)
-                                                .withOpacity(0.2),
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: [
+                                                Colors.white,
+                                                Color(0xFFF8F9FA),
+                                              ],
+                                            ),
                                             borderRadius:
-                                                BorderRadius.circular(8),
+                                                BorderRadius.circular(16),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black
+                                                    .withOpacity(0.04),
+                                                blurRadius: 10,
+                                                offset: Offset(0, 4),
+                                              ),
+                                            ],
                                           ),
-                                          child: Icon(Icons.local_offer_rounded,
-                                              color: Color(0xFF4CAF50),
-                                              size: 20),
-                                        ),
-                                        SizedBox(width: 12),
-                                        Expanded(
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                usedCoupon,
-                                                style: TextStyle(
-                                                  fontFamily: 'Urbanist',
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color(0xFF2E7D32),
-                                                ),
-                                              ),
-                                              Text(
-                                                'You saved RS ${couponValue.toStringAsFixed(2)}',
-                                                style: TextStyle(
-                                                  fontFamily: 'Urbanist',
-                                                  fontSize: 12,
-                                                  color: Color(0xFF388E3C),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              usedCoupon = '';
-                                              couponValue = 0;
-                                              couponId = '';
-                                              coupon = '';
-                                            });
-                                          },
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 10, vertical: 6),
-                                            decoration: BoxDecoration(
-                                              color:
-                                                  Colors.red.withOpacity(0.1),
-                                              borderRadius:
-                                                  BorderRadius.circular(6),
-                                            ),
-                                            child: Text(
-                                              'Remove',
-                                              style: TextStyle(
-                                                fontFamily: 'Urbanist',
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600,
-                                                color: Colors.red,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  // Coupon Input Form
-                                  if (usedCoupon.isEmpty)
-                                    Form(
-                                      key: _formKey,
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                              color: Color(0xFFF5F5F5),
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                            child: Icon(Icons.discount_rounded,
-                                                color: Color(0xFFC7B456),
-                                                size: 20),
-                                          ),
-                                          SizedBox(width: 10),
-                                          Expanded(
-                                            child: Container(
-                                              height: 44,
-                                              decoration: BoxDecoration(
-                                                color: Color(0xFFF8F9FA),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                border: Border.all(
-                                                    color: Color(0xFFE0E0E0)),
-                                              ),
-                                              child: TextFormField(
-                                                decoration: InputDecoration(
-                                                  border: InputBorder.none,
-                                                  contentPadding:
-                                                      EdgeInsets.symmetric(
-                                                          horizontal: 12,
-                                                          vertical: 10),
-                                                  hintText: 'Enter promo code',
-                                                  hintStyle: TextStyle(
-                                                    fontFamily: 'Urbanist',
-                                                    fontSize: 13,
-                                                    color: Color(0xFFAAAAAA),
+                                              Row(
+                                                children: [
+                                                  Container(
+                                                    padding: EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(
+                                                      color: Color(0xFFE8F5E9),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.location_on_rounded,
+                                                      color: Color(0xFF4CAF50),
+                                                      size: 20,
+                                                    ),
                                                   ),
-                                                ),
-                                                style: TextStyle(
-                                                  fontFamily: 'Urbanist',
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xFF1A1A1A),
-                                                ),
-                                                onSaved: (value) {
-                                                  coupon = value.toString();
-                                                },
+                                                  SizedBox(width: 12),
+                                                  Expanded(
+                                                    child: Text(
+                                                      'Delivery Address',
+                                                      style: TextStyle(
+                                                        fontFamily: 'Urbanist',
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        color:
+                                                            Color(0xFF1A1A1A),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  if (address.id != null)
+                                                    InkWell(
+                                                      onTap: () async {
+                                                        final result =
+                                                            await Navigator.of(
+                                                                    context)
+                                                                .push(
+                                                          MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    AddressPage(
+                                                              arguments: {
+                                                                'cartTotal':
+                                                                    _addToCartModel
+                                                                        .cartTotal
+                                                                        .toString(),
+                                                                'cartItems':
+                                                                    _addToCartModel
+                                                                        .addToCarts,
+                                                                'couponValue':
+                                                                    couponValue,
+                                                                'isAddress':
+                                                                    true
+                                                              },
+                                                            ),
+                                                          ),
+                                                        );
+                                                        if (result != null &&
+                                                            result['address'] !=
+                                                                null) {
+                                                          setState(() {
+                                                            address = UserAddress
+                                                                .fromJson(result[
+                                                                    'address']);
+                                                          });
+                                                        }
+                                                      },
+                                                      child: Container(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 12,
+                                                                vertical: 6),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color:
+                                                              Color(0xFFF5F5F5),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(20),
+                                                        ),
+                                                        child: Text(
+                                                          'Change',
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Urbanist',
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            color: Color(
+                                                                0xFF666666),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                ],
                                               ),
-                                            ),
-                                          ),
-                                          SizedBox(width: 10),
-                                          InkWell(
-                                            onTap: buttonLoading
-                                                ? null
-                                                : () async {
-                                                    setState(() {
-                                                      buttonLoading = true;
-                                                    });
-                                                    _formKey.currentState!
-                                                        .save();
-
-                                                    await _couponModel
-                                                        .verifyCoupon(coupon);
-                                                    // print(_couponModel.coupons![0].minOrderValue);
-                                                    if (_couponModel.coupons !=
-                                                            null &&
-                                                        _couponModel.coupons!
-                                                            .isNotEmpty) {
-                                                      final firstCoupon =
-                                                          _couponModel
-                                                              .coupons![0];
-                                                      final cartTotal =
-                                                          int.parse(
-                                                              _addToCartModel
-                                                                  .cartTotal
-                                                                  .toString());
-
-                                                      // Check coupon usage count
-                                                      final orderModel =
-                                                          Provider.of<
-                                                                  OrderModel>(
-                                                              context,
-                                                              listen: false);
-                                                      final usageCount =
-                                                          await orderModel
-                                                              .getCouponUsageCount(
-                                                                  firstCoupon.id
-                                                                      .toString());
-
-                                                      if (firstCoupon
-                                                                  .noPerUser !=
-                                                              null &&
-                                                          firstCoupon
-                                                                  .noPerUser! >
-                                                              0 &&
-                                                          usageCount >=
-                                                              firstCoupon
-                                                                  .noPerUser!) {
-                                                        showDialog(
-                                                          context: context,
-                                                          builder: (BuildContext
-                                                                  context) =>
-                                                              AlertDialog(
-                                                            shape: RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            20)),
-                                                            title: Text(
-                                                                "Coupon Usage Limit Reached"),
-                                                            content: Text(
-                                                                "You have already used this coupon ${firstCoupon.noPerUser} time${firstCoupon.noPerUser! > 1 ? 's' : ''}. This is the maximum allowed per user."),
-                                                            actions: <Widget>[
-                                                              TextButton(
-                                                                onPressed: () {
-                                                                  Navigator.pop(
-                                                                      context);
-                                                                },
-                                                                child:
-                                                                    Text('Ok'),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        );
-                                                      } else if (firstCoupon
-                                                              .minOrderValue! <
-                                                          cartTotal) {
-                                                        setState(() {
-                                                          // Calculate item total (cart total without GST)
-                                                          final itemTotal =
-                                                              (cartTotal /
-                                                                      105) *
-                                                                  100;
-
-                                                          // Check coupon type and calculate value accordingly
-                                                          final couponType =
-                                                              firstCoupon.type
-                                                                  ?.toLowerCase()
-                                                                  .trim();
-                                                          final isPercentage =
-                                                              couponType ==
-                                                                      'percentage' ||
-                                                                  couponType ==
-                                                                      'percent' ||
-                                                                  couponType ==
-                                                                      '%';
-
-                                                          if (isPercentage) {
-                                                            // Calculate percentage of item total
-                                                            final percentageValue =
-                                                                double.parse(firstCoupon
-                                                                        .value
-                                                                        .toString()) /
-                                                                    100;
-                                                            couponValue =
-                                                                itemTotal *
-                                                                    percentageValue;
-                                                          } else {
-                                                            // Flat discount - use value directly
-                                                            couponValue = double
-                                                                .parse(firstCoupon
-                                                                    .value
-                                                                    .toString());
-                                                          }
-                                                          couponId = firstCoupon
-                                                              .id
-                                                              .toString();
-                                                          usedCoupon =
-                                                              firstCoupon.name
-                                                                  .toString();
-                                                        });
-                                                      } else {
-                                                        showDialog(
-                                                          context: context,
-                                                          builder: (BuildContext
-                                                                  context) =>
-                                                              AlertDialog(
-                                                            shape: RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            20)),
-                                                            title: Text(
-                                                              "Coupon Cannot Be Applied",
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 18,
-                                                              ),
-                                                            ),
-                                                            content: Text(
-                                                              "This coupon requires a minimum cart total of RS ${firstCoupon.minOrderValue.toString()}. Your current cart total is RS ${cartTotal.toString()}. Please add more items to use this coupon.",
-                                                              style: TextStyle(
-                                                                  fontSize: 14),
-                                                            ),
-                                                            actions: <Widget>[
-                                                              TextButton(
-                                                                onPressed: () {
-                                                                  Navigator.pop(
-                                                                      context);
-                                                                },
-                                                                child: Text(
-                                                                    'Understood'),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        );
-                                                      }
-                                                    } else {
-                                                      showDialog(
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                                context) =>
-                                                            AlertDialog(
-                                                          shape: RoundedRectangleBorder(
+                                              if (address.id != null) ...[
+                                                SizedBox(height: 12),
+                                                Container(
+                                                  padding: EdgeInsets.all(12),
+                                                  decoration: BoxDecoration(
+                                                    color: Color(0xFFF8F9FA),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    border: Border.all(
+                                                        color:
+                                                            Color(0xFFE0E0E0)),
+                                                  ),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          Container(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        8,
+                                                                    vertical:
+                                                                        4),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Color(
+                                                                      0xFFC7B456)
+                                                                  .withOpacity(
+                                                                      0.2),
                                                               borderRadius:
                                                                   BorderRadius
                                                                       .circular(
-                                                                          20)),
-                                                          title: Text(
-                                                              "Invalid coupon."),
-                                                          actions: <Widget>[
-                                                            TextButton(
-                                                              onPressed: () {
-                                                                Navigator.pop(
-                                                                    context);
-                                                              },
-                                                              child: Text('Ok'),
+                                                                          4),
                                                             ),
-                                                          ],
-                                                        ),
-                                                      );
-                                                    }
-
-                                                    setState(() {
-                                                      buttonLoading = false;
-                                                    });
-                                                  },
-                                            child: Container(
-                                              height: 44,
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 16),
-                                              decoration: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  colors: [
-                                                    Color(0xFFC7B456),
-                                                    Color(0xFFAA9A40)
-                                                  ],
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              child: Center(
-                                                child: buttonLoading
-                                                    ? SizedBox(
-                                                        width: 18,
-                                                        height: 18,
-                                                        child:
-                                                            CircularProgressIndicator(
-                                                          strokeWidth: 2,
-                                                          color: Colors.white,
-                                                        ),
-                                                      )
-                                                    : Text(
-                                                        'Apply',
-                                                        style: TextStyle(
-                                                          fontFamily:
-                                                              'Urbanist',
-                                                          fontSize: 13,
-                                                          fontWeight:
-                                                              FontWeight.w700,
-                                                          color: Colors.white,
-                                                        ),
-                                                      ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                            // View Promocodes Link
-                            InkWell(
-                              onTap: () async {
-                                try {
-                                  final result = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => PromocodesPage()),
-                                  );
-
-                                  if (result != null &&
-                                      result['name'] != null) {
-                                    setState(() {
-                                      buttonLoading = true;
-                                    });
-
-                                    await _couponModel
-                                        .verifyCoupon(result['name']);
-
-                                    if (_couponModel.coupons != null &&
-                                        _couponModel.coupons!.isNotEmpty) {
-                                      final firstCoupon =
-                                          _couponModel.coupons![0];
-                                      final cartTotal = int.parse(
-                                          _addToCartModel.cartTotal.toString());
-
-                                      // Check coupon usage count
-                                      final orderModel =
-                                          Provider.of<OrderModel>(context,
-                                              listen: false);
-                                      final usageCount =
-                                          await orderModel.getCouponUsageCount(
-                                              firstCoupon.id.toString());
-
-                                      if (firstCoupon.noPerUser != null &&
-                                          firstCoupon.noPerUser! > 0 &&
-                                          usageCount >=
-                                              firstCoupon.noPerUser!) {
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) =>
-                                              AlertDialog(
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(20)),
-                                            title: Text(
-                                                "Coupon Usage Limit Reached"),
-                                            content: Text(
-                                                "You have already used this coupon ${firstCoupon.noPerUser} time${firstCoupon.noPerUser! > 1 ? 's' : ''}. This is the maximum allowed per user."),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text('Ok'),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      } else if (firstCoupon.minOrderValue! <
-                                          cartTotal) {
-                                        // Combine all setState calls into one
-                                        setState(() {
-                                          usedCoupon =
-                                              firstCoupon.name.toString();
-
-                                          // Calculate item total (cart total without GST)
-                                          final itemTotal =
-                                              (cartTotal / 105) * 100;
-
-                                          // Check coupon type and calculate value accordingly
-                                          final couponType = firstCoupon.type
-                                              ?.toLowerCase()
-                                              .trim();
-                                          final isPercentage =
-                                              couponType == 'percentage' ||
-                                                  couponType == 'percent' ||
-                                                  couponType == '%';
-
-                                          if (isPercentage) {
-                                            // Calculate percentage of item total
-                                            final percentageValue =
-                                                double.parse(firstCoupon.value
-                                                        .toString()) /
-                                                    100;
-                                            couponValue =
-                                                itemTotal * percentageValue;
-                                          } else {
-                                            // Flat discount - use value directly
-                                            couponValue = double.parse(
-                                                firstCoupon.value.toString());
-                                          }
-                                          couponId = firstCoupon.id.toString();
-                                        });
-                                      } else {
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) =>
-                                              AlertDialog(
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(20)),
-                                            title: Text(
-                                              "Coupon Cannot Be Applied",
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 18,
-                                              ),
-                                            ),
-                                            content: Text(
-                                              "This coupon requires a minimum cart total of RS ${firstCoupon.minOrderValue.toString()}. Your current cart total is RS ${cartTotal.toString()}. Please add more items to use this coupon.",
-                                              style: TextStyle(fontSize: 14),
-                                            ),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text('Understood'),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      }
-                                    } else {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content:
-                                              Text('No valid coupon found'),
-                                          backgroundColor: Colors.orange,
-                                        ),
-                                      );
-                                    }
-                                  }
-                                } catch (e) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content:
-                                          Text('Error applying coupon: $e'),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                                }
-
-                                setState(() {
-                                  buttonLoading = false;
-                                });
-                                // });
-                                // print(result);
-                              },
-                              child: Container(
-                                padding: EdgeInsets.symmetric(vertical: 10),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.local_offer_outlined,
-                                        size: 16, color: Color(0xFFC7B456)),
-                                    SizedBox(width: 6),
-                                    Text(
-                                      'Browse All Promo Codes',
-                                      style: TextStyle(
-                                        fontFamily: 'Urbanist',
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                        color: Color(0xFFC7B456),
-                                      ),
-                                    ),
-                                    SizedBox(width: 4),
-                                    Icon(Icons.arrow_forward_ios,
-                                        size: 12, color: Color(0xFFC7B456)),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            // SizedBox(
-                            //   height: 10,
-                            // ),
-                            // if (_addToCartModel.addToCarts!.length != 0)
-                            //   Row(
-                            //     children: [
-                            //       Text(
-                            //         'Total:',
-                            //         style: MyGoogleFontStyle(
-                            //           fontFamily: 'Urbanist',
-                            //           fontWeight: FontWeight.w700,
-                            //           color: Color(0xff808080),
-                            //         ),
-                            //       ),
-                            //       Expanded(
-                            //         child: Text(
-                            //           _addToCartModel.cartTotal.toString() != null
-                            //               ? 'RS' +
-                            //                   ' ' +
-                            //                   (int.parse(_addToCartModel.cartTotal
-                            //                               .toString()) -
-                            //                           int.parse(
-                            //                               couponValue.toString()))
-                            //                       .toString()
-                            //               : 'RS' + '0',
-                            //           textAlign: TextAlign.right,
-                            //           style: MyGoogleFontStyle(
-                            //             fontFamily: 'Inter',
-                            //             fontWeight: FontWeight.w700,
-                            //             color: Color(0xff303030),
-                            //           ),
-                            //         ),
-                            //       )
-                            //     ],
-                            //   ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            // _addToCartModel.addToCarts!.length != 0
-                            //     ? Container(
-                            //         margin: EdgeInsets.fromLTRB(0.89, 0, 0, 0),
-                            //         child: TextButton(
-                            //           onPressed: () {
-                            //             Navigator.of(context).push(
-                            //                 MaterialPageRoute(
-                            //                     builder: (context) =>
-                            //                         CheckoutPage(arguments: {
-                            //                           'cartTotal': _addToCartModel
-                            //                               .cartTotal
-                            //                               .toString(),
-                            //                           'cartItems': _addToCartModel
-                            //                               .addToCarts,
-                            //                           'address': _orderModel
-                            //                                   .orders.isNotEmpty
-                            //                               ? _orderModel
-                            //                                   .orders[0].address!
-                            //                                   .toJson()
-                            //                               : null,
-                            //                           'couponValue': couponValue,
-                            //                           'couponId': couponId
-                            //                         })));
-                            //           },
-                            //           style: TextButton.styleFrom(
-                            //             padding: EdgeInsets.zero,
-                            //           ),
-                            //           child: Container(
-                            //             width: 321,
-                            //             height: 53,
-                            //             decoration: BoxDecoration(
-                            //               color: Color(0xff1e1e1e),
-                            //               borderRadius: BorderRadius.circular(10),
-                            //             ),
-                            //             child: Center(
-                            //               child: Text(
-                            //                 'Checkout',
-                            //                 style: MyGoogleFontStyle(
-                            //                   fontFamily: 'Urbanist',
-                            //                   fontWeight: FontWeight.w700,
-                            //                   color: Color(0xffffffff),
-                            //                 ),
-                            //               ),
-                            //             ),
-                            //           ),
-                            //         ),
-                            //       )
-                            //     : Text(''),
-                            Container(
-                              margin: EdgeInsets.only(top: 20),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Shipping Address - Beautiful Card Design
-                                  Container(
-                                    margin: EdgeInsets.only(bottom: 16),
-                                    padding: EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          Colors.white,
-                                          Color(0xFFF8F9FA),
-                                        ],
-                                      ),
-                                      borderRadius: BorderRadius.circular(16),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.04),
-                                          blurRadius: 10,
-                                          offset: Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Container(
-                                              padding: EdgeInsets.all(8),
-                                              decoration: BoxDecoration(
-                                                color: Color(0xFFE8F5E9),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              child: Icon(
-                                                Icons.location_on_rounded,
-                                                color: Color(0xFF4CAF50),
-                                                size: 20,
-                                              ),
-                                            ),
-                                            SizedBox(width: 12),
-                                            Expanded(
-                                              child: Text(
-                                                'Delivery Address',
-                                                style: TextStyle(
-                                                  fontFamily: 'Urbanist',
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color(0xFF1A1A1A),
-                                                ),
-                                              ),
-                                            ),
-                                            if (address.id != null)
-                                              InkWell(
-                                                onTap: () async {
-                                                  final result =
-                                                      await Navigator.of(
-                                                              context)
-                                                          .push(
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          AddressPage(
-                                                        arguments: {
-                                                          'cartTotal':
-                                                              _addToCartModel
-                                                                  .cartTotal
-                                                                  .toString(),
-                                                          'cartItems':
-                                                              _addToCartModel
-                                                                  .addToCarts,
-                                                          'couponValue':
-                                                              couponValue,
-                                                          'isAddress': true
-                                                        },
-                                                      ),
-                                                    ),
-                                                  );
-                                                  if (result != null &&
-                                                      result['address'] !=
-                                                          null) {
-                                                    setState(() {
-                                                      address =
-                                                          UserAddress.fromJson(
-                                                              result[
-                                                                  'address']);
-                                                    });
-                                                  }
-                                                },
-                                                child: Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 12,
-                                                      vertical: 6),
-                                                  decoration: BoxDecoration(
-                                                    color: Color(0xFFF5F5F5),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20),
-                                                  ),
-                                                  child: Text(
-                                                    'Change',
-                                                    style: TextStyle(
-                                                      fontFamily: 'Urbanist',
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: Color(0xFF666666),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                        if (address.id != null) ...[
-                                          SizedBox(height: 12),
-                                          Container(
-                                            padding: EdgeInsets.all(12),
-                                            decoration: BoxDecoration(
-                                              color: Color(0xFFF8F9FA),
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              border: Border.all(
-                                                  color: Color(0xFFE0E0E0)),
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Container(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 8,
-                                                              vertical: 4),
-                                                      decoration: BoxDecoration(
-                                                        color: Color(0xFFC7B456)
-                                                            .withOpacity(0.2),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(4),
-                                                      ),
-                                                      child: Text(
-                                                        address.label
-                                                                ?.toString()
-                                                                .toUpperCase() ??
-                                                            'HOME',
-                                                        style: TextStyle(
-                                                          fontFamily:
-                                                              'Urbanist',
-                                                          fontSize: 10,
-                                                          fontWeight:
-                                                              FontWeight.w700,
-                                                          color:
-                                                              Color(0xFFC7B456),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    SizedBox(width: 8),
-                                                    Expanded(
-                                                      child: Text(
-                                                        _configModel
-                                                                .user?.firstName
-                                                                ?.toString() ??
-                                                            '',
-                                                        style: TextStyle(
-                                                          fontFamily:
-                                                              'Urbanist',
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          color:
-                                                              Color(0xFF1A1A1A),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                SizedBox(height: 8),
-                                                Text(
-                                                  [
-                                                    address.fullName,
-                                                    address.add1,
-                                                    address.add2,
-                                                    address.add3,
-                                                    address.city,
-                                                    address.state,
-                                                    address.pincode
-                                                  ]
-                                                      .where((e) =>
-                                                          e != null &&
-                                                          e
-                                                              .toString()
-                                                              .isNotEmpty)
-                                                      .join(', '),
-                                                  style: TextStyle(
-                                                    fontFamily: 'Urbanist',
-                                                    fontSize: 13,
-                                                    fontWeight: FontWeight.w400,
-                                                    color: Color(0xFF666666),
-                                                    height: 1.5,
-                                                  ),
-                                                ),
-                                                if (address.phone != null) ...[
-                                                  SizedBox(height: 6),
-                                                  Row(
-                                                    children: [
-                                                      Icon(Icons.phone,
-                                                          size: 14,
-                                                          color: Color(
-                                                              0xFF888888)),
-                                                      SizedBox(width: 6),
-                                                      Text(
-                                                        address.phone
-                                                            .toString(),
-                                                        style: TextStyle(
-                                                          fontFamily:
-                                                              'Urbanist',
-                                                          fontSize: 13,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color:
-                                                              Color(0xFF444444),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                        if (address.id == null)
-                                          InkWell(
-                                            onTap: () async {
-                                              final result =
-                                                  await Navigator.of(context)
-                                                      .push(
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      AddressPage(
-                                                    arguments: {
-                                                      'cartTotal':
-                                                          _addToCartModel
-                                                              .cartTotal
-                                                              .toString(),
-                                                      'cartItems':
-                                                          _addToCartModel
-                                                              .addToCarts,
-                                                      'couponValue':
-                                                          couponValue,
-                                                      'isAddress': true
-                                                    },
-                                                  ),
-                                                ),
-                                              );
-                                              if (result != null &&
-                                                  result['address'] != null) {
-                                                setState(() {
-                                                  address =
-                                                      UserAddress.fromJson(
-                                                          result['address']);
-                                                });
-                                              }
-                                            },
-                                            child: Container(
-                                              margin: EdgeInsets.only(top: 12),
-                                              padding: EdgeInsets.symmetric(
-                                                  vertical: 14),
-                                              decoration: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  colors: [
-                                                    Color(0xFF2A2A2A),
-                                                    Color(0xFF1A1A1A)
-                                                  ],
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Icon(
-                                                      Icons
-                                                          .add_location_alt_rounded,
-                                                      color: Colors.white,
-                                                      size: 18),
-                                                  SizedBox(width: 8),
-                                                  Text(
-                                                    'Add Delivery Address',
-                                                    style: TextStyle(
-                                                      fontFamily: 'Urbanist',
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                  // Payment Options - Beautiful Card Design
-                                  Container(
-                                    margin: EdgeInsets.only(bottom: 16),
-                                    padding: EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          Colors.white,
-                                          Color(0xFFF8F9FA)
-                                        ],
-                                      ),
-                                      borderRadius: BorderRadius.circular(16),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.04),
-                                          blurRadius: 10,
-                                          offset: Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Container(
-                                              padding: EdgeInsets.all(8),
-                                              decoration: BoxDecoration(
-                                                color: Color(0xFFE3F2FD),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              child: Icon(
-                                                Icons.payment_rounded,
-                                                color: Color(0xFF1976D2),
-                                                size: 20,
-                                              ),
-                                            ),
-                                            SizedBox(width: 12),
-                                            Text(
-                                              'Payment Method',
-                                              style: TextStyle(
-                                                fontFamily: 'Urbanist',
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w700,
-                                                color: Color(0xFF1A1A1A),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 16),
-                                        // COD Option
-                                        GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              paymentOption =
-                                                  'Cash On Delivery';
-                                            });
-                                          },
-                                          child: AnimatedContainer(
-                                            duration:
-                                                Duration(milliseconds: 200),
-                                            padding: EdgeInsets.all(14),
-                                            decoration: BoxDecoration(
-                                              color: paymentOption ==
-                                                      'Cash On Delivery'
-                                                  ? Color(0xFFF5F0E0)
-                                                  : Color(0xFFF8F9FA),
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              border: Border.all(
-                                                color: paymentOption ==
-                                                        'Cash On Delivery'
-                                                    ? Color(0xFFC7B456)
-                                                    : Color(0xFFE0E0E0),
-                                                width: paymentOption ==
-                                                        'Cash On Delivery'
-                                                    ? 2
-                                                    : 1,
-                                              ),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                Container(
-                                                  width: 40,
-                                                  height: 40,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.green
-                                                        .withOpacity(0.1),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.money_rounded,
-                                                    color: Colors.green,
-                                                    size: 22,
-                                                  ),
-                                                ),
-                                                SizedBox(width: 12),
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        'Cash on Delivery',
-                                                        style: TextStyle(
-                                                          fontFamily:
-                                                              'Urbanist',
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          color:
-                                                              Color(0xFF1A1A1A),
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        'Pay when you receive',
-                                                        style: TextStyle(
-                                                          fontFamily:
-                                                              'Urbanist',
-                                                          fontSize: 11,
-                                                          color:
-                                                              Color(0xFF888888),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                AnimatedContainer(
-                                                  duration: Duration(
-                                                      milliseconds: 200),
-                                                  width: 22,
-                                                  height: 22,
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: paymentOption ==
-                                                            'Cash On Delivery'
-                                                        ? Color(0xFFC7B456)
-                                                        : Colors.transparent,
-                                                    border: Border.all(
-                                                      color: paymentOption ==
-                                                              'Cash On Delivery'
-                                                          ? Color(0xFFC7B456)
-                                                          : Color(0xFFBDBDBD),
-                                                      width: 2,
-                                                    ),
-                                                  ),
-                                                  child: paymentOption ==
-                                                          'Cash On Delivery'
-                                                      ? Icon(Icons.check,
-                                                          size: 14,
-                                                          color: Colors.white)
-                                                      : null,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(height: 10),
-                                        // UPI/PhonePe Option
-                                        GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              paymentOption = 'UPI/PhonePe';
-                                            });
-                                          },
-                                          child: AnimatedContainer(
-                                            duration:
-                                                Duration(milliseconds: 200),
-                                            padding: EdgeInsets.all(14),
-                                            decoration: BoxDecoration(
-                                              color:
-                                                  paymentOption == 'UPI/PhonePe'
-                                                      ? Color(0xFFF5F0E0)
-                                                      : Color(0xFFF8F9FA),
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              border: Border.all(
-                                                color: paymentOption ==
-                                                        'UPI/PhonePe'
-                                                    ? Color(0xFFC7B456)
-                                                    : Color(0xFFE0E0E0),
-                                                width: paymentOption ==
-                                                        'UPI/PhonePe'
-                                                    ? 2
-                                                    : 1,
-                                              ),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                Container(
-                                                  width: 40,
-                                                  height: 40,
-                                                  decoration: BoxDecoration(
-                                                    color: Color(0xFF5F259F)
-                                                        .withOpacity(0.1),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.smartphone_rounded,
-                                                    color: Color(0xFF5F259F),
-                                                    size: 22,
-                                                  ),
-                                                ),
-                                                SizedBox(width: 12),
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        'UPI / PhonePe',
-                                                        style: TextStyle(
-                                                          fontFamily:
-                                                              'Urbanist',
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          color:
-                                                              Color(0xFF1A1A1A),
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        'Fast & secure payment',
-                                                        style: TextStyle(
-                                                          fontFamily:
-                                                              'Urbanist',
-                                                          fontSize: 11,
-                                                          color:
-                                                              Color(0xFF888888),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                AnimatedContainer(
-                                                  duration: Duration(
-                                                      milliseconds: 200),
-                                                  width: 22,
-                                                  height: 22,
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: paymentOption ==
-                                                            'UPI/PhonePe'
-                                                        ? Color(0xFFC7B456)
-                                                        : Colors.transparent,
-                                                    border: Border.all(
-                                                      color: paymentOption ==
-                                                              'UPI/PhonePe'
-                                                          ? Color(0xFFC7B456)
-                                                          : Color(0xFFBDBDBD),
-                                                      width: 2,
-                                                    ),
-                                                  ),
-                                                  child: paymentOption ==
-                                                          'UPI/PhonePe'
-                                                      ? Icon(Icons.check,
-                                                          size: 14,
-                                                          color: Colors.white)
-                                                      : null,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-
-                                  // Send as Gift - Beautiful Toggle Card
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        isGift = !isGift;
-                                      });
-                                      if (isGift == true) {
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) =>
-                                              AlertDialog(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                            title: Text(
-                                                "Is it the same address as mentioned above?"),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                onPressed: () =>
-                                                    Navigator.pop(context),
-                                                child: Text('Yes',
-                                                    style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 16)),
-                                              ),
-                                              TextButton(
-                                                onPressed: () async {
-                                                  Navigator.pop(context);
-                                                  final result =
-                                                      await Navigator.of(
-                                                              context)
-                                                          .push(
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          AddressPage(
-                                                        arguments: {
-                                                          'cartTotal':
-                                                              _addToCartModel
-                                                                  .cartTotal
-                                                                  .toString(),
-                                                          'cartItems':
-                                                              _addToCartModel
-                                                                  .addToCarts,
-                                                          'couponValue':
-                                                              couponValue,
-                                                          'isAddress': true
-                                                        },
-                                                      ),
-                                                    ),
-                                                  );
-                                                  if (result != null &&
-                                                      result['address'] !=
-                                                          null) {
-                                                    setState(() {
-                                                      address =
-                                                          UserAddress.fromJson(
-                                                              result[
-                                                                  'address']);
-                                                    });
-                                                  }
-                                                },
-                                                child: Text('No',
-                                                    style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontSize: 16)),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      }
-                                    },
-                                    child: AnimatedContainer(
-                                      duration: Duration(milliseconds: 200),
-                                      margin: EdgeInsets.only(bottom: 16),
-                                      padding: EdgeInsets.all(14),
-                                      decoration: BoxDecoration(
-                                        gradient: isGift
-                                            ? LinearGradient(
-                                                colors: [
-                                                  Color(0xFFFFF8E1),
-                                                  Color(0xFFFFECB3)
-                                                ],
-                                              )
-                                            : LinearGradient(
-                                                colors: [
-                                                  Colors.white,
-                                                  Color(0xFFF8F9FA)
-                                                ],
-                                              ),
-                                        borderRadius: BorderRadius.circular(14),
-                                        border: Border.all(
-                                          color: isGift
-                                              ? Color(0xFFC7B456)
-                                              : Color(0xFFE0E0E0),
-                                          width: isGift ? 2 : 1,
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color:
-                                                Colors.black.withOpacity(0.03),
-                                            blurRadius: 8,
-                                            offset: Offset(0, 2),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.all(10),
-                                            decoration: BoxDecoration(
-                                              color: isGift
-                                                  ? Color(0xFFC7B456)
-                                                      .withOpacity(0.2)
-                                                  : Color(0xFFF5F5F5),
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            child: Icon(
-                                              Icons.card_giftcard_rounded,
-                                              color: isGift
-                                                  ? Color(0xFFC7B456)
-                                                  : Color(0xFF888888),
-                                              size: 22,
-                                            ),
-                                          ),
-                                          SizedBox(width: 14),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  'Send as a Gift',
-                                                  style: TextStyle(
-                                                    fontFamily: 'Urbanist',
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: Color(0xFF1A1A1A),
-                                                  ),
-                                                ),
-                                                Text(
-                                                  'We\'ll add a special touch',
-                                                  style: TextStyle(
-                                                    fontFamily: 'Urbanist',
-                                                    fontSize: 11,
-                                                    color: Color(0xFF888888),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          AnimatedContainer(
-                                            duration:
-                                                Duration(milliseconds: 200),
-                                            width: 46,
-                                            height: 26,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(13),
-                                              color: isGift
-                                                  ? Color(0xFFC7B456)
-                                                  : Color(0xFFE0E0E0),
-                                            ),
-                                            child: AnimatedAlign(
-                                              duration:
-                                                  Duration(milliseconds: 200),
-                                              alignment: isGift
-                                                  ? Alignment.centerRight
-                                                  : Alignment.centerLeft,
-                                              child: Container(
-                                                width: 22,
-                                                height: 22,
-                                                margin: EdgeInsets.symmetric(
-                                                    horizontal: 2),
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: Colors.white,
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Colors.black
-                                                          .withOpacity(0.1),
-                                                      blurRadius: 4,
-                                                      offset: Offset(0, 2),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  // Order Summary - Beautiful Card Design
-                                  Container(
-                                    width: 1.0.sw - 50,
-                                    margin: EdgeInsets.only(top: 8),
-                                    padding: EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          Colors.white,
-                                          Color(0xFFF8F9FA)
-                                        ],
-                                      ),
-                                      borderRadius: BorderRadius.circular(16),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.04),
-                                          blurRadius: 10,
-                                          offset: Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        // Header
-                                        Row(
-                                          children: [
-                                            Container(
-                                              padding: EdgeInsets.all(8),
-                                              decoration: BoxDecoration(
-                                                color: Color(0xFFFFF3E0),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              child: Icon(
-                                                Icons.receipt_long_rounded,
-                                                color: Color(0xFFFF9800),
-                                                size: 20,
-                                              ),
-                                            ),
-                                            SizedBox(width: 12),
-                                            Text(
-                                              'Order Summary',
-                                              style: TextStyle(
-                                                fontFamily: 'Urbanist',
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w700,
-                                                color: Color(0xFF1A1A1A),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 16),
-                                        Divider(
-                                            height: 1,
-                                            color: Color(0xFFEEEEEE)),
-                                        SizedBox(height: 12),
-                                        // Item Total Row (Selected Items Only)
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                'Item Total (${_selectedCartItemIds.length} selected)',
-                                                style: TextStyle(
-                                                  fontFamily: 'Urbanist',
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xFF666666),
-                                                ),
-                                              ),
-                                            ),
-                                            Text(
-                                              'RS ' +
-                                                  (((_calculateSelectedItemsTotal() /
-                                                          105 *
-                                                          100))
-                                                      .toStringAsFixed(2)),
-                                              textAlign: TextAlign.right,
-                                              style: TextStyle(
-                                                fontFamily: 'Inter',
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w600,
-                                                color: Color(0xFF1A1A1A),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                        if ((double.tryParse(_configModel
-                                                        .user
-                                                        ?.companies?[0]
-                                                        .deliveryCharges
-                                                        ?.toString() ??
-                                                    '0') ??
-                                                0) >
-                                            0)
-                                          SizedBox(height: 8),
-                                        if ((double.tryParse(_configModel
-                                                        .user
-                                                        ?.companies?[0]
-                                                        .deliveryCharges
-                                                        ?.toString() ??
-                                                    '0') ??
-                                                0) >
-                                            0)
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  'Delivery',
-                                                  style: MyGoogleFontStyle(
-                                                    fontFamily: 'Urbanist',
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Color(0xff909090),
-                                                  ),
-                                                ),
-                                              ),
-                                              Text(
-                                                'RS ${double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ?? '0')?.toStringAsFixed(2) ?? '0'}',
-                                                textAlign: TextAlign.right,
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Inter',
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color(0xff303030),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        if (address.state == 'Maharashtra')
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  'SGST 2.5%',
-                                                  style: MyGoogleFontStyle(
-                                                    fontFamily: 'Urbanist',
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Color(0xff909090),
-                                                  ),
-                                                ),
-                                              ),
-                                              Text(
-                                                'RS' +
-                                                    ' ' +
-                                                    (() {
-                                                      // Calculate SGST using selected items total
-                                                      int cartTotal =
-                                                          _calculateSelectedItemsTotal();
-                                                      // Calculate GST on cart total after applying discounts
-                                                      double
-                                                          cartTotalAfterDiscounts =
-                                                          cartTotal -
-                                                              couponValue -
-                                                              useWalletPoint;
-                                                      // Calculate using new method: item total = cartTotalAfterDiscounts / 105 * 100
-                                                      double itemTotal =
-                                                          (cartTotalAfterDiscounts /
-                                                                  105) *
-                                                              100;
-                                                      // GST = Cart Total After Discounts - Item Total
-                                                      double gstAmount =
-                                                          cartTotalAfterDiscounts -
-                                                              itemTotal;
-                                                      double sgstAmount =
-                                                          gstAmount / 2;
-                                                      // SGST fixed at 2.5% of original cart total
-                                                      return sgstAmount
-                                                          .toStringAsFixed(2);
-                                                    }()),
-                                                textAlign: TextAlign.right,
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Inter',
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color(0xff303030),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        if (address.state == 'Maharashtra')
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                        if (address.state == 'Maharashtra')
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  'CGST 2.5%',
-                                                  style: MyGoogleFontStyle(
-                                                    fontFamily: 'Urbanist',
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Color(0xff909090),
-                                                  ),
-                                                ),
-                                              ),
-                                              Text(
-                                                'RS' +
-                                                    ' ' +
-                                                    (() {
-                                                      // Calculate CGST using selected items total
-                                                      int cartTotal =
-                                                          _calculateSelectedItemsTotal();
-                                                      // Calculate GST on cart total after applying discounts
-                                                      double
-                                                          cartTotalAfterDiscounts =
-                                                          cartTotal -
-                                                              couponValue -
-                                                              useWalletPoint;
-                                                      // Calculate using new method: item total = cartTotalAfterDiscounts / 105 * 100
-                                                      double itemTotal =
-                                                          (cartTotalAfterDiscounts /
-                                                                  105) *
-                                                              100;
-                                                      // GST = Cart Total After Discounts - Item Total
-                                                      double gstAmount =
-                                                          cartTotalAfterDiscounts -
-                                                              itemTotal;
-                                                      double cgstAmount =
-                                                          gstAmount / 2;
-                                                      // CGST fixed at 2.5% of original cart total
-                                                      return cgstAmount
-                                                          .toStringAsFixed(2);
-                                                    }()),
-                                                textAlign: TextAlign.right,
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Inter',
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color(0xff303030),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        if (address.state != 'Maharashtra')
-                                          SizedBox(height: 10),
-                                        if (address.state != 'Maharashtra')
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  'IGST 5%',
-                                                  style: MyGoogleFontStyle(
-                                                    fontFamily: 'Urbanist',
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Color(0xff909090),
-                                                  ),
-                                                ),
-                                              ),
-                                              Text(
-                                                'RS' +
-                                                    ' ' +
-                                                    (() {
-                                                      // Calculate IGST using selected items total
-                                                      int cartTotal =
-                                                          _calculateSelectedItemsTotal();
-                                                      // Calculate GST on cart total after applying discounts
-                                                      double
-                                                          cartTotalAfterDiscounts =
-                                                          cartTotal -
-                                                              couponValue -
-                                                              useWalletPoint;
-                                                      // Calculate using new method: item total = cartTotalAfterDiscounts / 105 * 100
-                                                      double itemTotalCalc =
-                                                          (cartTotalAfterDiscounts /
-                                                                  105) *
-                                                              100;
-                                                      // GST = Cart Total After Discounts - Item Total
-                                                      double gstAmount =
-                                                          cartTotalAfterDiscounts -
-                                                              itemTotalCalc;
-                                                      double igstAmount =
-                                                          gstAmount; // For IGST states, IGST = full GST
-                                                      return igstAmount
-                                                          .toStringAsFixed(2);
-                                                    }()),
-                                                // (5 *
-                                                //         int.parse(_addToCartModel
-                                                //             .cartTotal
-                                                //             .toString()) /
-                                                //         100)
-                                                // .toString(),
-                                                textAlign: TextAlign.right,
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Inter',
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color(0xff303030),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        if ((_configModel.user?.companies?[0]
-                                                    .packagingCharges ??
-                                                0) >
-                                            0)
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  'Packaging Charges',
-                                                  style: MyGoogleFontStyle(
-                                                    fontFamily: 'Urbanist',
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Color(0xff909090),
-                                                  ),
-                                                ),
-                                              ),
-                                              Text(
-                                                'RS ${_configModel.user?.companies?[0].packagingCharges!.toStringAsFixed(2)}',
-                                                textAlign: TextAlign.right,
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Inter',
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color(0xff303030),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        if ((_configModel.user?.companies?[0]
-                                                    .platformFee ??
-                                                0) >
-                                            0)
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  'Platform Fee',
-                                                  style: MyGoogleFontStyle(
-                                                    fontFamily: 'Urbanist',
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Color(0xff909090),
-                                                  ),
-                                                ),
-                                              ),
-                                              Text(
-                                                'RS ${_configModel.user?.companies?[0].platformFee?.toStringAsFixed(2) ?? '0.00'}',
-                                                textAlign: TextAlign.right,
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Inter',
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color(0xff303030),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        if (couponValue > 0)
-                                          SizedBox(height: 10),
-                                        if (couponValue > 0)
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  'Coupon (-)',
-                                                  style: MyGoogleFontStyle(
-                                                    fontFamily: 'Urbanist',
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Color(0xff909090),
-                                                  ),
-                                                ),
-                                              ),
-                                              Text(
-                                                'RS' +
-                                                    ' ' +
-                                                    couponValue
-                                                        .toStringAsFixed(2),
-                                                textAlign: TextAlign.right,
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Inter',
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color(0xff303030),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        SizedBox(height: 10),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                'Rewards (-)',
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Urbanist',
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xff909090),
-                                                ),
-                                              ),
-                                            ),
-                                            if (useWalletPoint != 0)
-                                              InkWell(
-                                                onTap: () {
-                                                  setState(() {
-                                                    useWalletPoint = 0;
-                                                  });
-                                                },
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          right: 8.0),
-                                                  child: Text('(Remove)'),
-                                                ),
-                                              ),
-                                            if (useWalletPoint == 0)
-                                              InkWell(
-                                                onTap: () async {
-                                                  await _userWaletModel
-                                                      .getMyUserWallets();
-                                                  setState(() {
-                                                    // Calculate 25% of item total after coupon discount (using selected items)
-                                                    final cartTotal =
-                                                        _calculateSelectedItemsTotal();
-                                                    // Calculate using new method: item total = cartTotal / 105 * 100
-                                                    final itemTotal =
-                                                        (cartTotal / 105) * 100;
-                                                    // Item total is already calculated after discounts, so use it directly
-                                                    final cartAfterCoupon =
-                                                        itemTotal;
-
-                                                    final calculatedPoints =
-                                                        (cartAfterCoupon * 0.25)
-                                                            .round();
-                                                    final availablePoints =
-                                                        _userWaletModel
-                                                            .totaRemainingPoint;
-                                                    useWalletPoint =
-                                                        calculatedPoints >
-                                                                availablePoints
-                                                            ? availablePoints
-                                                            : calculatedPoints;
-                                                  });
-                                                },
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          right: 8.0),
-                                                  child: Text('(Add)'),
-                                                ),
-                                              ),
-                                            Text(
-                                              'RS ${(useWalletPoint).toStringAsFixed(2)}',
-                                              // Division by 3 directly
-                                              textAlign: TextAlign.right,
-                                              style: MyGoogleFontStyle(
-                                                fontFamily: 'Inter',
-                                                fontWeight: FontWeight.w700,
-                                                color: Color(0xff303030),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                        SizedBox(height: 12),
-                                        Divider(
-                                            height: 1,
-                                            color: Color(0xFFEEEEEE)),
-                                        SizedBox(height: 12),
-                                        // Total Row - Highlighted
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 12, vertical: 10),
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                Color(0xFFFFF8E1),
-                                                Color(0xFFFFECB3)
-                                              ],
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  'Total Amount',
-                                                  style: TextStyle(
-                                                    fontFamily: 'Urbanist',
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.w700,
-                                                    color: Color(0xFF1A1A1A),
-                                                  ),
-                                                ),
-                                              ),
-                                              Text(
-                                                'RS ' +
-                                                    (() {
-                                                      int cartTotal = int.parse(
-                                                          _addToCartModel
-                                                              .cartTotal
-                                                              .toString());
-                                                      double deliveryCharges =
-                                                          double.tryParse(_configModel
-                                                                      .user
-                                                                      ?.companies?[
-                                                                          0]
-                                                                      .deliveryCharges
-                                                                      ?.toString() ??
-                                                                  '0') ??
-                                                              0;
-                                                      double packagingCharges =
-                                                          double.tryParse(_configModel
-                                                                      .user
-                                                                      ?.companies?[
-                                                                          0]
-                                                                      .packagingCharges
-                                                                      ?.toString() ??
-                                                                  '0') ??
-                                                              0;
-                                                      double platformFeeValue =
-                                                          double.tryParse(_configModel
-                                                                      .user
-                                                                      ?.companies?[
-                                                                          0]
-                                                                      .platformFee
-                                                                      ?.toString() ??
-                                                                  '0') ??
-                                                              0;
-                                                      double total = cartTotal +
-                                                          deliveryCharges +
-                                                          packagingCharges +
-                                                          platformFeeValue -
-                                                          couponValue -
-                                                          useWalletPoint;
-                                                      return total
-                                                          .toStringAsFixed(2);
-                                                    }()),
-                                                textAlign: TextAlign.right,
-                                                style: TextStyle(
-                                                  fontFamily: 'Inter',
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w800,
-                                                  color: Color(0xFFC7B456),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-
-                                  SizedBox(height: 6),
-                                  // Show pay button only if there are selected items (in-stock items)
-                                  Builder(
-                                    builder: (context) {
-                                      // If no items are selected, show warning
-                                      if (_selectedCartItemIds.isEmpty) {
-                                        return Container(
-                                          width: double.infinity,
-                                          padding: EdgeInsets.all(16),
-                                          margin: EdgeInsets.symmetric(
-                                              horizontal: 16),
-                                          decoration: BoxDecoration(
-                                            color:
-                                                Colors.orange.withOpacity(0.1),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                            border: Border.all(
-                                                color: Colors.orange
-                                                    .withOpacity(0.3)),
-                                          ),
-                                          child: Column(
-                                            children: [
-                                              Icon(
-                                                Icons.warning_amber_rounded,
-                                                color: Colors.orange,
-                                                size: 32,
-                                              ),
-                                              SizedBox(height: 8),
-                                              Text(
-                                                'No items selected',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                  color: Colors.orange[700],
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                              SizedBox(height: 4),
-                                              Text(
-                                                'Please select at least one item to proceed with checkout',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                  color: Colors.orange[400],
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      }
-                                      // Show proceed button when items are selected
-                                      return address.id != null
-                                          ? Align(
-                                              alignment: Alignment.bottomCenter,
-                                              child: Container(
-                                                margin: EdgeInsets.fromLTRB(
-                                                    0.89, 0, 0, 0),
-                                                child: TextButton(
-                                                  onPressed: () async {
-                                                    if (paymentOption == '') {
-                                                      showDialog(
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                                context) =>
-                                                            AlertDialog(
-                                                          title: Text(
-                                                              'Please select payment type.'),
-                                                          actions: [
-                                                            TextButton(
-                                                              onPressed: () {
-                                                                Navigator.pop(
-                                                                    context);
-                                                              },
-                                                              child: Text('Ok'),
-                                                            )
-                                                          ],
-                                                        ),
-                                                      );
-                                                    } else {
-                                                      // Check if any items are selected
-                                                      if (_selectedCartItemIds
-                                                          .isEmpty) {
-                                                        ScaffoldMessenger.of(
-                                                                context)
-                                                            .showSnackBar(
-                                                          SnackBar(
-                                                            content: Text(
-                                                                'Please select at least one item to proceed'),
-                                                            backgroundColor:
-                                                                Colors.orange,
-                                                            duration: Duration(
-                                                                seconds: 2),
-                                                          ),
-                                                        );
-                                                        return;
-                                                      }
-
-                                                      // Check for out of stock and insufficient stock items before placing order
-                                                      Map<
-                                                              String,
-                                                              List<
-                                                                  Map<String,
-                                                                      dynamic>>>
-                                                          stockCheckResult =
-                                                          await _getOutOfStockItems();
-                                                      List<Map<String, dynamic>>
-                                                          outOfStockItems =
-                                                          stockCheckResult[
-                                                                  'outOfStock'] ??
-                                                              [];
-                                                      List<Map<String, dynamic>>
-                                                          insufficientStockItems =
-                                                          stockCheckResult[
-                                                                  'insufficientStock'] ??
-                                                              [];
-
-                                                      if (outOfStockItems
-                                                              .isNotEmpty ||
-                                                          insufficientStockItems
-                                                              .isNotEmpty) {
-                                                        showDialog(
-                                                          context: context,
-                                                          builder: (BuildContext
-                                                                  context) =>
-                                                              AlertDialog(
-                                                            title: Text(
-                                                                'Stock Issue'),
-                                                            content:
-                                                                SingleChildScrollView(
-                                                              child: Column(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  if (outOfStockItems
-                                                                      .isNotEmpty) ...[
-                                                                    Text(
-                                                                      'Out of Stock:',
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              14,
-                                                                          fontWeight: FontWeight
-                                                                              .bold,
-                                                                          color:
-                                                                              Colors.red),
-                                                                    ),
-                                                                    SizedBox(
-                                                                        height:
-                                                                            8),
-                                                                    ...outOfStockItems
-                                                                        .map((item) =>
-                                                                            Padding(
-                                                                              padding: EdgeInsets.symmetric(vertical: 4),
-                                                                              child: Row(
-                                                                                children: [
-                                                                                  Icon(Icons.error_outline, color: Colors.red, size: 18),
-                                                                                  SizedBox(width: 8),
-                                                                                  Expanded(
-                                                                                    child: Text(
-                                                                                      '${item['name']}',
-                                                                                      style: TextStyle(fontSize: 13),
-                                                                                    ),
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                            ))
-                                                                        .toList(),
-                                                                    SizedBox(
-                                                                        height:
-                                                                            12),
-                                                                  ],
-                                                                  if (insufficientStockItems
-                                                                      .isNotEmpty) ...[
-                                                                    Text(
-                                                                      'Insufficient Stock:',
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              14,
-                                                                          fontWeight: FontWeight
-                                                                              .bold,
-                                                                          color:
-                                                                              Colors.orange),
-                                                                    ),
-                                                                    SizedBox(
-                                                                        height:
-                                                                            8),
-                                                                    ...insufficientStockItems
-                                                                        .map((item) =>
-                                                                            Padding(
-                                                                              padding: EdgeInsets.symmetric(vertical: 4),
-                                                                              child: Row(
-                                                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                children: [
-                                                                                  Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 18),
-                                                                                  SizedBox(width: 8),
-                                                                                  Expanded(
-                                                                                    child: Column(
-                                                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                      children: [
-                                                                                        Text(
-                                                                                          '${item['name']}',
-                                                                                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-                                                                                        ),
-                                                                                        Text(
-                                                                                          'Ordered: ${item['orderedQty']} | Available: ${item['availableQty']}',
-                                                                                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                                                                                        ),
-                                                                                      ],
-                                                                                    ),
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                            ))
-                                                                        .toList(),
-                                                                    SizedBox(
-                                                                        height:
-                                                                            12),
-                                                                  ],
-                                                                  Text(
-                                                                    outOfStockItems
-                                                                            .isNotEmpty
-                                                                        ? 'Please remove out of stock items or reduce quantity for insufficient stock items to proceed.'
-                                                                        : 'Please reduce the quantity to available stock to proceed.',
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            12,
-                                                                        color: Colors
-                                                                            .grey[600]),
-                                                                  ),
-                                                                ],
+                                                            child: Text(
+                                                              address.label
+                                                                      ?.toString()
+                                                                      .toUpperCase() ??
+                                                                  'HOME',
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'Urbanist',
+                                                                fontSize: 10,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
+                                                                color: Color(
+                                                                    0xFFC7B456),
                                                               ),
                                                             ),
-                                                            actions: [
-                                                              TextButton(
-                                                                onPressed: () {
-                                                                  Navigator.pop(
-                                                                      context);
-                                                                  // Trigger UI refresh to update out of stock display
-                                                                  setState(
-                                                                      () {});
-                                                                },
-                                                                child:
-                                                                    Text('Ok'),
-                                                              )
-                                                            ],
                                                           ),
-                                                        );
-                                                        // Trigger UI refresh to show out of stock state
-                                                        setState(() {});
-                                                        return;
-                                                      }
-
-                                                      var addressId =
-                                                          address.id;
-
-                                                      // Calculate gstAmount before payment processing (using selected items)
-                                                      int cartTotalForGst =
-                                                          _calculateSelectedItemsTotal();
-                                                      double
-                                                          cartTotalAfterDiscountsForGst =
-                                                          cartTotalForGst -
-                                                              couponValue -
-                                                              useWalletPoint;
-                                                      double itemTotalForGst =
-                                                          (cartTotalAfterDiscountsForGst /
-                                                                  105) *
-                                                              100;
-                                                      double gstAmount =
-                                                          cartTotalAfterDiscountsForGst -
-                                                              itemTotalForGst;
-
-                                                      // Payment processing
-
-                                                      if (paymentOption ==
-                                                          'UPI/PhonePe') {
-                                                        // Prepare payload data for the transaction - use selected items only
-                                                        final selectedItemsForPayment =
-                                                            _getSelectedCartItems();
-                                                        final selectedTotalForPayment =
-                                                            _calculateSelectedItemsTotal();
-
-                                                        Map<String, dynamic>
-                                                            payloadData = {
-                                                          'cartItems':
-                                                              selectedItemsForPayment,
-                                                          'cartTotal':
-                                                              selectedTotalForPayment
+                                                          SizedBox(width: 8),
+                                                          Expanded(
+                                                            child: Text(
+                                                              address.fullName
+                                                                      ?.toString() ??
+                                                                  '',
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'Urbanist',
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                color: Color(
+                                                                    0xFF1A1A1A),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      SizedBox(height: 8),
+                                                      Text(
+                                                        [
+                                                          address.fullName,
+                                                          address.add1,
+                                                          address.add2,
+                                                          address.add3,
+                                                          address.city,
+                                                          address.state,
+                                                          address.pincode
+                                                        ]
+                                                            .where((e) =>
+                                                                e != null &&
+                                                                e
+                                                                    .toString()
+                                                                    .isNotEmpty)
+                                                            .join(', '),
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontSize: 13,
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          color:
+                                                              Color(0xFF666666),
+                                                          height: 1.5,
+                                                        ),
+                                                      ),
+                                                      if (address.phone !=
+                                                          null) ...[
+                                                        SizedBox(height: 6),
+                                                        Row(
+                                                          children: [
+                                                            Icon(Icons.phone,
+                                                                size: 14,
+                                                                color: Color(
+                                                                    0xFF888888)),
+                                                            SizedBox(width: 6),
+                                                            Text(
+                                                              address.phone
                                                                   .toString(),
-                                                          'addressId':
-                                                              addressId,
-                                                          'isGift': isGift,
-                                                          'useWalletPoint':
-                                                              useWalletPoint,
-                                                          'couponId': couponId
-                                                              .toString(),
-                                                          'deliveryMethod':
-                                                              "deliveryMethod",
-                                                          'couponValue':
-                                                              couponValue
-                                                                  .toString(),
-                                                        };
-
-                                                        // Add gstAmount to payloadData for online payment
-                                                        payloadData[
-                                                                'gstAmount'] =
-                                                            gstAmount
-                                                                .toStringAsFixed(
-                                                                    2);
-                                                        payloadData[
-                                                                'platformFee'] =
-                                                            _configModel
-                                                                    .user
-                                                                    ?.companies?[
-                                                                        0]
-                                                                    .platformFee ??
-                                                                0;
-
-                                                        // Calculate the amount to be paid
-                                                        double itemTotal =
-                                                            itemTotalForGst;
-                                                        double sgstAmount =
-                                                            gstAmount / 2;
-                                                        double cgstAmount =
-                                                            gstAmount / 2;
-
-                                                        int deliveryCharges = _configModel
-                                                                    .user!
-                                                                    .companies![
-                                                                        0]
-                                                                    .deliveryCharges ==
-                                                                null
-                                                            ? 0
-                                                            : int.parse(_configModel
-                                                                .user!
-                                                                .companies![0]
-                                                                .deliveryCharges
-                                                                .toString());
-                                                        int packagingCharges = _configModel
-                                                                    .user!
-                                                                    .companies![
-                                                                        0]
-                                                                    .packagingCharges ==
-                                                                null
-                                                            ? 0
-                                                            : int.parse(_configModel
-                                                                .user!
-                                                                .companies![0]
-                                                                .packagingCharges
-                                                                .toString());
-
-                                                        // Calculate total amount
-                                                        double
-                                                            amountAfterDiscounts =
-                                                            itemTotal;
-                                                        double taxAmount =
-                                                            sgstAmount +
-                                                                cgstAmount;
-                                                        double
-                                                            platformFeeAmount =
-                                                            double.tryParse(_configModel
-                                                                        .user
-                                                                        ?.companies?[
-                                                                            0]
-                                                                        .platformFee
-                                                                        ?.toString() ??
-                                                                    '0') ??
-                                                                0;
-                                                        double totalAmount =
-                                                            amountAfterDiscounts +
-                                                                deliveryCharges +
-                                                                packagingCharges +
-                                                                platformFeeAmount +
-                                                                taxAmount;
-
-                                                        int minumumPayable =
-                                                            totalAmount.round();
-                                                        String mobileNumber =
-                                                            _configModel
-                                                                .user!.phone
-                                                                .toString();
-
-                                                        // Start PhonePe transaction
-                                                        _startTransaction(
-                                                            minumumPayable,
-                                                            mobileNumber,
-                                                            payloadData,
-                                                            context);
-                                                      } else {
-                                                        // Cash on Delivery - use selected items only
-                                                        final selectedItems =
-                                                            _getSelectedCartItems();
-                                                        final selectedTotal =
-                                                            _calculateSelectedItemsTotal();
-
-                                                        bool response =
-                                                            await _orderModel
-                                                                .placedOrder(
-                                                          selectedItems,
-                                                          selectedTotal
-                                                              .toString(),
-                                                          addressId,
-                                                          isGift,
-                                                          useWalletPoint,
-                                                          couponId.toString(),
-                                                          'Cash on Delivery',
-                                                          "deliveryMethod",
-                                                          couponValue
-                                                              .toString(),
-                                                          gstAmount
-                                                              .toStringAsFixed(
-                                                                  2),
-                                                          _configModel
-                                                                  .user
-                                                                  ?.companies?[
-                                                                      0]
-                                                                  .platformFee ??
-                                                              0,
-                                                        );
-
-                                                        if (response == true) {
-                                                          Navigator.pushNamed(
-                                                              context,
-                                                              '/successPage');
-                                                        }
-                                                      }
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'Urbanist',
+                                                                fontSize: 13,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                color: Color(
+                                                                    0xFF444444),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                              if (address.id == null)
+                                                InkWell(
+                                                  onTap: () async {
+                                                    final result =
+                                                        await Navigator.of(
+                                                                context)
+                                                            .push(
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            AddressPage(
+                                                          arguments: {
+                                                            'cartTotal':
+                                                                _addToCartModel
+                                                                    .cartTotal
+                                                                    .toString(),
+                                                            'cartItems':
+                                                                _addToCartModel
+                                                                    .addToCarts,
+                                                            'couponValue':
+                                                                couponValue,
+                                                            'isAddress': true
+                                                          },
+                                                        ),
+                                                      ),
+                                                    );
+                                                    if (result != null &&
+                                                        result['address'] !=
+                                                            null) {
+                                                      setState(() {
+                                                        address = UserAddress
+                                                            .fromJson(result[
+                                                                'address']);
+                                                      });
                                                     }
                                                   },
-                                                  style: TextButton.styleFrom(
-                                                    padding: EdgeInsets.zero,
-                                                  ),
                                                   child: Container(
-                                                    width: double.infinity,
-                                                    height: 54,
-                                                    margin:
+                                                    margin: EdgeInsets.only(
+                                                        top: 12),
+                                                    padding:
                                                         EdgeInsets.symmetric(
-                                                            horizontal: 16),
+                                                            vertical: 14),
                                                     decoration: BoxDecoration(
                                                       gradient: LinearGradient(
-                                                        begin:
-                                                            Alignment.topLeft,
-                                                        end: Alignment
-                                                            .bottomRight,
                                                         colors: [
-                                                          Color(0xFFD4C76A),
-                                                          Color(0xFFC7B456),
-                                                          Color(0xFFAA9A40)
+                                                          Color(0xFF2A2A2A),
+                                                          Color(0xFF1A1A1A)
                                                         ],
                                                       ),
                                                       borderRadius:
                                                           BorderRadius.circular(
-                                                              14),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: Color(
-                                                                  0xFFC7B456)
-                                                              .withOpacity(0.4),
-                                                          blurRadius: 12,
-                                                          offset: Offset(0, 4),
-                                                        ),
-                                                      ],
+                                                              12),
                                                     ),
                                                     child: Row(
                                                       mainAxisAlignment:
@@ -4454,18 +3048,18 @@ class _CartPageState extends State<CartPage> {
                                                       children: [
                                                         Icon(
                                                             Icons
-                                                                .shopping_bag_rounded,
+                                                                .add_location_alt_rounded,
                                                             color: Colors.white,
-                                                            size: 20),
-                                                        SizedBox(width: 10),
+                                                            size: 18),
+                                                        SizedBox(width: 8),
                                                         Text(
-                                                          'Proceed (${_selectedCartItemIds.length} items)',
+                                                          'Add Delivery Address',
                                                           style: TextStyle(
                                                             fontFamily:
                                                                 'Urbanist',
-                                                            fontSize: 16,
+                                                            fontSize: 14,
                                                             fontWeight:
-                                                                FontWeight.w700,
+                                                                FontWeight.w600,
                                                             color: Colors.white,
                                                           ),
                                                         ),
@@ -4473,356 +3067,1907 @@ class _CartPageState extends State<CartPage> {
                                                     ),
                                                   ),
                                                 ),
+                                            ],
+                                          ),
+                                        ),
+                                        // Payment Options - Beautiful Card Design
+                                        Container(
+                                          margin: EdgeInsets.only(bottom: 16),
+                                          padding: EdgeInsets.all(16),
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: [
+                                                Colors.white,
+                                                Color(0xFFF8F9FA)
+                                              ],
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black
+                                                    .withOpacity(0.04),
+                                                blurRadius: 10,
+                                                offset: Offset(0, 4),
                                               ),
-                                            )
-                                          : Center(
-                                              child: InkWell(
-                                                onTap: () async {
-                                                  final result =
-                                                      await Navigator.of(
-                                                              context)
-                                                          .push(
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          AddressPage(
-                                                        arguments: {
-                                                          'cartTotal':
-                                                              _addToCartModel
-                                                                  .cartTotal
-                                                                  .toString(),
-                                                          'cartItems':
-                                                              _addToCartModel
-                                                                  .addToCarts,
-                                                          'couponValue':
-                                                              couponValue,
-                                                          'isAddress': true
-                                                        },
-                                                      ),
+                                            ],
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Container(
+                                                    padding: EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(
+                                                      color: Color(0xFFE3F2FD),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
                                                     ),
-                                                  );
-                                                  if (result != null &&
-                                                      result['address'] !=
-                                                          null) {
-                                                    setState(() {
-                                                      address =
-                                                          UserAddress.fromJson(
-                                                              result[
-                                                                  'address']);
-                                                    });
-                                                  }
+                                                    child: Icon(
+                                                      Icons.payment_rounded,
+                                                      color: Color(0xFF1976D2),
+                                                      size: 20,
+                                                    ),
+                                                  ),
+                                                  SizedBox(width: 12),
+                                                  Text(
+                                                    'Payment Method',
+                                                    style: TextStyle(
+                                                      fontFamily: 'Urbanist',
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Color(0xFF1A1A1A),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(height: 16),
+                                              // COD Option
+                                              GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    paymentOption =
+                                                        'Cash On Delivery';
+                                                  });
                                                 },
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                child: Container(
-                                                  width: double.infinity,
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 20,
-                                                      vertical: 14),
-                                                  margin: EdgeInsets.symmetric(
-                                                      horizontal: 16),
+                                                child: AnimatedContainer(
+                                                  duration: Duration(
+                                                      milliseconds: 200),
+                                                  padding: EdgeInsets.all(14),
                                                   decoration: BoxDecoration(
-                                                    gradient: LinearGradient(
-                                                      colors: [
-                                                        Color(0xFF2A2A2A),
-                                                        Color(0xFF1A1A1A)
-                                                      ],
-                                                    ),
+                                                    color: paymentOption ==
+                                                            'Cash On Delivery'
+                                                        ? Color(0xFFF5F0E0)
+                                                        : Color(0xFFF8F9FA),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             12),
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Colors.black
-                                                            .withOpacity(0.2),
-                                                        blurRadius: 8,
-                                                        offset: Offset(0, 4),
-                                                      ),
-                                                    ],
+                                                    border: Border.all(
+                                                      color: paymentOption ==
+                                                              'Cash On Delivery'
+                                                          ? Color(0xFFC7B456)
+                                                          : Color(0xFFE0E0E0),
+                                                      width: paymentOption ==
+                                                              'Cash On Delivery'
+                                                          ? 2
+                                                          : 1,
+                                                    ),
                                                   ),
                                                   child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
                                                     children: [
-                                                      Icon(
-                                                          Icons
-                                                              .add_location_alt_rounded,
-                                                          color: Colors.white,
-                                                          size: 20),
-                                                      SizedBox(width: 10),
-                                                      Text(
-                                                        'Add Delivery Address to Continue',
-                                                        style: TextStyle(
-                                                          fontFamily:
-                                                              'Urbanist',
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          color: Colors.white,
+                                                      Container(
+                                                        width: 40,
+                                                        height: 40,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.green
+                                                              .withOpacity(0.1),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
                                                         ),
+                                                        child: Icon(
+                                                          Icons.money_rounded,
+                                                          color: Colors.green,
+                                                          size: 22,
+                                                        ),
+                                                      ),
+                                                      SizedBox(width: 12),
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              'Cash on Delivery',
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'Urbanist',
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                color: Color(
+                                                                    0xFF1A1A1A),
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              'Pay when you receive',
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'Urbanist',
+                                                                fontSize: 11,
+                                                                color: Color(
+                                                                    0xFF888888),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      AnimatedContainer(
+                                                        duration: Duration(
+                                                            milliseconds: 200),
+                                                        width: 22,
+                                                        height: 22,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          color: paymentOption ==
+                                                                  'Cash On Delivery'
+                                                              ? Color(
+                                                                  0xFFC7B456)
+                                                              : Colors
+                                                                  .transparent,
+                                                          border: Border.all(
+                                                            color: paymentOption ==
+                                                                    'Cash On Delivery'
+                                                                ? Color(
+                                                                    0xFFC7B456)
+                                                                : Color(
+                                                                    0xFFBDBDBD),
+                                                            width: 2,
+                                                          ),
+                                                        ),
+                                                        child: paymentOption ==
+                                                                'Cash On Delivery'
+                                                            ? Icon(Icons.check,
+                                                                size: 14,
+                                                                color: Colors
+                                                                    .white)
+                                                            : null,
                                                       ),
                                                     ],
                                                   ),
                                                 ),
                                               ),
-                                            );
-                                    },
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Container(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Add More Items',
-                                          style: MyGoogleFontStyle(
-                                            fontFamily: 'Urbanist',
-                                            fontWeight: FontWeight.w700,
-                                            color: Color(0xff000000),
+                                              SizedBox(height: 10),
+                                              // UPI/PhonePe Option
+                                              GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    paymentOption =
+                                                        'UPI/PhonePe';
+                                                  });
+                                                },
+                                                child: AnimatedContainer(
+                                                  duration: Duration(
+                                                      milliseconds: 200),
+                                                  padding: EdgeInsets.all(14),
+                                                  decoration: BoxDecoration(
+                                                    color: paymentOption ==
+                                                            'UPI/PhonePe'
+                                                        ? Color(0xFFF5F0E0)
+                                                        : Color(0xFFF8F9FA),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12),
+                                                    border: Border.all(
+                                                      color: paymentOption ==
+                                                              'UPI/PhonePe'
+                                                          ? Color(0xFFC7B456)
+                                                          : Color(0xFFE0E0E0),
+                                                      width: paymentOption ==
+                                                              'UPI/PhonePe'
+                                                          ? 2
+                                                          : 1,
+                                                    ),
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 40,
+                                                        height: 40,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Color(
+                                                                  0xFF5F259F)
+                                                              .withOpacity(0.1),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                        ),
+                                                        child: Icon(
+                                                          Icons
+                                                              .smartphone_rounded,
+                                                          color:
+                                                              Color(0xFF5F259F),
+                                                          size: 22,
+                                                        ),
+                                                      ),
+                                                      SizedBox(width: 12),
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              'UPI / PhonePe',
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'Urbanist',
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                color: Color(
+                                                                    0xFF1A1A1A),
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              'Fast & secure payment',
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'Urbanist',
+                                                                fontSize: 11,
+                                                                color: Color(
+                                                                    0xFF888888),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      AnimatedContainer(
+                                                        duration: Duration(
+                                                            milliseconds: 200),
+                                                        width: 22,
+                                                        height: 22,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          color: paymentOption ==
+                                                                  'UPI/PhonePe'
+                                                              ? Color(
+                                                                  0xFFC7B456)
+                                                              : Colors
+                                                                  .transparent,
+                                                          border: Border.all(
+                                                            color: paymentOption ==
+                                                                    'UPI/PhonePe'
+                                                                ? Color(
+                                                                    0xFFC7B456)
+                                                                : Color(
+                                                                    0xFFBDBDBD),
+                                                            width: 2,
+                                                          ),
+                                                        ),
+                                                        child: paymentOption ==
+                                                                'UPI/PhonePe'
+                                                            ? Icon(Icons.check,
+                                                                size: 14,
+                                                                color: Colors
+                                                                    .white)
+                                                            : null,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
+                                        ),
+
+                                        // Send as Gift - Beautiful Toggle Card
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              isGift = !isGift;
+                                            });
+                                            if (isGift == true) {
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) =>
+                                                        AlertDialog(
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20),
+                                                  ),
+                                                  title: Text(
+                                                      "Is it the same address as mentioned above?"),
+                                                  actions: <Widget>[
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.pop(
+                                                              context),
+                                                      child: Text('Yes',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontSize: 16)),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () async {
+                                                        Navigator.pop(context);
+                                                        final result =
+                                                            await Navigator.of(
+                                                                    context)
+                                                                .push(
+                                                          MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    AddressPage(
+                                                              arguments: {
+                                                                'cartTotal':
+                                                                    _addToCartModel
+                                                                        .cartTotal
+                                                                        .toString(),
+                                                                'cartItems':
+                                                                    _addToCartModel
+                                                                        .addToCarts,
+                                                                'couponValue':
+                                                                    couponValue,
+                                                                'isAddress':
+                                                                    true
+                                                              },
+                                                            ),
+                                                          ),
+                                                        );
+                                                        if (result != null &&
+                                                            result['address'] !=
+                                                                null) {
+                                                          setState(() {
+                                                            address = UserAddress
+                                                                .fromJson(result[
+                                                                    'address']);
+                                                          });
+                                                        }
+                                                      },
+                                                      child: Text('No',
+                                                          style: TextStyle(
+                                                              color: Colors.red,
+                                                              fontSize: 16)),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            }
+                                          },
+                                          child: AnimatedContainer(
+                                            duration:
+                                                Duration(milliseconds: 200),
+                                            margin: EdgeInsets.only(bottom: 16),
+                                            padding: EdgeInsets.all(14),
+                                            decoration: BoxDecoration(
+                                              gradient: isGift
+                                                  ? LinearGradient(
+                                                      colors: [
+                                                        Color(0xFFFFF8E1),
+                                                        Color(0xFFFFECB3)
+                                                      ],
+                                                    )
+                                                  : LinearGradient(
+                                                      colors: [
+                                                        Colors.white,
+                                                        Color(0xFFF8F9FA)
+                                                      ],
+                                                    ),
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                              border: Border.all(
+                                                color: isGift
+                                                    ? Color(0xFFC7B456)
+                                                    : Color(0xFFE0E0E0),
+                                                width: isGift ? 2 : 1,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(0.03),
+                                                  blurRadius: 8,
+                                                  offset: Offset(0, 2),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  padding: EdgeInsets.all(10),
+                                                  decoration: BoxDecoration(
+                                                    color: isGift
+                                                        ? Color(0xFFC7B456)
+                                                            .withOpacity(0.2)
+                                                        : Color(0xFFF5F5F5),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.card_giftcard_rounded,
+                                                    color: isGift
+                                                        ? Color(0xFFC7B456)
+                                                        : Color(0xFF888888),
+                                                    size: 22,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 14),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        'Send as a Gift',
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontSize: 15,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color:
+                                                              Color(0xFF1A1A1A),
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        'We\'ll add a special touch',
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontSize: 11,
+                                                          color:
+                                                              Color(0xFF888888),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                AnimatedContainer(
+                                                  duration: Duration(
+                                                      milliseconds: 200),
+                                                  width: 46,
+                                                  height: 26,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            13),
+                                                    color: isGift
+                                                        ? Color(0xFFC7B456)
+                                                        : Color(0xFFE0E0E0),
+                                                  ),
+                                                  child: AnimatedAlign(
+                                                    duration: Duration(
+                                                        milliseconds: 200),
+                                                    alignment: isGift
+                                                        ? Alignment.centerRight
+                                                        : Alignment.centerLeft,
+                                                    child: Container(
+                                                      width: 22,
+                                                      height: 22,
+                                                      margin:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 2),
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: Colors.white,
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors.black
+                                                                .withOpacity(
+                                                                    0.1),
+                                                            blurRadius: 4,
+                                                            offset:
+                                                                Offset(0, 2),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        // Order Summary - Beautiful Card Design
+                                        Container(
+                                          width: 1.0.sw - 50,
+                                          margin: EdgeInsets.only(top: 8),
+                                          padding: EdgeInsets.all(16),
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: [
+                                                Colors.white,
+                                                Color(0xFFF8F9FA)
+                                              ],
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black
+                                                    .withOpacity(0.04),
+                                                blurRadius: 10,
+                                                offset: Offset(0, 4),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              // Header
+                                              Row(
+                                                children: [
+                                                  Container(
+                                                    padding: EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(
+                                                      color: Color(0xFFFFF3E0),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                    ),
+                                                    child: Icon(
+                                                      Icons
+                                                          .receipt_long_rounded,
+                                                      color: Color(0xFFFF9800),
+                                                      size: 20,
+                                                    ),
+                                                  ),
+                                                  SizedBox(width: 12),
+                                                  Text(
+                                                    'Order Summary',
+                                                    style: TextStyle(
+                                                      fontFamily: 'Urbanist',
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Color(0xFF1A1A1A),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(height: 16),
+                                              Divider(
+                                                  height: 1,
+                                                  color: Color(0xFFEEEEEE)),
+                                              SizedBox(height: 12),
+                                              // Item Total Row (Selected Items Only)
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      'Item Total (${_selectedCartItemIds.length} selected)',
+                                                      style: TextStyle(
+                                                        fontFamily: 'Urbanist',
+                                                        fontSize: 13,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color:
+                                                            Color(0xFF666666),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    'RS ' +
+                                                        (((_calculateSelectedItemsTotal() /
+                                                                105 *
+                                                                100))
+                                                            .toStringAsFixed(
+                                                                2)),
+                                                    textAlign: TextAlign.right,
+                                                    style: TextStyle(
+                                                      fontFamily: 'Inter',
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Color(0xFF1A1A1A),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                              if ((double.tryParse(_configModel
+                                                              .user
+                                                              ?.companies?[0]
+                                                              .deliveryCharges
+                                                              ?.toString() ??
+                                                          '0') ??
+                                                      0) >
+                                                  0)
+                                                SizedBox(height: 8),
+                                              if ((double.tryParse(_configModel
+                                                              .user
+                                                              ?.companies?[0]
+                                                              .deliveryCharges
+                                                              ?.toString() ??
+                                                          '0') ??
+                                                      0) >
+                                                  0)
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        'Delivery',
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color:
+                                                              Color(0xff909090),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      'RS ${double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ?? '0')?.toStringAsFixed(2) ?? '0'}',
+                                                      textAlign:
+                                                          TextAlign.right,
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Inter',
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        color:
+                                                            Color(0xff303030),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              if (address.state ==
+                                                  'Maharashtra')
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        'SGST 2.5%',
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color:
+                                                              Color(0xff909090),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      'RS' +
+                                                          ' ' +
+                                                          (() {
+                                                            // Calculate SGST using selected items total
+                                                            int cartTotal =
+                                                                _calculateSelectedItemsTotal();
+                                                            // Calculate GST on cart total after applying discounts
+                                                            double
+                                                                cartTotalAfterDiscounts =
+                                                                cartTotal -
+                                                                    couponValue -
+                                                                    useWalletPoint;
+                                                            // Calculate using new method: item total = cartTotalAfterDiscounts / 105 * 100
+                                                            double itemTotal =
+                                                                (cartTotalAfterDiscounts /
+                                                                        105) *
+                                                                    100;
+                                                            // GST = Cart Total After Discounts - Item Total
+                                                            double gstAmount =
+                                                                cartTotalAfterDiscounts -
+                                                                    itemTotal;
+                                                            double sgstAmount =
+                                                                gstAmount / 2;
+                                                            // SGST fixed at 2.5% of original cart total
+                                                            return sgstAmount
+                                                                .toStringAsFixed(
+                                                                    2);
+                                                          }()),
+                                                      textAlign:
+                                                          TextAlign.right,
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Inter',
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        color:
+                                                            Color(0xff303030),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              if (address.state ==
+                                                  'Maharashtra')
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                              if (address.state ==
+                                                  'Maharashtra')
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        'CGST 2.5%',
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color:
+                                                              Color(0xff909090),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      'RS' +
+                                                          ' ' +
+                                                          (() {
+                                                            // Calculate CGST using selected items total
+                                                            int cartTotal =
+                                                                _calculateSelectedItemsTotal();
+                                                            // Calculate GST on cart total after applying discounts
+                                                            double
+                                                                cartTotalAfterDiscounts =
+                                                                cartTotal -
+                                                                    couponValue -
+                                                                    useWalletPoint;
+                                                            // Calculate using new method: item total = cartTotalAfterDiscounts / 105 * 100
+                                                            double itemTotal =
+                                                                (cartTotalAfterDiscounts /
+                                                                        105) *
+                                                                    100;
+                                                            // GST = Cart Total After Discounts - Item Total
+                                                            double gstAmount =
+                                                                cartTotalAfterDiscounts -
+                                                                    itemTotal;
+                                                            double cgstAmount =
+                                                                gstAmount / 2;
+                                                            // CGST fixed at 2.5% of original cart total
+                                                            return cgstAmount
+                                                                .toStringAsFixed(
+                                                                    2);
+                                                          }()),
+                                                      textAlign:
+                                                          TextAlign.right,
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Inter',
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        color:
+                                                            Color(0xff303030),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              if (address.state !=
+                                                  'Maharashtra')
+                                                SizedBox(height: 10),
+                                              if (address.state !=
+                                                  'Maharashtra')
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        'IGST 5%',
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color:
+                                                              Color(0xff909090),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      'RS' +
+                                                          ' ' +
+                                                          (() {
+                                                            // Calculate IGST using selected items total
+                                                            int cartTotal =
+                                                                _calculateSelectedItemsTotal();
+                                                            // Calculate GST on cart total after applying discounts
+                                                            double
+                                                                cartTotalAfterDiscounts =
+                                                                cartTotal -
+                                                                    couponValue -
+                                                                    useWalletPoint;
+                                                            // Calculate using new method: item total = cartTotalAfterDiscounts / 105 * 100
+                                                            double
+                                                                itemTotalCalc =
+                                                                (cartTotalAfterDiscounts /
+                                                                        105) *
+                                                                    100;
+                                                            // GST = Cart Total After Discounts - Item Total
+                                                            double gstAmount =
+                                                                cartTotalAfterDiscounts -
+                                                                    itemTotalCalc;
+                                                            double igstAmount =
+                                                                gstAmount; // For IGST states, IGST = full GST
+                                                            return igstAmount
+                                                                .toStringAsFixed(
+                                                                    2);
+                                                          }()),
+                                                      // (5 *
+                                                      //         int.parse(_addToCartModel
+                                                      //             .cartTotal
+                                                      //             .toString()) /
+                                                      //         100)
+                                                      // .toString(),
+                                                      textAlign:
+                                                          TextAlign.right,
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Inter',
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        color:
+                                                            Color(0xff303030),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              if ((_configModel
+                                                          .user
+                                                          ?.companies?[0]
+                                                          .packagingCharges ??
+                                                      0) >
+                                                  0)
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        'Packaging Charges',
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color:
+                                                              Color(0xff909090),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      'RS ${_configModel.user?.companies?[0].packagingCharges!.toStringAsFixed(2)}',
+                                                      textAlign:
+                                                          TextAlign.right,
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Inter',
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        color:
+                                                            Color(0xff303030),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              if ((_configModel
+                                                          .user
+                                                          ?.companies?[0]
+                                                          .platformFee ??
+                                                      0) >
+                                                  0)
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        'Platform Fee',
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color:
+                                                              Color(0xff909090),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      'RS ${_configModel.user?.companies?[0].platformFee?.toStringAsFixed(2) ?? '0.00'}',
+                                                      textAlign:
+                                                          TextAlign.right,
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Inter',
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        color:
+                                                            Color(0xff303030),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              if (couponValue > 0)
+                                                SizedBox(height: 10),
+                                              if (couponValue > 0)
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        'Coupon (-)',
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color:
+                                                              Color(0xff909090),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      'RS' +
+                                                          ' ' +
+                                                          couponValue
+                                                              .toStringAsFixed(
+                                                                  2),
+                                                      textAlign:
+                                                          TextAlign.right,
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Inter',
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        color:
+                                                            Color(0xff303030),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              SizedBox(height: 10),
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      'Rewards (-)',
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Urbanist',
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color:
+                                                            Color(0xff909090),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  if (useWalletPoint != 0)
+                                                    InkWell(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          useWalletPoint = 0;
+                                                        });
+                                                      },
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                right: 8.0),
+                                                        child: Text('(Remove)'),
+                                                      ),
+                                                    ),
+                                                  if (useWalletPoint == 0)
+                                                    InkWell(
+                                                      onTap: () async {
+                                                        await _userWaletModel
+                                                            .getMyUserWallets();
+                                                        setState(() {
+                                                          // Calculate 25% of item total after coupon discount (using selected items)
+                                                          final cartTotal =
+                                                              _calculateSelectedItemsTotal();
+                                                          // Calculate using new method: item total = cartTotal / 105 * 100
+                                                          final itemTotal =
+                                                              (cartTotal /
+                                                                      105) *
+                                                                  100;
+                                                          // Item total is already calculated after discounts, so use it directly
+                                                          final cartAfterCoupon =
+                                                              itemTotal;
+
+                                                          final calculatedPoints =
+                                                              (cartAfterCoupon *
+                                                                      0.25)
+                                                                  .round();
+                                                          final availablePoints =
+                                                              _userWaletModel
+                                                                  .totaRemainingPoint;
+                                                          useWalletPoint =
+                                                              calculatedPoints >
+                                                                      availablePoints
+                                                                  ? availablePoints
+                                                                  : calculatedPoints;
+                                                        });
+                                                      },
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                right: 8.0),
+                                                        child: Text('(Add)'),
+                                                      ),
+                                                    ),
+                                                  Text(
+                                                    'RS ${(useWalletPoint).toStringAsFixed(2)}',
+                                                    // Division by 3 directly
+                                                    textAlign: TextAlign.right,
+                                                    style: MyGoogleFontStyle(
+                                                      fontFamily: 'Inter',
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Color(0xff303030),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                              SizedBox(height: 12),
+                                              Divider(
+                                                  height: 1,
+                                                  color: Color(0xFFEEEEEE)),
+                                              SizedBox(height: 12),
+                                              // Total Row - Highlighted
+                                              Container(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 12,
+                                                    vertical: 10),
+                                                decoration: BoxDecoration(
+                                                  gradient: LinearGradient(
+                                                    colors: [
+                                                      Color(0xFFFFF8E1),
+                                                      Color(0xFFFFECB3)
+                                                    ],
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        'Total Amount',
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontSize: 15,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                          color:
+                                                              Color(0xFF1A1A1A),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      'RS ' +
+                                                          (() {
+                                                            int cartTotal = int.parse(
+                                                                _addToCartModel
+                                                                    .cartTotal
+                                                                    .toString());
+                                                            double
+                                                                deliveryCharges =
+                                                                double.tryParse(_configModel
+                                                                            .user
+                                                                            ?.companies?[0]
+                                                                            .deliveryCharges
+                                                                            ?.toString() ??
+                                                                        '0') ??
+                                                                    0;
+                                                            double
+                                                                packagingCharges =
+                                                                double.tryParse(_configModel
+                                                                            .user
+                                                                            ?.companies?[0]
+                                                                            .packagingCharges
+                                                                            ?.toString() ??
+                                                                        '0') ??
+                                                                    0;
+                                                            double
+                                                                platformFeeValue =
+                                                                double.tryParse(_configModel
+                                                                            .user
+                                                                            ?.companies?[0]
+                                                                            .platformFee
+                                                                            ?.toString() ??
+                                                                        '0') ??
+                                                                    0;
+                                                            double total = cartTotal +
+                                                                deliveryCharges +
+                                                                packagingCharges +
+                                                                platformFeeValue -
+                                                                couponValue -
+                                                                useWalletPoint;
+                                                            return total
+                                                                .toStringAsFixed(
+                                                                    2);
+                                                          }()),
+                                                      textAlign:
+                                                          TextAlign.right,
+                                                      style: TextStyle(
+                                                        fontFamily: 'Inter',
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                        color:
+                                                            Color(0xFFC7B456),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+
+                                        SizedBox(height: 6),
+                                        // Show pay button only if there are selected items (in-stock items)
+                                        Builder(
+                                          builder: (context) {
+                                            // If no items are selected, show warning
+                                            if (_selectedCartItemIds.isEmpty) {
+                                              return Container(
+                                                width: double.infinity,
+                                                padding: EdgeInsets.all(16),
+                                                margin: EdgeInsets.symmetric(
+                                                    horizontal: 16),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.orange
+                                                      .withOpacity(0.1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  border: Border.all(
+                                                      color: Colors.orange
+                                                          .withOpacity(0.3)),
+                                                ),
+                                                child: Column(
+                                                  children: [
+                                                    Icon(
+                                                      Icons
+                                                          .warning_amber_rounded,
+                                                      color: Colors.orange,
+                                                      size: 32,
+                                                    ),
+                                                    SizedBox(height: 8),
+                                                    Text(
+                                                      'No items selected',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                        color:
+                                                            Colors.orange[700],
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 4),
+                                                    Text(
+                                                      'Please select at least one item to proceed with checkout',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                        color:
+                                                            Colors.orange[400],
+                                                        fontSize: 12,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            }
+                                            // Show proceed button when items are selected
+                                            return address.id != null
+                                                ? Align(
+                                                    alignment:
+                                                        Alignment.bottomCenter,
+                                                    child: Container(
+                                                      margin:
+                                                          EdgeInsets.fromLTRB(
+                                                              0.89, 0, 0, 0),
+                                                      child: TextButton(
+                                                        onPressed: () async {
+                                                          if (paymentOption ==
+                                                              '') {
+                                                            showDialog(
+                                                              context: context,
+                                                              builder: (BuildContext
+                                                                      context) =>
+                                                                  AlertDialog(
+                                                                title: Text(
+                                                                    'Please select payment type.'),
+                                                                actions: [
+                                                                  TextButton(
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator.pop(
+                                                                          context);
+                                                                    },
+                                                                    child: Text(
+                                                                        'Ok'),
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            );
+                                                          } else {
+                                                            // Check if any items are selected
+                                                            if (_selectedCartItemIds
+                                                                .isEmpty) {
+                                                              ScaffoldMessenger
+                                                                      .of(context)
+                                                                  .showSnackBar(
+                                                                SnackBar(
+                                                                  content: Text(
+                                                                      'Please select at least one item to proceed'),
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .orange,
+                                                                  duration:
+                                                                      Duration(
+                                                                          seconds:
+                                                                              2),
+                                                                ),
+                                                              );
+                                                              return;
+                                                            }
+
+                                                            // Check for out of stock and insufficient stock items before placing order
+                                                            Map<
+                                                                    String,
+                                                                    List<
+                                                                        Map<String,
+                                                                            dynamic>>>
+                                                                stockCheckResult =
+                                                                await _getOutOfStockItems();
+                                                            List<
+                                                                    Map<String,
+                                                                        dynamic>>
+                                                                outOfStockItems =
+                                                                stockCheckResult[
+                                                                        'outOfStock'] ??
+                                                                    [];
+                                                            List<
+                                                                    Map<String,
+                                                                        dynamic>>
+                                                                insufficientStockItems =
+                                                                stockCheckResult[
+                                                                        'insufficientStock'] ??
+                                                                    [];
+
+                                                            if (outOfStockItems
+                                                                    .isNotEmpty ||
+                                                                insufficientStockItems
+                                                                    .isNotEmpty) {
+                                                              showDialog(
+                                                                context:
+                                                                    context,
+                                                                builder: (BuildContext
+                                                                        context) =>
+                                                                    AlertDialog(
+                                                                  title: Text(
+                                                                      'Stock Issue'),
+                                                                  content:
+                                                                      SingleChildScrollView(
+                                                                    child:
+                                                                        Column(
+                                                                      mainAxisSize:
+                                                                          MainAxisSize
+                                                                              .min,
+                                                                      crossAxisAlignment:
+                                                                          CrossAxisAlignment
+                                                                              .start,
+                                                                      children: [
+                                                                        if (outOfStockItems
+                                                                            .isNotEmpty) ...[
+                                                                          Text(
+                                                                            'Out of Stock:',
+                                                                            style: TextStyle(
+                                                                                fontSize: 14,
+                                                                                fontWeight: FontWeight.bold,
+                                                                                color: Colors.red),
+                                                                          ),
+                                                                          SizedBox(
+                                                                              height: 8),
+                                                                          ...outOfStockItems
+                                                                              .map((item) => Padding(
+                                                                                    padding: EdgeInsets.symmetric(vertical: 4),
+                                                                                    child: Row(
+                                                                                      children: [
+                                                                                        Icon(Icons.error_outline, color: Colors.red, size: 18),
+                                                                                        SizedBox(width: 8),
+                                                                                        Expanded(
+                                                                                          child: Text(
+                                                                                            '${item['name']}',
+                                                                                            style: TextStyle(fontSize: 13),
+                                                                                          ),
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  ))
+                                                                              .toList(),
+                                                                          SizedBox(
+                                                                              height: 12),
+                                                                        ],
+                                                                        if (insufficientStockItems
+                                                                            .isNotEmpty) ...[
+                                                                          Text(
+                                                                            'Insufficient Stock:',
+                                                                            style: TextStyle(
+                                                                                fontSize: 14,
+                                                                                fontWeight: FontWeight.bold,
+                                                                                color: Colors.orange),
+                                                                          ),
+                                                                          SizedBox(
+                                                                              height: 8),
+                                                                          ...insufficientStockItems
+                                                                              .map((item) => Padding(
+                                                                                    padding: EdgeInsets.symmetric(vertical: 4),
+                                                                                    child: Row(
+                                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                      children: [
+                                                                                        Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 18),
+                                                                                        SizedBox(width: 8),
+                                                                                        Expanded(
+                                                                                          child: Column(
+                                                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                            children: [
+                                                                                              Text(
+                                                                                                '${item['name']}',
+                                                                                                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                                                                                              ),
+                                                                                              Text(
+                                                                                                'Ordered: ${item['orderedQty']} | Available: ${item['availableQty']}',
+                                                                                                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                                                                              ),
+                                                                                            ],
+                                                                                          ),
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  ))
+                                                                              .toList(),
+                                                                          SizedBox(
+                                                                              height: 12),
+                                                                        ],
+                                                                        Text(
+                                                                          outOfStockItems.isNotEmpty
+                                                                              ? 'Please remove out of stock items or reduce quantity for insufficient stock items to proceed.'
+                                                                              : 'Please reduce the quantity to available stock to proceed.',
+                                                                          style: TextStyle(
+                                                                              fontSize: 12,
+                                                                              color: Colors.grey[600]),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                  actions: [
+                                                                    TextButton(
+                                                                      onPressed:
+                                                                          () {
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                        // Trigger UI refresh to update out of stock display
+                                                                        setState(
+                                                                            () {});
+                                                                      },
+                                                                      child: Text(
+                                                                          'Ok'),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              );
+                                                              // Trigger UI refresh to show out of stock state
+                                                              setState(() {});
+                                                              return;
+                                                            }
+
+                                                            var addressId =
+                                                                address.id;
+
+                                                            // Calculate gstAmount before payment processing (using selected items)
+                                                            int cartTotalForGst =
+                                                                _calculateSelectedItemsTotal();
+                                                            double
+                                                                cartTotalAfterDiscountsForGst =
+                                                                cartTotalForGst -
+                                                                    couponValue -
+                                                                    useWalletPoint;
+                                                            double
+                                                                itemTotalForGst =
+                                                                (cartTotalAfterDiscountsForGst /
+                                                                        105) *
+                                                                    100;
+                                                            double gstAmount =
+                                                                cartTotalAfterDiscountsForGst -
+                                                                    itemTotalForGst;
+
+                                                            // Payment processing
+
+                                                            if (paymentOption ==
+                                                                'UPI/PhonePe') {
+                                                              // Prepare payload data for the transaction - use selected items only
+                                                              final selectedItemsForPayment =
+                                                                  _getSelectedCartItems();
+                                                              final selectedTotalForPayment =
+                                                                  _calculateSelectedItemsTotal();
+
+                                                              Map<String,
+                                                                      dynamic>
+                                                                  payloadData =
+                                                                  {
+                                                                'cartItems':
+                                                                    selectedItemsForPayment,
+                                                                'cartTotal':
+                                                                    selectedTotalForPayment
+                                                                        .toString(),
+                                                                'addressId':
+                                                                    addressId,
+                                                                'isGift':
+                                                                    isGift,
+                                                                'useWalletPoint':
+                                                                    useWalletPoint,
+                                                                'couponId': couponId
+                                                                    .toString(),
+                                                                'deliveryMethod':
+                                                                    "deliveryMethod",
+                                                                'couponValue':
+                                                                    couponValue
+                                                                        .toString(),
+                                                              };
+
+                                                              // Add gstAmount to payloadData for online payment
+                                                              payloadData[
+                                                                      'gstAmount'] =
+                                                                  gstAmount
+                                                                      .toStringAsFixed(
+                                                                          2);
+                                                              payloadData[
+                                                                      'platformFee'] =
+                                                                  _configModel
+                                                                          .user
+                                                                          ?.companies?[
+                                                                              0]
+                                                                          .platformFee ??
+                                                                      0;
+
+                                                              // Calculate the amount to be paid
+                                                              double itemTotal =
+                                                                  itemTotalForGst;
+                                                              double
+                                                                  sgstAmount =
+                                                                  gstAmount / 2;
+                                                              double
+                                                                  cgstAmount =
+                                                                  gstAmount / 2;
+
+                                                              int deliveryCharges = _configModel
+                                                                          .user!
+                                                                          .companies![
+                                                                              0]
+                                                                          .deliveryCharges ==
+                                                                      null
+                                                                  ? 0
+                                                                  : int.parse(_configModel
+                                                                      .user!
+                                                                      .companies![
+                                                                          0]
+                                                                      .deliveryCharges
+                                                                      .toString());
+                                                              int packagingCharges = _configModel
+                                                                          .user!
+                                                                          .companies![
+                                                                              0]
+                                                                          .packagingCharges ==
+                                                                      null
+                                                                  ? 0
+                                                                  : int.parse(_configModel
+                                                                      .user!
+                                                                      .companies![
+                                                                          0]
+                                                                      .packagingCharges
+                                                                      .toString());
+
+                                                              // Calculate total amount
+                                                              double
+                                                                  amountAfterDiscounts =
+                                                                  itemTotal;
+                                                              double taxAmount =
+                                                                  sgstAmount +
+                                                                      cgstAmount;
+                                                              double
+                                                                  platformFeeAmount =
+                                                                  double.tryParse(_configModel
+                                                                              .user
+                                                                              ?.companies?[0]
+                                                                              .platformFee
+                                                                              ?.toString() ??
+                                                                          '0') ??
+                                                                      0;
+                                                              double
+                                                                  totalAmount =
+                                                                  amountAfterDiscounts +
+                                                                      deliveryCharges +
+                                                                      packagingCharges +
+                                                                      platformFeeAmount +
+                                                                      taxAmount;
+
+                                                              int minumumPayable =
+                                                                  totalAmount
+                                                                      .round();
+                                                              String
+                                                                  mobileNumber =
+                                                                  _configModel
+                                                                      .user!
+                                                                      .phone
+                                                                      .toString();
+
+                                                              // Start PhonePe transaction
+                                                              _startTransaction(
+                                                                  minumumPayable,
+                                                                  mobileNumber,
+                                                                  payloadData,
+                                                                  context);
+                                                            } else {
+                                                              // Cash on Delivery - use selected items only
+                                                              final selectedItems =
+                                                                  _getSelectedCartItems();
+                                                              final selectedTotal =
+                                                                  _calculateSelectedItemsTotal();
+
+                                                              bool response =
+                                                                  await _orderModel
+                                                                      .placedOrder(
+                                                                selectedItems,
+                                                                selectedTotal
+                                                                    .toString(),
+                                                                addressId,
+                                                                isGift,
+                                                                useWalletPoint,
+                                                                couponId
+                                                                    .toString(),
+                                                                'Cash on Delivery',
+                                                                "deliveryMethod",
+                                                                couponValue
+                                                                    .toString(),
+                                                                gstAmount
+                                                                    .toStringAsFixed(
+                                                                        2),
+                                                                _configModel
+                                                                        .user
+                                                                        ?.companies?[
+                                                                            0]
+                                                                        .platformFee ??
+                                                                    0,
+                                                              );
+
+                                                              if (response ==
+                                                                  true) {
+                                                                Navigator.pushNamed(
+                                                                    context,
+                                                                    '/successPage');
+                                                              }
+                                                            }
+                                                          }
+                                                        },
+                                                        style: TextButton
+                                                            .styleFrom(
+                                                          padding:
+                                                              EdgeInsets.zero,
+                                                        ),
+                                                        child: Container(
+                                                          width:
+                                                              double.infinity,
+                                                          height: 54,
+                                                          margin: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      16),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            gradient:
+                                                                LinearGradient(
+                                                              begin: Alignment
+                                                                  .topLeft,
+                                                              end: Alignment
+                                                                  .bottomRight,
+                                                              colors: [
+                                                                Color(
+                                                                    0xFFD4C76A),
+                                                                Color(
+                                                                    0xFFC7B456),
+                                                                Color(
+                                                                    0xFFAA9A40)
+                                                              ],
+                                                            ),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        14),
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: Color(
+                                                                        0xFFC7B456)
+                                                                    .withOpacity(
+                                                                        0.4),
+                                                                blurRadius: 12,
+                                                                offset: Offset(
+                                                                    0, 4),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Icon(
+                                                                  Icons
+                                                                      .shopping_bag_rounded,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  size: 20),
+                                                              SizedBox(
+                                                                  width: 10),
+                                                              Text(
+                                                                'Proceed (${_selectedCartItemIds.length} items)',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontFamily:
+                                                                      'Urbanist',
+                                                                  fontSize: 16,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w700,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                : Center(
+                                                    child: InkWell(
+                                                      onTap: () async {
+                                                        final result =
+                                                            await Navigator.of(
+                                                                    context)
+                                                                .push(
+                                                          MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    AddressPage(
+                                                              arguments: {
+                                                                'cartTotal':
+                                                                    _addToCartModel
+                                                                        .cartTotal
+                                                                        .toString(),
+                                                                'cartItems':
+                                                                    _addToCartModel
+                                                                        .addToCarts,
+                                                                'couponValue':
+                                                                    couponValue,
+                                                                'isAddress':
+                                                                    true
+                                                              },
+                                                            ),
+                                                          ),
+                                                        );
+                                                        if (result != null &&
+                                                            result['address'] !=
+                                                                null) {
+                                                          setState(() {
+                                                            address = UserAddress
+                                                                .fromJson(result[
+                                                                    'address']);
+                                                          });
+                                                        }
+                                                      },
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                      child: Container(
+                                                        width: double.infinity,
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 20,
+                                                                vertical: 14),
+                                                        margin: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 16),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          gradient:
+                                                              LinearGradient(
+                                                            colors: [
+                                                              Color(0xFF2A2A2A),
+                                                              Color(0xFF1A1A1A)
+                                                            ],
+                                                          ),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              color: Colors
+                                                                  .black
+                                                                  .withOpacity(
+                                                                      0.2),
+                                                              blurRadius: 8,
+                                                              offset:
+                                                                  Offset(0, 4),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Icon(
+                                                                Icons
+                                                                    .add_location_alt_rounded,
+                                                                color: Colors
+                                                                    .white,
+                                                                size: 20),
+                                                            SizedBox(width: 10),
+                                                            Text(
+                                                              'Add Delivery Address to Continue',
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'Urbanist',
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                          },
                                         ),
                                         SizedBox(
                                           height: 10,
                                         ),
                                         Container(
-                                          width: 1.0.sw,
-                                          height: 0.40.sh,
-                                          child: Row(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Expanded(
-                                                child: _productModel
-                                                        .productsLoader
-                                                    ? Center(
-                                                        child:
-                                                            LinearProgressIndicator())
-                                                    : (_productModel.allProducts ==
-                                                                null ||
-                                                            _productModel
-                                                                .allProducts!
-                                                                .isEmpty)
-                                                        ? Center(
-                                                            child: Text(
-                                                              'No products available',
-                                                              style:
-                                                                  MyGoogleFontStyle(
-                                                                fontFamily:
-                                                                    'Urbanist',
-                                                                fontSize: 14,
-                                                                color:
-                                                                    Colors.grey,
-                                                              ),
-                                                            ),
-                                                          )
-                                                        : ListView.builder(
-                                                            // padding:
-                                                            //     const EdgeInsets.only(left: 5, right: 8),
-                                                            scrollDirection:
-                                                                Axis.horizontal,
-                                                            shrinkWrap: true,
-                                                            itemCount: _productModel
-                                                                    .allProducts
-                                                                    ?.length ??
-                                                                0,
-                                                            itemBuilder:
-                                                                (context,
-                                                                    index) {
-                                                              return Padding(
-                                                                padding: const EdgeInsets
-                                                                    .symmetric(
-                                                                    horizontal:
-                                                                        10),
-                                                                child:
-                                                                    Container(
-                                                                  width: MediaQuery.of(
-                                                                              context)
-                                                                          .size
-                                                                          .width *
-                                                                      0.4,
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            15),
+                                              Text(
+                                                'Add More Items',
+                                                style: MyGoogleFontStyle(
+                                                  fontFamily: 'Urbanist',
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xff000000),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                              Container(
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.35,
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: _productModel
+                                                              .productsLoader
+                                                          ? Center(
+                                                              child:
+                                                                  LinearProgressIndicator())
+                                                          : (_productModel.randomProducts ==
+                                                                      null ||
+                                                                  _productModel
+                                                                      .randomProducts!
+                                                                      .isEmpty)
+                                                              ? Center(
+                                                                  child: Text(
+                                                                    'No products available',
+                                                                    style:
+                                                                        MyGoogleFontStyle(
+                                                                      fontFamily:
+                                                                          'Urbanist',
+                                                                      fontSize:
+                                                                          14,
+                                                                      color: Colors
+                                                                          .grey,
+                                                                    ),
                                                                   ),
-                                                                  child: Column(
-                                                                    mainAxisSize:
-                                                                        MainAxisSize
-                                                                            .min,
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      InkWell(
-                                                                        onTap:
-                                                                            () {
-                                                                          Navigator.of(context)
-                                                                              .push(
-                                                                            MaterialPageRoute(
-                                                                              builder: (context) => ProductIdPage(arguments: {
-                                                                                'product': _productModel.allProducts?[index].toJson(),
-                                                                                'product_images': _productModel.allProducts?[index].productImages
-                                                                              }),
-                                                                            ),
-                                                                          );
-                                                                        },
-                                                                        child:
-                                                                            Container(
-                                                                          margin: EdgeInsets.fromLTRB(
-                                                                              0.0.w,
-                                                                              0.0.w,
-                                                                              0.0.w,
-                                                                              5.0.w),
-                                                                          padding: EdgeInsets.fromLTRB(
-                                                                              106.0.w,
-                                                                              13.0.w,
-                                                                              14.0.w,
-                                                                              15.0.w),
-                                                                          width:
-                                                                              0.4.sw,
-                                                                          height:
-                                                                              0.26.sh,
-                                                                          decoration:
-                                                                              BoxDecoration(
-                                                                            borderRadius:
-                                                                                BorderRadius.circular(15),
-                                                                            image:
-                                                                                DecorationImage(
-                                                                              fit: BoxFit.contain,
-                                                                              image: NetworkImage(_configModel.apiConfig['mediaURL'] + ((_productModel.allProducts?[index].productImages?.isNotEmpty ?? false) ? _productModel.allProducts![index].productImages!.first.imagepath?.toString() ?? '' : '')),
-                                                                            ),
-                                                                          ),
-                                                                          child:
-                                                                              InkWell(
-                                                                            onTap:
-                                                                                () async {
-                                                                              if (_configModel.user != null) {
-                                                                                await _wishListModel.getWishLists(_productModel.allProducts?[index].id);
-                                                                                setState(() {});
-                                                                              } else {
-                                                                                // Show login required dialog
-                                                                                showDialog(
-                                                                                  context: context,
-                                                                                  builder: (context) => AlertDialog(
-                                                                                    title: Text('Login Required'),
-                                                                                    content: Text('Please login to add items to wishlist'),
-                                                                                    actions: [
-                                                                                      TextButton(
-                                                                                        onPressed: () => Navigator.pop(context),
-                                                                                        child: Text('OK'),
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                );
-                                                                              }
-                                                                            },
-                                                                            child: _wishListModel.wishListLoader
-                                                                                ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
-                                                                                : _wishListModel.wishLists?.where((wishList) => wishList.productId == _productModel.allProducts?[index].id && wishList.userId == _configModel.user?.id).toList().length == 0
-                                                                                    ? Align(alignment: Alignment.topRight, child: Icon(Icons.favorite_border_outlined))
-                                                                                    : Align(
-                                                                                        alignment: Alignment.topRight,
-                                                                                        child: Icon(
-                                                                                          Icons.favorite_outlined,
-                                                                                          color: Colors.red,
-                                                                                        )),
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                      SizedBox(
-                                                                        height:
-                                                                            10,
-                                                                      ),
-                                                                      InkWell(
-                                                                        onTap:
-                                                                            () {
-                                                                          Navigator.of(context).push(MaterialPageRoute(
-                                                                              builder: (context) => ProductIdPage(arguments: {
-                                                                                    'product': _productModel.allProducts?[index].toJson(),
-                                                                                    'category': _productModel.allProducts?[index].category?.name?.toString() ?? '',
-                                                                                  })));
-                                                                        },
-                                                                        child:
-                                                                            Container(
-                                                                          child:
-                                                                              Text(
-                                                                            _productModel.allProducts![index].name.toString(),
-                                                                            textAlign:
-                                                                                TextAlign.center,
-                                                                            style:
-                                                                                MyGoogleFontStyle(
-                                                                              fontFamily: 'Urbanist',
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.w700,
-                                                                              color: Color(0xff000000),
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                      Container(
-                                                                        child: ((_productModel.allProducts?[index].productPrices?.isNotEmpty ?? false) &&
-                                                                                (_productModel.allProducts![index].productPrices![0].offerPrice ?? 0) != 0)
-                                                                            ? Text.rich(TextSpan(children: [
-                                                                                new TextSpan(
-                                                                                  text: 'RS. ${_productModel.allProducts![index].productPrices![0].price?.toString() ?? '0'}',
-                                                                                  style: new TextStyle(
-                                                                                    color: Colors.grey,
-                                                                                    decoration: TextDecoration.lineThrough,
-                                                                                  ),
-                                                                                ),
-                                                                                new TextSpan(
-                                                                                  text: ' RS.${_productModel.allProducts![index].productPrices![0].offerPrice?.toString() ?? '0'}',
-                                                                                ),
-                                                                              ]))
-                                                                            : Text(
-                                                                                (_productModel.allProducts?[index].productPrices?.isNotEmpty ?? false) ? (_productModel.allProducts![index].productPrices![0].price?.toString() ?? '0') + " " + 'RS' : '0 RS',
-                                                                                style: MyGoogleFontStyle(
-                                                                                  fontFamily: 'Poppins',
-                                                                                  fontSize: 13,
-                                                                                  fontWeight: FontWeight.w500,
-                                                                                  height: 1.5,
-                                                                                  letterSpacing: -0.2190869331,
-                                                                                  color: Color(0x99000000),
-                                                                                ),
-                                                                              ),
-                                                                      ),
-                                                                      if (discountPrice !=
-                                                                          0.0)
-                                                                        Center(
-                                                                          child:
-                                                                              Text(
-                                                                            '( ${discountPrice.round()}% Off)',
-                                                                            style:
-                                                                                MyGoogleFontStyle(
-                                                                              fontFamily: 'Poppins',
-                                                                              fontSize: 12,
-                                                                              fontWeight: FontWeight.bold,
-                                                                              color: Color(0x99000000),
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                    ],
-                                                                  ),
+                                                                )
+                                                              : ListView
+                                                                  .builder(
+                                                                  scrollDirection:
+                                                                      Axis.horizontal,
+                                                                  shrinkWrap:
+                                                                      true,
+                                                                  itemCount: _productModel
+                                                                          .randomProducts
+                                                                          ?.length ??
+                                                                      0,
+                                                                  itemBuilder:
+                                                                      (context,
+                                                                          index) {
+                                                                    return Padding(
+                                                                      padding: EdgeInsets.only(
+                                                                          right:
+                                                                              12.0),
+                                                                      child:
+                                                                          () {
+                                                                        final product =
+                                                                            _productModel.randomProducts![index];
+                                                                        double
+                                                                            discountPrice =
+                                                                            0.0;
+                                                                        if (product.productPrices?.isNotEmpty ??
+                                                                            false) {
+                                                                          final price =
+                                                                              int.tryParse(product.productPrices![0].price?.toString() ?? '0') ?? 0;
+                                                                          final offerPrice =
+                                                                              int.tryParse(product.productPrices![0].offerPrice?.toString() ?? '0') ?? 0;
+
+                                                                          if (price > 0 &&
+                                                                              offerPrice > 0 &&
+                                                                              offerPrice < price) {
+                                                                            discountPrice = ((price - offerPrice) /
+                                                                                price *
+                                                                                100);
+                                                                          }
+                                                                        }
+                                                                        return CommonProductCard(
+                                                                          product:
+                                                                              product,
+                                                                          discountPrice:
+                                                                              discountPrice,
+                                                                        );
+                                                                      }(),
+                                                                    );
+                                                                  },
                                                                 ),
-                                                              );
-                                                            },
-                                                          ),
-                                              )
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ),
+                                  )
                                 ],
                               ),
-                            )
-                          ],
-                        ),
-                      ),
+                            ),
+                          ),
+                      ],
                     ),
+                  ),
                 ],
               ),
             ),
@@ -4830,5 +4975,138 @@ class _CartPageState extends State<CartPage> {
         ),
       ),
     );
+  }
+
+  Widget _buildBottomNavigationBar(
+    BuildContext context,
+    ConfigModel configModel,
+    AddToCartModel addToCartModel,
+    int cartCount,
+  ) {
+    const double _bottomNavBarHeight = 90.0;
+    const double _bottomNavIconSize = 24.0;
+    return Container(
+      height: _bottomNavBarHeight,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0xFFEED056).withOpacity(0.15),
+            blurRadius: 25,
+            spreadRadius: 0,
+            offset: Offset(0, -8),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
+            offset: Offset(0, -4),
+          ),
+        ],
+        border: Border(
+          top: BorderSide(
+            color: Color(0xFFEED056).withOpacity(0.2),
+            width: 1.5,
+          ),
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        child: BottomNavigationBar(
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          selectedItemColor: Color(0xFFEED056),
+          unselectedItemColor: Color(0xFF909090),
+          selectedFontSize: 11,
+          unselectedFontSize: 11,
+          currentIndex: 2, // Set 'Cart' as active (Index 2)
+          selectedLabelStyle: TextStyle(
+            fontFamily: 'Urbanist',
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.5,
+          ),
+          unselectedLabelStyle: TextStyle(
+            fontFamily: 'Urbanist',
+            fontWeight: FontWeight.w500,
+          ),
+          onTap: (value) =>
+              _handleBottomNavTap(context, value, configModel, addToCartModel),
+          items: [
+            BottomNavigationBarItem(
+              label: 'Home',
+              icon: Image.asset('assets/images/home-icon.png',
+                  width: _bottomNavIconSize,
+                  height: _bottomNavIconSize,
+                  color: Color(0xFF909090)), // Explicitly grey
+            ),
+            BottomNavigationBarItem(
+              label: 'Category',
+              icon: Image.asset('assets/images/category-icon.png',
+                  width: _bottomNavIconSize,
+                  height: _bottomNavIconSize,
+                  color: Color(0xFF909090)), // Explicitly grey
+            ),
+            BottomNavigationBarItem(
+              label: 'Cart',
+              icon: badges.Badge(
+                badgeContent: Text('$cartCount',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold)),
+                badgeStyle: badges.BadgeStyle(
+                  badgeColor: Color(0xFFEED056),
+                  padding: EdgeInsets.all(6),
+                ),
+                child: Image.asset('assets/images/cart-icon.png',
+                    width: _bottomNavIconSize,
+                    height: _bottomNavIconSize,
+                    color: Color(0xFFEED056)), // Active (Yellow)
+              ),
+            ),
+            BottomNavigationBarItem(
+              label: 'Profile',
+              icon: Image.asset('assets/images/user-profile-icon.png',
+                  width: _bottomNavIconSize,
+                  height: _bottomNavIconSize,
+                  color: Color(0xFF909090)), // Explicitly grey
+            ),
+            BottomNavigationBarItem(
+              label: 'Notifs',
+              icon: Image.asset('assets/images/notification-icon.png',
+                  width: _bottomNavIconSize,
+                  height: _bottomNavIconSize,
+                  color: Color(0xFF909090)), // Explicitly grey
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _handleBottomNavTap(
+    BuildContext context,
+    int value,
+    ConfigModel configModel,
+    AddToCartModel addToCartModel,
+  ) async {
+    if (value == 0) {
+      Navigator.pushNamed(context, '/homePage');
+    } else if (value == 1) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const ShopsPage(initialText: '')));
+    } else if (value == 2) {
+      // Already on Cart Page
+    } else if (value == 3 && configModel.user != null) {
+      Navigator.pushNamed(context, '/profilePage');
+    } else if (value == 4 && configModel.user != null) {
+      Navigator.pushNamed(context, '/notificationPage');
+    } else {
+      showDialog(
+          context: context, builder: (context) => LoginRequiredPopupWidget());
+    }
   }
 }
