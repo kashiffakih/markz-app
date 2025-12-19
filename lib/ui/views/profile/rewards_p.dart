@@ -15,8 +15,9 @@ class _RewardsPageState extends State<RewardsPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<UserWalletModel>(context, listen: false).getMyUserWallets();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Provider.of<UserWalletModel>(context, listen: false)
+          .getMyUserWallets();
     });
   }
 
@@ -305,8 +306,18 @@ class _RewardsPageState extends State<RewardsPage> {
               final wallet = wallets[index];
               final amountVal = double.tryParse(wallet.amount ?? '0') ?? 0;
               final isUsed =
-                  wallet.source?.toLowerCase().contains('used') ?? false;
+                  wallet.source?.toLowerCase().contains('used') == true ||
+                      wallet.source?.toLowerCase().contains('deducted') == true;
               final isPositive = !isUsed;
+
+              String title = 'Order Reward';
+              if (wallet.source == 'Points Return') {
+                title = 'Points Returned';
+              } else if (wallet.source == 'Points Deducted') {
+                title = 'Points Deducted';
+              } else {
+                title = 'Order Reward ${wallet.source?.split(' ').last ?? ''}';
+              }
 
               return Container(
                 margin: const EdgeInsets.only(bottom: 12),
@@ -344,7 +355,7 @@ class _RewardsPageState extends State<RewardsPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Order Reward ${wallet.source?.split(' ').last ?? ''}',
+                            title,
                             style: TextStyle(
                               fontFamily: 'Urbanist',
                               fontSize: 15,

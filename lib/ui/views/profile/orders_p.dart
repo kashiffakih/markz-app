@@ -19,7 +19,7 @@ class OrdersPage extends StatefulWidget {
 }
 
 class _OrdersPageState extends State<OrdersPage> {
-  final DateFormat _dateFormat = DateFormat('MMMM d, yyyy');
+  final DateFormat _dateFormat = DateFormat('MMM d, yyyy');
   bool _isPageLoading = false;
 
   final ConfigModel _configModel = locator<ConfigModel>();

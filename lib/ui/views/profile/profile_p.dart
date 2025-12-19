@@ -30,7 +30,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  static const double _bottomNavBarHeight = 70.0;
+  static const double _bottomNavBarHeight = 90.0;
   static const int _bottomNavIconSize = 23;
 
   @override

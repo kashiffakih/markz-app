@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage>
   static const double _bannerCarouselHeightRatio = 0.3;
   static const double _newArrivalsHeightRatio = 0.35;
   static const double _inviteBannerHeight = 180.0;
-  static const double _bottomNavBarHeight = 70.0;
+  static const double _bottomNavBarHeight = 90.0;
   static const int _bottomNavIconSize = 23;
 
   final TextEditingController _controller = TextEditingController();
@@ -765,7 +765,7 @@ class _HomePageState extends State<HomePage>
         ),
         SizedBox(height: 15.w),
         SizedBox(
-          height: 100.w,
+          height: 115.w,
           child: ListView.separated(
             padding: EdgeInsets.symmetric(horizontal: 20.w),
             scrollDirection: Axis.horizontal,
@@ -977,7 +977,7 @@ class _HomePageState extends State<HomePage>
             child: TextButton(
               onPressed: () async {
                 final message =
-                    'Hello! This is my referral Code ${configModel.user?.referralCode} Redeem them to get instant discounts.';
+                    'Hello! Use my referral code *${configModel.user?.referralCode}* to get instant discounts on the Aadab App! 🎁\n\nDownload here: https://play.google.com/store/apps/details?id=com.crazzycode.aadab&hl=en_IN';
                 final whatsappUrl =
                     'whatsapp://send?text=${Uri.encodeComponent(message)}';
                 try {

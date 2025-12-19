@@ -1975,59 +1975,167 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       null) {
                                                     showModalBottomSheet(
                                                       context: context,
+                                                      isScrollControlled: true,
+                                                      shape:
+                                                          const RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.vertical(
+                                                                top: Radius
+                                                                    .circular(
+                                                                        20)),
+                                                      ),
                                                       builder: (context) =>
-                                                          InkWell(
-                                                        onTap: () {
-                                                          Navigator.of(context)
-                                                              .push(
-                                                            MaterialPageRoute(
-                                                              builder:
-                                                                  (context) =>
-                                                                      ImageScreen(
-                                                                image:
-                                                                    '${configModel.apiConfig['mediaURL']}${product.sizeChartPath}',
+                                                          Container(
+                                                        height: 0.5.sh,
+                                                        decoration:
+                                                            const BoxDecoration(
+                                                          color: Colors.white,
+                                                          borderRadius:
+                                                              BorderRadius.vertical(
+                                                                  top: Radius
+                                                                      .circular(
+                                                                          20)),
+                                                        ),
+                                                        child: Column(
+                                                          children: [
+                                                            // Header
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(
+                                                                      16.0),
+                                                              child: Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  Text(
+                                                                    'Size Guide',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontFamily:
+                                                                          'Urbanist',
+                                                                      fontSize:
+                                                                          18.sp,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      color: Colors
+                                                                          .black,
+                                                                    ),
+                                                                  ),
+                                                                  InkWell(
+                                                                    onTap: () =>
+                                                                        Navigator.pop(
+                                                                            context),
+                                                                    child:
+                                                                        Container(
+                                                                      padding:
+                                                                          const EdgeInsets
+                                                                              .all(
+                                                                              8),
+                                                                      decoration:
+                                                                          BoxDecoration(
+                                                                        color: Colors
+                                                                            .grey[100],
+                                                                        shape: BoxShape
+                                                                            .circle,
+                                                                      ),
+                                                                      child:
+                                                                          const Icon(
+                                                                        Icons
+                                                                            .close,
+                                                                        size:
+                                                                            20,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
                                                               ),
                                                             ),
-                                                          );
-                                                        },
-                                                        child: Container(
-                                                          width:
-                                                              double.infinity,
-                                                          padding:
-                                                              EdgeInsets.all(
-                                                                  20.0.w),
-                                                          height: 200.0.w,
-                                                          child: Image.network(
-                                                            '${configModel.apiConfig['mediaURL']}${product.sizeChartPath}',
-                                                            fit: BoxFit.contain,
-                                                            errorBuilder: (context,
-                                                                    error,
-                                                                    stackTrace) =>
-                                                                const Icon(Icons
-                                                                    .error),
-                                                          ),
+                                                            const Divider(
+                                                                height: 1),
+                                                            // Content
+                                                            Expanded(
+                                                              child: InkWell(
+                                                                onTap: () {
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .push(
+                                                                    MaterialPageRoute(
+                                                                      builder:
+                                                                          (context) =>
+                                                                              ImageScreen(
+                                                                        image:
+                                                                            '${configModel.apiConfig['mediaURL']}${product.sizeChartPath}',
+                                                                      ),
+                                                                    ),
+                                                                  );
+                                                                },
+                                                                child:
+                                                                    Container(
+                                                                  width: double
+                                                                      .infinity,
+                                                                  padding: EdgeInsets
+                                                                      .all(16.0
+                                                                          .w),
+                                                                  child: Image
+                                                                      .network(
+                                                                    '${configModel.apiConfig['mediaURL']}${product.sizeChartPath}',
+                                                                    fit: BoxFit
+                                                                        .contain,
+                                                                    errorBuilder: (context,
+                                                                            error,
+                                                                            stackTrace) =>
+                                                                        const Center(
+                                                                            child:
+                                                                                Icon(Icons.error)),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                       ),
                                                     );
                                                   }
                                                 },
-                                                child: Column(
-                                                  children: [
-                                                    Image.asset(
-                                                      'assets/images/size-chart-icon.png',
-                                                      width: 40.0.w,
-                                                      height: 40.0.w,
-                                                    ),
-                                                    Text(
-                                                      'Size Chart',
-                                                      style: TextStyle(
-                                                        fontSize: 11.0.sp,
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.bold,
+                                                child: Container(
+                                                  height: 45.w,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12.r),
+                                                    border: Border.all(
+                                                        color: Colors
+                                                            .grey.shade300),
+                                                  ),
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.straighten,
+                                                        color:
+                                                            Color(0xFFC7B456),
+                                                        size: 20.sp,
                                                       ),
-                                                    ),
-                                                  ],
+                                                      SizedBox(height: 2.w),
+                                                      Text(
+                                                        'Size Chart',
+                                                        style: TextStyle(
+                                                          fontSize: 10.sp,
+                                                          color: Colors.black87,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -2053,7 +2161,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                     ),
                                   // Customer Ratings
                                   Padding(
-                                    padding: EdgeInsets.only(top: 10.0.w),
+                                    padding: EdgeInsets.only(
+                                        top: 15.0.w, bottom: 15.0.w),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -2067,6 +2176,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                             color: const Color(0x99000000),
                                           ),
                                         ),
+                                        SizedBox(height: 10.0.w),
                                         Builder(
                                           builder: (context) {
                                             // Use product-level ratings instead of pack-specific
@@ -2884,7 +2994,7 @@ class _ProductDescriptionSectionState extends State<ProductDescriptionSection> {
           ],
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Card Header (Tappable)
             InkWell(
@@ -2968,7 +3078,7 @@ class _ProductDescriptionSectionState extends State<ProductDescriptionSection> {
                   data: data,
                 ),
               ),
-              secondChild: SizedBox.shrink(),
+              secondChild: Container(height: 0, width: double.infinity),
               sizeCurve: Curves.easeInOut,
             ),
           ],

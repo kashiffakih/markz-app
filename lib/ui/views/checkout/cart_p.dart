@@ -295,9 +295,9 @@ class _CartPageState extends State<CartPage> {
     if (widget.arguments != null && widget.arguments['address'] != null) {
       address = UserAddress.fromJson(widget.arguments['address']);
     }
-    _loadData();
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadData();
       _initializeSelection();
       _removeOutOfStockFromSelection();
     });
@@ -2174,13 +2174,29 @@ class _CartPageState extends State<CartPage> {
                                                       onTap: buttonLoading
                                                           ? null
                                                           : () async {
+                                                              _formKey
+                                                                  .currentState!
+                                                                  .save();
+                                                              if (coupon
+                                                                  .trim()
+                                                                  .isEmpty) {
+                                                                ScaffoldMessenger.of(
+                                                                        context)
+                                                                    .showSnackBar(
+                                                                  const SnackBar(
+                                                                    content: Text(
+                                                                        'Please enter a promo code'),
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .red,
+                                                                  ),
+                                                                );
+                                                                return;
+                                                              }
                                                               setState(() {
                                                                 buttonLoading =
                                                                     true;
                                                               });
-                                                              _formKey
-                                                                  .currentState!
-                                                                  .save();
 
                                                               await _couponModel
                                                                   .verifyCoupon(
@@ -2338,23 +2354,96 @@ class _CartPageState extends State<CartPage> {
                                                                       context,
                                                                   builder: (BuildContext
                                                                           context) =>
-                                                                      AlertDialog(
-                                                                    shape: RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(20)),
-                                                                    title: Text(
-                                                                        "Invalid coupon."),
-                                                                    actions: <Widget>[
-                                                                      TextButton(
-                                                                        onPressed:
-                                                                            () {
-                                                                          Navigator.pop(
-                                                                              context);
-                                                                        },
-                                                                        child: Text(
-                                                                            'Ok'),
+                                                                      Dialog(
+                                                                    shape:
+                                                                        RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              20),
+                                                                    ),
+                                                                    child:
+                                                                        Padding(
+                                                                      padding: const EdgeInsets
+                                                                          .all(
+                                                                          20.0),
+                                                                      child:
+                                                                          Column(
+                                                                        mainAxisSize:
+                                                                            MainAxisSize.min,
+                                                                        children: [
+                                                                          Container(
+                                                                            padding:
+                                                                                const EdgeInsets.all(15),
+                                                                            decoration:
+                                                                                BoxDecoration(
+                                                                              color: const Color(0xFFFFF2F2),
+                                                                              shape: BoxShape.circle,
+                                                                            ),
+                                                                            child:
+                                                                                const Icon(
+                                                                              Icons.error_outline_rounded,
+                                                                              color: Colors.red,
+                                                                              size: 32,
+                                                                            ),
+                                                                          ),
+                                                                          const SizedBox(
+                                                                              height: 16),
+                                                                          const Text(
+                                                                            "Invalid Coupon",
+                                                                            style:
+                                                                                TextStyle(
+                                                                              fontFamily: 'Urbanist',
+                                                                              fontWeight: FontWeight.bold,
+                                                                              fontSize: 18,
+                                                                              color: Color(0xFF1A1A1A),
+                                                                            ),
+                                                                          ),
+                                                                          const SizedBox(
+                                                                              height: 8),
+                                                                          const Text(
+                                                                            "The promo code you entered is not valid. Please check and try again.",
+                                                                            textAlign:
+                                                                                TextAlign.center,
+                                                                            style:
+                                                                                TextStyle(
+                                                                              fontFamily: 'Urbanist',
+                                                                              fontSize: 14,
+                                                                              color: Color(0xFF757575),
+                                                                              height: 1.5,
+                                                                            ),
+                                                                          ),
+                                                                          const SizedBox(
+                                                                              height: 24),
+                                                                          SizedBox(
+                                                                            width:
+                                                                                double.infinity,
+                                                                            child:
+                                                                                ElevatedButton(
+                                                                              onPressed: () {
+                                                                                Navigator.pop(context);
+                                                                              },
+                                                                              style: ElevatedButton.styleFrom(
+                                                                                backgroundColor: const Color(0xFF1A1A1A),
+                                                                                foregroundColor: Colors.white,
+                                                                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                                                                shape: RoundedRectangleBorder(
+                                                                                  borderRadius: BorderRadius.circular(12),
+                                                                                ),
+                                                                                elevation: 0,
+                                                                              ),
+                                                                              child: const Text(
+                                                                                'Okay, Got it',
+                                                                                style: TextStyle(
+                                                                                  fontFamily: 'Urbanist',
+                                                                                  fontWeight: FontWeight.bold,
+                                                                                  fontSize: 15,
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ],
                                                                       ),
-                                                                    ],
+                                                                    ),
                                                                   ),
                                                                 );
                                                               }
@@ -3591,8 +3680,8 @@ class _CartPageState extends State<CartPage> {
                                         // Order Summary - Beautiful Card Design
                                         Container(
                                           width: 1.0.sw - 50,
-                                          margin: EdgeInsets.only(top: 8),
-                                          padding: EdgeInsets.all(16),
+                                          margin: EdgeInsets.only(top: 12),
+                                          padding: EdgeInsets.all(20),
                                           decoration: BoxDecoration(
                                             gradient: LinearGradient(
                                               begin: Alignment.topLeft,
@@ -3603,13 +3692,13 @@ class _CartPageState extends State<CartPage> {
                                               ],
                                             ),
                                             borderRadius:
-                                                BorderRadius.circular(16),
+                                                BorderRadius.circular(20),
                                             boxShadow: [
                                               BoxShadow(
                                                 color: Colors.black
-                                                    .withOpacity(0.04),
-                                                blurRadius: 10,
-                                                offset: Offset(0, 4),
+                                                    .withOpacity(0.06),
+                                                blurRadius: 16,
+                                                offset: Offset(0, 8),
                                               ),
                                             ],
                                           ),
@@ -3621,12 +3710,12 @@ class _CartPageState extends State<CartPage> {
                                               Row(
                                                 children: [
                                                   Container(
-                                                    padding: EdgeInsets.all(8),
+                                                    padding: EdgeInsets.all(10),
                                                     decoration: BoxDecoration(
                                                       color: Color(0xFFFFF3E0),
                                                       borderRadius:
                                                           BorderRadius.circular(
-                                                              10),
+                                                              12),
                                                     ),
                                                     child: Icon(
                                                       Icons
@@ -3635,12 +3724,12 @@ class _CartPageState extends State<CartPage> {
                                                       size: 20,
                                                     ),
                                                   ),
-                                                  SizedBox(width: 12),
+                                                  SizedBox(width: 14),
                                                   Text(
                                                     'Order Summary',
                                                     style: TextStyle(
                                                       fontFamily: 'Urbanist',
-                                                      fontSize: 16,
+                                                      fontSize: 17,
                                                       fontWeight:
                                                           FontWeight.w700,
                                                       color: Color(0xFF1A1A1A),
@@ -3648,11 +3737,11 @@ class _CartPageState extends State<CartPage> {
                                                   ),
                                                 ],
                                               ),
-                                              SizedBox(height: 16),
+                                              SizedBox(height: 20),
                                               Divider(
                                                   height: 1,
                                                   color: Color(0xFFEEEEEE)),
-                                              SizedBox(height: 12),
+                                              SizedBox(height: 16),
                                               // Item Total Row (Selected Items Only)
                                               Row(
                                                 children: [
@@ -3661,7 +3750,7 @@ class _CartPageState extends State<CartPage> {
                                                       'Item Total (${_selectedCartItemIds.length} selected)',
                                                       style: TextStyle(
                                                         fontFamily: 'Urbanist',
-                                                        fontSize: 13,
+                                                        fontSize: 14,
                                                         fontWeight:
                                                             FontWeight.w500,
                                                         color:
@@ -3679,7 +3768,7 @@ class _CartPageState extends State<CartPage> {
                                                     textAlign: TextAlign.right,
                                                     style: TextStyle(
                                                       fontFamily: 'Inter',
-                                                      fontSize: 13,
+                                                      fontSize: 14,
                                                       fontWeight:
                                                           FontWeight.w600,
                                                       color: Color(0xFF1A1A1A),
@@ -3687,15 +3776,7 @@ class _CartPageState extends State<CartPage> {
                                                   )
                                                 ],
                                               ),
-                                              if ((double.tryParse(_configModel
-                                                              .user
-                                                              ?.companies?[0]
-                                                              .deliveryCharges
-                                                              ?.toString() ??
-                                                          '0') ??
-                                                      0) >
-                                                  0)
-                                                SizedBox(height: 8),
+                                              SizedBox(height: 14),
                                               if ((double.tryParse(_configModel
                                                               .user
                                                               ?.companies?[0]
@@ -3708,15 +3789,16 @@ class _CartPageState extends State<CartPage> {
                                                   children: [
                                                     Expanded(
                                                       child: Text(
-                                                        'Delivery',
+                                                        'Delivery Charges',
                                                         style:
                                                             MyGoogleFontStyle(
                                                           fontFamily:
                                                               'Urbanist',
+                                                          fontSize: 14,
                                                           fontWeight:
                                                               FontWeight.w500,
                                                           color:
-                                                              Color(0xff909090),
+                                                              Color(0xff666666),
                                                         ),
                                                       ),
                                                     ),
@@ -3734,6 +3816,105 @@ class _CartPageState extends State<CartPage> {
                                                     )
                                                   ],
                                                 ),
+                                              if ((double.tryParse(_configModel
+                                                              .user
+                                                              ?.companies?[0]
+                                                              .deliveryCharges
+                                                              ?.toString() ??
+                                                          '0') ??
+                                                      0) >
+                                                  0)
+                                                SizedBox(height: 14),
+                                              if ((_configModel
+                                                          .user
+                                                          ?.companies?[0]
+                                                          .packagingCharges ??
+                                                      0) >
+                                                  0)
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        'Packaging Charges',
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color:
+                                                              Color(0xff666666),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      'RS ${_configModel.user?.companies?[0].packagingCharges!.toStringAsFixed(2)}',
+                                                      textAlign:
+                                                          TextAlign.right,
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Inter',
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        color:
+                                                            Color(0xff303030),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              if ((_configModel
+                                                          .user
+                                                          ?.companies?[0]
+                                                          .packagingCharges ??
+                                                      0) >
+                                                  0)
+                                                SizedBox(height: 14),
+                                              if ((_configModel
+                                                          .user
+                                                          ?.companies?[0]
+                                                          .platformFee ??
+                                                      0) >
+                                                  0)
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        'Platform Fee',
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color:
+                                                              Color(0xff666666),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      'RS ${_configModel.user?.companies?[0].platformFee?.toStringAsFixed(2) ?? '0.00'}',
+                                                      textAlign:
+                                                          TextAlign.right,
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Inter',
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        color:
+                                                            Color(0xff303030),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              if ((_configModel
+                                                          .user
+                                                          ?.companies?[0]
+                                                          .platformFee ??
+                                                      0) >
+                                                  0)
+                                                SizedBox(height: 14),
+
+                                              // Taxes Section
                                               if (address.state ==
                                                   'Maharashtra')
                                                 Row(
@@ -3745,10 +3926,11 @@ class _CartPageState extends State<CartPage> {
                                                             MyGoogleFontStyle(
                                                           fontFamily:
                                                               'Urbanist',
+                                                          fontSize: 14,
                                                           fontWeight:
                                                               FontWeight.w500,
                                                           color:
-                                                              Color(0xff909090),
+                                                              Color(0xff666666),
                                                         ),
                                                       ),
                                                     ),
@@ -3796,7 +3978,7 @@ class _CartPageState extends State<CartPage> {
                                               if (address.state ==
                                                   'Maharashtra')
                                                 SizedBox(
-                                                  height: 10,
+                                                  height: 14,
                                                 ),
                                               if (address.state ==
                                                   'Maharashtra')
@@ -3809,10 +3991,11 @@ class _CartPageState extends State<CartPage> {
                                                             MyGoogleFontStyle(
                                                           fontFamily:
                                                               'Urbanist',
+                                                          fontSize: 14,
                                                           fontWeight:
                                                               FontWeight.w500,
                                                           color:
-                                                              Color(0xff909090),
+                                                              Color(0xff666666),
                                                         ),
                                                       ),
                                                     ),
@@ -3859,7 +4042,7 @@ class _CartPageState extends State<CartPage> {
                                                 ),
                                               if (address.state !=
                                                   'Maharashtra')
-                                                SizedBox(height: 10),
+                                                SizedBox(height: 14),
                                               if (address.state !=
                                                   'Maharashtra')
                                                 Row(
@@ -3871,10 +4054,11 @@ class _CartPageState extends State<CartPage> {
                                                             MyGoogleFontStyle(
                                                           fontFamily:
                                                               'Urbanist',
+                                                          fontSize: 14,
                                                           fontWeight:
                                                               FontWeight.w500,
                                                           color:
-                                                              Color(0xff909090),
+                                                              Color(0xff666666),
                                                         ),
                                                       ),
                                                     ),
@@ -3925,99 +4109,42 @@ class _CartPageState extends State<CartPage> {
                                                     )
                                                   ],
                                                 ),
-                                              if ((_configModel
-                                                          .user
-                                                          ?.companies?[0]
-                                                          .packagingCharges ??
-                                                      0) >
-                                                  0)
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Text(
-                                                        'Packaging Charges',
-                                                        style:
-                                                            MyGoogleFontStyle(
-                                                          fontFamily:
-                                                              'Urbanist',
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color:
-                                                              Color(0xff909090),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      'RS ${_configModel.user?.companies?[0].packagingCharges!.toStringAsFixed(2)}',
-                                                      textAlign:
-                                                          TextAlign.right,
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Inter',
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                        color:
-                                                            Color(0xff303030),
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                              if ((_configModel
-                                                          .user
-                                                          ?.companies?[0]
-                                                          .platformFee ??
-                                                      0) >
-                                                  0)
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Text(
-                                                        'Platform Fee',
-                                                        style:
-                                                            MyGoogleFontStyle(
-                                                          fontFamily:
-                                                              'Urbanist',
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color:
-                                                              Color(0xff909090),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      'RS ${_configModel.user?.companies?[0].platformFee?.toStringAsFixed(2) ?? '0.00'}',
-                                                      textAlign:
-                                                          TextAlign.right,
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Inter',
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                        color:
-                                                            Color(0xff303030),
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                              if (couponValue > 0)
-                                                SizedBox(height: 10),
+                                              SizedBox(height: 14),
+
+                                              // Discounts Section
                                               if (couponValue > 0)
                                                 Row(
                                                   children: [
                                                     Expanded(
-                                                      child: Text(
-                                                        'Coupon (-)',
-                                                        style:
-                                                            MyGoogleFontStyle(
-                                                          fontFamily:
-                                                              'Urbanist',
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color:
-                                                              Color(0xff909090),
-                                                        ),
+                                                      child: Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons
+                                                                .local_offer_outlined,
+                                                            size: 16,
+                                                            color: Colors
+                                                                .green[700],
+                                                          ),
+                                                          SizedBox(width: 8),
+                                                          Text(
+                                                            'Coupon Discount',
+                                                            style:
+                                                                MyGoogleFontStyle(
+                                                              fontFamily:
+                                                                  'Urbanist',
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              color: Colors
+                                                                  .green[700],
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ),
                                                     Text(
-                                                      'RS' +
+                                                      '- RS' +
                                                           ' ' +
                                                           couponValue
                                                               .toStringAsFixed(
@@ -4029,24 +4156,54 @@ class _CartPageState extends State<CartPage> {
                                                         fontWeight:
                                                             FontWeight.w700,
                                                         color:
-                                                            Color(0xff303030),
+                                                            Colors.green[700],
                                                       ),
                                                     )
                                                   ],
                                                 ),
-                                              SizedBox(height: 10),
+                                              if (couponValue > 0)
+                                                SizedBox(height: 14),
+
                                               Row(
                                                 children: [
                                                   Expanded(
-                                                    child: Text(
-                                                      'Rewards (-)',
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Urbanist',
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color:
-                                                            Color(0xff909090),
-                                                      ),
+                                                    child: Row(
+                                                      children: [
+                                                        if (useWalletPoint > 0)
+                                                          Icon(
+                                                            Icons
+                                                                .wallet_giftcard_rounded,
+                                                            size: 16,
+                                                            color: Colors
+                                                                .green[700],
+                                                          )
+                                                        else
+                                                          SizedBox(),
+                                                        if (useWalletPoint > 0)
+                                                          SizedBox(width: 8),
+                                                        Text(
+                                                          'Rewards Used',
+                                                          style:
+                                                              MyGoogleFontStyle(
+                                                            fontFamily:
+                                                                'Urbanist',
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                useWalletPoint >
+                                                                        0
+                                                                    ? FontWeight
+                                                                        .w600
+                                                                    : FontWeight
+                                                                        .w500,
+                                                            color: useWalletPoint >
+                                                                    0
+                                                                ? Colors
+                                                                    .green[700]
+                                                                : Color(
+                                                                    0xff666666),
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
                                                   if (useWalletPoint != 0)
@@ -4105,49 +4262,52 @@ class _CartPageState extends State<CartPage> {
                                                       ),
                                                     ),
                                                   Text(
-                                                    'RS ${(useWalletPoint).toStringAsFixed(2)}',
+                                                    '${useWalletPoint > 0 ? "- " : ""}RS ${(useWalletPoint).toStringAsFixed(2)}',
                                                     // Division by 3 directly
                                                     textAlign: TextAlign.right,
                                                     style: MyGoogleFontStyle(
                                                       fontFamily: 'Inter',
                                                       fontWeight:
                                                           FontWeight.w700,
-                                                      color: Color(0xff303030),
+                                                      color: useWalletPoint > 0
+                                                          ? Colors.green[700]
+                                                          : Color(0xff303030),
                                                     ),
                                                   )
                                                 ],
                                               ),
-                                              SizedBox(height: 12),
+
+                                              SizedBox(height: 20),
                                               Divider(
                                                   height: 1,
-                                                  color: Color(0xFFEEEEEE)),
-                                              SizedBox(height: 12),
+                                                  color: Color(0xFFEEEEEE),
+                                                  thickness: 1),
+                                              SizedBox(height: 20),
+
                                               // Total Row - Highlighted
                                               Container(
                                                 padding: EdgeInsets.symmetric(
-                                                    horizontal: 12,
-                                                    vertical: 10),
+                                                    horizontal: 16,
+                                                    vertical: 14),
                                                 decoration: BoxDecoration(
-                                                  gradient: LinearGradient(
-                                                    colors: [
-                                                      Color(0xFFFFF8E1),
-                                                      Color(0xFFFFECB3)
-                                                    ],
-                                                  ),
+                                                  color: Color(0xFFFFF8E1),
                                                   borderRadius:
-                                                      BorderRadius.circular(10),
+                                                      BorderRadius.circular(16),
+                                                  border: Border.all(
+                                                      color: Color(0xFFEED056)
+                                                          .withOpacity(0.3)),
                                                 ),
                                                 child: Row(
                                                   children: [
                                                     Expanded(
                                                       child: Text(
-                                                        'Total Amount',
+                                                        'Total Payable',
                                                         style: TextStyle(
                                                           fontFamily:
                                                               'Urbanist',
-                                                          fontSize: 15,
+                                                          fontSize: 16,
                                                           fontWeight:
-                                                              FontWeight.w700,
+                                                              FontWeight.w800,
                                                           color:
                                                               Color(0xFF1A1A1A),
                                                         ),
@@ -4201,7 +4361,7 @@ class _CartPageState extends State<CartPage> {
                                                           TextAlign.right,
                                                       style: TextStyle(
                                                         fontFamily: 'Inter',
-                                                        fontSize: 16,
+                                                        fontSize: 18,
                                                         fontWeight:
                                                             FontWeight.w800,
                                                         color:

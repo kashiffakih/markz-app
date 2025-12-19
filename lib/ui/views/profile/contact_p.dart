@@ -1,410 +1,4 @@
-// import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:provider/provider.dart';
-// import 'package:aadab/core/providers/config_pr.dart';
-// import 'package:aadab/core/providers/product_pr.dart';
-// import 'package:aadab/locator.dart';
-// import 'package:aadab/ui/shared/font_sh.dart';
-// import 'package:url_launcher/url_launcher.dart';
-
-// class ContactPage extends StatefulWidget {
-//   const ContactPage({Key? key}) : super(key: key);
-
-//   @override
-//   State<ContactPage> createState() => _ContactPageState();
-// }
-
-// class _ContactPageState extends State<ContactPage> {
-//   @override
-//   void initState() {
-//     Provider.of<ProductModel>(context, listen: false).getBanners();
-//     super.initState();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final ConfigModel _configModel = locator<ConfigModel>();
-//     // final AddToCartModel _addToCartModel = Provider.of<AddToCartModel>(context);
-//     final ProductModel _productModel =
-//         Provider.of<ProductModel>(context, listen: false);
-//     print(_productModel.banners!['email']);
-//     return Scaffold(
-//       body: SafeArea(
-//         child: SingleChildScrollView(
-//           child: Container(
-//             child: Column(
-//               children: [
-//                 // Title
-//                 Container(
-//                   margin:
-//                       const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-//                   width: double.infinity,
-//                   child: Row(
-//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       IconButton(
-//                         icon: const Icon(
-//                           Icons.arrow_back_ios,
-//                           size: 18,
-//                           color: Color(0xffEED056),
-//                         ),
-//                         onPressed: () {
-//                           Navigator.pop(context);
-//                         },
-//                       ),
-//                       Expanded(
-//                         child: Text(
-//                           'Contact Us',
-//                           textAlign: TextAlign.center,
-//                           style: MyGoogleFontStyle(
-//                             fontFamily: 'Urbanist',
-//                             fontSize: 18,
-//                             fontWeight: FontWeight.bold,
-//                             color: const Color(0xff1e232c),
-//                           ),
-//                         ),
-//                       ),
-//                       const SizedBox(width: 48),
-//                     ],
-//                   ),
-//                 ),
-//                 // Body
-//                 Container(
-//                   margin: EdgeInsets.all(10),
-//                   child: Column(
-//                     children: [
-//                       // Email
-//                       InkWell(
-//                         onTap: () async {
-//                           String email = Uri.encodeComponent(
-//                               _productModel.banners!['email'].toString());
-//                           String subject = Uri.encodeComponent("Hello Aadab");
-//                           String body = Uri.encodeComponent(
-//                               "Hello! I would like to order a delicious cake.");
-//                           print(subject); //output: Hello%20Flutter
-//                           Uri mail =
-//                               Uri.parse("mailto:$email?subject=$subject");
-//                           if (await launchUrl(mail)) {
-//                             //email app opened
-//                           } else {
-//                             //email app is not opened
-//                           }
-//                         },
-//                         child: Container(
-//                           margin: EdgeInsets.only(top: 10, bottom: 10),
-//                           padding: EdgeInsets.all(10),
-//                           decoration: BoxDecoration(
-//                             border: Border.all(color: Color(0xffc7b456)),
-//                             color: Color(0xffffffff),
-//                             borderRadius: BorderRadius.all(
-//                               Radius.circular(5),
-//                             ),
-//                             boxShadow: [
-//                               BoxShadow(
-//                                 color: Color(0x338a959e),
-//                                 offset: Offset(0, 7.6690645218),
-//                                 blurRadius: 19.1726608276,
-//                               ),
-//                             ],
-//                           ),
-//                           child: Row(
-//                             children: [
-//                               Container(
-//                                 margin: EdgeInsets.fromLTRB(0, 0, 18, 0),
-//                                 padding: EdgeInsets.fromLTRB(4, 5, 4, 5),
-//                                 decoration: BoxDecoration(
-//                                   color: Color(0xfffbfbfb),
-//                                   borderRadius: BorderRadius.circular(10),
-//                                   boxShadow: [
-//                                     BoxShadow(
-//                                       color: Color(0x3f000000),
-//                                       offset: Offset(0, 4),
-//                                       blurRadius: 2,
-//                                     ),
-//                                   ],
-//                                 ),
-//                                 child: Center(
-//                                   child: SizedBox(
-//                                     width: 32,
-//                                     height: 30,
-//                                     child: Image.asset(
-//                                       'assets/images/image-25.png',
-//                                     ),
-//                                   ),
-//                                 ),
-//                               ),
-//                               Expanded(
-//                                 child: Column(
-//                                   crossAxisAlignment: CrossAxisAlignment.start,
-//                                   children: [
-//                                     Text(
-//                                       'Email',
-//                                       style: MyGoogleFontStyle(
-//                                         fontFamily: 'Urbanist',
-//                                         fontWeight: FontWeight.w700,
-//                                         color: Color(0xff232323),
-//                                       ),
-//                                     ),
-//                                     SizedBox(
-//                                       height: 5,
-//                                     ),
-//                                     Text(
-//                                       _productModel.banners!['email'] ?? '',
-//                                       style: MyGoogleFontStyle(
-//                                         fontFamily: 'Urbanist',
-//                                         fontSize: 15,
-//                                         fontWeight: FontWeight.w400,
-//                                         color: Color(0xff232323),
-//                                       ),
-//                                     ),
-//                                   ],
-//                                 ),
-//                               ),
-//                             ],
-//                           ),
-//                         ),
-//                       ),
-
-//                       // Whatsapp
-//                       InkWell(
-//                         onTap: () async {
-//                           // final message =
-//                           //     'Hello! I would like to order a delicious cake.';
-//                           final phone =
-//                               _productModel.banners!['phone'].toString();
-//                           var whatsappUrl = "whatsapp://send?phone=${phone}";
-//                           try {
-//                             launch(whatsappUrl);
-//                           } catch (e) {
-//                             //To handle error and display error message
-//                             // Helper.errorSnackBar(
-//                             //     context: context,
-//                             //     message: "Unable to open whatsapp");
-//                           }
-//                         },
-//                         child: Container(
-//                           margin: EdgeInsets.only(top: 10, bottom: 10),
-//                           padding: EdgeInsets.all(10),
-//                           decoration: BoxDecoration(
-//                             border: Border.all(color: Color(0xffc7b456)),
-//                             color: Color(0xffffffff),
-//                             borderRadius: BorderRadius.all(
-//                               Radius.circular(5),
-//                             ),
-//                             boxShadow: [
-//                               BoxShadow(
-//                                 color: Color(0x338a959e),
-//                                 offset: Offset(0, 7.6690645218),
-//                                 blurRadius: 19.1726608276,
-//                               ),
-//                             ],
-//                           ),
-//                           child: Row(
-//                             children: [
-//                               Container(
-//                                 margin: EdgeInsets.fromLTRB(0, 0, 18, 0),
-//                                 padding: EdgeInsets.fromLTRB(4, 5, 4, 5),
-//                                 decoration: BoxDecoration(
-//                                   color: Color(0xfffbfbfb),
-//                                   borderRadius: BorderRadius.circular(10),
-//                                   boxShadow: [
-//                                     BoxShadow(
-//                                       color: Color(0x3f000000),
-//                                       offset: Offset(0, 4),
-//                                       blurRadius: 2,
-//                                     ),
-//                                   ],
-//                                 ),
-//                                 child: Center(
-//                                   child: SizedBox(
-//                                     width: 32,
-//                                     height: 30,
-//                                     child: Image.asset(
-//                                       'assets/images/image-26.png',
-//                                     ),
-//                                   ),
-//                                 ),
-//                               ),
-//                               Expanded(
-//                                 child: Column(
-//                                   crossAxisAlignment: CrossAxisAlignment.start,
-//                                   children: [
-//                                     Text(
-//                                       'Whatsapp',
-//                                       style: MyGoogleFontStyle(
-//                                         fontFamily: 'Urbanist',
-//                                         fontWeight: FontWeight.w700,
-//                                         color: Color(0xff232323),
-//                                       ),
-//                                     ),
-//                                     SizedBox(
-//                                       height: 5,
-//                                     ),
-//                                     Text(
-//                                       _productModel.banners!['phone'] ?? '',
-//                                       style: MyGoogleFontStyle(
-//                                         fontFamily: 'Urbanist',
-//                                         fontSize: 15,
-//                                         fontWeight: FontWeight.w400,
-//                                         color: Color(0xff232323),
-//                                       ),
-//                                     ),
-//                                   ],
-//                                 ),
-//                               ),
-//                             ],
-//                           ),
-//                         ),
-//                       ),
-//                       InkWell(
-//                         onTap: () async {
-//                           String number =
-//                               _productModel.banners!['phone'].toString();
-//                           final Uri phoneUri = Uri(scheme: 'tel', path: number);
-//                           if (await canLaunch(phoneUri.toString())) {
-//                             await launch(phoneUri.toString());
-//                           } else {
-//                             throw 'Could not launch $number';
-//                           }
-//                         },
-//                         child: Container(
-//                           margin: EdgeInsets.only(top: 10, bottom: 10),
-//                           padding: EdgeInsets.all(10),
-//                           decoration: BoxDecoration(
-//                             border: Border.all(color: Color(0xffc7b456)),
-//                             color: Color(0xffffffff),
-//                             borderRadius: BorderRadius.all(
-//                               Radius.circular(5),
-//                             ),
-//                             boxShadow: [
-//                               BoxShadow(
-//                                 color: Color(0x338a959e),
-//                                 offset: Offset(0, 7.6690645218),
-//                                 blurRadius: 19.1726608276,
-//                               ),
-//                             ],
-//                           ),
-//                           child: Row(
-//                             children: [
-//                               Container(
-//                                 margin: EdgeInsets.fromLTRB(0, 0, 18, 0),
-//                                 padding: EdgeInsets.fromLTRB(4, 5, 4, 5),
-//                                 decoration: BoxDecoration(
-//                                   color: Color(0xfffbfbfb),
-//                                   borderRadius: BorderRadius.circular(10),
-//                                   boxShadow: [
-//                                     BoxShadow(
-//                                       color: Color(0x3f000000),
-//                                       offset: Offset(0, 4),
-//                                       blurRadius: 2,
-//                                     ),
-//                                   ],
-//                                 ),
-//                                 child: Center(
-//                                   child: SizedBox(
-//                                     width: 32,
-//                                     height: 30,
-//                                     child: Icon(
-//                                       Icons.phone,
-//                                       size: 25,
-//                                     ),
-//                                   ),
-//                                 ),
-//                               ),
-//                               Expanded(
-//                                 child: Column(
-//                                   crossAxisAlignment: CrossAxisAlignment.start,
-//                                   children: [
-//                                     Text(
-//                                       'Call Us',
-//                                       style: MyGoogleFontStyle(
-//                                         fontFamily: 'Urbanist',
-//                                         fontWeight: FontWeight.w700,
-//                                         color: Color(0xff232323),
-//                                       ),
-//                                     ),
-//                                     SizedBox(
-//                                       height: 5,
-//                                     ),
-//                                     Text(
-//                                       _productModel.banners!['phone'] ?? '',
-//                                       style: MyGoogleFontStyle(
-//                                         fontFamily: 'Urbanist',
-//                                         fontSize: 15,
-//                                         fontWeight: FontWeight.w400,
-//                                         color: Color(0xff232323),
-//                                       ),
-//                                     ),
-//                                   ],
-//                                 ),
-//                               ),
-//                             ],
-//                           ),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 )
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//       // bottomNavigationBar: BottomNavigationBar(
-//       //   elevation: 10,
-//       //   iconSize: 30,
-//       //   type: BottomNavigationBarType.fixed,
-//       //   backgroundColor: Colors.white,
-//       //   selectedItemColor: Colors.black,
-//       //   unselectedItemColor: Colors.black,
-//       //   selectedFontSize: 14,
-//       //   unselectedFontSize: 14,
-//       //   onTap: (value) async {
-//       //     if (value == 0) {
-//       //       Navigator.pushNamed(context, '/homePage');
-//       //     }
-//       //     if (value == 1) {
-//       //       Navigator.pushNamed(context, '/wishlistPage');
-//       //     }
-
-//       //     if (value == 2) {
-//       //       Map<String, dynamic> _CartData = {
-//       //         'kindOfFlower': '',
-//       //         'flavour': '',
-//       //         'writeOnCake': '',
-//       //         'pack': ''
-//       //       };
-//       //       await _addToCartModel.getAddToCart('', '', _CartData);
-//       //       Navigator.pushNamed(context, '/cartPage');
-//       //     }
-//       //     if (value == 3) {
-//       //       Navigator.pushNamed(context, '/profilePage');
-//       //     }
-//       //   },
-//       //   items: const [
-//       //     BottomNavigationBarItem(
-//       //       label: 'Home',
-//       //       icon: Iconoir(Iconoir.home_simple),
-//       //       // icon: Icon(DonIcons.wap_home, size: 23),
-//       //     ),
-//       //     BottomNavigationBarItem(label: 'Saved', icon: Iconoir(Iconoir.heart)),
-//       //     BottomNavigationBarItem(
-//       //       label: 'Cart',
-//       //       icon: Iconoir(Iconoir.shopping_bag),
-//       //     ),
-//       //     BottomNavigationBarItem(
-//       //       label: 'Profile',
-//       //       icon: Icon(
-//       //         DonIcons.user_o,
-//       //         size: 23,
-//       //       ),
-//       //     ),
-//       //   ],
-//       // ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/providers/product_pr.dart';
@@ -447,6 +41,8 @@ class _ContactPageState extends State<ContactPage> {
     final productModel = Provider.of<ProductModel>(context, listen: false);
     return Scaffold(
       body: Container(
+        width: 1.0.sw,
+        height: 1.0.sh,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -474,17 +70,19 @@ class _ContactPageState extends State<ContactPage> {
                           ],
                         ),
                         child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Color(0xFFEED056)),
                           strokeWidth: 3,
                         ),
                       ),
                       SizedBox(height: 20),
-                      Text('Loading...', style: MyGoogleFontStyle(
-                        fontFamily: 'Urbanist',
-                        fontSize: 16.0.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xff232323),
-                      )),
+                      Text('Loading...',
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 16.0.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff232323),
+                          )),
                     ],
                   ),
                 )
@@ -672,40 +270,46 @@ class _ContactPageState extends State<ContactPage> {
     return InkWell(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 10.0.w),
-        padding: EdgeInsets.all(10.0.w),
+        margin: EdgeInsets.symmetric(vertical: 8.0.w),
+        padding: EdgeInsets.all(16.0.w),
         decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xffc7b456)),
           color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(5.0.w)),
+          borderRadius: BorderRadius.all(Radius.circular(16.0.r)),
+          border: Border.all(
+            color: const Color(0xffEED056).withOpacity(0.3),
+            width: 1.5,
+          ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0x338a959e),
-              offset: Offset(0, 7.6690645218.w),
-              blurRadius: 19.1726608276.w,
+              color: const Color(0xFFEED056).withOpacity(0.12),
+              offset: Offset(0, 6),
+              blurRadius: 20,
+              spreadRadius: 2,
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              offset: Offset(0, 2),
+              blurRadius: 10,
             ),
           ],
         ),
         child: Row(
           children: [
             Container(
-              margin: EdgeInsets.only(right: 18.0.w),
-              padding: EdgeInsets.all(5.0.w),
+              margin: EdgeInsets.only(right: 16.0.w),
+              padding: EdgeInsets.all(12.0.w),
               decoration: BoxDecoration(
-                color: const Color(0xfffbfbfb),
-                borderRadius: BorderRadius.circular(10.0.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0x3f000000),
-                    offset: Offset(0, 4.0.w),
-                    blurRadius: 2.0.w,
-                  ),
-                ],
+                color: const Color(0xFFEED056).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12.0.r),
+                border: Border.all(
+                  color: const Color(0xFFEED056).withOpacity(0.3),
+                  width: 1,
+                ),
               ),
               child: Icon(
                 icon,
-                size: 25.0.w,
-                color: const Color(0xff232323),
+                size: 24.0.w,
+                color: const Color(0xffEED056),
               ),
             ),
             Expanded(
@@ -721,18 +325,23 @@ class _ContactPageState extends State<ContactPage> {
                       color: const Color(0xff232323),
                     ),
                   ),
-                  SizedBox(height: 5.0.w),
+                  SizedBox(height: 4.0.w),
                   Text(
                     subtitle,
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 15.0.sp,
-                      fontWeight: FontWeight.w400,
-                      color: const Color(0xff232323),
+                      fontSize: 14.0.sp,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xff909090),
                     ),
                   ),
                 ],
               ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 16.sp,
+              color: const Color(0xffEED056),
             ),
           ],
         ),
