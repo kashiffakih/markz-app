@@ -56,6 +56,7 @@ class User {
   List<Company>? companies;
   String? referralCode;
   int? referedById;
+  int? isRegisterBonusSeen;
 
   User(
       {this.id,
@@ -111,6 +112,7 @@ class User {
       this.imagepath,
       this.location,
       this.roles,
+      this.isRegisterBonusSeen,
       this.companies});
 
   User.fromJson(Map<String, dynamic> json) {
@@ -164,6 +166,7 @@ class User {
     referredCodeUser = json['referred_code_user'];
     referralCode = json['referral_code'];
     referedById = json['refered_by_id'];
+    isRegisterBonusSeen = json['is_register_bonus_seen'];
     imagepath = json['imagepath'];
     location = json['location'] != null
         ? new Location.fromJson(json['location'])
@@ -234,6 +237,7 @@ class User {
     data['referred_code_user'] = this.referredCodeUser;
     data['referral_code'] = this.referralCode;
     data['refered_by_id'] = this.referedById;
+    data['is_register_bonus_seen'] = this.isRegisterBonusSeen;
     data['imagepath'] = this.imagepath;
     if (this.location != null) {
       data['location'] = this.location!.toJson();

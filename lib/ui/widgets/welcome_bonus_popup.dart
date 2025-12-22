@@ -366,10 +366,10 @@ class ConfettiPainter extends CustomPainter {
         ..color = particle.color.withOpacity(1 - progress * 0.5)
         ..style = PaintingStyle.fill;
 
-      final x = particle.x * size.width +
-          sin(particle.angle + progress * 10) * 30;
-      final y = particle.y * size.height +
-          progress * size.height * particle.speed;
+      final x =
+          particle.x * size.width + sin(particle.angle + progress * 10) * 30;
+      final y =
+          particle.y * size.height + progress * size.height * particle.speed;
 
       if (y < size.height) {
         canvas.save();
@@ -412,12 +412,12 @@ class ConfettiPainter extends CustomPainter {
 }
 
 /// Helper function to show the welcome bonus popup
-void showWelcomeBonusPopup({
+Future<void> showWelcomeBonusPopup({
   required BuildContext context,
   required String userName,
   int bonusPoints = 100,
 }) {
-  showGeneralDialog(
+  return showGeneralDialog(
     context: context,
     barrierDismissible: true,
     barrierLabel: 'Welcome Bonus Popup',

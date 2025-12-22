@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'package:aadab/core/providers/config_pr.dart';
 import 'package:aadab/locator.dart';
 import 'package:flutter/material.dart';
@@ -34,85 +33,126 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
   }
 
   bool _loading = false;
+
   @override
   Widget build(BuildContext context) {
     AuthModel _userModel = Provider.of<AuthModel>(context, listen: false);
     final ConfigModel _configModel = locator<ConfigModel>();
 
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-            child: Column(
-              children: [
-                // Title
-                Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                  width: double.infinity,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.arrow_back_ios,
-                          size: 18,
-                          color: Color(0xffEED056),
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      Expanded(
-                        child: Text(
-                          'Update details',
-                          textAlign: TextAlign.center,
-                          style: MyGoogleFontStyle(
-                            fontFamily: 'Urbanist',
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xff1e232c),
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFFFFEF9), Color(0xFFFFFDF7), Colors.white],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.only(left: 24.w, right: 24.w, bottom: 80.h),
+              child: Column(
+                children: [
+                  // Title Header
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 24.h),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        InkWell(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: EdgeInsets.all(10.w),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color:
+                                      const Color(0xFFEED056).withOpacity(0.15),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              size: 18.sp,
+                              color: const Color(0xFFEED056),
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 48),
-                    ],
+                        Text(
+                          'Update Profile',
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 20.sp,
+                            fontWeight: FontWeight.w700,
+                            height: 1.2,
+                            color: const Color(0xFF1E232C),
+                          ),
+                        ),
+                        SizedBox(width: 40.w), // Spacer for centering
+                      ],
+                    ),
                   ),
-                ),
-                // Body
-                Container(
-                  padding: EdgeInsets.all(15),
-                  child: Form(
+
+                  // Form Body
+                  Form(
                     key: _formKey,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Full Name
+                        _buildLabel('Full Name'),
+                        SizedBox(height: 8.h),
                         Container(
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Color(0xffe3e3e3)),
-                            color: Color(0xfffbfbfb),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    const Color(0xFFEED056).withOpacity(0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                            border:
+                                Border.all(color: Colors.grey.withOpacity(0.1)),
                           ),
                           child: TextFormField(
                             initialValue: _user.firstName,
                             decoration: InputDecoration(
+                              hintText: 'Enter your full name',
+                              hintStyle: TextStyle(
+                                color: Color(0xFF8391A1),
+                                fontSize: 14.sp,
+                                fontFamily: 'Urbanist',
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 16.w,
+                                vertical: 16.h,
+                              ),
                               border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-                              hintText: 'Full name',
-                              hintStyle: TextStyle(color: Color(0x3f000000)),
+                              prefixIcon: Icon(
+                                Icons.person_outline_rounded,
+                                color: Color(0xFFEED056),
+                                size: 20.sp,
+                              ),
                             ),
                             style: MyGoogleFontStyle(
                               fontFamily: 'Urbanist',
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff000000),
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF1E232C),
                             ),
+                            cursorColor: const Color(0xFFEED056),
                             validator: (value) {
                               if (value!.isEmpty) {
-                                return "Full name Cannot be empty.";
+                                return "Full name cannot be empty";
                               }
                               return null;
                             },
@@ -121,15 +161,25 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                             },
                           ),
                         ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        // Address
+
+                        SizedBox(height: 24.h),
+
+                        _buildLabel('Phone Number'),
+                        SizedBox(height: 8.h),
                         Container(
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Color(0xffe3e3e3)),
-                            color: Color(0xfffbfbfb),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    const Color(0xFFEED056).withOpacity(0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                            border:
+                                Border.all(color: Colors.grey.withOpacity(0.1)),
                           ),
                           child: TextFormField(
                             initialValue: _user.phone.toString(),
@@ -139,26 +189,36 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                               LengthLimitingTextInputFormatter(10),
                             ],
                             decoration: InputDecoration(
+                              hintText: 'Enter your phone number',
+                              hintStyle: TextStyle(
+                                color: Color(0xFF8391A1),
+                                fontSize: 14.sp,
+                                fontFamily: 'Urbanist',
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 16.w,
+                                vertical: 16.h,
+                              ),
                               border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.fromLTRB(9, 6, 1, 5),
-                              hintText: 'Phone',
-                              hintStyle: TextStyle(color: Color(0x3f000000)),
+                              prefixIcon: Icon(
+                                Icons.phone_android_rounded,
+                                color: Color(0xFFEED056),
+                                size: 20.sp,
+                              ),
                             ),
                             style: MyGoogleFontStyle(
                               fontFamily: 'Urbanist',
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff000000),
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF1E232C),
                             ),
+                            cursorColor: const Color(0xFFEED056),
                             validator: (value) {
                               if (value!.isEmpty) {
-                                return "Phone Cannot be empty.";
+                                return "Phone cannot be empty";
                               }
                               if (value.length != 10) {
-                                return "Phone number must be exactly 10 digits.";
+                                return "Phone number must be 10 digits";
                               }
                               return null;
                             },
@@ -167,45 +227,13 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                             },
                           ),
                         ),
-                        // SizedBox(
-                        //   height: 20,
-                        // ),
-                        // Center(
-                        //   child: Column(
-                        //     mainAxisAlignment: MainAxisAlignment.center,
-                        //     children: [
-                        //       ElevatedButton(
-                        //         style: ButtonStyle(
-                        //             backgroundColor: MaterialStateProperty.all(
-                        //                 Colors.green)),
-                        //         child: const Text(
-                        //             'Select Image from Gallery and Camera'),
-                        //         onPressed: () {
-                        //           _showPicker(context: context);
-                        //         },
-                        //       ),
-                        //       const SizedBox(
-                        //         height: 20,
-                        //       ),
-                        //       SizedBox(
-                        //         height: 200.0,
-                        //         width: 300.0,
-                        //         child: galleryFile == null
-                        //             ? const Center(
-                        //                 child: Text('Sorry nothing selected!!'))
-                        //             : Center(child: Image.file(galleryFile!)),
-                        //       )
-                        //     ],
-                        //   ),
-                        // ),
+
+                        SizedBox(height: 48.h),
+
+                        // Update Button
                         SizedBox(
-                          height: 20,
-                        ),
-                        // Save address
-                        Container(
-                          // primaryXwC (318:2628)
-                          margin: EdgeInsets.fromLTRB(5, 0, 6.34, 0),
-                          child: TextButton(
+                          width: double.infinity,
+                          child: ElevatedButton(
                             onPressed: () async {
                               if (_formKey.currentState!.validate()) {
                                 _formKey.currentState!.save();
@@ -213,27 +241,46 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                                 setState(() {
                                   _loading = true;
                                 });
-                                // print(galleryFile.toString());
-                                // _user.imagepath =
-                                //     galleryFile.toString() != 'null'
-                                //         ? galleryFile.toString().split('/').last
-                                //         : '';
+
                                 _user.referedById =
                                     _configModel.user!.referedById ?? 0;
                                 Map<String, dynamic> response = await _userModel
                                     .updateUser(updateUserData: _user.toJson());
+
+                                if (!mounted) return;
+
                                 if (response['success'] == true) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                        content: Text(response['message'] ??
-                                            'Profile updated successfully')),
+                                      content: Text(
+                                        response['message'] ??
+                                            'Profile updated successfully',
+                                        style:
+                                            TextStyle(fontFamily: 'Urbanist'),
+                                      ),
+                                      backgroundColor: Colors.green,
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                    ),
                                   );
                                   Navigator.pushNamed(context, '/settingsPage');
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                        content: Text(response['message'] ??
-                                            'Failed to update profile')),
+                                      content: Text(
+                                        response['message'] ??
+                                            'Failed to update profile',
+                                        style:
+                                            TextStyle(fontFamily: 'Urbanist'),
+                                      ),
+                                      backgroundColor: Colors.red,
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                    ),
                                   );
                                 }
                                 setState(() {
@@ -241,48 +288,57 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                                 });
                               }
                             },
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                            ),
-                            child: Container(
-                              width: double.infinity,
-                              height: 53,
-                              decoration: BoxDecoration(
-                                color: Color(0xff1e1e1e),
-                                borderRadius: BorderRadius.circular(10),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFEED056),
+                              padding: EdgeInsets.symmetric(vertical: 16.h),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.r),
                               ),
-                              child: Center(
-                                child: _loading
-                                    ? SizedBox(
-                                        child: CircularProgressIndicator(
-                                          backgroundColor: Colors.white,
-                                        ),
-                                        height: 20,
-                                        width: 20,
-                                      )
-                                    : Text(
-                                        'Update Personal information',
-                                        textAlign: TextAlign.center,
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontSize: 15.1428556442,
-                                          fontWeight: FontWeight.w700,
-                                          height: 1.4999999685,
-                                          color: Color(0xffffffff),
-                                        ),
-                                      ),
-                              ),
+                              elevation: 0,
+                              shadowColor:
+                                  const Color(0xFFEED056).withOpacity(0.4),
                             ),
+                            child: _loading
+                                ? SizedBox(
+                                    height: 24.h,
+                                    width: 24.h,
+                                    child: const CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.white),
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Text(
+                                    'Update Profile',
+                                    style: MyGoogleFontStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildLabel(String text) {
+    return Text(
+      text,
+      style: MyGoogleFontStyle(
+        fontFamily: 'Urbanist',
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w700,
+        color: const Color(0xFF8391A1),
       ),
     );
   }
@@ -297,7 +353,7 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
         if (xfilePick != null) {
           galleryFile = File(pickedFile!.path);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(// is this context <<<
+          ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Nothing is selected')));
         }
       },

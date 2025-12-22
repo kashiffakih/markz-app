@@ -175,7 +175,7 @@ class ConfigModel with ChangeNotifier {
     // Clear user data from memory
     clearUserData();
   }
-  
+
   void clearUserData() {
     // Clear all user-related data from memory
     _user = null;
@@ -236,7 +236,9 @@ class ConfigModel with ChangeNotifier {
       final currentUser = user;
       apiConfig = _configService.getApiConfig(
         token: currentUser?.apiToken,
-        companyId: (currentUser != null && currentUser.companies != null && currentUser.companies!.isNotEmpty)
+        companyId: (currentUser != null &&
+                currentUser.companies != null &&
+                currentUser.companies!.isNotEmpty)
             ? currentUser.companies![0].id
             : 1,
       );
@@ -318,4 +320,11 @@ class ConfigModel with ChangeNotifier {
   //   selectedImage = newPath; // Store the selected image path
   //   notifyListeners();
   // }
+
+  void updateRegisterBonusSeen(bool seen) {
+    if (_user != null) {
+      _user!.isRegisterBonusSeen = seen ? 1 : 0;
+      notifyListeners();
+    }
+  }
 }

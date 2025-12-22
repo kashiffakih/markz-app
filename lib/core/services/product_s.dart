@@ -99,6 +99,7 @@ class ProductService {
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
+    // print(_responseData['data']['register_bonus']);
     if (_responseData['success']) {
       _banners = _responseData['data'];
     }

@@ -74,12 +74,13 @@ class _HomePageState extends State<HomePage>
 
     if (!mounted) return;
 
-    // Check if user is logged in and check for referral
+    // Check if user is logged in
     if (configModel.user != null) {
-      await configModel.checkAndSetNewUserStatus();
-
-      // Only check for referral logic - welcome popup will show when referral code is submitted
-      await _checkAndShowReferralPrompt(configModel);
+      // Check if register bonus is NOT seen yet
+      if ((configModel.user!.isRegisterBonusSeen ?? 0) == 0) {
+        _showWelcomeBonusDialog(configModel);
+        await _checkAndShowReferralPrompt(configModel);
+      }
     }
   }
 
@@ -101,70 +102,198 @@ class _HomePageState extends State<HomePage>
           builder: (context) {
             final TextEditingController _codeController =
                 TextEditingController(text: pendingCode ?? '');
-            return AlertDialog(
-              title: Text('Have a Referral Code?'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Enter it below to claim your bonus!'),
-                  SizedBox(height: 10),
-                  TextField(
-                    controller: _codeController,
-                    decoration: InputDecoration(
-                      hintText: 'Referral Code',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ],
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.r),
               ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context); // Close dialog
-                  },
-                  child: Text('Skip'),
+              backgroundColor: Colors.white,
+              elevation: 0,
+              child: Padding(
+                padding: EdgeInsets.all(24.w),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Icon
+                    Container(
+                      padding: EdgeInsets.all(12.w),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEED056).withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.card_giftcard_rounded,
+                        color: const Color(0xFFEED056),
+                        size: 32.sp,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+
+                    // Title
+                    Text(
+                      'Have a Referral Code?',
+                      textAlign: TextAlign.center,
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF1E232C),
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+
+                    // Subtitle
+                    Text(
+                      'Enter it below to claim your bonus!',
+                      textAlign: TextAlign.center,
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF8391A1),
+                      ),
+                    ),
+                    SizedBox(height: 24.h),
+
+                    // Input Field
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFEED056).withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+                      ),
+                      child: TextField(
+                        controller: _codeController,
+                        decoration: InputDecoration(
+                          hintText: 'Enter Referral Code',
+                          hintStyle: TextStyle(
+                            color: Color(0xFF8391A1),
+                            fontFamily: 'Urbanist',
+                            fontSize: 14.sp,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 14.h,
+                          ),
+                          prefixIcon: Icon(
+                            Icons.confirmation_number_outlined,
+                            color: Color(0xFFEED056),
+                            size: 20.sp,
+                          ),
+                        ),
+                        style: MyGoogleFontStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF1E232C),
+                        ),
+                        cursorColor: const Color(0xFFEED056),
+                      ),
+                    ),
+
+                    SizedBox(height: 24.h),
+
+                    // Buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.pop(context); // Close dialog
+                            },
+                            child: Text(
+                              'Skip',
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF8391A1),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              if (_codeController.text.trim().isEmpty) return;
+                              Navigator.pop(context); // Close dialog first
+
+                              // Show loading
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) => const Center(
+                                    child: CircularProgressIndicator(
+                                        color: Color(0xFFEED056))),
+                              );
+
+                              final authModel = Provider.of<AuthModel>(context,
+                                  listen: false);
+                              final result =
+                                  await authModel.authService.mapReferrer(
+                                referralCode: _codeController.text.trim(),
+                                userId: configModel.user!.id!,
+                              );
+
+                              Navigator.pop(context); // Close loading
+
+                              if (result['success']) {
+                                // Refresh valid user data to reflect changes
+                                // await configModel.getUserData(); // Optional if needed immediately
+
+                                // Show Success Popup (Hurray!)
+                                if (mounted) {
+                                  _showWelcomeBonusDialog(configModel);
+                                }
+                              } else {
+                                // Show Error
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      result['message'] ?? 'Invalid Code',
+                                      style: TextStyle(fontFamily: 'Urbanist'),
+                                    ),
+                                    backgroundColor: Colors.red,
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                  ),
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFEED056),
+                              padding: EdgeInsets.symmetric(vertical: 12.h),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: Text(
+                              'Submit',
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (_codeController.text.trim().isEmpty) return;
-                    Navigator.pop(context); // Close dialog first
-
-                    // Show loading
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (context) =>
-                          Center(child: CircularProgressIndicator()),
-                    );
-
-                    final authModel =
-                        Provider.of<AuthModel>(context, listen: false);
-                    final result = await authModel.authService.mapReferrer(
-                      referralCode: _codeController.text.trim(),
-                      userId: configModel.user!.id!,
-                    );
-
-                    Navigator.pop(context); // Close loading
-
-                    if (result['success']) {
-                      // Refresh valid user data to reflect changes
-                      // await configModel.getUserData(); // Optional if needed immediately
-
-                      // Show Success Popup (Hurray!)
-                      if (mounted) {
-                        _showWelcomeBonusDialog(configModel);
-                      }
-                    } else {
-                      // Show Error
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content: Text(result['message'] ?? 'Invalid Code')),
-                      );
-                    }
-                  },
-                  child: Text('Submit'),
-                ),
-              ],
+              ),
             );
           },
         );
@@ -172,27 +301,35 @@ class _HomePageState extends State<HomePage>
     }
   }
 
-  void _showWelcomeBonusDialog(ConfigModel configModel) {
+  Future<void> _showWelcomeBonusDialog(ConfigModel configModel) async {
     final userName = configModel.user?.firstName ?? 'User';
     final productModel = context.read<ProductModel>();
+    if (productModel.banners == null) {
+      await productModel.getBanners();
+    }
 
     // Get register bonus from settings, default to 100 if not available
-    int bonusPoints = 100;
+    int bonusPoints = 0;
     if (productModel.banners != null &&
         productModel.banners!['register_bonus'] != null) {
       bonusPoints =
-          int.tryParse(productModel.banners!['register_bonus'].toString()) ??
-              100;
+          int.tryParse(productModel.banners!['register_bonus'].toString()) ?? 0;
     }
 
-    showWelcomeBonusPopup(
+    await showWelcomeBonusPopup(
       context: context,
       userName: userName,
       bonusPoints: bonusPoints,
     );
 
-    // Mark welcome bonus as shown after displaying
-    configModel.setWelcomeBonusShown(true);
+    // Mark welcome bonus as shown in API
+    if (mounted) {
+      final authModel = Provider.of<AuthModel>(context, listen: false);
+      authModel.authService.markRegisterBonusSeen();
+
+      // Mark welcome bonus as shown locally (legacy or for session)
+      configModel.setWelcomeBonusShown(true);
+    }
   }
 
   Future<void> _initializeData() async {

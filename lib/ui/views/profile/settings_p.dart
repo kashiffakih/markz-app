@@ -22,12 +22,13 @@ class _SettingsPageState extends State<SettingsPage> {
     return WillPopScope(
       onWillPop: () async {
         Navigator.pushNamed(context, '/profilePage');
-
         return false;
       },
       child: Scaffold(
         body: Container(
-          decoration: BoxDecoration(
+          height: MediaQuery.of(context).size.height,
+          width: double.infinity,
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -36,557 +37,454 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           child: SafeArea(
             child: SingleChildScrollView(
-              child: Container(
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 80.h),
                 child: Column(
                   children: [
-                    // Title
+                    // Title Header
                     Container(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 30, vertical: 10),
-                      width: double.infinity,
+                      margin: EdgeInsets.symmetric(
+                          horizontal: 24.w, vertical: 16.h),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           InkWell(
-                            onTap: () {
-                              Navigator.pushNamed(context, '/profilePage');
-                            },
+                            onTap: () =>
+                                Navigator.pushNamed(context, '/profilePage'),
                             child: Container(
-                              padding: EdgeInsets.all(8.0.w),
+                              padding: EdgeInsets.all(10.w),
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Color(0xFFEED056).withOpacity(0.15),
-                                    blurRadius: 8,
-                                    offset: Offset(0, 2),
+                                    color: const Color(0xFFEED056)
+                                        .withOpacity(0.15),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
                                   ),
                                 ],
                               ),
                               child: Icon(
-                                Icons.arrow_back_ios_new,
-                                size: 16.0.sp,
-                                color: const Color(0xffEED056),
+                                Icons.arrow_back_ios_new_rounded,
+                                size: 18.sp,
+                                color: const Color(0xFFEED056),
                               ),
                             ),
                           ),
-                          Expanded(
-                            child: Text(
-                              'Settings',
-                              textAlign: TextAlign.center,
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Urbanist',
-                                fontSize: 20.0.sp,
-                                fontWeight: FontWeight.w700,
-                                color: const Color(0xff1e232c),
+                          Text(
+                            'Settings',
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.w700,
+                              height: 1.2,
+                              color: const Color(0xFF1E232C),
+                            ),
+                          ),
+                          // Edit Button
+                          InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => SettingUpdatePage(
+                                          arguments: {
+                                            'user': _configModel.user!
+                                          })));
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(10.w),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEED056).withOpacity(0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.edit_rounded,
+                                size: 20.sp,
+                                color: const Color(0xFFEED056),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 48),
                         ],
                       ),
                     ),
-                  // Body
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 25.0.w),
-                    child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+
+                    // Main Content
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Section Header
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 12.h, left: 4.w),
+                            child: Text(
+                              'Personal Information',
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF1E232C),
+                              ),
+                            ),
+                          ),
+
+                          // Profile Info Card
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(20.w),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(24.r),
+                              boxShadow: [
+                                BoxShadow(
+                                  color:
+                                      const Color(0xFFEED056).withOpacity(0.08),
+                                  blurRadius: 24,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ],
+                              border: Border.all(
+                                color: const Color(0xFFEED056).withOpacity(0.1),
+                                width: 1,
+                              ),
+                            ),
+                            child: Column(
                               children: [
-                                // Personal information
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        'Personal information',
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xff909090),
-                                        ),
-                                      ),
-                                    ),
-                                    InkWell(
-                                      onTap: () {
-                                        Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SettingUpdatePage(
-                                                        arguments: {
-                                                          'user':
-                                                              _configModel.user!
-                                                        })));
-                                      },
-                                      child: Image.asset(
-                                        'assets/images/edit-2-mP4.png',
-                                        width: 15.34,
-                                        height: 19.15,
-                                      ),
-                                    )
-                                  ],
+                                _buildProfileRow(
+                                  icon: Icons.person_outline_rounded,
+                                  label: 'Full Name',
+                                  value:
+                                      _configModel.user!.firstName.toString(),
                                 ),
-                                Container(
-                                  width: double.infinity,
-                                  margin: EdgeInsets.only(top: 10, bottom: 10),
-                                  padding: EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Color(0xffc7b456)),
-                                    color: Color(0xffffffff),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(5),
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Color(0x338a959e),
-                                        offset: Offset(0, 7.6690645218),
-                                        blurRadius: 19.1726608276,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Name',
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xff232323),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 3,
-                                      ),
-                                      Text(
-                                        _configModel.user!.firstName.toString(),
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xff909090),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                Divider(height: 32.h, color: Colors.grey[100]),
+                                _buildProfileRow(
+                                  icon: Icons.email_outlined,
+                                  label: 'Email Address',
+                                  value: _configModel.user!.email.toString(),
                                 ),
-                                Container(
-                                  width: double.infinity,
-                                  margin: EdgeInsets.only(top: 10, bottom: 10),
-                                  padding: EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Color(0xffc7b456)),
-                                    color: Color(0xffffffff),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(5),
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Color(0x338a959e),
-                                        offset: Offset(0, 7.6690645218),
-                                        blurRadius: 19.1726608276,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Email',
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xff232323),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 3,
-                                      ),
-                                      Text(
-                                        _configModel.user!.email.toString(),
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xff909090),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                Divider(height: 32.h, color: Colors.grey[100]),
+                                _buildProfileRow(
+                                  icon: Icons.phone_iphone_rounded,
+                                  label: 'Phone Number',
+                                  value: _configModel.user!.phone.toString(),
                                 ),
-                                Container(
-                                  width: double.infinity,
-                                  margin: EdgeInsets.only(top: 10, bottom: 10),
-                                  padding: EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Color(0xffc7b456)),
-                                    color: Color(0xffffffff),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(5),
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Color(0x338a959e),
-                                        offset: Offset(0, 7.6690645218),
-                                        blurRadius: 19.1726608276,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Phone',
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xff232323),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 3,
-                                      ),
-                                      Text(
-                                        _configModel.user!.phone.toString(),
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xff909090),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                Divider(height: 32.h, color: Colors.grey[100]),
+                                _buildProfileRow(
+                                  icon: Icons.confirmation_number_outlined,
+                                  label: 'Referral Code',
+                                  value: _configModel.user!.referralCode
+                                          ?.toString() ??
+                                      'N/A',
+                                  isLast: true,
                                 ),
-                                Container(
-                                  width: double.infinity,
-                                  margin: EdgeInsets.only(top: 10, bottom: 10),
-                                  padding: EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Color(0xffc7b456)),
-                                    color: Color(0xffffffff),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(5),
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Color(0x338a959e),
-                                        offset: Offset(0, 7.6690645218),
-                                        blurRadius: 19.1726608276,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Referral Code',
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xff232323),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 3,
-                                      ),
-                                      Text(
-                                        _configModel.user!.referralCode != null
-                                            ? _configModel.user!.referralCode
-                                                .toString()
-                                            : '',
-                                        style: MyGoogleFontStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xff909090),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                if (_configModel.user?.referedById == null ||
-                                    _configModel.user?.referedById! == '' ||
-                                    _configModel.user?.referedById == 'null')
-                                  Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment
-                                          .stretch, // Ensures full width
-                                      children: <Widget>[
-                                        Center(
-                                          child: Text(
-                                            'Redeem Referral Code',
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        ElevatedButton(
-                                          style: ButtonStyle(
-                                              backgroundColor:
-                                                  WidgetStateProperty.all<
-                                                          Color>(
-                                                      Color.fromARGB(
-                                                          255, 67, 67, 243))),
-                                          onPressed: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                TextEditingController
-                                                    referralCodeController =
-                                                    TextEditingController();
-
-                                                return AlertDialog(
-                                                  title: const Text(
-                                                    'Redeem Referral Code',
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                  content: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      TextField(
-                                                        controller:
-                                                            referralCodeController,
-                                                        decoration:
-                                                            InputDecoration(
-                                                          labelText:
-                                                              'Enter Referral Code',
-                                                          border:
-                                                              OutlineInputBorder(),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        Navigator.pop(
-                                                            context); // Close the dialog
-                                                      },
-                                                      child:
-                                                          const Text('Cancel'),
-                                                    ),
-                                                    ElevatedButton(
-                                                      onPressed: () async {
-                                                        String referralCode =
-                                                            referralCodeController
-                                                                .text;
-                                                        if (referralCode
-                                                            .isNotEmpty) {
-                                                          // Show loading indicator
-                                                          showDialog(
-                                                            context: context,
-                                                            barrierDismissible:
-                                                                false,
-                                                            builder:
-                                                                (BuildContext
-                                                                    context) {
-                                                              return const Center(
-                                                                child:
-                                                                    CircularProgressIndicator(),
-                                                              );
-                                                            },
-                                                          );
-
-                                                          try {
-                                                            Map<String, dynamic>
-                                                                response =
-                                                                await Provider.of<
-                                                                            UserWalletModel>(
-                                                                        context,
-                                                                        listen:
-                                                                            false)
-                                                                    .mapRedeemReferralCode(
-                                                                        referralCode);
-
-                                                            // Close loading indicator
-                                                            Navigator.pop(
-                                                                context);
-                                                            // Close the referral dialog
-                                                            Navigator.pop(
-                                                                context);
-
-                                                            // Show appropriate message based on response
-                                                            _showReferralResponseDialog(
-                                                                context,
-                                                                response);
-                                                          } catch (e) {
-                                                            // Close loading indicator
-                                                            Navigator.pop(
-                                                                context);
-                                                            // Show error message
-                                                            ScaffoldMessenger
-                                                                    .of(context)
-                                                                .showSnackBar(
-                                                              const SnackBar(
-                                                                content: Text(
-                                                                    'An error occurred. Please try again.'),
-                                                                backgroundColor:
-                                                                    Colors.red,
-                                                              ),
-                                                            );
-                                                          }
-                                                        } else {
-                                                          ScaffoldMessenger.of(
-                                                                  context)
-                                                              .showSnackBar(
-                                                            const SnackBar(
-                                                                content: Text(
-                                                                    'Please enter a valid referral code')),
-                                                          );
-                                                        }
-                                                      },
-                                                      child:
-                                                          const Text('Redeem'),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            );
-                                          },
-                                          child: const Text(
-                                            'Redeem',
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-
-                                // Notifications
-                                // Row(
-                                //   children: [
-                                //     Expanded(
-                                //       child: Text(
-                                //         'Notifications',
-                                //         style: MyGoogleFontStyle(
-                                //           fontFamily: 'Urbanist',
-                                //           fontWeight: FontWeight.w700,
-                                //           color: Color(0xff909090),
-                                //         ),
-                                //       ),
-                                //     ),
-                                //   ],
-                                // ),
-                                // Container(
-                                //   width: 1.0.sw - 50,
-                                //   margin: EdgeInsets.only(top: 10, bottom: 10),
-                                //   padding: EdgeInsets.all(10),
-                                //   decoration: BoxDecoration(
-                                //     border: Border.all(color: Color(0xffc7b456)),
-                                //     color: Color(0xffffffff),
-                                //     borderRadius: BorderRadius.all(
-                                //       Radius.circular(5),
-                                //     ),
-                                //     boxShadow: [
-                                //       BoxShadow(
-                                //         color: Color(0x338a959e),
-                                //         offset: Offset(0, 7.6690645218),
-                                //         blurRadius: 19.1726608276,
-                                //       ),
-                                //     ],
-                                //   ),
-                                //   child: Row(
-                                //     crossAxisAlignment: CrossAxisAlignment.start,
-                                //     children: [
-                                //       Text(
-                                //         'New arrivals',
-                                //         style: MyGoogleFontStyle(
-                                //           fontFamily: 'Urbanist',
-                                //           fontWeight: FontWeight.w700,
-                                //           color: Color(0xff232323),
-                                //         ),
-                                //       ),
-                                //       Expanded(
-                                //         child: Container(
-                                //           child: Text(
-                                //             'Icon',
-                                //             textAlign: TextAlign.end,
-                                //             style: MyGoogleFontStyle(
-                                //               fontFamily: 'Urbanist',
-                                //               fontWeight: FontWeight.w700,
-                                //               color: Color(0xff232323),
-                                //             ),
-                                //           ),
-                                //         ),
-                                //       ),
-                                //     ],
-                                //   ),
-                                // ),
                               ],
                             ),
-                  )
+                          ),
+
+                          SizedBox(height: 24.h),
+
+                          // Redeem Referral Section
+                          if (_configModel.user?.referedById == null ||
+                              _configModel.user?.referedById.toString() ==
+                                  'null' ||
+                              _configModel.user?.referedById == '')
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(20.w),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    const Color(0xFFEED056).withOpacity(0.1),
+                                    const Color(0xFFFFC107).withOpacity(0.05),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(24.r),
+                                border: Border.all(
+                                  color:
+                                      const Color(0xFFEED056).withOpacity(0.3),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.all(8.w),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFEED056),
+                                          borderRadius:
+                                              BorderRadius.circular(12.r),
+                                        ),
+                                        child: Icon(
+                                          Icons.card_giftcard_rounded,
+                                          color: Colors.white,
+                                          size: 20.sp,
+                                        ),
+                                      ),
+                                      SizedBox(width: 12.w),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Have a Referral Code?',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontSize: 16.sp,
+                                              fontWeight: FontWeight.w700,
+                                              color: const Color(0xFF1E232C),
+                                            ),
+                                          ),
+                                          Text(
+                                            'Redeem it to get existing rewards',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.w500,
+                                              color: const Color(0xFF8391A1),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 16.h),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                      onPressed: () =>
+                                          _showRedeemDialog(context),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xFFEED056),
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 14.h),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12.r),
+                                        ),
+                                        elevation: 0,
+                                      ),
+                                      child: Text(
+                                        'Redeem Now',
+                                        style: MyGoogleFontStyle(
+                                          fontFamily: 'Urbanist',
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          SizedBox(height: 30.h),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
           ),
         ),
-        // bottomNavigationBar: BottomNavigationBar(
-        //   elevation: 10,
-        //   iconSize: 30,
-        //   type: BottomNavigationBarType.fixed,
-        //   backgroundColor: Colors.white,
-        //   selectedItemColor: Colors.black,
-        //   unselectedItemColor: Colors.black,
-        //   selectedFontSize: 14,
-        //   unselectedFontSize: 14,
-        //   onTap: (value) async {
-        //     if (value == 0) {
-        //       Navigator.pushNamed(context, '/homePage');
-        //     }
-        //     if (value == 1) {
-        //       Navigator.pushNamed(context, '/wishlistPage');
-        //     }
-
-        //     if (value == 2) {
-        //       Map<String, dynamic> _CartData = {
-        //         'kindOfFlower': '',
-        //         'flavour': '',
-        //         'writeOnCake': '',
-        //         'pack': ''
-        //       };
-        //       await _addToCartModel.getAddToCart('', '', _CartData);
-        //       Navigator.pushNamed(context, '/cartPage');
-        //     }
-        //     if (value == 3) {
-        //       Navigator.pushNamed(context, '/profilePage');
-        //     }
-        //   },
-        //   items: const [
-        //     BottomNavigationBarItem(
-        //       label: 'Home',
-        //       icon: Iconoir(Iconoir.home_simple),
-        //       // icon: Icon(DonIcons.wap_home, size: 23),
-        //     ),
-        //     BottomNavigationBarItem(label: 'Saved', icon: Iconoir(Iconoir.heart)),
-        //     BottomNavigationBarItem(
-        //       label: 'Cart',
-        //       icon: Iconoir(Iconoir.shopping_bag),
-        //     ),
-        //     BottomNavigationBarItem(
-        //       label: 'Profile',
-        //       icon: Icon(
-        //         DonIcons.user_o,
-        //         size: 23,
-        //       ),
-        //     ),
-        //   ],
-        // ),
       ),
     );
+  }
+
+  // Helper widget for profile rows
+  Widget _buildProfileRow({
+    required IconData icon,
+    required String label,
+    required String value,
+    bool isLast = false,
+  }) {
+    return Row(
+      children: [
+        Container(
+          padding: EdgeInsets.all(10.w),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF7F8F9),
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: Icon(
+            icon,
+            color: const Color(0xFFEED056),
+            size: 22.sp,
+          ),
+        ),
+        SizedBox(width: 16.w),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: MyGoogleFontStyle(
+                  fontFamily: 'Urbanist',
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFF8391A1),
+                ),
+              ),
+              SizedBox(height: 2.h),
+              Text(
+                value,
+                style: MyGoogleFontStyle(
+                  fontFamily: 'Urbanist',
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF1E232C),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Helper method to show redeem dialog
+  void _showRedeemDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController referralCodeController = TextEditingController();
+
+        return Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+          backgroundColor: Colors.white,
+          child: Padding(
+            padding: EdgeInsets.all(24.w),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Redeem Code',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF1E232C),
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  'Enter your referral code below',
+                  textAlign: TextAlign.center,
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF8391A1),
+                  ),
+                ),
+                SizedBox(height: 24.h),
+                TextField(
+                  controller: referralCodeController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter Code',
+                    hintStyle: TextStyle(color: Color(0xFF8391A1)),
+                    filled: true,
+                    fillColor: Color(0xFFF7F8F9),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                      borderSide: BorderSide(color: Color(0xFFEED056)),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 16.h,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 24.h),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            color: Color(0xFF8391A1),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          String referralCode = referralCodeController.text;
+                          if (referralCode.isNotEmpty) {
+                            Navigator.pop(context); // Close input dialog
+                            _processRedemption(referralCode);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Please enter a valid code')),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFFEED056),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'Redeem',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _processRedemption(String code) async {
+    // Show loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+          child: CircularProgressIndicator(color: Color(0xFFEED056))),
+    );
+
+    try {
+      Map<String, dynamic> response =
+          await Provider.of<UserWalletModel>(context, listen: false)
+              .mapRedeemReferralCode(code);
+
+      Navigator.pop(context); // Close loading
+      _showReferralResponseDialog(context, response);
+    } catch (e) {
+      Navigator.pop(context); // Close loading
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('An error occurred. Please try again.')),
+      );
+    }
   }
 
   // Show referral response dialog with appropriate styling

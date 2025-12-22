@@ -1,31 +1,10 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:googleapis_auth/auth_io.dart' as auth;
-import 'package:flutter/services.dart' show rootBundle;
+
 import 'package:flutter/material.dart';
-
-Future<String> getAccessToken() async {
-  try {
-    // Load the service account credentials from a JSON file
-    final serviceAccountKey = json
-        .decode(await rootBundle.loadString('assets/service_account_key.json'));
-    final credentials =
-        auth.ServiceAccountCredentials.fromJson(serviceAccountKey);
-    const scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
-
-    // Obtain access credentials
-    final auth.AccessCredentials accessCredentials =
-        await auth.obtainAccessCredentialsViaServiceAccount(
-            credentials, scopes, http.Client());
-
-    return accessCredentials.accessToken.data;
-  } catch (e) {
-    //print('Error obtaining access token: $e');
-    rethrow;
-  }
-}
+import 'package:aadab/locator.dart';
+import 'package:aadab/core/services/auth_s.dart';
 
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
   debugPrint('Background message received:');
@@ -37,10 +16,10 @@ Future<void> handleBackgroundMessage(RemoteMessage message) async {
 class FirebaseApi {
   final _firebaseMessaging = FirebaseMessaging.instance;
   final _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  
+
   // Callback for notification taps
   static Function(Map<String, dynamic>)? onNotificationTap;
-  
+
   // Store FCM token
   static String? _fcmToken;
   static String? get fcmToken => _fcmToken;
@@ -59,7 +38,8 @@ class FirebaseApi {
         sound: true,
       );
 
-      debugPrint('Notification permission status: ${settings.authorizationStatus}');
+      debugPrint(
+          'Notification permission status: ${settings.authorizationStatus}');
 
       // Set foreground notification presentation options
       await _firebaseMessaging.setForegroundNotificationPresentationOptions(
@@ -72,12 +52,24 @@ class FirebaseApi {
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
         _fcmToken = await _firebaseMessaging.getToken();
         debugPrint('FCM Token: $_fcmToken');
-        
+
+        // Subscribe to general topics for broadcast notifications
+        await _firebaseMessaging.subscribeToTopic('all_users');
+        await _firebaseMessaging
+            .subscribeToTopic('allUser'); // Backup for legacy
+
         // Listen for token refresh
         _firebaseMessaging.onTokenRefresh.listen((newToken) {
           _fcmToken = newToken;
           debugPrint('FCM Token refreshed: $newToken');
-          // TODO: Update token on server if needed
+
+          // Update token on server
+          try {
+            final authService = locator<AuthService>();
+            authService.updateFcmToken(newToken: newToken);
+          } catch (e) {
+            debugPrint('Error locating AuthService during token refresh: $e');
+          }
         });
       } else {
         debugPrint('User declined notification permissions');
@@ -95,20 +87,22 @@ class FirebaseApi {
         debugPrint('Title: ${message.notification?.title}');
         debugPrint('Body: ${message.notification?.body}');
         debugPrint('Data: ${message.data}');
-        
+
         if (message.notification != null) {
           _showNotification(message);
         }
       });
-      
+
       // Handle notification when app is opened from terminated state
-      FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
+      FirebaseMessaging.instance
+          .getInitialMessage()
+          .then((RemoteMessage? message) {
         if (message != null) {
           debugPrint('App opened from terminated state via notification');
           _handleNotificationTap(message.data);
         }
       });
-      
+
       // Handle notification when app is in background
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
         debugPrint('App opened from background via notification');
@@ -156,15 +150,15 @@ class FirebaseApi {
       },
     );
   }
-  
+
   void _handleNotificationTap(Map<String, dynamic> data) {
     debugPrint('Handling notification tap with data: $data');
-    
+
     // Call the callback if set
     if (onNotificationTap != null) {
       onNotificationTap!(data);
     }
-    
+
     // You can also handle specific navigation here based on data
     // For example:
     // if (data['type'] == 'order') {
@@ -194,7 +188,7 @@ class FirebaseApi {
         htmlFormatContentTitle: true,
       ),
     );
-    
+
     // Add custom sound if available
     if (message.notification?.android?.sound != null) {
       androidDetails = AndroidNotificationDetails(
@@ -239,17 +233,17 @@ class FirebaseApi {
       payload: message.data.isNotEmpty ? jsonEncode(message.data) : null,
     );
   }
-  
+
   // Method to cancel all notifications
   Future<void> cancelAllNotifications() async {
     await _flutterLocalNotificationsPlugin.cancelAll();
   }
-  
+
   // Method to cancel specific notification
   Future<void> cancelNotification(int id) async {
     await _flutterLocalNotificationsPlugin.cancel(id);
   }
-  
+
   // Method to get pending notifications (Android only)
   Future<List<PendingNotificationRequest>> getPendingNotifications() async {
     return await _flutterLocalNotificationsPlugin.pendingNotificationRequests();

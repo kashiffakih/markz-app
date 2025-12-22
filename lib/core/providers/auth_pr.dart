@@ -29,7 +29,7 @@ class AuthModel with ChangeNotifier {
       token = null;
     }
     loginData['fcm_token'] = token;
-    print(token);
+    // print(token);
     return await _authService.getLoggedInUser(
       loginData: loginData,
     );

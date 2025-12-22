@@ -28,7 +28,7 @@ class AuthService {
       if (_response.headers['content-type']?.contains('application/json') ??
           false) {
         Map<String, dynamic> _responseData = json.decode(_response.body);
-        print(_responseData);
+        // print(_responseData);
 
         if (_responseData['success'] == null) {
           return {
@@ -51,10 +51,10 @@ class AuthService {
         }
       } else {
         // Handle non-JSON response
-        print('Error: Server returned non-JSON response');
-        print('Status Code: ${_response.statusCode}');
-        print(
-            'Response: ${_response.body.substring(0, _response.body.length > 200 ? 200 : _response.body.length)}...');
+        // print('Error: Server returned non-JSON response');
+        // print('Status Code: ${_response.statusCode}');
+        // print(
+        //     'Response: ${_response.body.substring(0, _response.body.length > 200 ? 200 : _response.body.length)}...');
 
         // Save empty user data to indicate login failure
         _configModel.saveUserData(responseData: {
@@ -92,8 +92,8 @@ class AuthService {
     );
 
     Map<String, dynamic> _responseData = json.decode(_response.body);
-    print('Registration response: ${_response.body}');
-    print('Status code: ${_response.statusCode}');
+    // print('Registration response: ${_response.body}');
+    // print('Status code: ${_response.statusCode}');
 
     // Handle different HTTP status codes
     if (_response.statusCode == 409) {
@@ -365,5 +365,60 @@ class AuthService {
     //     'message': 'Network error: Failed to update profile',
     //   };
     // }
+  }
+
+  Future<void> markRegisterBonusSeen() async {
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+
+    try {
+      var userId = _configModel.user!.id;
+      final response = await http.post(
+        Uri.parse('${_apiConfig['baseURL']}/users/mark_register_bonus_seen'),
+        body: json.encode({'user_id': userId}),
+        headers: _apiConfig['headers'],
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success']) {
+          // Update local user model
+          _configModel.updateRegisterBonusSeen(true);
+        }
+      }
+    } catch (e) {
+      debugPrint('Error marking bonus as seen: $e');
+    }
+  }
+
+  Future<void> updateFcmToken({required String newToken}) async {
+    // Check if user is logged in
+    if (_configModel.user == null || _configModel.user!.id == null) {
+      debugPrint('Cannot update FCM token: User not logged in');
+      return;
+    }
+
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+
+    try {
+      var userId = _configModel.user!.id;
+      // We can use the existing update user endpoint since it accepts any field
+      http.Response _response = await http.patch(
+        Uri.parse('${_apiConfig['baseURL']}/users/$userId'),
+        body: json.encode({'fcm_token': newToken}),
+        headers: _apiConfig['headers'],
+      );
+
+      debugPrint('FCM Token Update Response: ${_response.body}');
+
+      Map<String, dynamic> _responseData = json.decode(_response.body);
+      if (_responseData['success']) {
+        debugPrint('FCM token updated successfully on server');
+      } else {
+        debugPrint(
+            'Failed to update FCM token on server: ${_responseData['message']}');
+      }
+    } catch (e) {
+      debugPrint('Error updating FCM token: $e');
+    }
   }
 }
