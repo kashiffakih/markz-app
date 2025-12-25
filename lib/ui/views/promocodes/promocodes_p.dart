@@ -324,6 +324,15 @@ class _PromocodesPageState extends State<PromocodesPage> {
                           ),
                           SizedBox(height: 6.h),
                           Text(
+                            'Coupon Value:${coupon.type?.toString() == 'Flat' ? ' ₹${coupon.value?.toString() ?? '0'}' : ' %${coupon.value?.toString() ?? '0'}'}',
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          Text(
                             'Min Order: ₹${coupon.minOrderValue?.toString() ?? '0'}',
                             style: MyGoogleFontStyle(
                               fontFamily: 'Urbanist',
