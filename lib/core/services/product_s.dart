@@ -114,6 +114,7 @@ class ProductService {
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
+    print('Check $_responseData');
     if (_responseData['success']) {
       _tags = [];
       _responseData['data'].forEach((data) {

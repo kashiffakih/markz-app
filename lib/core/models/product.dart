@@ -80,138 +80,145 @@ class Product {
       this.totalReviews});
 
   Product.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    companyId = json['company_id'];
-    userId = json['user_id'];
-    categoryId = json['category_id'];
-    inventoryId = json['inventory_id'];
-    name = json['name'];
-    smallDescription = json['small_description'];
-    description = json['description'];
-    description1 = json['description_1'];
-    description2 = json['description_2'];
-    sizeChartPath = json['size_chart_path'];
-    location = json['location'];
-    isActive = json['is_active'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
-    imagepath1 = json['imagepath1'];
-    imagepath2 = json['imagepath2'];
-    imagepath3 = json['imagepath3'];
-    imagepath4 = json['imagepath4'];
-    subCategoryId = json['sub_category_id'];
-    position = json['position'];
-    sub2CategoryId = json['sub_2_category_id'];
-    sub3CategoryId = json['sub_3_category_id'];
-    vegNonveg = json['veg_nonveg'];
-    inventory = json['inventory'];
-    qty = json['qty'];
-    rating = json['rating']?.toString() ?? '0';
-    totalReviews = json['total_reviews'];
-    // Parse category with error handling
     try {
-      category = json['category'] != null
-          ? new Category.fromJson(json['category'])
-          : null;
-    } catch (e) {
-      print('Error parsing category in product ${json['id']}: $e');
-      category = null;
-    }
+      id = json['id'];
+      companyId = json['company_id'];
+      userId = json['user_id'];
+      categoryId = json['category_id'];
+      inventoryId = json['inventory_id'];
+      name = json['name'];
+      smallDescription = json['small_description'];
+      description = json['description'];
+      description1 = json['description_1'];
+      description2 = json['description_2'];
+      sizeChartPath = json['size_chart_path'];
+      location = json['location'];
+      isActive = json['is_active'];
+      createdAt = json['created_at'];
+      updatedAt = json['updated_at'];
+      imagepath1 = json['imagepath1'];
+      imagepath2 = json['imagepath2'];
+      imagepath3 = json['imagepath3'];
+      imagepath4 = json['imagepath4'];
+      subCategoryId = json['sub_category_id'];
+      position = json['position'];
+      sub2CategoryId = json['sub_2_category_id'];
+      sub3CategoryId = json['sub_3_category_id'];
+      vegNonveg = json['veg_nonveg'];
+      inventory = json['inventory'];
+      qty = json['qty'];
+      rating = json['rating']?.toString() ?? '0';
+      totalReviews = json['total_reviews'];
 
-    // Parse subCategory with error handling
-    try {
-      subCategory = json['sub_category'] != null
-          ? new SubCategory.fromJson(json['sub_category'])
-          : null;
-    } catch (e) {
-      print('Error parsing sub_category in product ${json['id']}: $e');
-      subCategory = null;
-    }
-
-    // Parse sub2Category with error handling
-    try {
-      sub2Category = json['sub_2_category'] != null
-          ? new Sub2Category.fromJson(json['sub_2_category'])
-          : null;
-    } catch (e) {
-      print('Error parsing sub_2_category in product ${json['id']}: $e');
-      sub2Category = null;
-    }
-
-    // Parse sub3Category with error handling
-    try {
-      sub3Category = json['sub_3_category'] != null
-          ? new Sub3Category.fromJson(json['sub_3_category'])
-          : null;
-    } catch (e) {
-      print('Error parsing sub_3_category in product ${json['id']}: $e');
-      sub3Category = null;
-    }
-
-    // Parse product_prices with error handling
-    if (json['product_prices'] != null) {
-      productPrices = <ProductPrices>[];
-      if (json['product_prices'] is List) {
-        (json['product_prices'] as List).forEach((v) {
-          try {
-            productPrices!.add(new ProductPrices.fromJson(v));
-          } catch (e) {
-            print('Error parsing product_price in product ${json['id']}: $e');
-          }
-        });
+      // Parse category with error handling
+      try {
+        category = json['category'] != null
+            ? new Category.fromJson(json['category'])
+            : null;
+      } catch (e) {
+        print('Error parsing category in product ${json['id']}: $e');
+        category = null;
       }
-    }
 
-    // Parse product_packs with error handling
-    if (json['product_packs'] != null) {
-      productPacks = <ProductPack>[];
-      if (json['product_packs'] is List) {
-        (json['product_packs'] as List).forEach((v) {
-          try {
-            productPacks!.add(new ProductPack.fromJson(v));
-          } catch (e) {
-            print('Error parsing product_pack in product ${json['id']}: $e');
-          }
-        });
+      // Parse subCategory with error handling
+      try {
+        subCategory = json['sub_category'] != null
+            ? new SubCategory.fromJson(json['sub_category'])
+            : null;
+      } catch (e) {
+        print('Error parsing sub_category in product ${json['id']}: $e');
+        subCategory = null;
       }
-    }
 
-    // Parse product_images with error handling
-    if (json['product_images'] != null) {
-      productImages = <ProductImages>[];
-      if (json['product_images'] is List) {
-        (json['product_images'] as List).forEach((v) {
-          try {
-            productImages!.add(new ProductImages.fromJson(v));
-          } catch (e) {
-            print('Error parsing product_image in product ${json['id']}: $e');
-          }
-        });
+      // Parse sub2Category with error handling
+      try {
+        sub2Category = json['sub_2_category'] != null
+            ? new Sub2Category.fromJson(json['sub_2_category'])
+            : null;
+      } catch (e) {
+        print('Error parsing sub_2_category in product ${json['id']}: $e');
+        sub2Category = null;
       }
-    }
 
-    // Parse tags with error handling
-    if (json['tags'] != null) {
-      tags = <Tags>[];
-      if (json['tags'] is List) {
-        (json['tags'] as List).forEach((v) {
-          try {
-            tags!.add(new Tags.fromJson(v));
-          } catch (e) {
-            print('Error parsing tag in product ${json['id']}: $e');
-          }
-        });
+      // Parse sub3Category with error handling
+      try {
+        sub3Category = json['sub_3_category'] != null
+            ? new Sub3Category.fromJson(json['sub_3_category'])
+            : null;
+      } catch (e) {
+        print('Error parsing sub_3_category in product ${json['id']}: $e');
+        sub3Category = null;
       }
-    }
 
-    // Parse company with error handling
-    try {
-      company = json['company'] != null
-          ? new Company.fromJson(json['company'])
-          : null;
+      // Parse product_prices with error handling
+      if (json['product_prices'] != null) {
+        productPrices = <ProductPrices>[];
+        if (json['product_prices'] is List) {
+          (json['product_prices'] as List).forEach((v) {
+            try {
+              productPrices!.add(new ProductPrices.fromJson(v));
+            } catch (e) {
+              print('Error parsing product_price in product ${json['id']}: $e');
+            }
+          });
+        }
+      }
+
+      // Parse product_packs with error handling
+      if (json['product_packs'] != null) {
+        productPacks = <ProductPack>[];
+        if (json['product_packs'] is List) {
+          (json['product_packs'] as List).forEach((v) {
+            try {
+              productPacks!.add(new ProductPack.fromJson(v));
+            } catch (e) {
+              print('Error parsing product_pack in product ${json['id']}: $e');
+            }
+          });
+        }
+      }
+
+      // Parse product_images with error handling
+      if (json['product_images'] != null) {
+        productImages = <ProductImages>[];
+        if (json['product_images'] is List) {
+          (json['product_images'] as List).forEach((v) {
+            try {
+              productImages!.add(new ProductImages.fromJson(v));
+            } catch (e) {
+              print('Error parsing product_image in product ${json['id']}: $e');
+            }
+          });
+        }
+      }
+
+      // Parse tags with error handling
+      if (json['tags'] != null) {
+        tags = <Tags>[];
+        if (json['tags'] is List) {
+          (json['tags'] as List).forEach((v) {
+            try {
+              tags!.add(new Tags.fromJson(v));
+            } catch (e) {
+              print('Error parsing tag in product ${json['id']}: $e');
+            }
+          });
+        }
+      }
+
+      // Parse company with error handling
+      try {
+        company = json['company'] != null
+            ? new Company.fromJson(json['company'])
+            : null;
+      } catch (e) {
+        print('Error parsing company in product ${json['id']}: $e');
+        company = null;
+      }
+
+      print('Parsed product ${json['id']} successfully');
     } catch (e) {
-      print('Error parsing company in product ${json['id']}: $e');
-      company = null;
+      print('CRITICAL Error parsing product ${json['id']}: $e');
     }
   }
 
@@ -691,7 +698,6 @@ class Tags {
     return data;
   }
 }
-
 
 class ProductImages {
   int? id;

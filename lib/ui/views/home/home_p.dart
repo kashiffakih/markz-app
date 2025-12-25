@@ -342,7 +342,6 @@ class _HomePageState extends State<HomePage>
       final productModel = context.read<ProductModel>();
 
       await Future.wait<dynamic>([
-        productModel.getProduct(),
         productModel.getCategories(),
         productModel.getBanners(),
         productModel.getTags(),
@@ -498,14 +497,9 @@ class _HomePageState extends State<HomePage>
                             // const SizedBox(height: 16),
                             _buildBannerCarousel(context),
                             // const SizedBox(height: 16),
-                            _buildNewArrivals(context, productModel,
-                                wishListModel, configModel),
+
                             if (productModel.tags != null)
-                              ...productModel.tags!
-                                  .where((tag) =>
-                                      tag.name != 'New Arrival' &&
-                                      tag.name != 'New Arrivals')
-                                  .map((tag) {
+                              ...productModel.tags!.map((tag) {
                                 if (tag.products != null &&
                                     tag.products!.isNotEmpty) {
                                   return Column(
@@ -753,110 +747,6 @@ class _HomePageState extends State<HomePage>
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildNewArrivals(
-    BuildContext context,
-    ProductModel productModel,
-    WishListModel wishListModel,
-    ConfigModel configModel,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(20.0.w, 16.0.w, 20.0.w, 16.0.w),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'New Arrivals',
-                    style: MyGoogleFontStyle(
-                      fontFamily: 'Urbanist',
-                      fontSize: 24.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xff232323),
-                    ),
-                  ),
-                  SizedBox(height: 6.0.w),
-                  Container(
-                    height: 4.0.w,
-                    width: 60.0.w,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Color(0xFFEED056),
-                          Color(0xFFEED056).withOpacity(0.3),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(2.0.r),
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                padding:
-                    EdgeInsets.symmetric(horizontal: 14.0.w, vertical: 8.0.w),
-                decoration: BoxDecoration(
-                  color: Color(0xFFEED056).withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(20.0.r),
-                  border: Border.all(
-                    color: Color(0xFFEED056).withOpacity(0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.fiber_new,
-                        size: 16.sp, color: Color(0xFFEED056)),
-                    SizedBox(width: 4.0.w),
-                    Text(
-                      'Fresh',
-                      style: MyGoogleFontStyle(
-                        fontFamily: 'Urbanist',
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF232323),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: _newArrivalsHeightRatio.sh,
-          child: productModel.productsLoader
-              ? const Center(child: CircularProgressIndicator())
-              : productModel.products?.isEmpty ?? true
-                  ? const Center(child: Text('No new arrivals'))
-                  : ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: EdgeInsets.symmetric(horizontal: 12.0.w),
-                      itemCount: productModel.products!.length,
-                      itemBuilder: (context, index) {
-                        final product = productModel.products![index];
-
-                        // print("product: ${product.productImages!.length}");
-                        final discountPrice =
-                            _calculateDiscountPercentage(product);
-                        return Padding(
-                          padding: EdgeInsets.only(right: 12.0.w),
-                          child: CommonProductCard(
-                            product: product,
-                            discountPrice: discountPrice,
-                          ),
-                        );
-                      },
-                    ),
-        ),
-      ],
     );
   }
 

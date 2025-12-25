@@ -151,6 +151,50 @@ class _ProductIdPageState extends State<ProductIdPage> {
         ? allPacks.where((pack) => pack['unit']?['name'] == unitName).toList()
         : allPacks.toList();
 
+    // Sort sizes
+    _sizes.sort((a, b) {
+      final valA = a['value']?.toString() ?? '';
+      final valB = b['value']?.toString() ?? '';
+
+      // Try numeric sort first
+      final numA = double.tryParse(valA);
+      final numB = double.tryParse(valB);
+
+      if (numA != null && numB != null) {
+        return numA.compareTo(numB);
+      }
+
+      // Standard sizes ranking
+      final sizeOrder = {
+        'XXS': 1,
+        'XS': 2,
+        'S': 3,
+        'M': 4,
+        'L': 5,
+        'XL': 6,
+        'XXL': 7,
+        '2XL': 7,
+        'XXXL': 8,
+        '3XL': 8,
+        '4XL': 9,
+        'Free Size': 100,
+      };
+
+      final rankA = sizeOrder[valA.toUpperCase()];
+      final rankB = sizeOrder[valB.toUpperCase()];
+
+      if (rankA != null && rankB != null) {
+        return rankA.compareTo(rankB);
+      } else if (rankA != null) {
+        return -1; // Known sizes come before unknown
+      } else if (rankB != null) {
+        return 1;
+      }
+
+      // Fallback to string sort
+      return valA.compareTo(valB);
+    });
+
     if (_sizes.isNotEmpty) {
       _cartData['kindOfFlower'] = _sizes[0]['value']?.toString() ?? '';
       _cartData['pack'] = _sizes[0]['id']?.toString() ?? '';
