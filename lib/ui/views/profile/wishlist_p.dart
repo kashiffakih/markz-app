@@ -219,7 +219,7 @@ class _WishlistPageState extends State<WishlistPage> {
             ),
             SizedBox(height: 24),
             InkWell(
-              onTap: () => Navigator.pop(context),
+              onTap: () => Navigator.pushNamed(context, '/homePage'),
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 32, vertical: 14),
                 decoration: BoxDecoration(

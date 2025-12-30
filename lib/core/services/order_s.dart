@@ -168,11 +168,11 @@ class OrderService {
       );
 
       // print('Response status: ${_response.statusCode}');
-      // print('Response body: ${_response.body}');
+      print('Response body: ${_response.body}');
 
       if (_response.statusCode == 200 || _response.statusCode == 201) {
         Map<String, dynamic> _responseData = json.decode(_response.body);
-        // print('Place order: $_responseData');
+        print('Place order: $_responseData');
 
         // Check if success field exists and return it, otherwise check status code
         if (_responseData.containsKey('success')) {

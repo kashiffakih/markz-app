@@ -264,6 +264,28 @@ class _CartPageState extends State<CartPage> {
     });
   }
 
+  // Sync selection state with actual cart items (remove stale selections)
+  void _syncSelectionsWithCart() {
+    final addToCartModel = Provider.of<AddToCartModel>(context, listen: false);
+    if (addToCartModel.addToCarts == null) {
+      _selectedCartItemIds.clear();
+      return;
+    }
+
+    // Get all current cart item IDs
+    final currentCartItemIds = addToCartModel.addToCarts!
+        .where((item) => item.id != null)
+        .map((item) => item.id!)
+        .toSet();
+
+    // Remove any selected IDs that are no longer in the cart
+    _selectedCartItemIds.removeWhere((id) => !currentCartItemIds.contains(id));
+
+    setState(() {
+      _updateSelectAllState();
+    });
+  }
+
   // Get selected cart items
   List<AddToCart> _getSelectedCartItems() {
     final addToCartModel = Provider.of<AddToCartModel>(context, listen: false);
@@ -396,6 +418,11 @@ class _CartPageState extends State<CartPage> {
       Map<String, dynamic> payload, BuildContext context) async {
     debugPrint("PhonePe V2 Transaction initiated");
 
+    // Store provider references before async operation to avoid accessing deactivated widget
+    final OrderModel orderModel =
+        Provider.of<OrderModel>(context, listen: false);
+    final navigator = Navigator.of(context);
+
     setState(() {
       _isLoading = true;
     });
@@ -415,6 +442,9 @@ class _CartPageState extends State<CartPage> {
       amount: amount * 100, // Amount in paisa as per docs
     );
 
+    // Check if widget is still mounted after async operation
+    if (!mounted) return;
+
     debugPrint("Transaction completed with state: ${payment?.state}");
 
     if (payment?.state == 'COMPLETED') {
@@ -427,9 +457,8 @@ class _CartPageState extends State<CartPage> {
       payload['merchant_id'] = payment?.merchantId.toString();
       payload['utr'] = payment?.paymentInstrument?.utr.toString();
 
-      // print(payload);
-      final OrderModel _orderModel =
-          Provider.of<OrderModel>(context, listen: false);
+      // Use the pre-stored orderModel reference
+      final OrderModel _orderModel = orderModel;
 
       // Create payment details string with transaction info
       String paymentDetails =
@@ -455,82 +484,92 @@ class _CartPageState extends State<CartPage> {
         payload['platformFee'],
       );
 
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
       if (orderResponse == true) {
-        Navigator.pushNamed(context, '/successPage');
+        navigator.pushNamed('/successPage');
       }
     } else if (payment?.state == 'PENDING') {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
 
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            title: Text("Payment Pending"),
-            content: Text(
-                "Your payment is being processed. You will receive a confirmation shortly. Check your order status in the app."),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text("OK", style: TextStyle(color: Colors.black)),
-              ),
-            ],
-          );
-        },
-      );
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              title: Text("Payment Pending"),
+              content: Text(
+                  "Your payment is being processed. You will receive a confirmation shortly. Check your order status in the app."),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("OK", style: TextStyle(color: Colors.black)),
+                ),
+              ],
+            );
+          },
+        );
+      }
     } else if (payment?.state == 'FAILED' || payment?.state == 'FAILURE') {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
 
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            title: Text("Payment Failed"),
-            content: Text(
-                "Payment failed: ${payment?.state}. Please try again or contact support."),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text("OK", style: TextStyle(color: Colors.black)),
-              ),
-            ],
-          );
-        },
-      );
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              title: Text("Payment Failed"),
+              content: Text(
+                  "Payment failed: ${payment?.state}. Please try again or contact support."),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("OK", style: TextStyle(color: Colors.black)),
+                ),
+              ],
+            );
+          },
+        );
+      }
     } else {
       // Handle unknown or other states
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
 
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            title: Text("Transaction Status"),
-            content: Text(
-                "Transaction status: ${payment?.state ?? 'Unknown'}. Please check your order status or contact support."),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text("OK", style: TextStyle(color: Colors.black)),
-              ),
-            ],
-          );
-        },
-      );
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              title: Text("Transaction Status"),
+              content: Text(
+                  "Transaction status: ${payment?.state ?? 'Unknown'}. Please check your order status or contact support."),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("OK", style: TextStyle(color: Colors.black)),
+                ),
+              ],
+            );
+          },
+        );
+      }
       // .then((_) {
       //   Navigator.pop(context);
       //   Navigator.pushNamed(
@@ -1755,6 +1794,10 @@ class _CartPageState extends State<CartPage> {
                                                                               _addToCartModel.addToCarts![index].product!.id,
                                                                               minus,
                                                                               _cartData);
+
+                                                                          // Sync selections with current cart items (removes stale selections)
+                                                                          _syncSelectionsWithCart();
+
                                                                           setState(
                                                                               () {});
                                                                           await _validateAppliedCoupon();
@@ -4778,6 +4821,7 @@ class _CartPageState extends State<CartPage> {
 
                                                               // Start PhonePe transaction
                                                               _startTransaction(
+                                                                  // 1,
                                                                   minumumPayable,
                                                                   mobileNumber,
                                                                   payloadData,
@@ -4988,17 +5032,23 @@ class _CartPageState extends State<CartPage> {
                                                                     .white,
                                                                 size: 20),
                                                             SizedBox(width: 10),
-                                                            Text(
-                                                              'Add Delivery Address to Continue',
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    'Urbanist',
-                                                                fontSize: 14,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                color: Colors
-                                                                    .white,
+                                                            Flexible(
+                                                              child: Text(
+                                                                'Add Delivery Address to Continue',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontFamily:
+                                                                      'Urbanist',
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
                                                               ),
                                                             ),
                                                           ],
