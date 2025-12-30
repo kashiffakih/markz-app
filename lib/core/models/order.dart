@@ -56,6 +56,7 @@ class Order {
   Company? company;
   String? deliveryBoy;
   UserAddress? address;
+  String? gstNumber;
 
   Order(
       {this.id,
@@ -110,7 +111,8 @@ class Order {
       this.company,
       this.deliveryBoy,
       required String taxPercent,
-      this.address});
+      this.address,
+      this.gstNumber});
 
   Order.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -162,6 +164,7 @@ class Order {
         : null;
     // Convert is_gift from int (0/1) to bool
     isGift = json['is_gift'] == 1 || json['is_gift'] == true;
+    gstNumber = json['gst_number'];
 
     // Parse user with error handling
     try {
@@ -270,6 +273,7 @@ class Order {
     data['is_gift'] = this.isGift;
     data['delivery_method'] = this.deliveryMethod;
     data['platform_fee'] = this.platformFee;
+    data['gst_number'] = this.gstNumber;
     if (this.user != null) {
       data['user'] = this.user!.toJson();
     }

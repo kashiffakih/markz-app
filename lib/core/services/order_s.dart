@@ -22,6 +22,7 @@ class OrderService {
     couponValue,
     gstAmount,
     platformFee,
+    gstNumber,
   ) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
@@ -154,7 +155,8 @@ class OrderService {
         isGift: isGift,
         deliveryMethod: deliveryMethod.toString(),
         platformFee: double.tryParse(platformFee?.toString() ?? '0') ?? 0.0,
-        addressId: parsedAddressId);
+        addressId: parsedAddressId,
+        gstNumber: gstNumber);
 
     var _orderJson = order.toJson();
     _orderJson['order_details'] = orderDetails;

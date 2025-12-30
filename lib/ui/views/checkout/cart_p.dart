@@ -310,6 +310,8 @@ class _CartPageState extends State<CartPage> {
     return total;
   }
 
+  bool _addGst = false;
+
   @override
   void initState() {
     initializePhonePe();
@@ -482,6 +484,7 @@ class _CartPageState extends State<CartPage> {
         payload['couponValue'],
         payload['gstAmount'],
         payload['platformFee'],
+        payload['gstNumber'], // Add GST Number
       );
 
       if (mounted) {
@@ -745,6 +748,7 @@ class _CartPageState extends State<CartPage> {
   }
 
   TextEditingController _controller = TextEditingController();
+  TextEditingController _gstController = TextEditingController();
   List<Map<String, dynamic>> paymentOptions = [
     {
       "name": 'Cash on Delivery',
@@ -3720,6 +3724,183 @@ class _CartPageState extends State<CartPage> {
                                             ),
                                           ),
                                         ),
+                                        // GST Input - Beautiful Card Design
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 16.0),
+                                          child: Consumer<ConfigModel>(
+                                            builder:
+                                                (context, configModel, child) {
+                                              bool hasSavedGst =
+                                                  configModel.user?.gstNumber !=
+                                                          null &&
+                                                      configModel
+                                                          .user!
+                                                          .gstNumber!
+                                                          .isNotEmpty;
+
+                                              return Container(
+                                                padding: EdgeInsets.all(20),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black
+                                                          .withOpacity(0.03),
+                                                      blurRadius: 8,
+                                                      offset: Offset(0, 2),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Container(
+                                                          padding:
+                                                              EdgeInsets.all(
+                                                                  10),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Color(
+                                                                0xFFE3F2FD),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12),
+                                                          ),
+                                                          child: Icon(
+                                                            Icons
+                                                                .assignment_outlined,
+                                                            color: Color(
+                                                                0xFF2196F3),
+                                                            size: 20,
+                                                          ),
+                                                        ),
+                                                        SizedBox(width: 14),
+                                                        Text(
+                                                          'GST Number (Optional)',
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Urbanist',
+                                                            fontSize: 17,
+                                                            fontWeight:
+                                                                FontWeight.w700,
+                                                            color: Color(
+                                                                0xFF1A1A1A),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(height: 16),
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                        color:
+                                                            Color(0xFFF8F9FA),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(12),
+                                                        border: Border.all(
+                                                            color: Colors
+                                                                .grey.shade200),
+                                                      ),
+                                                      child: CheckboxListTile(
+                                                        contentPadding:
+                                                            EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        12),
+                                                        activeColor:
+                                                            Color(0xFF2196F3),
+                                                        title: Text(
+                                                          "Use GST Number",
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Urbanist',
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            color: Color(
+                                                                0xFF1A1A1A),
+                                                          ),
+                                                        ),
+                                                        value: _addGst,
+                                                        onChanged: (val) {
+                                                          setState(() {
+                                                            _addGst =
+                                                                val ?? false;
+                                                            if (_addGst) {
+                                                              if (hasSavedGst) {
+                                                                _gstController
+                                                                        .text =
+                                                                    configModel
+                                                                        .user!
+                                                                        .gstNumber!;
+                                                              }
+                                                            } else {
+                                                              _gstController
+                                                                  .clear();
+                                                            }
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
+                                                    if (_addGst) ...[
+                                                      SizedBox(height: 16),
+                                                      TextFormField(
+                                                        controller:
+                                                            _gstController,
+                                                        decoration:
+                                                            InputDecoration(
+                                                          hintText:
+                                                              'Enter GST Number',
+                                                          hintStyle: TextStyle(
+                                                            fontFamily:
+                                                                'Urbanist',
+                                                            color: Colors
+                                                                .grey[400],
+                                                            fontSize: 14,
+                                                          ),
+                                                          filled: true,
+                                                          fillColor:
+                                                              Color(0xFFF8F9FA),
+                                                          border:
+                                                              OutlineInputBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12),
+                                                            borderSide:
+                                                                BorderSide.none,
+                                                          ),
+                                                          contentPadding:
+                                                              EdgeInsets
+                                                                  .symmetric(
+                                                            horizontal: 16,
+                                                            vertical: 14,
+                                                          ),
+                                                        ),
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
+                                                          fontSize: 15,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color:
+                                                              Color(0xFF1A1A1A),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
                                         // Order Summary - Beautiful Card Design
                                         Container(
                                           width: 1.0.sw - 50,
@@ -4731,6 +4912,9 @@ class _CartPageState extends State<CartPage> {
                                                                 'couponValue':
                                                                     couponValue
                                                                         .toString(),
+                                                                'gstNumber':
+                                                                    _gstController
+                                                                        .text, // Add GST Number
                                                               };
 
                                                               // Add gstAmount to payloadData for online payment
@@ -4857,6 +5041,8 @@ class _CartPageState extends State<CartPage> {
                                                                             0]
                                                                         .platformFee ??
                                                                     0,
+                                                                _gstController
+                                                                    .text, // Pass GST Number
                                                               );
 
                                                               if (response ==

@@ -31,7 +31,8 @@ class OrderModel with ChangeNotifier {
       String deliveryMethod,
       [couponValue,
       gstAmount,
-      platformFee]) async {
+      platformFee,
+      gstNumber]) async {
     return await _orderService.placedOrder(
         cartItems,
         cartTotal,
@@ -43,7 +44,8 @@ class OrderModel with ChangeNotifier {
         deliveryMethod,
         couponValue,
         gstAmount,
-        platformFee);
+        platformFee,
+        gstNumber);
   }
 
   List<Order> _orders = [];
@@ -58,7 +60,8 @@ class OrderModel with ChangeNotifier {
   getOrder() async {
     debugPrint('OrderModel: Fetching orders...');
     final fetchedOrders = await _orderService.getOrders();
-    debugPrint('OrderModel: Received ${fetchedOrders.length} orders from service');
+    debugPrint(
+        'OrderModel: Received ${fetchedOrders.length} orders from service');
     orders = fetchedOrders;
     debugPrint('OrderModel: Set ${_orders.length} orders in state');
   }
