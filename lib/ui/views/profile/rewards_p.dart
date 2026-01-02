@@ -315,6 +315,12 @@ class _RewardsPageState extends State<RewardsPage> {
                 title = 'Points Returned';
               } else if (wallet.source == 'Points Deducted') {
                 title = 'Points Deducted';
+              } else if (wallet.source != null &&
+                  wallet.source!.toLowerCase().contains('referral')) {
+                title = 'Referral Bonus';
+              } else if (wallet.source != null &&
+                  wallet.source!.toLowerCase().contains('register')) {
+                title = 'Registration Bonus';
               } else {
                 title = 'Order Reward ${wallet.source?.split(' ').last ?? ''}';
               }

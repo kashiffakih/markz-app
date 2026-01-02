@@ -228,6 +228,59 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                           ),
                         ),
 
+                        SizedBox(height: 24.h),
+
+                        _buildLabel('GST Number (Optional)'),
+                        SizedBox(height: 8.h),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    const Color(0xFFEED056).withOpacity(0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                            border:
+                                Border.all(color: Colors.grey.withOpacity(0.1)),
+                          ),
+                          child: TextFormField(
+                            initialValue: _user.gstNumber,
+                            decoration: InputDecoration(
+                              hintText: 'Enter your GST number',
+                              hintStyle: TextStyle(
+                                color: Color(0xFF8391A1),
+                                fontSize: 14.sp,
+                                fontFamily: 'Urbanist',
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 16.w,
+                                vertical: 16.h,
+                              ),
+                              border: InputBorder.none,
+                              prefixIcon: Icon(
+                                Icons.receipt_long_rounded,
+                                color: Color(0xFFEED056),
+                                size: 20.sp,
+                              ),
+                            ),
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF1E232C),
+                            ),
+                            cursorColor: const Color(0xFFEED056),
+                            textCapitalization: TextCapitalization.characters,
+                            onSaved: (value) {
+                              _user.gstNumber = value;
+                            },
+                          ),
+                        ),
+
                         SizedBox(height: 48.h),
 
                         // Update Button

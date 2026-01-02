@@ -637,6 +637,14 @@ class _CartPageState extends State<CartPage> {
               debugPrint('Debug: Set default address: ${address.id}');
             }
           }
+
+          // Auto-fill GST Number from user profile
+          final configModel = locator<ConfigModel>();
+          if (configModel.user?.gstNumber != null &&
+              configModel.user!.gstNumber!.isNotEmpty) {
+            _gstController.text = configModel.user!.gstNumber!;
+            _addGst = true;
+          }
           // Calculate 25% of item total after coupon discount
           final addToCartModel =
               Provider.of<AddToCartModel>(context, listen: false);
@@ -3731,13 +3739,8 @@ class _CartPageState extends State<CartPage> {
                                           child: Consumer<ConfigModel>(
                                             builder:
                                                 (context, configModel, child) {
-                                              bool hasSavedGst =
-                                                  configModel.user?.gstNumber !=
-                                                          null &&
-                                                      configModel
-                                                          .user!
-                                                          .gstNumber!
-                                                          .isNotEmpty;
+                                              print(
+                                                  "${configModel.user?.gstNumber}");
 
                                               return Container(
                                                 padding: EdgeInsets.all(20),
@@ -3834,10 +3837,21 @@ class _CartPageState extends State<CartPage> {
                                                             _addGst =
                                                                 val ?? false;
                                                             if (_addGst) {
-                                                              if (hasSavedGst) {
+                                                              // Restore from profile if available using locator for robustness
+                                                              final userConfig =
+                                                                  locator<
+                                                                      ConfigModel>();
+                                                              if (userConfig
+                                                                          .user
+                                                                          ?.gstNumber !=
+                                                                      null &&
+                                                                  userConfig
+                                                                      .user!
+                                                                      .gstNumber!
+                                                                      .isNotEmpty) {
                                                                 _gstController
                                                                         .text =
-                                                                    configModel
+                                                                    userConfig
                                                                         .user!
                                                                         .gstNumber!;
                                                               }
