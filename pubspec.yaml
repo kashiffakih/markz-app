@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -15,16 +15,14 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.2+4
+version: 1.0.2+5
 
 environment:
   sdk: ">=2.17.0 <4.0.0"
 
-
 dependencies:
   flutter:
     sdk: flutter
-
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -40,9 +38,9 @@ dependencies:
   package_info_plus: ^8.0.1
   google_fonts: ^6.2.1
   image_picker: ^1.1.2
-  file_picker: ^5.2.1
+  file_picker: ^8.0.0
   icon_forest: ^1.1.8
-  csc_picker: ^0.2.7
+  csc_picker_plus: any
   share_plus: ^10.0.0
   badges: ^3.1.1
   get_ip_address: ^0.0.5
@@ -68,18 +66,15 @@ dependencies:
   pdf: ^3.11.3
   printing: ^5.14.2
 
-
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
-    
+
 flutter_icons:
   image_path_android: "assets/images/aadab-logo-mini.png"
   image_path_ios: "assets/images/logo.png"
   android: true
   ios: true
-
 
 flutter_launcher_icons:
   android: "launcher_icon"
@@ -92,7 +87,6 @@ flutter_launcher_icons:
 
 # The following section is specific to Flutter.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

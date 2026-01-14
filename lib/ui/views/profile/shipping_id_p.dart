@@ -1,4 +1,4 @@
-import 'package:csc_picker/csc_picker.dart';
+import 'package:csc_picker_plus/csc_picker_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -351,8 +351,8 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                               SizedBox(height: 10),
                               Row(
                                 children: [
-                                  _buildInfoChip(
-                                      'Country', countryValue, Icons.flag_rounded),
+                                  _buildInfoChip('Country', countryValue,
+                                      Icons.flag_rounded),
                                   SizedBox(width: 8),
                                   _buildInfoChip(
                                       'State',
@@ -395,7 +395,7 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                               _buildSectionHeader(
                                   'Update Location', Icons.my_location_rounded),
                               SizedBox(height: 4),
-                              CSCPicker(
+                              CSCPickerPlus(
                                 layout: Layout.vertical,
                                 showStates: true,
                                 showCities: true,
@@ -467,7 +467,8 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                                   FilteringTextInputFormatter.digitsOnly,
                                   LengthLimitingTextInputFormatter(6),
                                 ],
-                                onSaved: (value) => _userAddress.pincode = value,
+                                onSaved: (value) =>
+                                    _userAddress.pincode = value,
                                 validator: (value) {
                                   if (value!.isEmpty) {
                                     return "Pincode is required";
@@ -501,8 +502,8 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildSectionHeader(
-                                  'Contact Details', Icons.contact_phone_rounded),
+                              _buildSectionHeader('Contact Details',
+                                  Icons.contact_phone_rounded),
                               SizedBox(height: 4),
                               _buildTextField(
                                 hintText: 'Full Name',
@@ -620,8 +621,10 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(Icons.remove_circle_outline_rounded,
-                                            color: Colors.red, size: 18),
+                                        Icon(
+                                            Icons.remove_circle_outline_rounded,
+                                            color: Colors.red,
+                                            size: 18),
                                         SizedBox(width: 8),
                                         Text(
                                           'Remove Alternate Phone',
@@ -814,42 +817,42 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
 
                         SizedBox(height: 24),
 
-                      // Set as Default Checkbox
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                             BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
-                              blurRadius: 10,
-                              offset: Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: CheckboxListTile(
-                          value: _userAddress.isDefault == 1,
-                          onChanged: (value) {
-                            setState(() {
-                              _userAddress.isDefault = value == true ? 1 : 0;
-                            });
-                          },
-                          activeColor: Color(0xFFC7B456),
-                          title: Text(
-                            "Set as Default Address",
-                             style: TextStyle(
-                              fontFamily: 'Urbanist',
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF1A1A1A),
-                            ),
+                        // Set as Default Checkbox
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.04),
+                                blurRadius: 10,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
                           ),
-                          controlAffinity: ListTileControlAffinity.leading,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                          child: CheckboxListTile(
+                            value: _userAddress.isDefault == 1,
+                            onChanged: (value) {
+                              setState(() {
+                                _userAddress.isDefault = value == true ? 1 : 0;
+                              });
+                            },
+                            activeColor: Color(0xFFC7B456),
+                            title: Text(
+                              "Set as Default Address",
+                              style: TextStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF1A1A1A),
+                              ),
+                            ),
+                            controlAffinity: ListTileControlAffinity.leading,
+                            contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                          ),
                         ),
-                      ),
 
-                      SizedBox(height: 24),
+                        SizedBox(height: 24),
 
                         // Update Button
                         GestureDetector(
@@ -925,22 +928,19 @@ class _ShippingUpdatePageState extends State<ShippingUpdatePage> {
                                             MaterialPageRoute(
                                               builder: (context) => AddressPage(
                                                 arguments: {
-                                                  'cartItems':
-                                                      widget.arguments[
-                                                              'cartItems'] ??
-                                                          [],
-                                                  'cartTotal':
-                                                      widget.arguments[
-                                                              'cartTotal'] ??
-                                                          '',
+                                                  'cartItems': widget.arguments[
+                                                          'cartItems'] ??
+                                                      [],
+                                                  'cartTotal': widget.arguments[
+                                                          'cartTotal'] ??
+                                                      '',
                                                   'couponValue':
                                                       widget.arguments[
                                                               'couponValue'] ??
                                                           0,
-                                                  'isAddress':
-                                                      widget.arguments[
-                                                              'isAddress'] ??
-                                                          false,
+                                                  'isAddress': widget.arguments[
+                                                          'isAddress'] ??
+                                                      false,
                                                 },
                                               ),
                                             ),

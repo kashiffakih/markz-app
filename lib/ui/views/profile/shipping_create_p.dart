@@ -1,4 +1,4 @@
-import 'package:csc_picker/csc_picker.dart';
+import 'package:csc_picker_plus/csc_picker_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +23,6 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
     city: null,
     state: null,
     nationality: 'INDIA',
-
     pincode: '',
     isDefault: 0,
   );
@@ -340,7 +339,7 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                             _buildSectionHeader(
                                 'Location', Icons.my_location_rounded),
                             SizedBox(height: 4),
-                            CSCPicker(
+                            CSCPickerPlus(
                               layout: Layout.vertical,
                               showStates: true,
                               showCities: true,
@@ -752,14 +751,14 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                       ),
 
                       SizedBox(height: 24),
-                      
+
                       // Set as Default Checkbox
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
-                             BoxShadow(
+                            BoxShadow(
                               color: Colors.black.withOpacity(0.04),
                               blurRadius: 10,
                               offset: Offset(0, 4),
@@ -776,7 +775,7 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                           activeColor: Color(0xFFC7B456),
                           title: Text(
                             "Set as Default Address",
-                             style: TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Urbanist',
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
@@ -787,7 +786,6 @@ class _ShippingCreatePageState extends State<ShippingCreatePage> {
                           contentPadding: EdgeInsets.symmetric(horizontal: 8),
                         ),
                       ),
-
 
                       SizedBox(height: 24),
 
