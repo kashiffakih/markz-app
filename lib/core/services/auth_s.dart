@@ -78,7 +78,7 @@ class AuthService {
     }
   }
 
-  Future<bool> registerUser(
+  Future<Map<String, dynamic>> registerUser(
       {@required Map<String, dynamic>? registerData}) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
@@ -92,7 +92,7 @@ class AuthService {
     );
 
     Map<String, dynamic> _responseData = json.decode(_response.body);
-    // print('Registration response: ${_response.body}');
+    print('Registration response: ${_response.body}');
     // print('Status code: ${_response.statusCode}');
 
     // Handle different HTTP status codes
@@ -119,7 +119,9 @@ class AuthService {
       throw Exception(_responseData['message']);
     }
 
+    String? userId;
     if (_responseData['success']) {
+      userId = _responseData['data']['id'].toString();
       var roleId;
       roleId = registerData!['role'] == 'Distributor' ? 3 : 6;
       var userRole = {
@@ -141,33 +143,12 @@ class AuthService {
         headers: _apiConfig['headers'],
       );
     }
-    // if (registerData!['imagepath'] != null ||
-    //     registerData!['imagepath'] != 'null' ||
-    //     registerData!['imagepath'] != '' ||
-    //     registerData!['imagepath'].toString() != null ||
-    //     registerData!['imagepath'].toString() != 'null' ||
-    //     registerData!['imagepath'].toString() != '' ||
-    //     registerData!['imagepath'].toString().isNotEmpty) {
-    //   print(registerData!['imagepath']);
-    //   var _id = _responseData['data']['id'].toString();
-    //   var request = http.MultipartRequest(
-    //     'POST',
-    //     Uri.parse('${_apiConfig['baseURL']}/upload_user_photo'),
-    //   )
-    //     ..fields['userid'] = _id
-    //     // ..fields['attachment'] = registerData['imagepath']
-    //     ..files.add(
-    //       await http.MultipartFile.fromPath(
-    //         'attachment',
-    //         registerData['imagepath'],
-    //       ),
-    //     )
-    //     ..headers.addAll(_apiConfig['headers']);
-    //   http.StreamedResponse _responseImage = await request.send();
-    //   http.Response response = await http.Response.fromStream(_responseImage);
-    //   print(response.body);
-    // }
-    return _responseData['success'] ?? false;
+
+    return {
+      'success': _responseData['success'] ?? false,
+      'userId': userId,
+      'data': _responseData['data'],
+    };
   }
 
   Future<bool> sendCodeForResetPassword(
@@ -221,7 +202,13 @@ class AuthService {
 
   Future<dynamic> signInWithGoogle() async {
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      // Web client ID from google-services.json (client_type: 3)
+      final googleSignIn = GoogleSignIn(
+        scopes: ['email'],
+        serverClientId:
+            '990776187523-31hv31ogtp5c4pdpf5t5f4d687ve4tct.apps.googleusercontent.com',
+      );
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
       final GoogleSignInAuthentication? googleAuth =
           await googleUser?.authentication;
@@ -283,6 +270,78 @@ class AuthService {
       'success': true,
       'data': responseData,
     };
+  }
+
+  /// Upload wholesaler documents (visiting card and shop image)
+  Future<Map<String, dynamic>> uploadWholesalerDocuments({
+    required String userId,
+    File? visitingCardImage,
+    File? shopImage,
+  }) async {
+    try {
+      final Map<String, dynamic> apiConfig = _configModel.apiConfig;
+      final String uploadUrl =
+          '${apiConfig['baseURL']}/upload_wholesaler_documents';
+
+      print('Uploading to: $uploadUrl');
+      print('User ID: $userId');
+      print('Visiting card path: ${visitingCardImage?.path}');
+      print('Shop image path: ${shopImage?.path}');
+
+      final request = http.MultipartRequest('POST', Uri.parse(uploadUrl));
+
+      // Add user ID field
+      request.fields['user_id'] = userId;
+
+      // Add visiting card image if provided
+      if (visitingCardImage != null) {
+        print('Adding visiting card file...');
+        final visitingCardMultipart = await http.MultipartFile.fromPath(
+          'visiting_card',
+          visitingCardImage.path,
+        );
+        request.files.add(visitingCardMultipart);
+      }
+
+      // Add shop image if provided
+      if (shopImage != null) {
+        print('Adding shop image file...');
+        final shopImageMultipart = await http.MultipartFile.fromPath(
+          'shop_image',
+          shopImage.path,
+        );
+        request.files.add(shopImageMultipart);
+      }
+
+      // Add headers (excluding content-type as MultipartRequest sets it automatically)
+      final headers = Map<String, String>.from(apiConfig['headers']);
+      headers.remove('Content-Type');
+      request.headers.addAll(headers);
+
+      print('Sending request with ${request.files.length} files...');
+
+      // Send request
+      final response = await request.send();
+      final responseBody = await http.Response.fromStream(response);
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${responseBody.body}');
+
+      final responseData = json.decode(responseBody.body);
+
+      return {
+        'success': responseData['success'] ?? false,
+        'message': responseData['message'] ?? 'Upload completed',
+        'data': responseData['data'],
+      };
+    } catch (e) {
+      print('Error uploading wholesaler documents: $e');
+      debugPrint('Error uploading wholesaler documents: $e');
+      return {
+        'success': false,
+        'message': 'Failed to upload documents: ${e.toString()}',
+      };
+    }
   }
 
   Future<Map<String, dynamic>> mapReferrer({
@@ -419,6 +478,69 @@ class AuthService {
       }
     } catch (e) {
       debugPrint('Error updating FCM token: $e');
+    }
+  }
+
+  /// Update active role in the database
+  Future<bool> updateActiveRole({required String role}) async {
+    if (_configModel.user == null || _configModel.user!.id == null) {
+      debugPrint('Cannot update active role: User not logged in');
+      return false;
+    }
+
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+
+    try {
+      http.Response _response = await http.post(
+        Uri.parse('${_apiConfig['baseURL']}/users/update_active_role'),
+        body: json.encode({'role': role}),
+        headers: _apiConfig['headers'],
+      );
+
+      Map<String, dynamic> _responseData = json.decode(_response.body);
+      if (_responseData['success'] == true) {
+        debugPrint('Active role updated to $role on server');
+        return true;
+      } else {
+        debugPrint('Failed to update active role: ${_responseData['message']}');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('Error updating active role: $e');
+      return false;
+    }
+  }
+
+  /// Add a new role to the current user
+  Future<Map<String, dynamic>> addRole({required String role}) async {
+    if (_configModel.user == null || _configModel.user!.id == null) {
+      return {'success': false, 'message': 'User not logged in'};
+    }
+
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+
+    try {
+      http.Response _response = await http.post(
+        Uri.parse('${_apiConfig['baseURL']}/users/add_role'),
+        body: json.encode({'role': role}),
+        headers: _apiConfig['headers'],
+      );
+
+      Map<String, dynamic> _responseData = json.decode(_response.body);
+      print("Check Respo $_responseData");
+      if (_responseData['success'] == true) {
+        // Update local user data with new roles
+        _configModel.saveUserData(responseData: _responseData);
+        return {'success': true, 'message': _responseData['message']};
+      } else {
+        return {
+          'success': false,
+          'message': _responseData['message'] ?? 'Failed to add role'
+        };
+      }
+    } catch (e) {
+      debugPrint('Error adding role: $e');
+      return {'success': false, 'message': 'Network error. Please try again.'};
     }
   }
 }

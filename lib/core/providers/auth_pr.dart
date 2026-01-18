@@ -38,10 +38,15 @@ class AuthModel with ChangeNotifier {
   Future<Map<String, dynamic>> register(
       {required Map<String, dynamic> registerData}) async {
     try {
-      bool success =
+      Map<String, dynamic> result =
           await _authService.registerUser(registerData: registerData);
-      if (success) {
-        return {'success': true, 'message': 'Registration successful'};
+      if (result['success'] == true) {
+        return {
+          'success': true,
+          'message': 'Registration successful',
+          'userId': result['userId'],
+          'data': result['data'],
+        };
       } else {
         return {
           'success': false,
@@ -132,5 +137,22 @@ class AuthModel with ChangeNotifier {
     return await _authService.updateUser(
       updateUserData: updateUserData,
     );
+  }
+
+  /// Upload wholesaler documents (visiting card and shop image)
+  Future<Map<String, dynamic>> uploadWholesalerDocuments({
+    required String userId,
+    File? visitingCardImage,
+    File? shopImage,
+  }) async {
+    loading = true;
+    final response = await _authService.uploadWholesalerDocuments(
+      userId: userId,
+      visitingCardImage: visitingCardImage,
+      shopImage: shopImage,
+    );
+    loading = false;
+    notifyListeners();
+    return response;
   }
 }

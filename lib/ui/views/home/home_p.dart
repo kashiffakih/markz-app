@@ -389,8 +389,20 @@ class _HomePageState extends State<HomePage>
 
   double _calculateDiscountPercentage(Product product) {
     if (product.productPrices?.isNotEmpty ?? false) {
-      final priceValue = product.productPrices![0].price;
-      final offerPriceValue = product.productPrices![0].offerPrice;
+      final priceObj = product.productPrices![0];
+      final isDistributor = configModel.activeRole == 'Distributor';
+
+      dynamic priceValue;
+      dynamic offerPriceValue;
+
+      if (isDistributor) {
+        // Use distributor prices if available
+        priceValue = priceObj.distributorPrice ?? priceObj.price;
+        offerPriceValue = priceObj.distributorOfferPrice ?? priceObj.offerPrice;
+      } else {
+        priceValue = priceObj.price;
+        offerPriceValue = priceObj.offerPrice;
+      }
 
       if (priceValue == null || offerPriceValue == null) {
         return 0.0;
@@ -1236,6 +1248,7 @@ class _HomePageState extends State<HomePage>
             itemCount: tag.products!.length,
             itemBuilder: (context, index) {
               final product = tag.products![index];
+              print("product: ${product.productPrices!.first.toJson()}");
               final discountPrice = _calculateDiscountPercentage(product);
               return Padding(
                 padding: EdgeInsets.only(right: 12.0.w),

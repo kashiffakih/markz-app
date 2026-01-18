@@ -39,6 +39,7 @@ class Product {
   Company? company;
   String? rating;
   int? totalReviews;
+  double? favWholesalerDiscount;
 
   Product(
       {this.id,
@@ -77,7 +78,8 @@ class Product {
       this.tags,
       this.rating,
       this.company,
-      this.totalReviews});
+      this.totalReviews,
+      this.favWholesalerDiscount});
 
   Product.fromJson(Map<String, dynamic> json) {
     try {
@@ -109,6 +111,8 @@ class Product {
       qty = json['qty'];
       rating = json['rating']?.toString() ?? '0';
       totalReviews = json['total_reviews'];
+      favWholesalerDiscount =
+          double.tryParse(json['fav_wholesaler_discount']?.toString() ?? '0');
 
       // Parse category with error handling
       try {

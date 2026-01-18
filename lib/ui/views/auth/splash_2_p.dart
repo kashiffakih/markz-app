@@ -11,110 +11,168 @@ class Splash2Page extends StatefulWidget {
 
 class _Splash2PageState extends State<Splash2Page> {
   // Define colors as constants for better maintainability
-  static const Color borderColor = Color(0xff000000);
+  static const Color primaryColor = Color(0xFF1A237E); // Deep Indigo
+  static const Color wholesalerColor = Color(0xFF00695C); // Deep Teal
+  static const Color customerColor = Color(0xFF7B1FA2); // Purple
+  static const Color guestColor = Color(0xFF455A64); // Blue Grey
   static const Color whiteColor = Color(0xffffffff);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          height: 1.0.sh,
-          color: whiteColor,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Logo
-                SizedBox(
-                  width: 200,
-                  height: 300,
-                  child: Image.asset(
-                    'assets/images/aadab-logo.png',
+      body: Container(
+        height: 1.0.sh,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFF5F5F5),
+              Color(0xFFE8EAF6),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  // Logo
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: whiteColor,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.red.withOpacity(0.6),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: SizedBox(
+                      width: 150,
+                      height: 150,
+                      child: Image.asset(
+                        'assets/images/aadab-logo.png',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 30),
-                // Wholesaler Button
-                // _buildButton(
-                //   context,
-                //   label: 'Wholesaler',
-                //   backgroundColor: primaryColor,
-                //   textColor: whiteColor,
-                //   onPressed: () {
-                //     Navigator.pushNamed(
-                //       context,
-                //       '/loginPage',
-                //       arguments: {'role': 'Distributor'},
-                //     );
-                //   },
-                // ),
-                const SizedBox(height: 10),
-                // Customer Button
-                _buildOutlinedButton(
-                  context,
-                  label: 'Customer',
-                  onPressed: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/loginPage',
-                      arguments: {'role': 'User'},
-                    );
-                  },
-                ),
-                const SizedBox(height: 10),
-                // Guest Button
-                _buildOutlinedButton(
-                  context,
-                  label: 'Guest',
-                  backgroundColor: Colors.grey,
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/homePage');
-                  },
-                ),
-                const SizedBox(height: 30),
-                // Terms & Conditions and Privacy Policy links
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () => _showTermsAndConditions(context),
-                      child: Text(
-                        'Terms & Conditions',
+                  const SizedBox(height: 30),
+                  // Welcome Text
+                  Text(
+                    'Welcome to Aadab',
+                    style: MyGoogleFontStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 26,
+                      fontWeight: FontWeight.w800,
+                      color: primaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Choose how you want to continue',
+                    style: MyGoogleFontStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  // Role Selection Cards
+                  // Wholesaler Card
+                  _buildRoleCard(
+                    context,
+                    icon: Icons.business,
+                    label: 'Wholesaler',
+                    subtitle: 'For bulk orders & business',
+                    color: wholesalerColor,
+                    onPressed: () {
+                      Navigator.pushNamed(
+                        context,
+                        '/loginPage',
+                        arguments: {'role': 'Distributor'},
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  // Customer Card
+                  _buildRoleCard(
+                    context,
+                    icon: Icons.shopping_bag,
+                    label: 'Customer',
+                    subtitle: 'Shop our latest collection',
+                    color: customerColor,
+                    onPressed: () {
+                      Navigator.pushNamed(
+                        context,
+                        '/loginPage',
+                        arguments: {'role': 'User'},
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  // Guest Card
+                  _buildRoleCard(
+                    context,
+                    icon: Icons.visibility,
+                    label: 'Guest',
+                    subtitle: 'Browse without account',
+                    color: guestColor,
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/homePage');
+                    },
+                  ),
+                  const SizedBox(height: 40),
+                  // Terms & Conditions and Privacy Policy links
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () => _showTermsAndConditions(context),
+                        child: Text(
+                          'Terms & Conditions',
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: primaryColor,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '  •  ',
                         style: MyGoogleFontStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: Colors.blue,
-                          decoration: TextDecoration.underline,
+                          color: Colors.grey,
                         ),
                       ),
-                    ),
-                    Text(
-                      '  |  ',
-                      style: MyGoogleFontStyle(
-                        fontFamily: 'Urbanist',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => _showPrivacyPolicy(context),
-                      child: Text(
-                        'Privacy Policy',
-                        style: MyGoogleFontStyle(
-                          fontFamily: 'Urbanist',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.blue,
-                          decoration: TextDecoration.underline,
+                      GestureDetector(
+                        onTap: () => _showPrivacyPolicy(context),
+                        child: Text(
+                          'Privacy Policy',
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: primaryColor,
+                            decoration: TextDecoration.underline,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
         ),
@@ -122,32 +180,97 @@ class _Splash2PageState extends State<Splash2Page> {
     );
   }
 
-  // Helper method for creating outlined buttons
-  Widget _buildOutlinedButton(BuildContext context,
-      {required String label,
-      Color backgroundColor = whiteColor,
-      required VoidCallback onPressed}) {
+  // Helper method for creating role selection cards
+  Widget _buildRoleCard(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String subtitle,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
     return Container(
       width: double.infinity,
-      height: 55,
       decoration: BoxDecoration(
-        border: Border.all(color: borderColor),
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(10),
+        color: whiteColor,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.15),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: MaterialButton(
-        height: 55,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        onPressed: onPressed,
-        child: Text(
-          label,
-          style: MyGoogleFontStyle(
-            fontFamily: 'Urbanist',
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-            color: backgroundColor == whiteColor ? borderColor : Colors.black,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onPressed,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                // Icon Container
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: color,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // Text Content
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        label,
+                        style: MyGoogleFontStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: color,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        style: MyGoogleFontStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Arrow Icon
+                Container(
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: whiteColor,
+                    size: 16,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

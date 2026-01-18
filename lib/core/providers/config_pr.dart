@@ -116,6 +116,7 @@
 import 'package:flutter/material.dart';
 import 'package:aadab/core/models/user.dart';
 import 'package:aadab/core/services/config_s.dart';
+import 'package:aadab/core/services/auth_s.dart';
 import 'package:aadab/locator.dart';
 import 'package:aadab/core/models/file.dart';
 
@@ -185,6 +186,7 @@ class ConfigModel with ChangeNotifier {
     _selectedImage = '';
     // Reset API config to default (without token)
     _apiConfig = _configService.getApiConfig(domain: '');
+    _activeRole = 'User';
     notifyListeners();
   }
 
@@ -244,8 +246,61 @@ class ConfigModel with ChangeNotifier {
       );
       currentAndroidVersionFromApi =
           responseData['currentAndroidVersionFromApi'];
+
+      // Initialize Active Role - Use API value first, then fall back to local logic
+      if (user?.activeRole != null && user!.activeRole!.isNotEmpty) {
+        // Use the role from API (persisted in database)
+        _activeRole = user!.activeRole!;
+      } else if (user?.roles?.any((r) => r.name == 'Distributor') ?? false) {
+        // Fallback: If user is a distributor, check approval status
+        if (user?.isApproved == 1) {
+          _activeRole = 'Distributor';
+        } else {
+          _activeRole = 'User';
+        }
+      } else {
+        _activeRole = 'User';
+      }
     }
     notifyListeners();
+  }
+
+  // Active Role Management
+  String _activeRole = 'User';
+
+  String get activeRole {
+    // Always use user's activeRole from their data when logged in
+    if (user?.activeRole != null && user!.activeRole!.isNotEmpty) {
+      return user!.activeRole!;
+    }
+    return _activeRole;
+  }
+
+  set activeRole(String role) {
+    _activeRole = role;
+    notifyListeners();
+  }
+
+  void switchRole(String role) {
+    _activeRole = role;
+    // Also update user's activeRole so getter returns correct value
+    if (user != null) {
+      user!.activeRole = role;
+    }
+    notifyListeners();
+
+    // Persist to API in background
+    _persistActiveRoleToApi(role);
+  }
+
+  /// Persist active role to API (fire and forget)
+  Future<void> _persistActiveRoleToApi(String role) async {
+    try {
+      final authService = locator<AuthService>();
+      await authService.updateActiveRole(role: role);
+    } catch (e) {
+      debugPrint('Failed to persist active role to API: $e');
+    }
   }
 
   String _selectedImage = '';

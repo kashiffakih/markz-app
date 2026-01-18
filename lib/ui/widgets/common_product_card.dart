@@ -32,7 +32,7 @@ class CommonProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ConfigModel configModel = locator<ConfigModel>();
+    final ConfigModel configModel = context.watch<ConfigModel>();
     final wishListModel = context.watch<WishListModel>();
 
     final isWishListed = configModel.user != null &&
@@ -292,44 +292,73 @@ class CommonProductCard extends StatelessWidget {
                       ),
                       // Price Row
                       if (product.productPrices?.isNotEmpty ?? false)
-                        Row(
-                          children: [
-                            Text(
-                              '₹${product.productPrices![0].offerPrice ?? product.productPrices![0].price}',
-                              style: TextStyle(
-                                fontFamily: 'Urbanist',
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFFC7B456),
-                              ),
-                            ),
-                            if (product.productPrices![0].offerPrice != null &&
-                                product.productPrices![0].offerPrice != 0 &&
-                                product.productPrices![0].price !=
-                                    product.productPrices![0].offerPrice) ...[
-                              SizedBox(width: 6),
-                              Text(
-                                '₹${product.productPrices![0].price}',
-                                style: TextStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontSize: 12,
-                                  color: Color(0xFF999999),
-                                  decoration: TextDecoration.lineThrough,
+                        // Price Row
+                        if (product.productPrices?.isNotEmpty ?? false) ...[
+                          (() {
+                            final isDistributor =
+                                configModel.activeRole == 'Distributor';
+                            final priceObj = product.productPrices![0];
+                            print("check ${priceObj.distributorOfferPrice}");
+                            double? price = priceObj.price?.toDouble();
+                            double? offerPrice =
+                                priceObj.offerPrice?.toDouble();
+                            print("is role : ${isDistributor}  ");
+                            print(
+                                "distributorPrice: ${priceObj.distributorPrice}, distributorOfferPrice: ${priceObj.distributorOfferPrice}");
+                            if (isDistributor == true) {
+                              if (priceObj.distributorPrice != null &&
+                                  priceObj.distributorPrice! > 0) {
+                                price = priceObj.distributorPrice!.toDouble();
+                              }
+                              if (priceObj.distributorOfferPrice != null &&
+                                  priceObj.distributorOfferPrice! > 0) {
+                                offerPrice =
+                                    priceObj.distributorOfferPrice!.toDouble();
+                              }
+                            }
+
+                            print(
+                                "FINAL price : $price  offerPrice : $offerPrice");
+
+                            return Row(
+                              children: [
+                                Text(
+                                  '₹${offerPrice ?? price}',
+                                  style: TextStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFFC7B456),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ],
-                        )
-                      else
-                        Text(
-                          '₹0',
-                          style: TextStyle(
-                            fontFamily: 'Urbanist',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFFC7B456),
+                                if (offerPrice != null &&
+                                    offerPrice != 0 &&
+                                    price != offerPrice) ...[
+                                  SizedBox(width: 6),
+                                  Text(
+                                    '₹$price',
+                                    style: TextStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontSize: 12,
+                                      color: Color(0xFF999999),
+                                      decoration: TextDecoration.lineThrough,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            );
+                          })()
+                        ] else ...[
+                          Text(
+                            '₹0',
+                            style: TextStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFFC7B456),
+                            ),
                           ),
-                        ),
+                        ],
                     ],
                   ),
                 ),

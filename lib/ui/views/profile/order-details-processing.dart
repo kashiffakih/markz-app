@@ -383,7 +383,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   ],
                 ],
               ),
-              _buildProductDetails(detail),
+              _buildProductDetails(detail, configModel),
               Divider(color: Colors.black),
             ],
           );
@@ -590,7 +590,38 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     );
   }
 
-  Widget _buildProductDetails(dynamic detail) {
+  Widget _buildProductDetails(dynamic detail, ConfigModel configModel) {
+    // Get role-based price
+    final productPrices = detail['product']['product_prices'][0];
+    final isDistributor = configModel.activeRole == 'Distributor';
+
+    // Determine which price to use based on role
+    double getPrice() {
+      if (isDistributor) {
+        if (productPrices['distributor_offer_price'] != null &&
+            productPrices['distributor_offer_price'] != 0) {
+          return double.tryParse(
+                  productPrices['distributor_offer_price'].toString()) ??
+              0;
+        }
+        if (productPrices['distributor_price'] != null &&
+            productPrices['distributor_price'] != 0) {
+          return double.tryParse(
+                  productPrices['distributor_price'].toString()) ??
+              0;
+        }
+      }
+      // Fallback to regular prices
+      if (productPrices['offer_price'] != null &&
+          productPrices['offer_price'] != 0) {
+        return double.tryParse(productPrices['offer_price'].toString()) ?? 0;
+      }
+      return double.tryParse(productPrices['price'].toString()) ?? 0;
+    }
+
+    final unitPrice = getPrice();
+    final quantity = int.tryParse(detail['quantity'].toString()) ?? 0;
+    final totalPrice = (quantity * unitPrice).toInt();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -678,14 +709,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     ),
                   ),
                   TextSpan(
-                    text: detail['product']['product_prices'][0]
-                                ['offer_price'] !=
-                            null
-                        ? detail['product']['product_prices'][0]['offer_price']
-                            .toString()
-                        : detail['product']['product_prices'][0]['price']
-                                .toString() ??
-                            '0',
+                    text: unitPrice.toStringAsFixed(0),
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 12.sp,
@@ -699,7 +723,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             ),
             const Spacer(),
             Text(
-              'RS ${(int.parse(detail['quantity'].toString()) * int.parse(detail['product']['product_prices'][0]['offer_price'] != null ? detail['product']['product_prices'][0]['offer_price'].toString() : detail['product']['product_prices'][0]['price'].toString() ?? '0'))}',
+              'RS $totalPrice',
               style: MyGoogleFontStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 12.sp,

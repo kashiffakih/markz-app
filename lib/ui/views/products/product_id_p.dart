@@ -211,9 +211,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
           [];
 
       if (_prices.isNotEmpty) {
-        final price = int.tryParse(_prices[0]['price']?.toString() ?? '0') ?? 0;
-        final offerPrice =
-            int.tryParse(_prices[0]['offer_price']?.toString() ?? '0') ?? 0;
+        final effective = _getEffectivePrices(_prices[0]);
+        final price = effective['price']!;
+        final offerPrice = effective['offer_price']!;
 
         if (price > 0 && offerPrice > 0 && offerPrice < price) {
           discountPrice = ((price - offerPrice) / price * 100);
@@ -222,6 +222,28 @@ class _ProductIdPageState extends State<ProductIdPage> {
     }
 
     cartCount = context.read<AddToCartModel>().addToCarts?.length ?? 0;
+  }
+
+  Map<String, double> _getEffectivePrices(Map<String, dynamic> priceData) {
+    final configModel = context.read<ConfigModel>();
+    final isDistributor = configModel.activeRole == 'Distributor';
+
+    double price = double.tryParse(priceData['price']?.toString() ?? '0') ?? 0;
+    double offerPrice =
+        double.tryParse(priceData['offer_price']?.toString() ?? '0') ?? 0;
+
+    if (isDistributor) {
+      double? distPrice =
+          double.tryParse(priceData['distributor_price']?.toString() ?? '');
+      double? distOfferPrice = double.tryParse(
+          priceData['distributor_offer_price']?.toString() ?? '');
+
+      if (distPrice != null && distPrice > 0) price = distPrice;
+      if (distOfferPrice != null && distOfferPrice > 0)
+        offerPrice = distOfferPrice;
+    }
+
+    return {'price': price, 'offer_price': offerPrice};
   }
 
   int _getTotalReviewsCount(Product? product) {
@@ -994,16 +1016,11 @@ class _ProductIdPageState extends State<ProductIdPage> {
 
                                         discountPrice = 0.0;
                                         if (_prices.isNotEmpty) {
-                                          final price = int.tryParse(_prices[0]
-                                                          ['price']
-                                                      ?.toString() ??
-                                                  '0') ??
-                                              0;
-                                          final offerPrice = int.tryParse(
-                                                  _prices[0]['offer_price']
-                                                          ?.toString() ??
-                                                      '0') ??
-                                              0;
+                                          final effective =
+                                              _getEffectivePrices(_prices[0]);
+                                          final price = effective['price']!;
+                                          final offerPrice =
+                                              effective['offer_price']!;
 
                                           if (price > 0 &&
                                               offerPrice > 0 &&
@@ -1122,101 +1139,117 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                             ),
                                             SizedBox(height: 10.w),
                                             // [MOVED PRICE SECTION]
-                                            _prices.isNotEmpty &&
-                                                    (_prices[0]['offer_price'] !=
-                                                            null &&
-                                                        _prices[0][
-                                                                'offer_price'] !=
-                                                            0)
-                                                ? Wrap(
-                                                    crossAxisAlignment:
-                                                        WrapCrossAlignment.end,
-                                                    children: [
-                                                      Text(
-                                                        '₹${_prices[0]['offer_price'] ?? '0'}',
-                                                        style:
-                                                            MyGoogleFontStyle(
-                                                          fontFamily:
-                                                              'Urbanist',
-                                                          fontSize: 24.0.sp,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.black,
-                                                        ),
-                                                      ),
-                                                      SizedBox(width: 8.w),
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                bottom: 4.h),
-                                                        child: Text(
-                                                          '₹${_prices[0]['price'] ?? '0'}',
-                                                          style: TextStyle(
-                                                            color: Colors
-                                                                .grey[500],
-                                                            decoration:
-                                                                TextDecoration
-                                                                    .lineThrough,
-                                                            fontSize: 14.0.sp,
+                                            Builder(builder: (context) {
+                                              final effective =
+                                                  _prices.isNotEmpty
+                                                      ? _getEffectivePrices(
+                                                          _prices[0])
+                                                      : {
+                                                          'price': 0.0,
+                                                          'offer_price': 0.0
+                                                        };
+                                              final price = effective['price'];
+                                              final offerPrice =
+                                                  effective['offer_price'];
+
+                                              return (price != null &&
+                                                      price > 0 &&
+                                                      offerPrice != null &&
+                                                      offerPrice > 0 &&
+                                                      offerPrice < price)
+                                                  ? Wrap(
+                                                      crossAxisAlignment:
+                                                          WrapCrossAlignment
+                                                              .end,
+                                                      children: [
+                                                        Text(
+                                                          '₹$offerPrice',
+                                                          style:
+                                                              MyGoogleFontStyle(
+                                                            fontFamily:
+                                                                'Urbanist',
+                                                            fontSize: 24.0.sp,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: Colors.black,
                                                           ),
                                                         ),
-                                                      ),
-                                                      if (discountPrice !=
-                                                          0.0) ...[
                                                         SizedBox(width: 8.w),
-                                                        Container(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  horizontal:
-                                                                      6.w,
-                                                                  vertical:
-                                                                      2.h),
-                                                          margin:
+                                                        Padding(
+                                                          padding:
                                                               EdgeInsets.only(
                                                                   bottom: 4.h),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            gradient:
-                                                                LinearGradient(
-                                                              colors: [
-                                                                Color(
-                                                                    0xFF4CAF50),
-                                                                Color(
-                                                                    0xFF388E3C)
-                                                              ],
-                                                            ),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        4.r),
-                                                          ),
                                                           child: Text(
-                                                            '${discountPrice.round()}% OFF',
+                                                            '₹$price',
                                                             style: TextStyle(
-                                                              fontSize: 10.0.sp,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              color:
-                                                                  Colors.white,
+                                                              color: Colors
+                                                                  .grey[500],
+                                                              decoration:
+                                                                  TextDecoration
+                                                                      .lineThrough,
+                                                              fontSize: 14.0.sp,
                                                             ),
                                                           ),
                                                         ),
+                                                        if (discountPrice !=
+                                                            0.0) ...[
+                                                          SizedBox(width: 8.w),
+                                                          Container(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        6.w,
+                                                                    vertical:
+                                                                        2.h),
+                                                            margin:
+                                                                EdgeInsets.only(
+                                                                    bottom:
+                                                                        4.h),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              gradient:
+                                                                  LinearGradient(
+                                                                colors: [
+                                                                  Color(
+                                                                      0xFF4CAF50),
+                                                                  Color(
+                                                                      0xFF388E3C)
+                                                                ],
+                                                              ),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          4.r),
+                                                            ),
+                                                            child: Text(
+                                                              '${discountPrice.round()}% OFF',
+                                                              style: TextStyle(
+                                                                fontSize:
+                                                                    10.0.sp,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ],
-                                                    ],
-                                                  )
-                                                : Text(
-                                                    _prices.isNotEmpty
-                                                        ? '₹${_prices[0]['price'] ?? '0'}'
-                                                        : 'Price not available',
-                                                    style: MyGoogleFontStyle(
-                                                      fontFamily: 'Urbanist',
-                                                      fontSize: 24.0.sp,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black,
-                                                    ),
-                                                  ),
+                                                    )
+                                                  : Text(
+                                                      _prices.isNotEmpty
+                                                          ? '₹${price ?? (_prices[0]['price'] ?? '0')}'
+                                                          : 'Price not available',
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Urbanist',
+                                                        fontSize: 24.0.sp,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black,
+                                                      ),
+                                                    );
+                                            }),
                                           ],
                                         ),
                                       ),
@@ -1312,11 +1345,14 @@ class _ProductIdPageState extends State<ProductIdPage> {
 
                                                   // Set product price safely
                                                   if (_prices.isNotEmpty) {
+                                                    final effective =
+                                                        _getEffectivePrices(
+                                                            _prices[0]);
                                                     final offerPrice =
-                                                        _prices[0]
-                                                            ['offer_price'];
+                                                        effective[
+                                                            'offer_price'];
                                                     final price =
-                                                        _prices[0]['price'];
+                                                        effective['price'];
 
                                                     _cartData['product_price'] =
                                                         (offerPrice != null &&
@@ -2349,45 +2385,64 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                                 .productPrices
                                                                 ?.isNotEmpty ??
                                                             false) {
-                                                          final priceValue =
+                                                          final configModel =
+                                                              context.read<
+                                                                  ConfigModel>();
+                                                          final isDistributor =
+                                                              configModel
+                                                                      .activeRole ==
+                                                                  'Distributor';
+                                                          final priceObj =
                                                               relatedProduct
-                                                                  .productPrices![
-                                                                      0]
-                                                                  .price;
-                                                          final offerPriceValue =
-                                                              relatedProduct
-                                                                  .productPrices![
-                                                                      0]
-                                                                  .offerPrice;
+                                                                  .productPrices![0];
 
-                                                          if (priceValue !=
-                                                                  null &&
-                                                              offerPriceValue !=
-                                                                  null &&
-                                                              offerPriceValue !=
-                                                                  0) {
-                                                            final price =
-                                                                int.tryParse(
-                                                                        priceValue
-                                                                            .toString()) ??
-                                                                    0;
-                                                            final offerPrice =
-                                                                int.tryParse(
-                                                                        offerPriceValue
-                                                                            .toString()) ??
-                                                                    0;
+                                                          double price = double
+                                                                  .tryParse(priceObj
+                                                                          .price
+                                                                          ?.toString() ??
+                                                                      '0') ??
+                                                              0;
+                                                          double offerPrice =
+                                                              double.tryParse(priceObj
+                                                                          .offerPrice
+                                                                          ?.toString() ??
+                                                                      '0') ??
+                                                                  0;
 
-                                                            if (price > 0 &&
-                                                                offerPrice >
-                                                                    0 &&
-                                                                price >
-                                                                    offerPrice) {
-                                                              relatedDiscount =
-                                                                  ((price -
-                                                                          offerPrice) /
-                                                                      price *
-                                                                      100);
-                                                            }
+                                                          if (isDistributor) {
+                                                            double? distPrice =
+                                                                double.tryParse(priceObj
+                                                                        .distributorPrice
+                                                                        ?.toString() ??
+                                                                    '');
+                                                            double?
+                                                                distOfferPrice =
+                                                                double.tryParse(priceObj
+                                                                        .distributorOfferPrice
+                                                                        ?.toString() ??
+                                                                    '');
+
+                                                            if (distPrice !=
+                                                                    null &&
+                                                                distPrice > 0)
+                                                              price = distPrice;
+                                                            if (distOfferPrice !=
+                                                                    null &&
+                                                                distOfferPrice >
+                                                                    0)
+                                                              offerPrice =
+                                                                  distOfferPrice;
+                                                          }
+
+                                                          if (price > 0 &&
+                                                              offerPrice > 0 &&
+                                                              offerPrice <
+                                                                  price) {
+                                                            relatedDiscount =
+                                                                ((price -
+                                                                        offerPrice) /
+                                                                    price *
+                                                                    100);
                                                           }
                                                         }
 

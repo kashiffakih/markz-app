@@ -58,6 +58,16 @@ class User {
   int? referedById;
   int? isRegisterBonusSeen;
   String? gstNumber;
+  String? businessName;
+  String? tradeName;
+  String? address;
+  String? pincodeBusiness;
+  String? stateBusiness;
+  String? registrationDate;
+  String? visitingCardPath;
+  String? shopImagePath;
+  int? isApproved;
+  String? activeRole;
 
   User(
       {this.id,
@@ -115,6 +125,16 @@ class User {
       this.roles,
       this.isRegisterBonusSeen,
       this.gstNumber,
+      this.businessName,
+      this.tradeName,
+      this.address,
+      this.pincodeBusiness,
+      this.stateBusiness,
+      this.registrationDate,
+      this.visitingCardPath,
+      this.shopImagePath,
+      this.isApproved,
+      this.activeRole,
       this.companies});
 
   User.fromJson(Map<String, dynamic> json) {
@@ -170,6 +190,16 @@ class User {
     referedById = json['refered_by_id'];
     isRegisterBonusSeen = json['is_register_bonus_seen'];
     gstNumber = json['gst_number'];
+    businessName = json['business_name'];
+    tradeName = json['trade_name'];
+    address = json['address'];
+    pincodeBusiness = json['pincode_business'];
+    stateBusiness = json['state_business'];
+    registrationDate = json['registration_date'];
+    visitingCardPath = json['visiting_card_path'];
+    shopImagePath = json['shop_image_path'];
+    isApproved = json['is_approved'];
+    activeRole = json['active_role'];
     imagepath = json['imagepath'];
     location = json['location'] != null
         ? new Location.fromJson(json['location'])
@@ -242,6 +272,16 @@ class User {
     data['refered_by_id'] = this.referedById;
     data['is_register_bonus_seen'] = this.isRegisterBonusSeen;
     data['gst_number'] = this.gstNumber;
+    data['business_name'] = this.businessName;
+    data['trade_name'] = this.tradeName;
+    data['address'] = this.address;
+    data['pincode_business'] = this.pincodeBusiness;
+    data['state_business'] = this.stateBusiness;
+    data['registration_date'] = this.registrationDate;
+    data['visiting_card_path'] = this.visitingCardPath;
+    data['shop_image_path'] = this.shopImagePath;
+    data['is_approved'] = this.isApproved;
+    data['active_role'] = this.activeRole;
     data['imagepath'] = this.imagepath;
     if (this.location != null) {
       data['location'] = this.location!.toJson();

@@ -1,9 +1,10 @@
 import 'package:aadab/ui/root_p.dart';
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:aadab/ui/views/checkout/cart_p.dart';
 import 'package:aadab/ui/views/profile/address_p.dart';
 import 'package:aadab/ui/views/profile/orders_p.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -15,12 +16,13 @@ import 'package:aadab/core/providers/review_pr.dart';
 import 'package:aadab/core/providers/user_address_pr.dart';
 import 'package:aadab/core/providers/user_wallet_pr.dart';
 import 'package:aadab/core/providers/wish_list_pr.dart';
-import 'package:aadab/locator.dart';
+
 import 'package:aadab/ui/shared/font_sh.dart';
 import 'package:aadab/ui/views/profile/widgets/photo_picker_w.dart';
 import 'package:aadab/ui/views/products/shops_p.dart';
 import 'package:aadab/ui/widgets/login_required_popup.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:aadab/core/models/user.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -35,7 +37,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final configModel = locator<ConfigModel>();
+    final configModel = context.watch<ConfigModel>();
     final addToCartModel = Provider.of<AddToCartModel>(context);
     final cartCount = addToCartModel.addToCarts?.length ?? 0;
 
@@ -67,6 +69,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Column(
                   children: [
                     _buildHeader(context, configModel),
+                    _buildRoleSwitcher(context, configModel),
                     _buildQuickLinks(context, configModel),
                     _buildBody(context, configModel),
                   ],
@@ -134,7 +137,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                       Text(
-                        configModel.user?.firstName?.toString() ?? 'Guest',
+                        _getDisplayName(configModel.user),
                         style: MyGoogleFontStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 22.0.sp,
@@ -453,6 +456,34 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  String _getDisplayName(User? user) {
+    if (user == null) return 'Guest';
+
+    // For Distributors, prioritize Business/Trade Name
+    if (user.roles?.any((r) => r.name == 'Distributor') ?? false) {
+      if (user.businessName != null && user.businessName!.isNotEmpty) {
+        // Capitalize Business Name
+        return user.businessName![0].toUpperCase() +
+            user.businessName!.substring(1);
+      }
+      if (user.tradeName != null && user.tradeName!.isNotEmpty) {
+        return user.tradeName!;
+      }
+    }
+
+    // Fallback to First Name + Last Name
+    String name = user.firstName ?? '';
+    if (user.lastName != null && user.lastName!.isNotEmpty) {
+      name += ' ${user.lastName}';
+    }
+    // Capitalize User Name
+    if (name.isNotEmpty) {
+      return name[0].toUpperCase() + name.substring(1);
+    }
+
+    return name.isNotEmpty ? name : 'Guest';
+  }
+
   void _clearAllProviderStates() {
     // Clear all provider states to ensure no data persists after logout
     try {
@@ -523,7 +554,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 // Sign out from all auth services and clear login data
                 await Future.wait([
-                  FirebaseAuth.instance.signOut(),
+                  auth.FirebaseAuth.instance.signOut(),
                   GoogleSignIn().signOut(),
                   FacebookAuth.instance.logOut(),
                   configModel.removeLoginData(),
@@ -700,6 +731,161 @@ class _ProfilePageState extends State<ProfilePage> {
     } else {
       showDialog(
           context: context, builder: (context) => LoginRequiredPopupWidget());
+    }
+  }
+
+  Widget _buildRoleSwitcher(BuildContext context, ConfigModel configModel) {
+    bool isDistributorActive = configModel.activeRole == 'Distributor';
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.w),
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor:
+              isDistributorActive ? Colors.blueGrey : Color(0xFFEED056),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.r),
+          ),
+          padding: EdgeInsets.symmetric(vertical: 12.h),
+        ),
+        onPressed: () => _handleRoleSwitch(context, configModel),
+        child: Text(
+          isDistributorActive
+              ? 'Switch to User View'
+              : 'Switch to Distributor View',
+          style: MyGoogleFontStyle(
+            fontFamily: 'Urbanist',
+            fontSize: 16.sp,
+            fontWeight: FontWeight.bold,
+            color: isDistributorActive ? Colors.white : Colors.black,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _handleRoleSwitch(BuildContext context, ConfigModel configModel) async {
+    final user = configModel.user;
+
+    if (configModel.activeRole == 'Distributor') {
+      // Trying to switch to User
+      final hasUserRole = user?.roles?.any((r) => r.name == 'User') ?? false;
+
+      if (!hasUserRole) {
+        print('Check yes');
+
+        // User doesn't have User role - add it automatically
+        // final authService = locator<AuthService>();
+
+        // Show loading
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text('Become a Customer'),
+            content:
+                Text('You need to register as a customer to access this mode.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  Navigator.pushNamed(context, '/registerPage',
+                      arguments: {'role': 'User'});
+                },
+                child: Text('Register'),
+              ),
+            ],
+          ),
+        );
+
+        // final result = await authService.addRole(role: 'User');
+
+        // Close loading dialog
+        // if (context.mounted) Navigator.pop(context);
+
+        // if (result['success'] == true) {
+        //   configModel.switchRole('User');
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     SnackBar(content: Text('Switched to User mode')),
+        //   );
+        // } else {
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     SnackBar(
+        //         content: Text(result['message'] ?? 'Failed to add User role')),
+        //   );
+        // }
+      } else {
+        // Has User role, switch
+        configModel.switchRole('User');
+      }
+    } else {
+      // Trying to switch to Distributor
+      final isDistributorRole =
+          user?.roles?.any((r) => r.name == 'Distributor') ?? false;
+
+      if (!isDistributorRole) {
+        // Not registered as Distributor - Go to Register
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text('Become a Distributor'),
+            content: Text(
+                'You need to register as a distributor to access this mode.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  Navigator.pushNamed(context, '/registerPage',
+                      arguments: {'role': 'Distributor'});
+                },
+                child: Text('Register'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        // Has role, check approval
+        if (user?.isApproved == 1) {
+          configModel.switchRole('Distributor');
+        } else if (user?.isApproved == 0 || user?.isApproved == null) {
+          // Pending
+          showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                    title: Text('Approval Pending'),
+                    content: Text(
+                        'Your distributor account is pending approval from admin.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: Text('OK'),
+                      )
+                    ],
+                  ));
+        } else {
+          // Rejected or others (2 usually means rejected/blocked)
+          showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                    title: Text('Account Blocked/Rejected'),
+                    content: Text(
+                        'Your distributor account has been rejected or blocked. Please contact admin.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: Text('OK'),
+                      )
+                    ],
+                  ));
+        }
+      }
     }
   }
 }

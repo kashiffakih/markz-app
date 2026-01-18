@@ -579,13 +579,26 @@ class ShopsPageState extends State<ShopsPage> {
                 double discountPrice = 0.0;
 
                 if (product.productPrices?.isNotEmpty ?? false) {
-                  final price = int.tryParse(
-                          product.productPrices![0].price?.toString() ?? '0') ??
-                      0;
-                  final offerPrice = int.tryParse(
-                          product.productPrices![0].offerPrice?.toString() ??
-                              '0') ??
-                      0;
+                  final configModel = context.watch<ConfigModel>();
+                  final isDistributor = configModel.activeRole == 'Distributor';
+                  final priceObj = product.productPrices![0];
+
+                  double price =
+                      double.tryParse(priceObj.price?.toString() ?? '0') ?? 0;
+                  double offerPrice =
+                      double.tryParse(priceObj.offerPrice?.toString() ?? '0') ??
+                          0;
+
+                  if (isDistributor) {
+                    double? distPrice = double.tryParse(
+                        priceObj.distributorPrice?.toString() ?? '');
+                    double? distOfferPrice = double.tryParse(
+                        priceObj.distributorOfferPrice?.toString() ?? '');
+
+                    if (distPrice != null && distPrice > 0) price = distPrice;
+                    if (distOfferPrice != null && distOfferPrice > 0)
+                      offerPrice = distOfferPrice;
+                  }
 
                   if (price > 0 && offerPrice > 0 && offerPrice < price) {
                     discountPrice = ((price - offerPrice) / price * 100);

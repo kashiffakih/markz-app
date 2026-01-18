@@ -28,6 +28,7 @@ import 'package:aadab/ui/views/products/shops_p.dart';
 import 'package:aadab/ui/views/profile/address_p.dart';
 import 'package:aadab/ui/views/promocodes/promocodes_p.dart';
 import 'package:aadab/ui/widgets/common_product_card.dart';
+import 'package:aadab/core/services/favourite_wholesaler_s.dart';
 
 import '../../../core/providers/wish_list_pr.dart';
 import '../products/product_id_p.dart';
@@ -68,6 +69,103 @@ class _CartPageState extends State<CartPage> {
   final PhonePeService _phonePeService = locator<PhonePeService>();
   String result = "";
 
+  // Helper to get active role
+  String get _activeRole {
+    final configModel = Provider.of<ConfigModel>(context, listen: false);
+    return configModel.activeRole;
+  }
+
+  // Helper to find correct price object for a pack
+  ProductPrices? _getProductPriceObj(Product product, String? packId) {
+    if (packId != null && product.productPrices != null) {
+      try {
+        return product.productPrices!.firstWhere(
+          (price) => price.productPackId.toString() == packId.toString(),
+          orElse: () => product.productPrices![0],
+        );
+      } catch (e) {
+        return product.productPrices?.isNotEmpty == true
+            ? product.productPrices![0]
+            : null;
+      }
+    } else if (product.productPrices?.isNotEmpty == true) {
+      return product.productPrices![0];
+    }
+    return null;
+  }
+
+  // Helper to get effective price based on active role
+  double _getEffectivePrice(ProductPrices? priceObj, {Product? product}) {
+    if (priceObj == null) return 0.0;
+
+    double price = 0.0;
+    if (_activeRole == 'Distributor') {
+      // Distributor Logic
+      price =
+          double.tryParse(priceObj.distributorPrice?.toString() ?? '0') ?? 0.0;
+
+      // If distributor price is missing/zero, fallback to standard price
+      if (price <= 0) {
+        price = double.tryParse(priceObj.price?.toString() ?? '0') ?? 0.0;
+      }
+
+      // Check for distributor offer (if exists)
+      double offer =
+          double.tryParse(priceObj.distributorOfferPrice?.toString() ?? '0') ??
+              0.0;
+      if (offer > 0 && offer < price) {
+        price = offer;
+      }
+
+      // Apply Favourite Wholesaler Discount (from Local Fetch)
+      if (product != null) {
+        double? discountPercent;
+
+        // Priority 1: Check Local Fetch (App Side)
+        if (_isDiscountsLoaded && _localDiscounts.containsKey(product.id)) {
+          discountPercent = _localDiscounts[product.id];
+        }
+        // Priority 2: Fallback to API injected value (if local not ready or missing)
+        else if (product.favWholesalerDiscount != null &&
+            product.favWholesalerDiscount! > 0) {
+          discountPercent = product.favWholesalerDiscount;
+        }
+
+        if (discountPercent != null && discountPercent > 0) {
+          double discountAmount = (price * discountPercent) / 100;
+          price -= discountAmount;
+          // Temporarily attach to product for UI display if using local
+          product.favWholesalerDiscount = discountPercent;
+        }
+      }
+
+      return price;
+    } else {
+      // Standard User Logic (existing logic)
+      price = double.tryParse(priceObj.price?.toString() ?? '0') ?? 0.0;
+      double offer =
+          double.tryParse(priceObj.offerPrice?.toString() ?? '0') ?? 0.0;
+      if (offer > 0 && offer < price) {
+        return offer;
+      }
+      return price;
+    }
+  }
+
+  // Helper to get original price (for strikethrough display)
+  double _getOriginalPrice(ProductPrices? priceObj) {
+    if (priceObj == null) return 0.0;
+    if (_activeRole == 'Distributor') {
+      double price =
+          double.tryParse(priceObj.distributorPrice?.toString() ?? '0') ?? 0.0;
+      if (price <= 0)
+        price = double.tryParse(priceObj.price?.toString() ?? '0') ?? 0.0;
+      return price;
+    } else {
+      return double.tryParse(priceObj.price?.toString() ?? '0') ?? 0.0;
+    }
+  }
+
   // Selection state for cart items
   Set<int> _selectedCartItemIds = {};
   bool _selectAll = true;
@@ -78,13 +176,12 @@ class _CartPageState extends State<CartPage> {
       setState(() {
         couponValidationLoading = true;
       });
-      final AddToCartModel _addToCartModel =
-          Provider.of<AddToCartModel>(context, listen: false);
+
       final CouponModel _couponModel =
           Provider.of<CouponModel>(context, listen: false);
 
       // Get current cart total
-      final cartTotal = int.parse(_addToCartModel.cartTotal.toString());
+      final cartTotal = _calculateSelectedItemsTotal();
 
       // Re-verify the coupon to get updated data
       await _couponModel.verifyCoupon(usedCoupon);
@@ -122,8 +219,6 @@ class _CartPageState extends State<CartPage> {
 
   // Method to recalculate rewards points based on current cart total
   Future<void> _recalculateRewards() async {
-    final AddToCartModel _addToCartModel =
-        Provider.of<AddToCartModel>(context, listen: false);
     final UserWalletModel _userWalletModel =
         Provider.of<UserWalletModel>(context, listen: false);
 
@@ -131,7 +226,7 @@ class _CartPageState extends State<CartPage> {
     if (useWalletPoint > 0) {
       setState(() {
         // Calculate 25% of item total after coupon discount
-        final cartTotal = int.parse(_addToCartModel.cartTotal.toString());
+        final cartTotal = _calculateSelectedItemsTotal();
         // Calculate using new method: item total = cartTotal / 105 * 100
         final itemTotal = (cartTotal / 105) * 100;
         // Item total is already calculated after coupon discount
@@ -301,16 +396,171 @@ class _CartPageState extends State<CartPage> {
     final addToCartModel = Provider.of<AddToCartModel>(context, listen: false);
     if (addToCartModel.addToCarts == null) return 0;
 
-    int total = 0;
+    double total = 0;
     for (var item in addToCartModel.addToCarts!) {
       if (item.id != null && _selectedCartItemIds.contains(item.id)) {
-        total += int.parse(item.productPrice ?? '0') * (item.qty ?? 1);
+        // Find price object
+        ProductPrices? priceObj = _getProductPriceObj(item.product!, item.pack);
+        // Get effective price using helper
+        double price = _getEffectivePrice(priceObj, product: item.product);
+        total += price * (item.qty ?? 1);
       }
     }
-    return total;
+    return total.toInt();
+  }
+
+  // Calculate total favourite wholesaler discount amount
+  double _calculateTotalFavWholesalerDiscount() {
+    final addToCartModel = Provider.of<AddToCartModel>(context, listen: false);
+    if (addToCartModel.addToCarts == null) return 0.0;
+
+    double totalDiscount = 0.0;
+    for (var item in addToCartModel.addToCarts!) {
+      if (item.id != null &&
+          _selectedCartItemIds.contains(item.id) &&
+          item.product != null) {
+        ProductPrices? priceObj = _getProductPriceObj(item.product!, item.pack);
+
+        // Calculate base distributor price (before fav discount)
+        double price = 0.0;
+        if (_activeRole == 'Distributor') {
+          price =
+              double.tryParse(priceObj?.distributorPrice?.toString() ?? '0') ??
+                  0.0;
+          if (price <= 0)
+            price = double.tryParse(priceObj?.price?.toString() ?? '0') ?? 0.0;
+
+          double offer = double.tryParse(
+                  priceObj?.distributorOfferPrice?.toString() ?? '0') ??
+              0.0;
+          if (offer > 0 && offer < price) {
+            price = offer;
+          }
+
+          // Calculate Discount Amount
+          double? discountPercent;
+          if (_isDiscountsLoaded &&
+              _localDiscounts.containsKey(item.product!.id)) {
+            discountPercent = _localDiscounts[item.product!.id];
+          } else if (item.product!.favWholesalerDiscount != null &&
+              item.product!.favWholesalerDiscount! > 0) {
+            discountPercent = item.product!.favWholesalerDiscount;
+          }
+
+          if (discountPercent != null && discountPercent > 0) {
+            double discountAmount = (price * discountPercent) / 100;
+            totalDiscount += discountAmount * (item.qty ?? 1);
+          }
+        }
+      }
+    }
+    return totalDiscount;
+  }
+
+  // Get favourite wholesaler discount percentage(s) for display
+  String _getFavWholesalerDiscountPercentage() {
+    final addToCartModel = Provider.of<AddToCartModel>(context, listen: false);
+    if (addToCartModel.addToCarts == null) return '';
+
+    Set<double> percentages = {};
+
+    for (var item in addToCartModel.addToCarts!) {
+      if (item.id != null &&
+          _selectedCartItemIds.contains(item.id) &&
+          item.product != null &&
+          _activeRole == 'Distributor') {
+        double? discountPercent;
+        if (_isDiscountsLoaded &&
+            _localDiscounts.containsKey(item.product!.id)) {
+          discountPercent = _localDiscounts[item.product!.id];
+        } else if (item.product!.favWholesalerDiscount != null &&
+            item.product!.favWholesalerDiscount! > 0) {
+          discountPercent = item.product!.favWholesalerDiscount;
+        }
+
+        if (discountPercent != null && discountPercent > 0) {
+          percentages.add(discountPercent);
+        }
+      }
+    }
+
+    if (percentages.isEmpty) return '';
+    if (percentages.length == 1) {
+      return ' (' + percentages.first.toStringAsFixed(0) + '%)';
+    } else {
+      // If multiple different percentages, just show '(%)' or handle as needed
+      return ' (%)';
+    }
+  }
+
+  bool _isOnlyMadaniProducts() {
+    final addToCartModel = Provider.of<AddToCartModel>(context, listen: false);
+    if (addToCartModel.addToCarts == null) return false;
+
+    var selectedItems = addToCartModel.addToCarts!
+        .where(
+            (item) => item.id != null && _selectedCartItemIds.contains(item.id))
+        .toList();
+
+    if (selectedItems.isEmpty) return false;
+
+    for (var item in selectedItems) {
+      String companyName = item.product?.company?.name?.toLowerCase() ?? '';
+      if (!companyName.contains('madani')) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  double _calculateTotalPayable() {
+    final configModel = Provider.of<ConfigModel>(context, listen: false);
+    int cartTotal = _calculateSelectedItemsTotal();
+    double deliveryCharges = double.tryParse(
+            configModel.user?.companies?[0].deliveryCharges?.toString() ??
+                '0') ??
+        0;
+    double packagingCharges = double.tryParse(
+            configModel.user?.companies?[0].packagingCharges?.toString() ??
+                '0') ??
+        0;
+    double platformFeeValue = double.tryParse(
+            configModel.user?.companies?[0].platformFee?.toString() ?? '0') ??
+        0;
+    return cartTotal +
+        deliveryCharges +
+        packagingCharges +
+        platformFeeValue -
+        couponValue -
+        useWalletPoint;
   }
 
   bool _addGst = false;
+
+  bool _isDiscountsLoaded = false;
+  Map<int, double> _localDiscounts = {};
+
+  Future<void> _fetchDiscounts() async {
+    if (_activeRole != 'Distributor') return;
+
+    final user = Provider.of<ConfigModel>(context, listen: false).user;
+    if (user != null && user.id != null) {
+      final service = locator<FavouriteWholesalerService>();
+      final discounts = await service.getDiscounts(user.id!);
+
+      if (mounted) {
+        setState(() {
+          _localDiscounts = {
+            for (var d in discounts)
+              d['product_id'] as int: (d['discount'] is int
+                  ? (d['discount'] as int).toDouble()
+                  : d['discount'] as double)
+          };
+          _isDiscountsLoaded = true;
+        });
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -324,6 +574,7 @@ class _CartPageState extends State<CartPage> {
       _loadData();
       _initializeSelection();
       _removeOutOfStockFromSelection();
+      _fetchDiscounts();
     });
   }
 
@@ -648,7 +899,8 @@ class _CartPageState extends State<CartPage> {
           // Calculate 25% of item total after coupon discount
           final addToCartModel =
               Provider.of<AddToCartModel>(context, listen: false);
-          final cartTotal = int.parse(addToCartModel.cartTotal.toString());
+          final cartTotal =
+              num.parse(addToCartModel.cartTotal.toString()).toInt();
           // Calculate GST on cart total after applying coupon discount
           final cartTotalAfterCoupon = cartTotal - couponValue;
           // Calculate using new method: item total = cartTotalAfterCoupon / 105 * 100
@@ -1129,12 +1381,48 @@ class _CartPageState extends State<CartPage> {
                                                                             .productPrices
                                                                             ?.isNotEmpty ??
                                                                         false) {
-                                                                      final price =
-                                                                          int.tryParse(product.productPrices![0].price?.toString() ?? '0') ??
+                                                                      final configModel =
+                                                                          context
+                                                                              .watch<ConfigModel>();
+                                                                      final isDistributor =
+                                                                          configModel.activeRole ==
+                                                                              'Distributor';
+                                                                      final priceObj =
+                                                                          product
+                                                                              .productPrices![0];
+
+                                                                      double
+                                                                          price =
+                                                                          double.tryParse(priceObj.price?.toString() ?? '0') ??
                                                                               0;
-                                                                      final offerPrice =
-                                                                          int.tryParse(product.productPrices![0].offerPrice?.toString() ?? '0') ??
+                                                                      double
+                                                                          offerPrice =
+                                                                          double.tryParse(priceObj.offerPrice?.toString() ?? '0') ??
                                                                               0;
+
+                                                                      if (isDistributor) {
+                                                                        double?
+                                                                            distPrice =
+                                                                            double.tryParse(priceObj.distributorPrice?.toString() ??
+                                                                                '');
+                                                                        double?
+                                                                            distOfferPrice =
+                                                                            double.tryParse(priceObj.distributorOfferPrice?.toString() ??
+                                                                                '');
+
+                                                                        if (distPrice !=
+                                                                                null &&
+                                                                            distPrice >
+                                                                                0)
+                                                                          price =
+                                                                              distPrice;
+                                                                        if (distOfferPrice !=
+                                                                                null &&
+                                                                            distOfferPrice >
+                                                                                0)
+                                                                          offerPrice =
+                                                                              distOfferPrice;
+                                                                      }
 
                                                                       if (price > 0 &&
                                                                           offerPrice >
@@ -1249,54 +1537,24 @@ class _CartPageState extends State<CartPage> {
                                             _addToCartModel.addToCarts![index];
                                         final product = cartItem.product!;
 
-                                        ProductPrices? correctPrice;
-                                        if (cartItem.pack != null &&
-                                            product.productPrices != null) {
-                                          try {
-                                            correctPrice = product
-                                                .productPrices!
-                                                .firstWhere(
-                                              (price) =>
-                                                  price.productPackId
-                                                      .toString() ==
-                                                  cartItem.pack.toString(),
-                                              orElse: () =>
-                                                  product.productPrices![0],
-                                            );
-                                          } catch (e) {
-                                            correctPrice = product
-                                                    .productPrices!.isNotEmpty
-                                                ? product.productPrices![0]
-                                                : null;
-                                          }
-                                        } else if (product.productPrices !=
-                                                null &&
-                                            product.productPrices!.isNotEmpty) {
-                                          correctPrice =
-                                              product.productPrices![0];
-                                        }
+                                        ProductPrices? correctPrice =
+                                            _getProductPriceObj(
+                                                product, cartItem.pack);
+
+                                        double effectivePrice =
+                                            _getEffectivePrice(correctPrice,
+                                                product: product);
+                                        double originalPrice =
+                                            _getOriginalPrice(correctPrice);
 
                                         double discountPrice = 0.0;
-                                        if (correctPrice != null) {
-                                          final price = int.tryParse(
-                                                  correctPrice.price
-                                                          ?.toString() ??
-                                                      '0') ??
-                                              0;
-                                          final offerPrice = int.tryParse(
-                                                  correctPrice.offerPrice
-                                                          ?.toString() ??
-                                                      '0') ??
-                                              0;
-
-                                          if (price > 0 &&
-                                              offerPrice > 0 &&
-                                              offerPrice < price) {
-                                            discountPrice =
-                                                ((price - offerPrice) /
-                                                    price *
-                                                    100);
-                                          }
+                                        if (originalPrice > 0 &&
+                                            effectivePrice > 0 &&
+                                            effectivePrice < originalPrice) {
+                                          discountPrice = ((originalPrice -
+                                                  effectivePrice) /
+                                              originalPrice *
+                                              100);
                                         }
 
                                         Map<String, dynamic> _cartData =
@@ -1524,11 +1782,8 @@ class _CartPageState extends State<CartPage> {
                                                       ),
                                                       SizedBox(height: 4.0.h),
                                                       if (correctPrice != null)
-                                                        correctPrice.offerPrice !=
-                                                                    null &&
-                                                                correctPrice
-                                                                        .offerPrice !=
-                                                                    0
+                                                        originalPrice >
+                                                                effectivePrice
                                                             ? Wrap(
                                                                 spacing: 4.0,
                                                                 runSpacing: 2.0,
@@ -1538,7 +1793,7 @@ class _CartPageState extends State<CartPage> {
                                                                       children: [
                                                                         TextSpan(
                                                                           text:
-                                                                              '₹${correctPrice.price}',
+                                                                              '₹${originalPrice.toInt()}',
                                                                           style:
                                                                               TextStyle(
                                                                             color:
@@ -1555,7 +1810,7 @@ class _CartPageState extends State<CartPage> {
                                                                         ),
                                                                         TextSpan(
                                                                           text:
-                                                                              ' ₹${correctPrice.offerPrice}',
+                                                                              ' ₹${effectivePrice.toInt()}',
                                                                           style:
                                                                               TextStyle(
                                                                             color:
@@ -1590,7 +1845,7 @@ class _CartPageState extends State<CartPage> {
                                                                 ],
                                                               )
                                                             : Text(
-                                                                '₹${correctPrice.price}',
+                                                                '₹${effectivePrice.toInt()}',
                                                                 style:
                                                                     MyGoogleFontStyle(
                                                                   fontFamily:
@@ -1604,6 +1859,7 @@ class _CartPageState extends State<CartPage> {
                                                                       0x99000000),
                                                                 ),
                                                               ),
+                                                      SizedBox(height: 6.0.h),
                                                       SizedBox(height: 6.0.h),
                                                       Wrap(
                                                         spacing: 8.0.w,
@@ -2267,9 +2523,10 @@ class _CartPageState extends State<CartPage> {
                                                                     _couponModel
                                                                         .coupons![0];
                                                                 final cartTotal =
-                                                                    int.parse(_addToCartModel
-                                                                        .cartTotal
-                                                                        .toString());
+                                                                    num.parse(_addToCartModel
+                                                                            .cartTotal
+                                                                            .toString())
+                                                                        .toInt();
 
                                                                 // Check coupon usage count
                                                                 final orderModel =
@@ -2612,9 +2869,10 @@ class _CartPageState extends State<CartPage> {
                                                   .coupons!.isNotEmpty) {
                                             final firstCoupon =
                                                 _couponModel.coupons![0];
-                                            final cartTotal = int.parse(
-                                                _addToCartModel.cartTotal
-                                                    .toString());
+                                            final cartTotal = num.parse(
+                                                    _addToCartModel.cartTotal
+                                                        .toString())
+                                                .toInt();
 
                                             // Check coupon usage count
                                             final orderModel =
@@ -3998,11 +4256,11 @@ class _CartPageState extends State<CartPage> {
                                                   ),
                                                   Text(
                                                     'RS ' +
-                                                        (((_calculateSelectedItemsTotal() /
+                                                        (((_calculateSelectedItemsTotal() +
+                                                                    _calculateTotalFavWholesalerDiscount()) /
                                                                 105 *
                                                                 100))
-                                                            .toStringAsFixed(
-                                                                2)),
+                                                            .toStringAsFixed(2),
                                                     textAlign: TextAlign.right,
                                                     style: TextStyle(
                                                       fontFamily: 'Inter',
@@ -4014,6 +4272,48 @@ class _CartPageState extends State<CartPage> {
                                                   )
                                                 ],
                                               ),
+                                              if (_calculateTotalFavWholesalerDiscount() >
+                                                  0)
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 14.0),
+                                                  child: Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: Text(
+                                                          'Fav. Wholesaler Disc.' +
+                                                              _getFavWholesalerDiscountPercentage(),
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Urbanist',
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: Colors.green,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        '- RS ' +
+                                                            ((_calculateTotalFavWholesalerDiscount() /
+                                                                    105 *
+                                                                    100))
+                                                                .toStringAsFixed(
+                                                                    2),
+                                                        textAlign:
+                                                            TextAlign.right,
+                                                        style: TextStyle(
+                                                          fontFamily: 'Inter',
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color: Colors.green,
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
                                               SizedBox(height: 14),
                                               if ((double.tryParse(_configModel
                                                               .user
@@ -4554,10 +4854,8 @@ class _CartPageState extends State<CartPage> {
                                                     Text(
                                                       'RS ' +
                                                           (() {
-                                                            int cartTotal = int.parse(
-                                                                _addToCartModel
-                                                                    .cartTotal
-                                                                    .toString());
+                                                            int cartTotal =
+                                                                _calculateSelectedItemsTotal();
                                                             double
                                                                 deliveryCharges =
                                                                 double.tryParse(_configModel
@@ -4722,6 +5020,42 @@ class _CartPageState extends State<CartPage> {
                                                                 ),
                                                               );
                                                               return;
+                                                            }
+
+                                                            // Check Minimum Order Amount for Distributor (except only Madani products)
+                                                            if (_activeRole ==
+                                                                'Distributor') {
+                                                              double
+                                                                  totalPayable =
+                                                                  _calculateTotalPayable();
+                                                              if (totalPayable <
+                                                                      10000 &&
+                                                                  !_isOnlyMadaniProducts()) {
+                                                                showDialog(
+                                                                  context:
+                                                                      context,
+                                                                  builder: (BuildContext
+                                                                          context) =>
+                                                                      AlertDialog(
+                                                                    title: Text(
+                                                                        'Minimum Order Limit'),
+                                                                    content: Text(
+                                                                        'Total payable amount must be at least ₹10,000 for Distributors (unless ordering only Madani products).'),
+                                                                    actions: [
+                                                                      TextButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                          Navigator.pop(
+                                                                              context);
+                                                                        },
+                                                                        child: Text(
+                                                                            'Ok'),
+                                                                      )
+                                                                    ],
+                                                                  ),
+                                                                );
+                                                                return;
+                                                              }
                                                             }
 
                                                             // Check for out of stock and insufficient stock items before placing order
@@ -4963,12 +5297,13 @@ class _CartPageState extends State<CartPage> {
                                                                           .deliveryCharges ==
                                                                       null
                                                                   ? 0
-                                                                  : int.parse(_configModel
-                                                                      .user!
-                                                                      .companies![
-                                                                          0]
-                                                                      .deliveryCharges
-                                                                      .toString());
+                                                                  : num.parse(_configModel
+                                                                          .user!
+                                                                          .companies![
+                                                                              0]
+                                                                          .deliveryCharges
+                                                                          .toString())
+                                                                      .toInt();
                                                               int packagingCharges = _configModel
                                                                           .user!
                                                                           .companies![
@@ -4976,12 +5311,13 @@ class _CartPageState extends State<CartPage> {
                                                                           .packagingCharges ==
                                                                       null
                                                                   ? 0
-                                                                  : int.parse(_configModel
-                                                                      .user!
-                                                                      .companies![
-                                                                          0]
-                                                                      .packagingCharges
-                                                                      .toString());
+                                                                  : num.parse(_configModel
+                                                                          .user!
+                                                                          .companies![
+                                                                              0]
+                                                                          .packagingCharges
+                                                                          .toString())
+                                                                      .toInt();
 
                                                               // Calculate total amount
                                                               double
@@ -5338,10 +5674,35 @@ class _CartPageState extends State<CartPage> {
                                                                             0.0;
                                                                         if (product.productPrices?.isNotEmpty ??
                                                                             false) {
-                                                                          final price =
-                                                                              int.tryParse(product.productPrices![0].price?.toString() ?? '0') ?? 0;
-                                                                          final offerPrice =
-                                                                              int.tryParse(product.productPrices![0].offerPrice?.toString() ?? '0') ?? 0;
+                                                                          final configModel =
+                                                                              locator<ConfigModel>();
+                                                                          final isDistributor =
+                                                                              configModel.user?.roles?.any((r) => r.name == 'Distributor') ?? false;
+                                                                          final priceObj =
+                                                                              product.productPrices![0];
+
+                                                                          double
+                                                                              price =
+                                                                              double.tryParse(priceObj.price?.toString() ?? '0') ?? 0;
+                                                                          double
+                                                                              offerPrice =
+                                                                              double.tryParse(priceObj.offerPrice?.toString() ?? '0') ?? 0;
+
+                                                                          if (isDistributor) {
+                                                                            double?
+                                                                                distPrice =
+                                                                                double.tryParse(priceObj.distributorPrice?.toString() ?? '');
+                                                                            double?
+                                                                                distOfferPrice =
+                                                                                double.tryParse(priceObj.distributorOfferPrice?.toString() ?? '');
+
+                                                                            if (distPrice != null &&
+                                                                                distPrice > 0)
+                                                                              price = distPrice;
+                                                                            if (distOfferPrice != null &&
+                                                                                distOfferPrice > 0)
+                                                                              offerPrice = distOfferPrice;
+                                                                          }
 
                                                                           if (price > 0 &&
                                                                               offerPrice > 0 &&

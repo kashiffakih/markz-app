@@ -17,7 +17,7 @@ class _RootPageState extends State<RootPage> {
   final PermissionService _permissionService = PermissionService();
 
   authenticateUser(_, AuthModel authModel, ConfigModel configModel) async {
-    // configModel.getApiConfig(domain: 'http://192.168.0.107:9090');
+    // configModel.getApiConfig(domain: 'http://192.168.0.104:9090');
     // configModel.getApiConfig(domain: 'http://localhost:7070');
     configModel.getApiConfig(domain: 'https://api.staging.aadab.online');
     // print(configModel.apiConfig['baseURL']);

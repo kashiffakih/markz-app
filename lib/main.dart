@@ -29,18 +29,18 @@ Future<void> main() async {
   setupLocator();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  
+
   // Initialize Firebase notifications
   final firebaseApi = FirebaseApi();
   await firebaseApi.initNotifications();
-  
+
   // Initialize connectivity service before running the app
   final connectivityService = ConnectivityService();
   await connectivityService.initialize();
-  
+
   // Small delay to ensure service is ready
   await Future.delayed(Duration(milliseconds: 100));
-  
+
   runApp(const MyApp());
 }
 
@@ -57,7 +57,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    
+
     // Set up notification tap callback
     FirebaseApi.onNotificationTap = _handleNotificationData;
 
@@ -81,10 +81,10 @@ class _MyAppState extends State<MyApp> {
     debugPrint('Handle notification navigation: ${message.data}');
     _handleNotificationData(data);
   }
-  
+
   void _handleNotificationData(Map<String, dynamic> data) {
     if (_navigatorKey.currentState == null) return;
-    
+
     // Handle different notification types
     if (data['type'] != null) {
       switch (data['type']) {
@@ -124,7 +124,7 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthModel()),
-        ChangeNotifierProvider(create: (_) => ConfigModel()),
+        ChangeNotifierProvider.value(value: locator<ConfigModel>()),
         ChangeNotifierProvider(create: (_) => ProductModel()),
         ChangeNotifierProvider(create: (_) => AddToCartModel()),
         ChangeNotifierProvider(create: (_) => OrderModel()),
