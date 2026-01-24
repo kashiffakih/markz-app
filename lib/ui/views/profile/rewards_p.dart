@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/providers/user_wallet_pr.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
+import 'package:aadab/core/providers/config_pr.dart';
 
 class RewardsPage extends StatefulWidget {
   const RewardsPage({Key? key}) : super(key: key);
@@ -16,6 +17,14 @@ class _RewardsPageState extends State<RewardsPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final configModel = Provider.of<ConfigModel>(context, listen: false);
+      if (configModel.activeRole == 'Distributor') {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Rewards are not available for distributors')),
+        );
+        return;
+      }
       await Provider.of<UserWalletModel>(context, listen: false)
           .getMyUserWallets();
     });

@@ -768,8 +768,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               'Platform Fee', order['platform_fee']?.toString() ?? '0'),
         _buildCostRow('Coupon Value', order['coupon_amount']?.toString() ?? '0',
             isNegative: true),
-        _buildCostRow('Reward', order['wallet_amount_used']?.toString() ?? '0',
-            isNegative: true),
+        if (locator<ConfigModel>().activeRole != 'Distributor')
+          _buildCostRow(
+              'Reward', order['wallet_amount_used']?.toString() ?? '0',
+              isNegative: true),
         Divider(color: Colors.black, indent: 20.w, endIndent: 20.w),
         _buildCostRow('Grand Total', order['total_amount']?.toString() ?? '0',
             isBold: true),

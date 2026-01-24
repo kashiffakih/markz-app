@@ -42,13 +42,24 @@ class _PromocodesPageState extends State<PromocodesPage> {
     final couponModel = Provider.of<CouponModel>(context);
 
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              _buildHeader(context),
-              _buildBody(context, couponModel),
-            ],
+      body: Container(
+        width: 1.0.sw,
+        height: 1.0.sh,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFFFFEF9), Color(0xFFFFFDF7), Colors.white],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                _buildHeader(context),
+                _buildBody(context, couponModel),
+              ],
+            ),
           ),
         ),
       ),
@@ -225,139 +236,67 @@ class _PromocodesPageState extends State<PromocodesPage> {
         Navigator.pop(context, {'name': coupon.name, 'isProfile': isProfile});
       },
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16.r),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xff1d1617).withOpacity(0.07),
-              offset: const Offset(0, 5),
-              blurRadius: 15,
-              spreadRadius: 0,
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16.r),
-          child: Stack(
-            children: [
-              // Decorative circle
-              Positioned(
-                right: -20,
-                top: -20,
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEED056).withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-
-              Padding(
-                padding: EdgeInsets.all(16.w),
-                child: Row(
-                  children: [
-                    // Icon Container
-                    Container(
-                      width: 50.w,
-                      height: 50.w,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFEED056), Color(0xFFC7B456)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(12.r),
+        height: 120.h,
+        margin: EdgeInsets.symmetric(horizontal: 16.w),
+        child: Stack(
+          children: [
+            Row(
+              children: [
+                // Left Side (Main Content)
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16.r),
+                        bottomLeft: Radius.circular(16.r),
                       ),
-                      child: Center(
-                        child: Icon(
-                          Icons.percent_rounded,
-                          color: Colors.white,
-                          size: 24.sp,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
-                      ),
+                      ],
                     ),
-                    SizedBox(width: 16.w),
-
-                    // Content
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                coupon.name ?? 'N/A',
-                                style: MyGoogleFontStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontSize: 18.sp,
-                                  fontWeight: FontWeight.w700,
-                                  color: const Color(0xff1d1617),
-                                  letterSpacing: 0.5,
-                                ),
+                    padding: EdgeInsets.all(16.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(8.w),
+                              decoration: BoxDecoration(
+                                color:
+                                    const Color(0xFFEED056).withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(8.r),
                               ),
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 10.w,
-                                  vertical: 4.h,
-                                ),
-                                decoration: BoxDecoration(
-                                  color:
-                                      const Color(0xFFEED056).withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  'Apply',
+                              child: Icon(
+                                Icons.local_offer,
+                                color: const Color(0xFFC7B456),
+                                size: 20.sp,
+                              ),
+                            ),
+                            SizedBox(width: 12.w),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  coupon.type?.toString() == 'Flat'
+                                      ? '₹${coupon.value?.toString() ?? '0'} OFF'
+                                      : '${coupon.value?.toString() ?? '0'}% OFF',
                                   style: MyGoogleFontStyle(
                                     fontFamily: 'Urbanist',
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: const Color(0xFFC4A64C),
+                                    fontSize: 20.sp,
+                                    fontWeight: FontWeight.w800,
+                                    color: const Color(0xff1d1617),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 6.h),
-                          Text(
-                            'Coupon Value:${coupon.type?.toString() == 'Flat' ? ' ₹${coupon.value?.toString() ?? '0'}' : ' %${coupon.value?.toString() ?? '0'}'}',
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          Text(
-                            'Min Order: ₹${coupon.minOrderValue?.toString() ?? '0'}',
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          SizedBox(height: 8.h),
-                          Container(
-                            height: 1,
-                            color: Colors.grey[200],
-                          ),
-                          SizedBox(height: 8.h),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.access_time_rounded,
-                                size: 14.sp,
-                                color: Colors.grey[500],
-                              ),
-                              SizedBox(width: 4.w),
-                              Expanded(
-                                child: Text(
-                                  'Expires: ${coupon.endDate ?? 'N/A'}',
+                                Text(
+                                  'Min Order: ₹${coupon.minOrderValue?.toString() ?? '0'}',
                                   style: MyGoogleFontStyle(
                                     fontFamily: 'Urbanist',
                                     fontSize: 12.sp,
@@ -365,17 +304,138 @@ class _PromocodesPageState extends State<PromocodesPage> {
                                     color: Colors.grey[500],
                                   ),
                                 ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 12.h),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.access_time_rounded,
+                              size: 14.sp,
+                              color: Colors.grey[400],
+                            ),
+                            SizedBox(width: 4.w),
+                            Text(
+                              'Expires: ${coupon.endDate ?? 'N/A'}',
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[400],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Divider (Dashed Line)
+                Container(
+                  width: 1,
+                  color: Colors.white,
+                  child: Column(
+                    children: List.generate(
+                      15,
+                      (index) => Expanded(
+                        child: Container(
+                          color: index % 2 == 0
+                              ? Colors.grey[300]
+                              : Colors.transparent,
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                // Right Side (Action)
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEED056).withOpacity(0.1),
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(16.r),
+                        bottomRight: Radius.circular(16.r),
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          coupon.name ?? 'CODE',
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xff1d1617),
+                            letterSpacing: 1,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 8.h),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 6.h,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFEED056), Color(0xFFC7B456)],
+                            ),
+                            borderRadius: BorderRadius.circular(20.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFEED056).withOpacity(0.4),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
                               ),
                             ],
                           ),
-                        ],
-                      ),
+                          child: Text(
+                            'APPLY',
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
+                ),
+              ],
+            ),
+            // Cutouts
+            Positioned(
+              top: -10,
+              right: 1.0.sw / 3 - 10,
+              child: Container(
+                width: 20,
+                height: 20,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFFFDF7), // Match background gradient
+                  shape: BoxShape.circle,
                 ),
               ),
-            ],
-          ),
+            ),
+            Positioned(
+              bottom: -10,
+              right: 1.0.sw / 3 - 10,
+              child: Container(
+                width: 20,
+                height: 20,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFFFDF7), // Match background gradient
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

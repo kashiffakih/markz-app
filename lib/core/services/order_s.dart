@@ -211,12 +211,17 @@ class OrderService {
 
     try {
       var userId = _configModel.user!.id;
-      debugPrint('getOrders: Fetching orders for userId=$userId');
+      // Get active role from config model
+      var activeRole = _configModel.activeRole;
+
       debugPrint(
-          'getOrders: API URL = ${_apiConfig['baseURL']}/orders?userId=$userId');
+          'getOrders: Fetching orders for userId=$userId, role=$activeRole');
+      debugPrint(
+          'getOrders: API URL = ${_apiConfig['baseURL']}/orders?userId=$userId&role=$activeRole');
 
       http.Response _response = await http.get(
-        Uri.parse('${_apiConfig['baseURL']}/orders?userId=$userId'),
+        Uri.parse(
+            '${_apiConfig['baseURL']}/orders?userId=$userId&role=$activeRole'),
         headers: _apiConfig['headers'],
       );
 

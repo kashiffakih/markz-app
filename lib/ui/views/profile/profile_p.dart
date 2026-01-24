@@ -227,13 +227,14 @@ class _ProfilePageState extends State<ProfilePage> {
             Colors.pink,
             () => Navigator.pushNamed(context, '/wishlistPage'),
           ),
-          _buildQuickLinkItem(
-            context,
-            'Wallet',
-            Icons.account_balance_wallet_rounded,
-            Colors.orange,
-            () => Navigator.pushNamed(context, '/rewardsPage'),
-          ),
+          if (configModel.activeRole != 'Distributor')
+            _buildQuickLinkItem(
+              context,
+              'Wallet',
+              Icons.account_balance_wallet_rounded,
+              Colors.orange,
+              () => Navigator.pushNamed(context, '/rewardsPage'),
+            ),
           _buildQuickLinkItem(
             context,
             'Help',

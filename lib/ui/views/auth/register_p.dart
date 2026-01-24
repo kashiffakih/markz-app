@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:csc_picker_plus/csc_picker_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,11 @@ class _RegisterPageState extends State<RegisterPage> {
   // Image files for wholesaler
   File? _visitingCardImage;
   File? _shopImage;
+
+  bool _hasGst = false;
+  String countryValue = "India";
+  String stateValue = "";
+  String cityValue = "";
 
   Map<String, dynamic> _registerData = {
     'first_name': '',
@@ -188,21 +194,29 @@ class _RegisterPageState extends State<RegisterPage> {
                 key: _registerKey,
                 child: Column(
                   children: [
-                    Container(
-                      margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Color(0xffe8ecf4)),
-                        color: Color(0xfff7f8f9),
-                        borderRadius: BorderRadius.circular(7.6632652283),
-                      ),
+                    // Full Name
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: TextFormField(
                         decoration: InputDecoration(
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
+                          filled: true,
+                          fillColor: Color(0xfff7f8f9),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xffe8ecf4)),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xffe8ecf4)),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.red),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.red),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
                           contentPadding: EdgeInsets.fromLTRB(
                               17.94.w, 16.34.w, 17.94.w, 17.66.w),
                           hintText: 'Full Name',
@@ -225,22 +239,32 @@ class _RegisterPageState extends State<RegisterPage> {
                         },
                       ),
                     ),
-                    Container(
-                      margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Color(0xffe8ecf4)),
-                        color: Color(0xfff7f8f9),
-                        borderRadius: BorderRadius.circular(7.6632652283),
-                      ),
+                    SizedBox(height: 10),
+
+                    // Email
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: TextFormField(
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
+                          filled: true,
+                          fillColor: Color(0xfff7f8f9),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xffe8ecf4)),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xffe8ecf4)),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.red),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.red),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
                           contentPadding: EdgeInsets.fromLTRB(
                               17.94.w, 16.34.w, 17.94.w, 17.66.w),
                           hintText: 'Email',
@@ -265,23 +289,33 @@ class _RegisterPageState extends State<RegisterPage> {
                         },
                       ),
                     ),
-                    Container(
-                      margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Color(0xffe8ecf4)),
-                        color: Color(0xfff7f8f9),
-                        borderRadius: BorderRadius.circular(7.6632652283),
-                      ),
+                    SizedBox(height: 10),
+
+                    // Phone
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: TextFormField(
                         keyboardType: TextInputType.number,
                         maxLength: 10,
                         decoration: InputDecoration(
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
+                          filled: true,
+                          fillColor: Color(0xfff7f8f9),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xffe8ecf4)),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xffe8ecf4)),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.red),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.red),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
                           contentPadding: EdgeInsets.fromLTRB(
                               17.94.w, 16.34.w, 17.94.w, 17.66.w),
                           hintText: 'Phone',
@@ -308,22 +342,32 @@ class _RegisterPageState extends State<RegisterPage> {
                         },
                       ),
                     ),
-                    Container(
-                      margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Color(0xffe8ecf4)),
-                        color: Color(0xfff7f8f9),
-                        borderRadius: BorderRadius.circular(7.6632652283),
-                      ),
+                    SizedBox(height: 10),
+
+                    // Password
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: TextFormField(
                         obscureText: _obscurePassword,
                         decoration: InputDecoration(
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
+                          filled: true,
+                          fillColor: Color(0xfff7f8f9),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xffe8ecf4)),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xffe8ecf4)),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.red),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.red),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
                           contentPadding: EdgeInsets.fromLTRB(
                               17.94.w, 16.34.w, 17.94.w, 17.66.w),
                           hintText: 'Password',
@@ -364,22 +408,31 @@ class _RegisterPageState extends State<RegisterPage> {
                         },
                       ),
                     ),
-                    Container(
-                      margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Color(0xffe8ecf4)),
-                        color: Color(0xfff7f8f9),
-                        borderRadius: BorderRadius.circular(7.6632652283),
-                      ),
+                    SizedBox(height: 10),
+                    // Confirm Password
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: TextFormField(
                         obscureText: _obscureConfirmPassword,
                         decoration: InputDecoration(
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
+                          filled: true,
+                          fillColor: Color(0xfff7f8f9),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xffe8ecf4)),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xffe8ecf4)),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.red),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.red),
+                            borderRadius: BorderRadius.circular(7.66),
+                          ),
                           contentPadding: EdgeInsets.fromLTRB(
                               17.94.w, 16.34.w, 17.94.w, 17.66.w),
                           hintText: 'Confirm Password',
@@ -426,7 +479,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     if (widget.argument?['role'] == 'Distributor') ...[
                       // Section Header
                       Container(
-                        margin: EdgeInsets.fromLTRB(20, 20, 20, 10),
+                        margin: EdgeInsets.fromLTRB(10, 20, 10, 10),
                         child: Text(
                           'Business Details',
                           style: MyGoogleFontStyle(
@@ -439,130 +492,277 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       // GST Number
                       Container(
-                        margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xffe8ecf4)),
-                          color: Color(0xfff7f8f9),
-                          borderRadius: BorderRadius.circular(7.6632652283),
-                        ),
-                        child: TextFormField(
-                          textCapitalization: TextCapitalization.characters,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            errorBorder: InputBorder.none,
-                            disabledBorder: InputBorder.none,
-                            contentPadding: EdgeInsets.fromLTRB(
-                                17.94.w, 16.34.w, 17.94.w, 17.66.w),
-                            hintText: 'GST Number',
-                            hintStyle: TextStyle(color: Color(0xff8390a1)),
-                          ),
-                          style: MyGoogleFontStyle(
-                            fontFamily: 'Urbanist',
-                            fontSize: 14.0.sp,
-                            fontWeight: FontWeight.w500,
-                            height: 1.25,
-                            color: Color(0xff000000),
-                          ),
-                          validator: (value) {
-                            if (value!.isEmpty) return 'GST Number is required';
-                            return null;
-                          },
-                          onSaved: (value) {
-                            _registerData['gst_number'] = value;
-                          },
+                        margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
+                        child: Row(
+                          children: [
+                            Checkbox(
+                              value: _hasGst,
+                              onChanged: (value) {
+                                setState(() {
+                                  _hasGst = value!;
+                                  if (!_hasGst) {
+                                    _registerData['gst_number'] = '';
+                                  }
+                                });
+                              },
+                              activeColor: Color(0xff1A1A1A),
+                            ),
+                            Text(
+                              'I have GST Number',
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 14.0.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xff1A1A1A),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      // Business Name
-                      Container(
-                        margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xffe8ecf4)),
-                          color: Color(0xfff7f8f9),
-                          borderRadius: BorderRadius.circular(7.6632652283),
-                        ),
-                        child: TextFormField(
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            errorBorder: InputBorder.none,
-                            disabledBorder: InputBorder.none,
-                            contentPadding: EdgeInsets.fromLTRB(
-                                17.94.w, 16.34.w, 17.94.w, 17.66.w),
-                            hintText: 'Business Name',
-                            hintStyle: TextStyle(color: Color(0xff8390a1)),
+                      if (_hasGst)
+                        // GST Number
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: TextFormField(
+                            textCapitalization: TextCapitalization.characters,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Color(0xfff7f8f9),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xffe8ecf4)),
+                                borderRadius: BorderRadius.circular(7.66),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xffe8ecf4)),
+                                borderRadius: BorderRadius.circular(7.66),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.red),
+                                borderRadius: BorderRadius.circular(7.66),
+                              ),
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.red),
+                                borderRadius: BorderRadius.circular(7.66),
+                              ),
+                              contentPadding: EdgeInsets.fromLTRB(
+                                  17.94.w, 16.34.w, 17.94.w, 17.66.w),
+                              hintText: 'GST Number',
+                              hintStyle: TextStyle(color: Color(0xff8390a1)),
+                            ),
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 14.0.sp,
+                              fontWeight: FontWeight.w500,
+                              height: 1.25,
+                              color: Color(0xff000000),
+                            ),
+                            validator: (value) {
+                              if (_hasGst && (value == null || value.isEmpty)) {
+                                return 'GST Number is required';
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _registerData['gst_number'] = value;
+                            },
                           ),
-                          style: MyGoogleFontStyle(
-                            fontFamily: 'Urbanist',
-                            fontSize: 14.0.sp,
-                            fontWeight: FontWeight.w500,
-                            height: 1.25,
-                            color: Color(0xff000000),
-                          ),
-                          validator: (value) {
-                            if (value!.isEmpty)
-                              return 'Business Name is required';
-                            return null;
-                          },
-                          onSaved: (value) {
-                            _registerData['business_name'] = value;
-                          },
                         ),
-                      ),
-                      // Trade Name
-                      Container(
-                        margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xffe8ecf4)),
-                          color: Color(0xfff7f8f9),
-                          borderRadius: BorderRadius.circular(7.6632652283),
-                        ),
-                        child: TextFormField(
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            errorBorder: InputBorder.none,
-                            disabledBorder: InputBorder.none,
-                            contentPadding: EdgeInsets.fromLTRB(
-                                17.94.w, 16.34.w, 17.94.w, 17.66.w),
-                            hintText: 'Trade Name',
-                            hintStyle: TextStyle(color: Color(0xff8390a1)),
+                      if (_hasGst) SizedBox(height: 10),
+                      if (_hasGst) ...[
+                        // Business Name
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: TextFormField(
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Color(0xfff7f8f9),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xffe8ecf4)),
+                                borderRadius: BorderRadius.circular(7.66),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xffe8ecf4)),
+                                borderRadius: BorderRadius.circular(7.66),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.red),
+                                borderRadius: BorderRadius.circular(7.66),
+                              ),
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.red),
+                                borderRadius: BorderRadius.circular(7.66),
+                              ),
+                              contentPadding: EdgeInsets.fromLTRB(
+                                  17.94.w, 16.34.w, 17.94.w, 17.66.w),
+                              hintText: 'Business Name',
+                              hintStyle: TextStyle(color: Color(0xff8390a1)),
+                            ),
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 14.0.sp,
+                              fontWeight: FontWeight.w500,
+                              height: 1.25,
+                              color: Color(0xff000000),
+                            ),
+                            validator: (value) {
+                              if (_hasGst && (value == null || value.isEmpty)) {
+                                return 'Business Name is required';
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _registerData['business_name'] = value;
+                            },
                           ),
-                          style: MyGoogleFontStyle(
-                            fontFamily: 'Urbanist',
-                            fontSize: 14.0.sp,
-                            fontWeight: FontWeight.w500,
-                            height: 1.25,
-                            color: Color(0xff000000),
-                          ),
-                          onSaved: (value) {
-                            _registerData['trade_name'] = value;
-                          },
                         ),
-                      ),
+                        SizedBox(height: 10),
+
+                        // Trade Name
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: TextFormField(
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Color(0xfff7f8f9),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xffe8ecf4)),
+                                borderRadius: BorderRadius.circular(7.66),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xffe8ecf4)),
+                                borderRadius: BorderRadius.circular(7.66),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.red),
+                                borderRadius: BorderRadius.circular(7.66),
+                              ),
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.red),
+                                borderRadius: BorderRadius.circular(7.66),
+                              ),
+                              contentPadding: EdgeInsets.fromLTRB(
+                                  17.94.w, 16.34.w, 17.94.w, 17.66.w),
+                              hintText: 'Trade Name',
+                              hintStyle: TextStyle(color: Color(0xff8390a1)),
+                            ),
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 14.0.sp,
+                              fontWeight: FontWeight.w500,
+                              height: 1.25,
+                              color: Color(0xff000000),
+                            ),
+                            // validator: (value) {
+                            //   if (_hasGst && (value == null || value.isEmpty)) {
+                            //     // Optional ?? Or required? Assuming optional for now unless specified
+                            //     // return 'Trade Name is required';
+                            //   }
+                            //   return null;
+                            // },
+                            onSaved: (value) {
+                              _registerData['trade_name'] = value;
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 10),
+
+                        // Registration Date
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: TextFormField(
+                            readOnly: true,
+                            controller: TextEditingController(
+                              text: _registerData['registration_date'] ?? '',
+                            ),
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Color(0xfff7f8f9),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xffe8ecf4)),
+                                borderRadius: BorderRadius.circular(7.66),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xffe8ecf4)),
+                                borderRadius: BorderRadius.circular(7.66),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.red),
+                                borderRadius: BorderRadius.circular(7.66),
+                              ),
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.red),
+                                borderRadius: BorderRadius.circular(7.66),
+                              ),
+                              contentPadding: EdgeInsets.fromLTRB(
+                                  17.94.w, 16.34.w, 17.94.w, 17.66.w),
+                              hintText: 'Registration Date',
+                              hintStyle: TextStyle(color: Color(0xff8390a1)),
+                              suffixIcon: Icon(Icons.calendar_today,
+                                  color: Color(0xff8390a1)),
+                            ),
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 14.0.sp,
+                              fontWeight: FontWeight.w500,
+                              height: 1.25,
+                              color: Color(0xff000000),
+                            ),
+                            validator: (value) {
+                              if (_hasGst && (value == null || value.isEmpty)) {
+                                return 'Registration Date is required';
+                              }
+                              return null;
+                            },
+                            onTap: () async {
+                              DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(1900),
+                                lastDate: DateTime.now(),
+                              );
+                              if (pickedDate != null) {
+                                setState(() {
+                                  _registerData['registration_date'] =
+                                      '${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}';
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                      ],
                       // Address
-                      Container(
-                        margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xffe8ecf4)),
-                          color: Color(0xfff7f8f9),
-                          borderRadius: BorderRadius.circular(7.6632652283),
-                        ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: TextFormField(
                           maxLines: 3,
                           decoration: InputDecoration(
-                            border: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            errorBorder: InputBorder.none,
-                            disabledBorder: InputBorder.none,
+                            filled: true,
+                            fillColor: Color(0xfff7f8f9),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xffe8ecf4)),
+                              borderRadius: BorderRadius.circular(7.66),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xffe8ecf4)),
+                              borderRadius: BorderRadius.circular(7.66),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                              borderRadius: BorderRadius.circular(7.66),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                              borderRadius: BorderRadius.circular(7.66),
+                            ),
                             contentPadding: EdgeInsets.fromLTRB(
                                 17.94.w, 16.34.w, 17.94.w, 17.66.w),
                             hintText: 'Business Address',
@@ -584,152 +784,140 @@ class _RegisterPageState extends State<RegisterPage> {
                           },
                         ),
                       ),
-                      // Pincode and State Row
+                      SizedBox(height: 10),
+
+                      // Pincode and Location Section
                       Container(
-                        margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Pincode
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xffe8ecf4)),
-                                  color: Color(0xfff7f8f9),
-                                  borderRadius:
-                                      BorderRadius.circular(7.6632652283),
-                                ),
-                                child: TextFormField(
-                                  keyboardType: TextInputType.number,
-                                  maxLength: 6,
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    focusedBorder: InputBorder.none,
-                                    enabledBorder: InputBorder.none,
-                                    errorBorder: InputBorder.none,
-                                    disabledBorder: InputBorder.none,
-                                    contentPadding: EdgeInsets.fromLTRB(
-                                        17.94.w, 16.34.w, 17.94.w, 17.66.w),
-                                    hintText: 'Pincode',
-                                    hintStyle:
-                                        TextStyle(color: Color(0xff8390a1)),
-                                    counterText: '',
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: TextFormField(
+                                keyboardType: TextInputType.number,
+                                maxLength: 6,
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: Color(0xfff7f8f9),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Color(0xffe8ecf4)),
+                                    borderRadius: BorderRadius.circular(7.66),
                                   ),
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 14.0.sp,
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.25,
-                                    color: Color(0xff000000),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Color(0xffe8ecf4)),
+                                    borderRadius: BorderRadius.circular(7.66),
                                   ),
-                                  validator: (value) {
-                                    if (value!.isEmpty)
-                                      return 'Pincode required';
-                                    if (value.length != 6)
-                                      return 'Invalid pincode';
-                                    return null;
-                                  },
-                                  onSaved: (value) {
-                                    _registerData['pincode_business'] = value;
-                                  },
+                                  errorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.red),
+                                    borderRadius: BorderRadius.circular(7.66),
+                                  ),
+                                  focusedErrorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.red),
+                                    borderRadius: BorderRadius.circular(7.66),
+                                  ),
+                                  contentPadding: EdgeInsets.fromLTRB(
+                                      17.94.w, 16.34.w, 17.94.w, 17.66.w),
+                                  hintText: 'Pincode',
+                                  hintStyle:
+                                      TextStyle(color: Color(0xff8390a1)),
+                                  counterText: '',
                                 ),
+                                style: MyGoogleFontStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontSize: 14.0.sp,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.25,
+                                  color: Color(0xff000000),
+                                ),
+                                validator: (value) {
+                                  if (value!.isEmpty) return 'Pincode required';
+                                  if (value.length != 6)
+                                    return 'Invalid pincode';
+                                  return null;
+                                },
+                                onSaved: (value) {
+                                  _registerData['pincode_business'] = value;
+                                },
                               ),
                             ),
-                            SizedBox(width: 10),
-                            // State
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xffe8ecf4)),
+                            SizedBox(height: 10),
+                            // CSC Picker for State and City
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              child: CSCPickerPlus(
+                                layout: Layout.vertical,
+                                showStates: true,
+                                showCities: true,
+                                flagState: CountryFlag.DISABLE,
+                                dropdownDecoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(7.66),
                                   color: Color(0xfff7f8f9),
-                                  borderRadius:
-                                      BorderRadius.circular(7.6632652283),
+                                  border: Border.all(color: Color(0xffe8ecf4)),
                                 ),
-                                child: TextFormField(
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    focusedBorder: InputBorder.none,
-                                    enabledBorder: InputBorder.none,
-                                    errorBorder: InputBorder.none,
-                                    disabledBorder: InputBorder.none,
-                                    contentPadding: EdgeInsets.fromLTRB(
-                                        17.94.w, 16.34.w, 17.94.w, 17.66.w),
-                                    hintText: 'State',
-                                    hintStyle:
-                                        TextStyle(color: Color(0xff8390a1)),
-                                  ),
-                                  style: MyGoogleFontStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 14.0.sp,
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.25,
-                                    color: Color(0xff000000),
-                                  ),
-                                  validator: (value) {
-                                    if (value!.isEmpty) return 'State required';
-                                    return null;
-                                  },
-                                  onSaved: (value) {
-                                    _registerData['state_business'] = value;
-                                  },
+                                disabledDropdownDecoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(7.66),
+                                  color: Color(0xfff7f8f9),
+                                  border: Border.all(color: Color(0xffe8ecf4)),
                                 ),
+                                countrySearchPlaceholder: "Search Country",
+                                stateSearchPlaceholder: "Search State",
+                                citySearchPlaceholder: "Search City",
+                                countryDropdownLabel: "Select Country",
+                                stateDropdownLabel: "Select State",
+                                cityDropdownLabel: "Select City",
+                                defaultCountry: CscCountry.India,
+                                disableCountry: false,
+                                selectedItemStyle: MyGoogleFontStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontSize: 14.0.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xff000000),
+                                ),
+                                dropdownHeadingStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                dropdownItemStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                ),
+                                dropdownDialogRadius: 10.0,
+                                searchBarRadius: 10.0,
+                                onCountryChanged: (value) {
+                                  setState(() {
+                                    countryValue = value;
+                                  });
+                                },
+                                onStateChanged: (value) {
+                                  setState(() {
+                                    stateValue =
+                                        value != null ? value.toString() : "";
+                                    _registerData['state_business'] =
+                                        stateValue;
+                                  });
+                                },
+                                onCityChanged: (value) {
+                                  setState(() {
+                                    cityValue =
+                                        value != null ? value.toString() : "";
+                                    // Optionally save city if you have a field for it
+                                    // _registerData['city_business'] = cityValue;
+                                  });
+                                },
                               ),
                             ),
                           ],
                         ),
                       ),
-                      // Registration Date
-                      Container(
-                        margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xffe8ecf4)),
-                          color: Color(0xfff7f8f9),
-                          borderRadius: BorderRadius.circular(7.6632652283),
-                        ),
-                        child: TextFormField(
-                          readOnly: true,
-                          controller: TextEditingController(
-                            text: _registerData['registration_date'] ?? '',
-                          ),
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            errorBorder: InputBorder.none,
-                            disabledBorder: InputBorder.none,
-                            contentPadding: EdgeInsets.fromLTRB(
-                                17.94.w, 16.34.w, 17.94.w, 17.66.w),
-                            hintText: 'Registration Date',
-                            hintStyle: TextStyle(color: Color(0xff8390a1)),
-                            suffixIcon: Icon(Icons.calendar_today,
-                                color: Color(0xff8390a1)),
-                          ),
-                          style: MyGoogleFontStyle(
-                            fontFamily: 'Urbanist',
-                            fontSize: 14.0.sp,
-                            fontWeight: FontWeight.w500,
-                            height: 1.25,
-                            color: Color(0xff000000),
-                          ),
-                          onTap: () async {
-                            DateTime? pickedDate = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime(1900),
-                              lastDate: DateTime.now(),
-                            );
-                            if (pickedDate != null) {
-                              setState(() {
-                                _registerData['registration_date'] =
-                                    '${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}';
-                              });
-                            }
-                          },
-                        ),
-                      ),
+
                       // Image Upload Section
                       Container(
-                        margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                        margin: EdgeInsets.fromLTRB(10, 10, 10, 10),
                         child: Text(
                           'Upload Documents',
                           style: MyGoogleFontStyle(
@@ -742,7 +930,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       // Visiting Card Upload
                       Container(
-                        margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
+                        margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -828,7 +1016,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       // Shop Image Upload
                       Container(
-                        margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
+                        margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

@@ -57,6 +57,7 @@ class Order {
   String? deliveryBoy;
   UserAddress? address;
   String? gstNumber;
+  String? role;
 
   Order(
       {this.id,
@@ -112,7 +113,8 @@ class Order {
       this.deliveryBoy,
       required String taxPercent,
       this.address,
-      this.gstNumber});
+      this.gstNumber,
+      this.role});
 
   Order.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -165,6 +167,7 @@ class Order {
     // Convert is_gift from int (0/1) to bool
     isGift = json['is_gift'] == 1 || json['is_gift'] == true;
     gstNumber = json['gst_number'];
+    role = json['role'];
 
     // Parse user with error handling
     try {

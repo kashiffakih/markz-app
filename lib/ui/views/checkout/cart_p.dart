@@ -223,6 +223,14 @@ class _CartPageState extends State<CartPage> {
         Provider.of<UserWalletModel>(context, listen: false);
 
     // Only recalculate if rewards are currently being used
+    if (_activeRole == 'Distributor') {
+      if (useWalletPoint > 0) {
+        setState(() {
+          useWalletPoint = 0;
+        });
+      }
+      return;
+    }
     if (useWalletPoint > 0) {
       setState(() {
         // Calculate 25% of item total after coupon discount
@@ -505,8 +513,8 @@ class _CartPageState extends State<CartPage> {
     if (selectedItems.isEmpty) return false;
 
     for (var item in selectedItems) {
-      String companyName = item.product?.company?.name?.toLowerCase() ?? '';
-      if (!companyName.contains('madani')) {
+      String productName = item.product?.name?.toLowerCase() ?? '';
+      if (!productName.contains('madani')) {
         return false;
       }
     }
@@ -2039,6 +2047,9 @@ class _CartPageState extends State<CartPage> {
                                                               ],
                                                             ),
                                                             child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceAround,
                                                               children: [
                                                                 InkWell(
                                                                   onTap: loadingItemIndex !=
@@ -3531,125 +3542,132 @@ class _CartPageState extends State<CartPage> {
                                               ),
                                               SizedBox(height: 16),
                                               // COD Option
-                                              GestureDetector(
-                                                onTap: () {
-                                                  setState(() {
-                                                    paymentOption =
-                                                        'Cash On Delivery';
-                                                  });
-                                                },
-                                                child: AnimatedContainer(
-                                                  duration: Duration(
-                                                      milliseconds: 200),
-                                                  padding: EdgeInsets.all(14),
-                                                  decoration: BoxDecoration(
-                                                    color: paymentOption ==
-                                                            'Cash On Delivery'
-                                                        ? Color(0xFFF5F0E0)
-                                                        : Color(0xFFF8F9FA),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            12),
-                                                    border: Border.all(
+                                              if (_activeRole != 'Distributor')
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      paymentOption =
+                                                          'Cash On Delivery';
+                                                    });
+                                                  },
+                                                  child: AnimatedContainer(
+                                                    duration: Duration(
+                                                        milliseconds: 200),
+                                                    padding: EdgeInsets.all(14),
+                                                    decoration: BoxDecoration(
                                                       color: paymentOption ==
                                                               'Cash On Delivery'
-                                                          ? Color(0xFFC7B456)
-                                                          : Color(0xFFE0E0E0),
-                                                      width: paymentOption ==
-                                                              'Cash On Delivery'
-                                                          ? 2
-                                                          : 1,
+                                                          ? Color(0xFFF5F0E0)
+                                                          : Color(0xFFF8F9FA),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                      border: Border.all(
+                                                        color: paymentOption ==
+                                                                'Cash On Delivery'
+                                                            ? Color(0xFFC7B456)
+                                                            : Color(0xFFE0E0E0),
+                                                        width: paymentOption ==
+                                                                'Cash On Delivery'
+                                                            ? 2
+                                                            : 1,
+                                                      ),
                                                     ),
-                                                  ),
-                                                  child: Row(
-                                                    children: [
-                                                      Container(
-                                                        width: 40,
-                                                        height: 40,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color: Colors.green
-                                                              .withOpacity(0.1),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
+                                                    child: Row(
+                                                      children: [
+                                                        Container(
+                                                          width: 40,
+                                                          height: 40,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Colors.green
+                                                                .withOpacity(
+                                                                    0.1),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                          ),
+                                                          child: Icon(
+                                                            Icons.money_rounded,
+                                                            color: Colors.green,
+                                                            size: 22,
+                                                          ),
                                                         ),
-                                                        child: Icon(
-                                                          Icons.money_rounded,
-                                                          color: Colors.green,
-                                                          size: 22,
-                                                        ),
-                                                      ),
-                                                      SizedBox(width: 12),
-                                                      Expanded(
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text(
-                                                              'Cash on Delivery',
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    'Urbanist',
-                                                                fontSize: 14,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                color: Color(
-                                                                    0xFF1A1A1A),
+                                                        SizedBox(width: 12),
+                                                        Expanded(
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text(
+                                                                'Cash on Delivery',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontFamily:
+                                                                      'Urbanist',
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  color: Color(
+                                                                      0xFF1A1A1A),
+                                                                ),
                                                               ),
-                                                            ),
-                                                            Text(
-                                                              'Pay when you receive',
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    'Urbanist',
-                                                                fontSize: 11,
-                                                                color: Color(
-                                                                    0xFF888888),
+                                                              Text(
+                                                                'Pay when you receive',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontFamily:
+                                                                      'Urbanist',
+                                                                  fontSize: 11,
+                                                                  color: Color(
+                                                                      0xFF888888),
+                                                                ),
                                                               ),
-                                                            ),
-                                                          ],
+                                                            ],
+                                                          ),
                                                         ),
-                                                      ),
-                                                      AnimatedContainer(
-                                                        duration: Duration(
-                                                            milliseconds: 200),
-                                                        width: 22,
-                                                        height: 22,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          shape:
-                                                              BoxShape.circle,
-                                                          color: paymentOption ==
-                                                                  'Cash On Delivery'
-                                                              ? Color(
-                                                                  0xFFC7B456)
-                                                              : Colors
-                                                                  .transparent,
-                                                          border: Border.all(
+                                                        AnimatedContainer(
+                                                          duration: Duration(
+                                                              milliseconds:
+                                                                  200),
+                                                          width: 22,
+                                                          height: 22,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            shape:
+                                                                BoxShape.circle,
                                                             color: paymentOption ==
                                                                     'Cash On Delivery'
                                                                 ? Color(
                                                                     0xFFC7B456)
-                                                                : Color(
-                                                                    0xFFBDBDBD),
-                                                            width: 2,
+                                                                : Colors
+                                                                    .transparent,
+                                                            border: Border.all(
+                                                              color: paymentOption ==
+                                                                      'Cash On Delivery'
+                                                                  ? Color(
+                                                                      0xFFC7B456)
+                                                                  : Color(
+                                                                      0xFFBDBDBD),
+                                                              width: 2,
+                                                            ),
                                                           ),
+                                                          child: paymentOption ==
+                                                                  'Cash On Delivery'
+                                                              ? Icon(
+                                                                  Icons.check,
+                                                                  size: 14,
+                                                                  color: Colors
+                                                                      .white)
+                                                              : null,
                                                         ),
-                                                        child: paymentOption ==
-                                                                'Cash On Delivery'
-                                                            ? Icon(Icons.check,
-                                                                size: 14,
-                                                                color: Colors
-                                                                    .white)
-                                                            : null,
-                                                      ),
-                                                    ],
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
                                               SizedBox(height: 10),
                                               // UPI/PhonePe Option
                                               GestureDetector(
@@ -4702,118 +4720,124 @@ class _CartPageState extends State<CartPage> {
                                               if (couponValue > 0)
                                                 SizedBox(height: 14),
 
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Row(
-                                                      children: [
-                                                        if (useWalletPoint > 0)
-                                                          Icon(
-                                                            Icons
-                                                                .wallet_giftcard_rounded,
-                                                            size: 16,
-                                                            color: Colors
-                                                                .green[700],
-                                                          )
-                                                        else
-                                                          SizedBox(),
-                                                        if (useWalletPoint > 0)
-                                                          SizedBox(width: 8),
-                                                        Text(
-                                                          'Rewards Used',
-                                                          style:
-                                                              MyGoogleFontStyle(
-                                                            fontFamily:
-                                                                'Urbanist',
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                                useWalletPoint >
-                                                                        0
-                                                                    ? FontWeight
-                                                                        .w600
-                                                                    : FontWeight
-                                                                        .w500,
-                                                            color: useWalletPoint >
-                                                                    0
-                                                                ? Colors
-                                                                    .green[700]
-                                                                : Color(
-                                                                    0xff666666),
+                                              if (_activeRole != 'Distributor')
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Row(
+                                                        children: [
+                                                          if (useWalletPoint >
+                                                              0)
+                                                            Icon(
+                                                              Icons
+                                                                  .wallet_giftcard_rounded,
+                                                              size: 16,
+                                                              color: Colors
+                                                                  .green[700],
+                                                            )
+                                                          else
+                                                            SizedBox(),
+                                                          if (useWalletPoint >
+                                                              0)
+                                                            SizedBox(width: 8),
+                                                          Text(
+                                                            'Rewards Used',
+                                                            style:
+                                                                MyGoogleFontStyle(
+                                                              fontFamily:
+                                                                  'Urbanist',
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  useWalletPoint >
+                                                                          0
+                                                                      ? FontWeight
+                                                                          .w600
+                                                                      : FontWeight
+                                                                          .w500,
+                                                              color: useWalletPoint >
+                                                                      0
+                                                                  ? Colors.green[
+                                                                      700]
+                                                                  : Color(
+                                                                      0xff666666),
+                                                            ),
                                                           ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    if (useWalletPoint != 0)
+                                                      InkWell(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            useWalletPoint = 0;
+                                                          });
+                                                        },
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  right: 8.0),
+                                                          child:
+                                                              Text('(Remove)'),
                                                         ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  if (useWalletPoint != 0)
-                                                    InkWell(
-                                                      onTap: () {
-                                                        setState(() {
-                                                          useWalletPoint = 0;
-                                                        });
-                                                      },
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                right: 8.0),
-                                                        child: Text('(Remove)'),
                                                       ),
-                                                    ),
-                                                  if (useWalletPoint == 0)
-                                                    InkWell(
-                                                      onTap: () async {
-                                                        await _userWaletModel
-                                                            .getMyUserWallets();
-                                                        setState(() {
-                                                          // Calculate 25% of item total after coupon discount (using selected items)
-                                                          final cartTotal =
-                                                              _calculateSelectedItemsTotal();
-                                                          // Calculate using new method: item total = cartTotal / 105 * 100
-                                                          final itemTotal =
-                                                              (cartTotal /
-                                                                      105) *
-                                                                  100;
-                                                          // Item total is already calculated after discounts, so use it directly
-                                                          final cartAfterCoupon =
-                                                              itemTotal;
+                                                    if (useWalletPoint == 0)
+                                                      InkWell(
+                                                        onTap: () async {
+                                                          await _userWaletModel
+                                                              .getMyUserWallets();
+                                                          setState(() {
+                                                            // Calculate 25% of item total after coupon discount (using selected items)
+                                                            final cartTotal =
+                                                                _calculateSelectedItemsTotal();
+                                                            // Calculate using new method: item total = cartTotal / 105 * 100
+                                                            final itemTotal =
+                                                                (cartTotal /
+                                                                        105) *
+                                                                    100;
+                                                            // Item total is already calculated after discounts, so use it directly
+                                                            final cartAfterCoupon =
+                                                                itemTotal;
 
-                                                          final calculatedPoints =
-                                                              (cartAfterCoupon *
-                                                                      0.25)
-                                                                  .round();
-                                                          final availablePoints =
-                                                              _userWaletModel
-                                                                  .totaRemainingPoint;
-                                                          useWalletPoint =
-                                                              calculatedPoints >
-                                                                      availablePoints
-                                                                  ? availablePoints
-                                                                  : calculatedPoints;
-                                                        });
-                                                      },
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                right: 8.0),
-                                                        child: Text('(Add)'),
+                                                            final calculatedPoints =
+                                                                (cartAfterCoupon *
+                                                                        0.25)
+                                                                    .round();
+                                                            final availablePoints =
+                                                                _userWaletModel
+                                                                    .totaRemainingPoint;
+                                                            useWalletPoint =
+                                                                calculatedPoints >
+                                                                        availablePoints
+                                                                    ? availablePoints
+                                                                    : calculatedPoints;
+                                                          });
+                                                        },
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  right: 8.0),
+                                                          child: Text('(Add)'),
+                                                        ),
                                                       ),
-                                                    ),
-                                                  Text(
-                                                    '${useWalletPoint > 0 ? "- " : ""}RS ${(useWalletPoint).toStringAsFixed(2)}',
-                                                    // Division by 3 directly
-                                                    textAlign: TextAlign.right,
-                                                    style: MyGoogleFontStyle(
-                                                      fontFamily: 'Inter',
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: useWalletPoint > 0
-                                                          ? Colors.green[700]
-                                                          : Color(0xff303030),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
+                                                    Text(
+                                                      '${useWalletPoint > 0 ? "- " : ""}RS ${(useWalletPoint).toStringAsFixed(2)}',
+                                                      // Division by 3 directly
+                                                      textAlign:
+                                                          TextAlign.right,
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Inter',
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        color: useWalletPoint >
+                                                                0
+                                                            ? Colors.green[700]
+                                                            : Color(0xff303030),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
 
                                               SizedBox(height: 20),
                                               Divider(
@@ -4888,7 +4912,10 @@ class _CartPageState extends State<CartPage> {
                                                                 packagingCharges +
                                                                 platformFeeValue -
                                                                 couponValue -
-                                                                useWalletPoint;
+                                                                (_activeRole ==
+                                                                        'Distributor'
+                                                                    ? 0
+                                                                    : useWalletPoint);
                                                             return total
                                                                 .toStringAsFixed(
                                                                     2);
@@ -5218,7 +5245,10 @@ class _CartPageState extends State<CartPage> {
                                                                 cartTotalAfterDiscountsForGst =
                                                                 cartTotalForGst -
                                                                     couponValue -
-                                                                    useWalletPoint;
+                                                                    (_activeRole ==
+                                                                            'Distributor'
+                                                                        ? 0
+                                                                        : useWalletPoint);
                                                             double
                                                                 itemTotalForGst =
                                                                 (cartTotalAfterDiscountsForGst /
@@ -5252,7 +5282,10 @@ class _CartPageState extends State<CartPage> {
                                                                 'isGift':
                                                                     isGift,
                                                                 'useWalletPoint':
-                                                                    useWalletPoint,
+                                                                    _activeRole ==
+                                                                            'Distributor'
+                                                                        ? 0
+                                                                        : useWalletPoint,
                                                                 'couponId': couponId
                                                                     .toString(),
                                                                 'deliveryMethod':
@@ -5375,7 +5408,10 @@ class _CartPageState extends State<CartPage> {
                                                                     .toString(),
                                                                 addressId,
                                                                 isGift,
-                                                                useWalletPoint,
+                                                                _activeRole ==
+                                                                        'Distributor'
+                                                                    ? 0
+                                                                    : useWalletPoint,
                                                                 couponId
                                                                     .toString(),
                                                                 'Cash on Delivery',

@@ -841,137 +841,135 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const Spacer(),
                   // Or Divider - Outside Card (hidden for Distributor/Wholesaler)
-                  if (widget.argument?['role'] != 'Distributor') ...[
-                    Row(
-                      children: [
-                        Expanded(
-                            child:
-                                Container(height: 1, color: inputBorderColor)),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Text(
-                            'Or continue with',
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey[500],
-                            ),
+                  // Or Divider
+                  Row(
+                    children: [
+                      Expanded(
+                          child: Container(height: 1, color: inputBorderColor)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(
+                          'Or continue with',
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[500],
                           ),
                         ),
-                        Expanded(
-                            child:
-                                Container(height: 1, color: inputBorderColor)),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    // Google Sign In Button - Outside Card
-                    InkWell(
-                      onTap: () async {
-                        try {
-                          setState(() => _isLoading = true);
-                          // Web client ID from google-services.json (client_type: 3)
-                          final googleSignIn = GoogleSignIn(
-                            scopes: ['email'],
-                            serverClientId:
-                                '990776187523-31hv31ogtp5c4pdpf5t5f4d687ve4tct.apps.googleusercontent.com',
-                          );
-                          final googleAccount = await googleSignIn.signIn();
-                          if (googleAccount == null) {
-                            setState(() => _isLoading = false);
-                            return;
-                          }
-                          final googleAuth = await googleAccount.authentication;
-                          final credential = GoogleAuthProvider.credential(
-                            accessToken: googleAuth.accessToken,
-                            idToken: googleAuth.idToken,
-                          );
-                          final userCredential = await FirebaseAuth.instance
-                              .signInWithCredential(credential);
-                          if (userCredential.user != null) {
-                            _loginData['email'] = userCredential.user!.email;
-                            _loginData['phone'] =
-                                userCredential.user!.phoneNumber;
-                            _loginData['first_name'] =
-                                userCredential.user!.displayName;
-                            _loginData['is_social_login'] = true;
-                            _loginData['password'] = '123456';
-                            _loginData['role'] = widget.argument['role'];
-                            _loginData['social_login_name'] = "GOOGLE";
-                            var authModel =
-                                Provider.of<AuthModel>(context, listen: false);
-                            await authModel.login(loginData: _loginData);
-                            if (_configModel.isLoggedIn) {
-                              Navigator.pushReplacementNamed(context, '/');
+                      ),
+                      Expanded(
+                          child: Container(height: 1, color: inputBorderColor)),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  // Google Sign In Button - Outside Card
+                  InkWell(
+                    onTap: () async {
+                      try {
+                        setState(() => _isLoading = true);
+                        // Web client ID from google-services.json (client_type: 3)
+                        final googleSignIn = GoogleSignIn(
+                          scopes: ['email'],
+                          serverClientId:
+                              '990776187523-31hv31ogtp5c4pdpf5t5f4d687ve4tct.apps.googleusercontent.com',
+                        );
+                        final googleAccount = await googleSignIn.signIn();
+                        if (googleAccount == null) {
+                          setState(() => _isLoading = false);
+                          return;
+                        }
+                        final googleAuth = await googleAccount.authentication;
+                        final credential = GoogleAuthProvider.credential(
+                          accessToken: googleAuth.accessToken,
+                          idToken: googleAuth.idToken,
+                        );
+                        final userCredential = await FirebaseAuth.instance
+                            .signInWithCredential(credential);
+                        if (userCredential.user != null) {
+                          _loginData['email'] = userCredential.user!.email;
+                          _loginData['phone'] =
+                              userCredential.user!.phoneNumber;
+                          _loginData['first_name'] =
+                              userCredential.user!.displayName;
+                          _loginData['is_social_login'] = true;
+                          _loginData['password'] = '123456';
+                          _loginData['role'] = widget.argument['role'];
+                          _loginData['social_login_name'] = "GOOGLE";
+                          var authModel =
+                              Provider.of<AuthModel>(context, listen: false);
+                          await authModel.login(loginData: _loginData);
+                          if (_configModel.isLoggedIn) {
+                            Navigator.pushReplacementNamed(context, '/');
+                          } else {
+                            String errorMessage =
+                                _configModel.loginFailedMessage;
+                            if (errorMessage
+                                    .toLowerCase()
+                                    .contains('already exists') ||
+                                errorMessage
+                                    .toLowerCase()
+                                    .contains('already registered') ||
+                                errorMessage
+                                    .toLowerCase()
+                                    .contains('user exists')) {
+                              _showExistingUserDialog();
                             } else {
-                              String errorMessage =
-                                  _configModel.loginFailedMessage;
-                              if (errorMessage
-                                      .toLowerCase()
-                                      .contains('already exists') ||
-                                  errorMessage
-                                      .toLowerCase()
-                                      .contains('already registered') ||
-                                  errorMessage
-                                      .toLowerCase()
-                                      .contains('user exists')) {
-                                _showExistingUserDialog();
-                              } else {
-                                _showGenericErrorDialog(errorMessage);
-                              }
+                              _showGenericErrorDialog(errorMessage);
                             }
                           }
-                        } catch (e) {
-                          String errorMessage =
-                              'An error occurred during Google Sign-In';
-                          if (e is FirebaseAuthException) {
-                            errorMessage =
-                                'Firebase Auth Error: ${e.code} - ${e.message}';
-                          } else {
-                            errorMessage = 'Error: $e';
-                          }
-                          print(errorMessage);
-                          _showGenericErrorDialog(errorMessage);
-                        } finally {
-                          setState(() => _isLoading = false);
                         }
-                      },
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: inputBorderColor),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.03),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
+                      } catch (e) {
+                        String errorMessage =
+                            'An error occurred during Google Sign-In';
+                        if (e is FirebaseAuthException) {
+                          errorMessage =
+                              'Firebase Auth Error: ${e.code} - ${e.message}';
+                        } else {
+                          errorMessage = 'Error: $e';
+                        }
+                        print(errorMessage);
+                        _showGenericErrorDialog(errorMessage);
+                      } finally {
+                        setState(() => _isLoading = false);
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: inputBorderColor),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.03),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset('assets/images/googleic-3Lc.png',
+                              width: 20, height: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Continue with Google',
+                            style: MyGoogleFontStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xff1e232c),
                             ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset('assets/images/googleic-3Lc.png',
-                                width: 20, height: 20),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Continue with Google',
-                              style: MyGoogleFontStyle(
-                                fontFamily: 'Urbanist',
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xff1e232c),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
+
                   const SizedBox(height: 16),
                   // Register Link - Outside Card
                   Center(
