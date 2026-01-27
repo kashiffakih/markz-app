@@ -14,6 +14,7 @@ class AddToCart {
   String? pack;
   String? productPrice;
   int? points;
+  String? role;
   User? user;
   Product? product;
 
@@ -30,6 +31,7 @@ class AddToCart {
       this.pack,
       this.points,
       this.productPrice,
+      this.role,
       this.user,
       this.product});
 
@@ -46,6 +48,7 @@ class AddToCart {
     pack = json['pack'];
     points = json['points'];
     productPrice = json['product_price'];
+    role = json['role'];
     user = json['user'] != null ? new User.fromJson(json['user']) : null;
     product =
         json['product'] != null ? new Product.fromJson(json['product']) : null;
@@ -65,6 +68,7 @@ class AddToCart {
     data['pack'] = this.pack;
     data['product_price'] = this.productPrice;
     data['points'] = this.points;
+    data['role'] = this.role;
     if (this.user != null) {
       data['user'] = this.user!.toJson();
     }

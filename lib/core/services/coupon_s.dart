@@ -13,7 +13,7 @@ class CouponService {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
     print(coupon);
     http.Response _response = await http.get(
-      Uri.parse('${_apiConfig['baseURL']}/company_coupons?search=$coupon'),
+      Uri.parse('${_apiConfig['baseURL']}/company_coupons'),
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);

@@ -2523,6 +2523,9 @@ class _CartPageState extends State<CartPage> {
                                                               await _couponModel
                                                                   .verifyCoupon(
                                                                       coupon);
+                                                              // Debug: Check coupon verification result
+                                                              print(
+                                                                  'DEBUG verifyCoupon: coupons=${_couponModel.coupons}, length=${_couponModel.coupons?.length ?? 0}');
                                                               // print(_couponModel.coupons![0].minOrderValue);
                                                               if (_couponModel
                                                                           .coupons !=
@@ -2534,10 +2537,11 @@ class _CartPageState extends State<CartPage> {
                                                                     _couponModel
                                                                         .coupons![0];
                                                                 final cartTotal =
-                                                                    num.parse(_addToCartModel
-                                                                            .cartTotal
-                                                                            .toString())
-                                                                        .toInt();
+                                                                    _calculateSelectedItemsTotal();
+
+                                                                // Debug: Check actual values being compared
+                                                                print(
+                                                                    'DEBUG Coupon: minOrderValue=${firstCoupon.minOrderValue}, cartTotal=$cartTotal, comparison: ${firstCoupon.minOrderValue} <= $cartTotal = ${(firstCoupon.minOrderValue ?? 0) <= cartTotal}');
 
                                                                 // Check coupon usage count
                                                                 final orderModel =
@@ -2587,7 +2591,7 @@ class _CartPageState extends State<CartPage> {
                                                                     ),
                                                                   );
                                                                 } else if (firstCoupon
-                                                                        .minOrderValue! <
+                                                                        .minOrderValue! <=
                                                                     cartTotal) {
                                                                   setState(() {
                                                                     // Calculate item total (cart total without GST)
@@ -2921,7 +2925,7 @@ class _CartPageState extends State<CartPage> {
                                                 ),
                                               );
                                             } else if (firstCoupon
-                                                    .minOrderValue! <
+                                                    .minOrderValue! <=
                                                 cartTotal) {
                                               // Combine all setState calls into one
                                               setState(() {
@@ -3542,132 +3546,126 @@ class _CartPageState extends State<CartPage> {
                                               ),
                                               SizedBox(height: 16),
                                               // COD Option
-                                              if (_activeRole != 'Distributor')
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      paymentOption =
-                                                          'Cash On Delivery';
-                                                    });
-                                                  },
-                                                  child: AnimatedContainer(
-                                                    duration: Duration(
-                                                        milliseconds: 200),
-                                                    padding: EdgeInsets.all(14),
-                                                    decoration: BoxDecoration(
+                                              // if (_activeRole != 'Distributor')
+                                              GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    paymentOption =
+                                                        'Cash On Delivery';
+                                                  });
+                                                },
+                                                child: AnimatedContainer(
+                                                  duration: Duration(
+                                                      milliseconds: 200),
+                                                  padding: EdgeInsets.all(14),
+                                                  decoration: BoxDecoration(
+                                                    color: paymentOption ==
+                                                            'Cash On Delivery'
+                                                        ? Color(0xFFF5F0E0)
+                                                        : Color(0xFFF8F9FA),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12),
+                                                    border: Border.all(
                                                       color: paymentOption ==
                                                               'Cash On Delivery'
-                                                          ? Color(0xFFF5F0E0)
-                                                          : Color(0xFFF8F9FA),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                      border: Border.all(
-                                                        color: paymentOption ==
-                                                                'Cash On Delivery'
-                                                            ? Color(0xFFC7B456)
-                                                            : Color(0xFFE0E0E0),
-                                                        width: paymentOption ==
-                                                                'Cash On Delivery'
-                                                            ? 2
-                                                            : 1,
-                                                      ),
+                                                          ? Color(0xFFC7B456)
+                                                          : Color(0xFFE0E0E0),
+                                                      width: paymentOption ==
+                                                              'Cash On Delivery'
+                                                          ? 2
+                                                          : 1,
                                                     ),
-                                                    child: Row(
-                                                      children: [
-                                                        Container(
-                                                          width: 40,
-                                                          height: 40,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: Colors.green
-                                                                .withOpacity(
-                                                                    0.1),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                          ),
-                                                          child: Icon(
-                                                            Icons.money_rounded,
-                                                            color: Colors.green,
-                                                            size: 22,
-                                                          ),
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 40,
+                                                        height: 40,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.green
+                                                              .withOpacity(0.1),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
                                                         ),
-                                                        SizedBox(width: 12),
-                                                        Expanded(
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Text(
-                                                                'Cash on Delivery',
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontFamily:
-                                                                      'Urbanist',
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                  color: Color(
-                                                                      0xFF1A1A1A),
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                'Pay when you receive',
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontFamily:
-                                                                      'Urbanist',
-                                                                  fontSize: 11,
-                                                                  color: Color(
-                                                                      0xFF888888),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
+                                                        child: Icon(
+                                                          Icons.money_rounded,
+                                                          color: Colors.green,
+                                                          size: 22,
                                                         ),
-                                                        AnimatedContainer(
-                                                          duration: Duration(
-                                                              milliseconds:
-                                                                  200),
-                                                          width: 22,
-                                                          height: 22,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            shape:
-                                                                BoxShape.circle,
+                                                      ),
+                                                      SizedBox(width: 12),
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              'Cash on Delivery',
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'Urbanist',
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                color: Color(
+                                                                    0xFF1A1A1A),
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              'Pay when you receive',
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'Urbanist',
+                                                                fontSize: 11,
+                                                                color: Color(
+                                                                    0xFF888888),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      AnimatedContainer(
+                                                        duration: Duration(
+                                                            milliseconds: 200),
+                                                        width: 22,
+                                                        height: 22,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          color: paymentOption ==
+                                                                  'Cash On Delivery'
+                                                              ? Color(
+                                                                  0xFFC7B456)
+                                                              : Colors
+                                                                  .transparent,
+                                                          border: Border.all(
                                                             color: paymentOption ==
                                                                     'Cash On Delivery'
                                                                 ? Color(
                                                                     0xFFC7B456)
-                                                                : Colors
-                                                                    .transparent,
-                                                            border: Border.all(
-                                                              color: paymentOption ==
-                                                                      'Cash On Delivery'
-                                                                  ? Color(
-                                                                      0xFFC7B456)
-                                                                  : Color(
-                                                                      0xFFBDBDBD),
-                                                              width: 2,
-                                                            ),
+                                                                : Color(
+                                                                    0xFFBDBDBD),
+                                                            width: 2,
                                                           ),
-                                                          child: paymentOption ==
-                                                                  'Cash On Delivery'
-                                                              ? Icon(
-                                                                  Icons.check,
-                                                                  size: 14,
-                                                                  color: Colors
-                                                                      .white)
-                                                              : null,
                                                         ),
-                                                      ],
-                                                    ),
+                                                        child: paymentOption ==
+                                                                'Cash On Delivery'
+                                                            ? Icon(Icons.check,
+                                                                size: 14,
+                                                                color: Colors
+                                                                    .white)
+                                                            : null,
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
+                                              ),
                                               SizedBox(height: 10),
                                               // UPI/PhonePe Option
                                               GestureDetector(
@@ -5056,7 +5054,7 @@ class _CartPageState extends State<CartPage> {
                                                                   totalPayable =
                                                                   _calculateTotalPayable();
                                                               if (totalPayable <
-                                                                      10000 &&
+                                                                      100 &&
                                                                   !_isOnlyMadaniProducts()) {
                                                                 showDialog(
                                                                   context:
@@ -5388,8 +5386,8 @@ class _CartPageState extends State<CartPage> {
 
                                                               // Start PhonePe transaction
                                                               _startTransaction(
-                                                                  // 1,
-                                                                  minumumPayable,
+                                                                  1,
+                                                                  // minumumPayable,
                                                                   mobileNumber,
                                                                   payloadData,
                                                                   context);

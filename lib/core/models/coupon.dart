@@ -34,8 +34,12 @@ class Coupon {
     value = json['value'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-    noPerUser = json['no_per_user'];
-    minOrderValue = json['min_order_value'];
+    noPerUser = json['no_per_user'] != null
+        ? int.tryParse(json['no_per_user'].toString())
+        : null;
+    minOrderValue = json['min_order_value'] != null
+        ? int.tryParse(json['min_order_value'].toString())
+        : null;
   }
 
   Map<String, dynamic> toJson() {

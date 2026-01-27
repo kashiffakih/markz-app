@@ -10,12 +10,12 @@ class WishListService {
   List<WishList> _wishLists = [];
   Future<List<WishList>> getWishLists(productId) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    
+
     // Return empty list if user is not logged in
     if (_configModel.user == null) {
       return <WishList>[];
     }
-    
+
     var userId = _configModel.user!.id;
 
     http.Response _response = await http.get(
@@ -35,16 +35,17 @@ class WishListService {
 
   Future<bool> addAllToCart() async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
-    
+
     if (_configModel.user == null) {
       return false;
     }
     var userId = _configModel.user!.id;
+    var activeRole = _configModel.activeRole; // Get active role
 
     bool type = true;
     http.Response _response = await http.get(
       Uri.parse(
-          '${_apiConfig['baseURL']}/wishlist_to_all_add_to_cart?userId=$userId&type=$type'),
+          '${_apiConfig['baseURL']}/wishlist_to_all_add_to_cart?userId=$userId&type=$type&role=$activeRole'),
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
