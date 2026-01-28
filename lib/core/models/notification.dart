@@ -17,6 +17,8 @@ class MyNotification {
   int? uActive;
   int? uInactive;
   int? userId;
+  int? isSeen;
+  String? sendBy;
 
   MyNotification(
       {this.id,
@@ -36,7 +38,9 @@ class MyNotification {
       this.vNa,
       this.uActive,
       this.uInactive,
-      this.userId});
+      this.userId,
+      this.isSeen,
+      this.sendBy});
 
   MyNotification.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -57,6 +61,8 @@ class MyNotification {
     uActive = json['u_active'];
     uInactive = json['u_inactive'];
     userId = json['user_id'];
+    isSeen = json['is_seen'];
+    sendBy = json['send_by'];
   }
 
   Map<String, dynamic> toJson() {
@@ -79,6 +85,8 @@ class MyNotification {
     data['u_active'] = this.uActive;
     data['u_inactive'] = this.uInactive;
     data['user_id'] = this.userId;
+    data['is_seen'] = this.isSeen;
+    data['send_by'] = this.sendBy;
     return data;
   }
 }

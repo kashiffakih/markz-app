@@ -23,6 +23,8 @@ import 'package:aadab/ui/views/products/shops_p.dart';
 import 'package:aadab/ui/widgets/login_required_popup.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:aadab/core/models/user.dart';
+import 'package:aadab/core/providers/notification_pr.dart';
+import 'package:aadab/ui/views/profile/notifications_p.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -688,10 +690,31 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             BottomNavigationBarItem(
               label: 'Notifs',
-              icon: Image.asset('assets/images/notification-icon.png',
-                  width: _bottomNavIconSize.toDouble(),
-                  height: _bottomNavIconSize.toDouble(),
-                  color: Color(0xFF909090)),
+              icon: Consumer<NotificationModel>(
+                builder: (context, notifModel, child) {
+                  return badges.Badge(
+                    showBadge: notifModel.systemUnreadCount > 0,
+                    badgeContent: Text(
+                      '${notifModel.systemUnreadCount}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    badgeStyle: badges.BadgeStyle(
+                      badgeColor: Color(0xFFEED056),
+                      padding: EdgeInsets.all(6),
+                    ),
+                    child: Image.asset(
+                      'assets/images/notification-icon.png',
+                      width: _bottomNavIconSize.toDouble(),
+                      height: _bottomNavIconSize.toDouble(),
+                      color: Color(0xFF909090),
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -728,7 +751,12 @@ class _ProfilePageState extends State<ProfilePage> {
     } else if (value == 3 && configModel.user != null) {
       // Already on profile page
     } else if (value == 4 && configModel.user != null) {
-      Navigator.pushNamed(context, '/notificationPage');
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NotificationsPage(sendBy: 'System'),
+        ),
+      );
     } else {
       showDialog(
           context: context, builder: (context) => LoginRequiredPopupWidget());

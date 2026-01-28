@@ -13,7 +13,8 @@ import 'package:aadab/ui/views/products/shops_p.dart';
 import 'package:aadab/ui/views/checkout/cart_p.dart';
 
 class NotificationsPage extends StatefulWidget {
-  const NotificationsPage({Key? key}) : super(key: key);
+  final String? sendBy;
+  const NotificationsPage({Key? key, this.sendBy}) : super(key: key);
 
   @override
   State<NotificationsPage> createState() => _NotificationsPageState();
@@ -38,8 +39,11 @@ class _NotificationsPageState extends State<NotificationsPage> {
     });
 
     try {
-      await Provider.of<NotificationModel>(context, listen: false)
-          .getMyNotifications();
+      final notifModel = Provider.of<NotificationModel>(context, listen: false);
+      await notifModel.getMyNotifications(sendBy: widget.sendBy);
+      // Mark as seen when page opens
+      notifModel.markAllAsSeen(sendBy: widget.sendBy);
+
       setState(() {
         _isLoading = false;
       });
@@ -248,6 +252,10 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                         SizedBox(height: 12.0.w),
                                     itemBuilder: (context, index) {
                                       final notification = notifications[index];
+                                      final bool isUnseen =
+                                          notification.isSeen == 0 ||
+                                              notification.isSeen == null;
+
                                       return InkWell(
                                         onTap: () {
                                           Navigator.push(
@@ -262,9 +270,20 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                         child: Container(
                                           padding: EdgeInsets.all(12.0.w),
                                           decoration: BoxDecoration(
-                                            color: Colors.white,
+                                            color: isUnseen
+                                                ? Color(
+                                                    0xFFFFFDF5) // Light yellow for unseen
+                                                : Colors.white,
                                             borderRadius:
                                                 BorderRadius.circular(12.0.r),
+                                            border: isUnseen
+                                                ? Border(
+                                                    left: BorderSide(
+                                                      color: Color(0xFFEED056),
+                                                      width: 4.0,
+                                                    ),
+                                                  )
+                                                : null,
                                             boxShadow: [
                                               BoxShadow(
                                                 color: Colors.black
@@ -274,34 +293,58 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                               ),
                                             ],
                                           ),
-                                          child: Column(
+                                          child: Row(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                notification.title ??
-                                                    'Notification',
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Poppins',
-                                                  fontSize: 14.0.sp,
-                                                  fontWeight: FontWeight.w600,
-                                                  color:
-                                                      const Color(0xff232323),
+                                              // Unseen indicator dot
+                                              if (isUnseen)
+                                                Container(
+                                                  margin: EdgeInsets.only(
+                                                      right: 8.w, top: 4.w),
+                                                  width: 8.w,
+                                                  height: 8.w,
+                                                  decoration: BoxDecoration(
+                                                    color: Color(0xFFEED056),
+                                                    shape: BoxShape.circle,
+                                                  ),
                                                 ),
-                                              ),
-                                              SizedBox(height: 4.0.w),
-                                              Text(
-                                                notification.details ??
-                                                    'No details available',
-                                                style: MyGoogleFontStyle(
-                                                  fontFamily: 'Poppins',
-                                                  fontSize: 12.0.sp,
-                                                  fontWeight: FontWeight.w400,
-                                                  color:
-                                                      const Color(0xff909090),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      notification.title ??
+                                                          'Notification',
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: 14.0.sp,
+                                                        fontWeight: isUnseen
+                                                            ? FontWeight.w700
+                                                            : FontWeight.w600,
+                                                        color: const Color(
+                                                            0xff232323),
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 4.0.w),
+                                                    Text(
+                                                      notification.details ??
+                                                          'No details available',
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: 12.0.sp,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        color: const Color(
+                                                            0xff909090),
+                                                      ),
+                                                      maxLines: 3,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ],
                                                 ),
-                                                maxLines: 3,
-                                                overflow: TextOverflow.ellipsis,
                                               ),
                                             ],
                                           ),

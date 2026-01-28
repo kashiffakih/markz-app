@@ -18,7 +18,24 @@ class NotificationModel with ChangeNotifier {
   }
 
   List<MyNotification>? get notifications => _notifications;
-  getMyNotifications() async {
-    notifications = await _notificationService.getMyNotifications();
+
+  int get unreadCount => _notificationService.unreadCount;
+  int get adminUnreadCount => _notificationService.adminUnreadCount;
+  int get systemUnreadCount => _notificationService.systemUnreadCount;
+
+  getMyNotifications({String? sendBy}) async {
+    notifications =
+        await _notificationService.getMyNotifications(sendBy: sendBy);
+    notifyListeners();
+  }
+
+  fetchUnreadCount() async {
+    await _notificationService.fetchUnreadCounts();
+    notifyListeners();
+  }
+
+  markAllAsSeen({String? sendBy}) async {
+    await _notificationService.markAllAsSeen(sendBy: sendBy);
+    await fetchUnreadCount();
   }
 }

@@ -4,12 +4,31 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:aadab/core/providers/config_pr.dart';
+import 'package:aadab/core/services/firebase_api.dart';
 import 'package:aadab/locator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class AuthService {
   final ConfigModel _configModel = locator<ConfigModel>();
+
+  /// Force refresh FCM token on login to prevent SenderId mismatch issues
+  Future<void> _refreshFcmTokenOnLogin() async {
+    try {
+      debugPrint('Refreshing FCM token on login...');
+      final firebaseApi = FirebaseApi();
+      final newToken = await firebaseApi.forceRefreshToken();
+
+      if (newToken != null && newToken.isNotEmpty) {
+        debugPrint('Got new FCM token, sending to server...');
+        await updateFcmToken(newToken: newToken);
+      } else {
+        debugPrint('Failed to get new FCM token');
+      }
+    } catch (e) {
+      debugPrint('Error refreshing FCM token on login: $e');
+    }
+  }
 
   Future<Map<String, dynamic>> getLoggedInUser(
       {@required Map<String, dynamic>? loginData}) async {
@@ -38,6 +57,10 @@ class AuthService {
         } else if (_responseData['success']) {
           await _configModel.saveLoginData(newLoginData: loginData);
           _configModel.saveUserData(responseData: _responseData);
+
+          // Force refresh FCM token on login to ensure fresh token
+          _refreshFcmTokenOnLogin();
+
           return {
             'success': true,
             'message': _responseData['message'] ?? 'Login successful'

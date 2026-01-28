@@ -23,6 +23,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:aadab/core/providers/auth_pr.dart';
 import 'package:aadab/ui/widgets/common_product_card.dart';
+import 'package:aadab/core/providers/notification_pr.dart';
+import 'package:aadab/ui/views/profile/notifications_p.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -349,6 +351,7 @@ class _HomePageState extends State<HomePage>
         if (configModel.user != null) ...[
           context.read<WishListModel>().getWishLists(''),
           context.read<AddToCartModel>().getAddToCart('', '', _cartData),
+          context.read<NotificationModel>().fetchUnreadCount(),
         ],
       ]);
 
@@ -595,14 +598,50 @@ class _HomePageState extends State<HomePage>
                   ),
                 ],
               ),
-              Container(
-                padding: EdgeInsets.all(8.w),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  shape: BoxShape.circle,
+              InkWell(
+                onTap: () {
+                  if (configModel.user != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            NotificationsPage(sendBy: 'Admin'),
+                      ),
+                    );
+                  } else {
+                    showDialog(
+                        context: context,
+                        builder: (context) => LoginRequiredPopupWidget());
+                  }
+                },
+                child: Consumer<NotificationModel>(
+                  builder: (context, notifModel, child) {
+                    return badges.Badge(
+                      showBadge: notifModel.adminUnreadCount > 0,
+                      badgeContent: Text(
+                        '${notifModel.adminUnreadCount}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      badgeStyle: badges.BadgeStyle(
+                        badgeColor: Color(0xFFEED056),
+                        padding: EdgeInsets.all(6),
+                      ),
+                      child: Container(
+                        padding: EdgeInsets.all(8.w),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.notifications_none,
+                            color: Colors.white, size: 22.sp),
+                      ),
+                    );
+                  },
                 ),
-                child: Icon(Icons.notifications_none,
-                    color: Colors.white, size: 22.sp),
               ),
             ],
           ),
@@ -1148,10 +1187,31 @@ class _HomePageState extends State<HomePage>
             ),
             BottomNavigationBarItem(
               label: 'Notifs',
-              icon: Image.asset('assets/images/notification-icon.png',
-                  width: _bottomNavIconSize.toDouble(),
-                  height: _bottomNavIconSize.toDouble(),
-                  color: Color(0xFF909090)), // Explicitly grey
+              icon: Consumer<NotificationModel>(
+                builder: (context, notifModel, child) {
+                  return badges.Badge(
+                    showBadge: notifModel.systemUnreadCount > 0,
+                    badgeContent: Text(
+                      '${notifModel.systemUnreadCount}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    badgeStyle: badges.BadgeStyle(
+                      badgeColor: Color(0xFFEED056),
+                      padding: EdgeInsets.all(6),
+                    ),
+                    child: Image.asset(
+                      'assets/images/notification-icon.png',
+                      width: _bottomNavIconSize.toDouble(),
+                      height: _bottomNavIconSize.toDouble(),
+                      color: Color(0xFF909090),
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -1188,7 +1248,12 @@ class _HomePageState extends State<HomePage>
     } else if (value == 3 && configModel.user != null) {
       Navigator.pushNamed(context, '/profilePage');
     } else if (value == 4 && configModel.user != null) {
-      Navigator.pushNamed(context, '/notificationPage');
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NotificationsPage(sendBy: 'System'),
+        ),
+      );
     } else {
       showDialog(
           context: context, builder: (context) => LoginRequiredPopupWidget());

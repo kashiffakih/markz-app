@@ -24,6 +24,23 @@ class FirebaseApi {
   static String? _fcmToken;
   static String? get fcmToken => _fcmToken;
 
+  /// Force refresh FCM token - call this on login to ensure fresh token
+  Future<String?> forceRefreshToken() async {
+    try {
+      debugPrint('Getting FCM token on login...');
+
+      // Just get the current token - don't delete it
+      // Deleting can cause race conditions where the new token isn't registered yet
+      _fcmToken = await _firebaseMessaging.getToken();
+      debugPrint('FCM Token on login: $_fcmToken');
+
+      return _fcmToken;
+    } catch (e) {
+      debugPrint('Error getting FCM token: $e');
+      return null;
+    }
+  }
+
   Future<void> initNotifications() async {
     try {
       // Request notification permissions
@@ -88,9 +105,8 @@ class FirebaseApi {
         debugPrint('Body: ${message.notification?.body}');
         debugPrint('Data: ${message.data}');
 
-        if (message.notification != null) {
-          _showNotification(message);
-        }
+        // Always show notification in foreground, whether notification payload exists or not
+        _showNotification(message);
       });
 
       // Handle notification when app is opened from terminated state
@@ -125,6 +141,23 @@ class FirebaseApi {
       requestBadgePermission: false,
       requestSoundPermission: false,
     );
+
+    // Create the notification channel explicitly for Android
+    // This ensures background notifications work even if _showNotification hasn't been called yet
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'aadab_notifications', // id
+      'Aadab Notifications', // title
+      description: 'Important notifications from Aadab app', // description
+      importance: Importance.high,
+      playSound: true,
+      enableVibration: true,
+      enableLights: true,
+    );
+
+    await _flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
 
     // Combine platform settings
     const InitializationSettings initializationSettings =
@@ -167,7 +200,14 @@ class FirebaseApi {
   }
 
   Future<void> _showNotification(RemoteMessage message) async {
-    // Create notification channel for Android
+    // Get title and body from notification or data payload
+    final title =
+        message.notification?.title ?? message.data['title'] ?? 'Aadab';
+    final body = message.notification?.body ??
+        message.data['body'] ??
+        'You have a new notification';
+
+    // Create notification channel for Android with default sound
     AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'aadab_notifications',
       'Aadab Notifications',
@@ -177,37 +217,18 @@ class FirebaseApi {
       showWhen: true,
       enableVibration: true,
       enableLights: true,
-      color: const Color(0xFF2196F3),
-      ledColor: const Color(0xFF2196F3),
+      playSound: true,
+      color: Color(0xFF2196F3),
+      ledColor: Color(0xFF2196F3),
       ledOnMs: 1000,
       ledOffMs: 500,
       styleInformation: BigTextStyleInformation(
-        message.notification?.body ?? '',
+        body,
         htmlFormatBigText: true,
-        contentTitle: message.notification?.title,
+        contentTitle: title,
         htmlFormatContentTitle: true,
       ),
     );
-
-    // Add custom sound if available
-    if (message.notification?.android?.sound != null) {
-      androidDetails = AndroidNotificationDetails(
-        'aadab_notifications',
-        'Aadab Notifications',
-        channelDescription: 'Important notifications from Aadab app',
-        importance: Importance.high,
-        priority: Priority.high,
-        sound: RawResourceAndroidNotificationSound(
-          message.notification!.android!.sound!.split('.').first,
-        ),
-        styleInformation: BigTextStyleInformation(
-          message.notification?.body ?? '',
-          htmlFormatBigText: true,
-          contentTitle: message.notification?.title,
-          htmlFormatContentTitle: true,
-        ),
-      );
-    }
 
     const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
       presentAlert: true,
@@ -227,8 +248,8 @@ class FirebaseApi {
 
     await _flutterLocalNotificationsPlugin.show(
       notificationId,
-      message.notification?.title ?? 'Aadab',
-      message.notification?.body ?? 'You have a new notification',
+      title,
+      body,
       platformDetails,
       payload: message.data.isNotEmpty ? jsonEncode(message.data) : null,
     );
