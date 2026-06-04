@@ -271,6 +271,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     ),
                   ),
                 ),
+              /*
               if (widget.arguments?['order']['delhivery_waybill'] != null) ...[
                 SizedBox(width: 8.w),
                 InkWell(
@@ -318,6 +319,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   ),
                 ),
               ],
+              */
             ],
           ),
           SizedBox(height: 12.w),

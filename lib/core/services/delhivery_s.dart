@@ -4,6 +4,7 @@ import 'package:aadab/core/providers/config_pr.dart';
 import 'package:aadab/locator.dart';
 import 'package:http/http.dart' as http;
 
+/*
 class DelhiveryService {
   final ConfigModel _configModel = locator<ConfigModel>();
 
@@ -44,3 +45,4 @@ class DelhiveryService {
     return _responseData;
   }
 }
+*/

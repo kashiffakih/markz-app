@@ -15,7 +15,7 @@ import 'package:aadab/core/services/phonepe_s.dart';
 import 'package:aadab/core/services/product_notification_s.dart';
 import 'package:aadab/core/services/invoice_service.dart';
 import 'package:aadab/core/services/favourite_wholesaler_s.dart';
-import 'package:aadab/core/services/delhivery_s.dart';
+// import 'package:aadab/core/services/delhivery_s.dart';
 
 GetIt locator = GetIt.instance;
 
@@ -36,5 +36,5 @@ void setupLocator() {
   locator.registerLazySingleton(() => ProductNotificationService());
   locator.registerLazySingleton(() => InvoiceService());
   locator.registerLazySingleton(() => FavouriteWholesalerService());
-  locator.registerLazySingleton(() => DelhiveryService());
+  // locator.registerLazySingleton(() => DelhiveryService());
 }

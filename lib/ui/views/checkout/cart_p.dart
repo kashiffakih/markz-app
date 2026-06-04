@@ -29,7 +29,7 @@ import 'package:aadab/ui/views/profile/address_p.dart';
 import 'package:aadab/ui/views/promocodes/promocodes_p.dart';
 import 'package:aadab/ui/widgets/common_product_card.dart';
 import 'package:aadab/core/services/favourite_wholesaler_s.dart';
-import 'package:aadab/core/services/delhivery_s.dart';
+// import 'package:aadab/core/services/delhivery_s.dart';
 
 import '../../../core/providers/wish_list_pr.dart';
 import '../products/product_id_p.dart';
@@ -70,10 +70,12 @@ class _CartPageState extends State<CartPage> {
   final PhonePeService _phonePeService = locator<PhonePeService>();
   String result = "";
 
-  double? delhiveryShippingCost;
+  // double? delhiveryShippingCost;
   bool isLoadingShipping = false;
 
   void _calculateShippingCost() async {
+    // Commented out Delhivery calculation
+    /*
     print("Checbh");
     if (address.pincode != null) {
       setState(() {
@@ -112,6 +114,7 @@ class _CartPageState extends State<CartPage> {
         });
       }
     }
+    */
   }
 
   // Helper to get active role
@@ -4389,8 +4392,6 @@ class _CartPageState extends State<CartPage> {
                                                 ),
                                               SizedBox(height: 14),
                                               if (isLoadingShipping ||
-                                                  delhiveryShippingCost !=
-                                                      null ||
                                                   (double.tryParse(_configModel
                                                                   .user
                                                                   ?.companies?[
@@ -4424,7 +4425,7 @@ class _CartPageState extends State<CartPage> {
                                                                     .orange,
                                                                 fontSize: 12))
                                                         : Text(
-                                                            'RS ${delhiveryShippingCost?.toStringAsFixed(2) ?? double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ?? '0')?.toStringAsFixed(2) ?? '0'}',
+                                                            'RS ${double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ?? '0')?.toStringAsFixed(2) ?? '0'}',
                                                             textAlign:
                                                                 TextAlign.right,
                                                             style:
@@ -4948,8 +4949,7 @@ class _CartPageState extends State<CartPage> {
                                                           (() {
                                                             int cartTotal =
                                                                 _calculateSelectedItemsTotal();
-                                                            double deliveryCharges = delhiveryShippingCost ??
-                                                                (double.tryParse(_configModel
+                                                            double deliveryCharges = (double.tryParse(_configModel
                                                                             .user
                                                                             ?.companies?[0]
                                                                             .deliveryCharges
@@ -5391,9 +5391,8 @@ class _CartPageState extends State<CartPage> {
                                                                   gstAmount / 2;
 
                                                               int deliveryCharges =
-                                                                  (delhiveryShippingCost ??
-                                                                          (double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ?? '0') ??
-                                                                              0))
+                                                                  (double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ?? '0') ??
+                                                                              0)
                                                                       .toInt();
                                                               int packagingCharges = _configModel
                                                                           .user!
@@ -5487,7 +5486,7 @@ class _CartPageState extends State<CartPage> {
                                                                     0,
                                                                 _gstController
                                                                     .text,
-                                                                delhiveryShippingCost,
+                                                                null,
                                                               );
 
                                                               if (response ==
