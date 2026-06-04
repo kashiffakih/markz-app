@@ -14,6 +14,7 @@ import 'package:aadab/locator.dart';
 import 'package:aadab/ui/views/products/product_id_p.dart';
 import 'package:aadab/core/services/invoice_service.dart';
 import 'package:printing/printing.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class OrderDetailsPage extends StatefulWidget {
   final arguments;
@@ -270,6 +271,53 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     ),
                   ),
                 ),
+              if (widget.arguments?['order']['delhivery_waybill'] != null) ...[
+                SizedBox(width: 8.w),
+                InkWell(
+                  onTap: () async {
+                    try {
+                      final waybill =
+                          widget.arguments?['order']['delhivery_waybill'];
+                      final trackingUrl =
+                          'https://www.delhivery.com/track/package/$waybill';
+                      print('Opening tracking URL: $trackingUrl');
+                      await launchUrl(
+                        Uri.parse(trackingUrl),
+                        mode: LaunchMode.externalApplication,
+                      );
+                    } catch (e) {
+                      print('Error launching URL: $e');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Could not open tracking page')),
+                      );
+                    }
+                  },
+                  child: Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.w),
+                    decoration: BoxDecoration(
+                      color: Color(0xFFEED056),
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.local_shipping_outlined,
+                            size: 16.sp, color: Colors.black87),
+                        SizedBox(width: 4.w),
+                        Text(
+                          'Track',
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
           SizedBox(height: 12.w),

@@ -60,7 +60,7 @@ class NotificationService {
         headers: _apiConfig['headers'],
       );
       Map<String, dynamic> adminData = json.decode(adminResponse.body);
-      if (adminData['success'] && adminData['unread_count'] != null) {
+      if (adminData['success'] == true && adminData['unread_count'] != null) {
         adminUnreadCount = adminData['unread_count'];
       }
     } catch (e) {
@@ -75,7 +75,7 @@ class NotificationService {
         headers: _apiConfig['headers'],
       );
       Map<String, dynamic> systemData = json.decode(systemResponse.body);
-      if (systemData['success'] && systemData['unread_count'] != null) {
+      if (systemData['success'] == true && systemData['unread_count'] != null) {
         systemUnreadCount = systemData['unread_count'];
       }
     } catch (e) {

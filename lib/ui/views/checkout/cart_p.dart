@@ -29,6 +29,7 @@ import 'package:aadab/ui/views/profile/address_p.dart';
 import 'package:aadab/ui/views/promocodes/promocodes_p.dart';
 import 'package:aadab/ui/widgets/common_product_card.dart';
 import 'package:aadab/core/services/favourite_wholesaler_s.dart';
+import 'package:aadab/core/services/delhivery_s.dart';
 
 import '../../../core/providers/wish_list_pr.dart';
 import '../products/product_id_p.dart';
@@ -68,6 +69,50 @@ class _CartPageState extends State<CartPage> {
 
   final PhonePeService _phonePeService = locator<PhonePeService>();
   String result = "";
+
+  double? delhiveryShippingCost;
+  bool isLoadingShipping = false;
+
+  void _calculateShippingCost() async {
+    print("Checbh");
+    if (address.pincode != null) {
+      setState(() {
+        isLoadingShipping = true;
+      });
+
+      try {
+        final DelhiveryService _delhiveryService = locator<DelhiveryService>();
+        String pincode = address.pincode.toString();
+
+        print("pincode qwer $pincode");
+
+        final selectedItems = _getSelectedCartItems();
+        int totalWeight = 0;
+        for (var item in selectedItems) {
+          totalWeight += (item.qty ?? 0) * 500; // 500g per item
+        }
+        if (totalWeight == 0) totalWeight = 500; // Minimum weight
+
+        var response = await _delhiveryService.calculateShippingCost(
+            pincode, totalWeight, 'Prepaid');
+
+        print("checqwqwqwq $response");
+
+        if (response != null && response['total_amount'] != null) {
+          setState(() {
+            delhiveryShippingCost =
+                double.tryParse(response['total_amount'].toString());
+          });
+        }
+      } catch (e) {
+        debugPrint('Error calculating Delhivery cost: $e');
+      } finally {
+        setState(() {
+          isLoadingShipping = false;
+        });
+      }
+    }
+  }
 
   // Helper to get active role
   String get _activeRole {
@@ -318,6 +363,7 @@ class _CartPageState extends State<CartPage> {
     });
     // Update select all state asynchronously to check stock status
     _updateSelectAllStateAsync();
+    _calculateShippingCost();
   }
 
   // Toggle select all (only in-stock items)
@@ -340,12 +386,14 @@ class _CartPageState extends State<CartPage> {
         _selectedCartItemIds = newSelection;
         _selectAll = true;
       });
+      _calculateShippingCost();
     } else {
       // Deselect all items
       setState(() {
         _selectedCartItemIds.clear();
         _selectAll = false;
       });
+      _calculateShippingCost();
     }
   }
 
@@ -365,6 +413,7 @@ class _CartPageState extends State<CartPage> {
     setState(() {
       _updateSelectAllState();
     });
+    _calculateShippingCost();
   }
 
   // Sync selection state with actual cart items (remove stale selections)
@@ -387,6 +436,7 @@ class _CartPageState extends State<CartPage> {
     setState(() {
       _updateSelectAllState();
     });
+    _calculateShippingCost();
   }
 
   // Get selected cart items
@@ -895,6 +945,11 @@ class _CartPageState extends State<CartPage> {
               address = defaultAddresses.first;
               debugPrint('Debug: Set default address: ${address.id}');
             }
+          }
+
+          // Calculate shipping cost if address is available
+          if (address.id != null) {
+            _calculateShippingCost();
           }
 
           // Auto-fill GST Number from user profile
@@ -2081,6 +2136,7 @@ class _CartPageState extends State<CartPage> {
                                                                               () {});
                                                                           await _validateAppliedCoupon();
                                                                           await _recalculateRewards();
+                                                                          _calculateShippingCost();
 
                                                                           setState(
                                                                               () {
@@ -2236,6 +2292,7 @@ class _CartPageState extends State<CartPage> {
                                                                               setState(() {});
                                                                               await _validateAppliedCoupon();
                                                                               await _recalculateRewards();
+                                                                              _calculateShippingCost();
 
                                                                               setState(() {
                                                                                 loadingItemIndex = null;
@@ -4331,14 +4388,18 @@ class _CartPageState extends State<CartPage> {
                                                   ),
                                                 ),
                                               SizedBox(height: 14),
-                                              if ((double.tryParse(_configModel
-                                                              .user
-                                                              ?.companies?[0]
-                                                              .deliveryCharges
-                                                              ?.toString() ??
-                                                          '0') ??
-                                                      0) >
-                                                  0)
+                                              if (isLoadingShipping ||
+                                                  delhiveryShippingCost !=
+                                                      null ||
+                                                  (double.tryParse(_configModel
+                                                                  .user
+                                                                  ?.companies?[
+                                                                      0]
+                                                                  .deliveryCharges
+                                                                  ?.toString() ??
+                                                              '0') ??
+                                                          0) >
+                                                      0)
                                                 Row(
                                                   children: [
                                                     Expanded(
@@ -4356,18 +4417,27 @@ class _CartPageState extends State<CartPage> {
                                                         ),
                                                       ),
                                                     ),
-                                                    Text(
-                                                      'RS ${double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ?? '0')?.toStringAsFixed(2) ?? '0'}',
-                                                      textAlign:
-                                                          TextAlign.right,
-                                                      style: MyGoogleFontStyle(
-                                                        fontFamily: 'Inter',
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                        color:
-                                                            Color(0xff303030),
-                                                      ),
-                                                    )
+                                                    isLoadingShipping
+                                                        ? Text('Calculating...',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .orange,
+                                                                fontSize: 12))
+                                                        : Text(
+                                                            'RS ${delhiveryShippingCost?.toStringAsFixed(2) ?? double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ?? '0')?.toStringAsFixed(2) ?? '0'}',
+                                                            textAlign:
+                                                                TextAlign.right,
+                                                            style:
+                                                                MyGoogleFontStyle(
+                                                              fontFamily:
+                                                                  'Inter',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              color: Color(
+                                                                  0xff303030),
+                                                            ),
+                                                          )
                                                   ],
                                                 ),
                                               if ((double.tryParse(_configModel
@@ -4878,15 +4948,14 @@ class _CartPageState extends State<CartPage> {
                                                           (() {
                                                             int cartTotal =
                                                                 _calculateSelectedItemsTotal();
-                                                            double
-                                                                deliveryCharges =
-                                                                double.tryParse(_configModel
+                                                            double deliveryCharges = delhiveryShippingCost ??
+                                                                (double.tryParse(_configModel
                                                                             .user
                                                                             ?.companies?[0]
                                                                             .deliveryCharges
                                                                             ?.toString() ??
                                                                         '0') ??
-                                                                    0;
+                                                                    0);
                                                             double
                                                                 packagingCharges =
                                                                 double.tryParse(_configModel
@@ -5321,19 +5390,10 @@ class _CartPageState extends State<CartPage> {
                                                                   cgstAmount =
                                                                   gstAmount / 2;
 
-                                                              int deliveryCharges = _configModel
-                                                                          .user!
-                                                                          .companies![
-                                                                              0]
-                                                                          .deliveryCharges ==
-                                                                      null
-                                                                  ? 0
-                                                                  : num.parse(_configModel
-                                                                          .user!
-                                                                          .companies![
-                                                                              0]
-                                                                          .deliveryCharges
-                                                                          .toString())
+                                                              int deliveryCharges =
+                                                                  (delhiveryShippingCost ??
+                                                                          (double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ?? '0') ??
+                                                                              0))
                                                                       .toInt();
                                                               int packagingCharges = _configModel
                                                                           .user!
@@ -5426,7 +5486,8 @@ class _CartPageState extends State<CartPage> {
                                                                         .platformFee ??
                                                                     0,
                                                                 _gstController
-                                                                    .text, // Pass GST Number
+                                                                    .text,
+                                                                delhiveryShippingCost,
                                                               );
 
                                                               if (response ==

@@ -58,6 +58,10 @@ class Order {
   UserAddress? address;
   String? gstNumber;
   String? role;
+  String? delhiveryWaybill;
+  String? delhiveryOrderId;
+  String? delhiveryTrackingUrl;
+  String? shippingLabelUrl;
 
   Order(
       {this.id,
@@ -114,7 +118,11 @@ class Order {
       required String taxPercent,
       this.address,
       this.gstNumber,
-      this.role});
+      this.role,
+      this.delhiveryWaybill,
+      this.delhiveryOrderId,
+      this.delhiveryTrackingUrl,
+      this.shippingLabelUrl});
 
   Order.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -168,6 +176,10 @@ class Order {
     isGift = json['is_gift'] == 1 || json['is_gift'] == true;
     gstNumber = json['gst_number'];
     role = json['role'];
+    delhiveryWaybill = json['delhivery_waybill'];
+    delhiveryOrderId = json['delhivery_order_id'];
+    delhiveryTrackingUrl = json['delhivery_tracking_url'];
+    shippingLabelUrl = json['shipping_label_url'];
 
     // Parse user with error handling
     try {
@@ -295,6 +307,10 @@ class Order {
     if (this.address != null) {
       data['address'] = this.address!.toJson();
     }
+    data['delhivery_waybill'] = this.delhiveryWaybill;
+    data['delhivery_order_id'] = this.delhiveryOrderId;
+    data['delhivery_tracking_url'] = this.delhiveryTrackingUrl;
+    data['shipping_label_url'] = this.shippingLabelUrl;
     return data;
   }
 }

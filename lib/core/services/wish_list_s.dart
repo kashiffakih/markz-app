@@ -24,7 +24,8 @@ class WishListService {
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);
-    if (_responseData['success']) {
+    // print("wish list ${_responseData['data']}");
+    if (_responseData['success'] == true && _responseData['data'] != null) {
       _wishLists = [];
       _responseData['data'].forEach((data) {
         _wishLists.add(WishList.fromJson(data));

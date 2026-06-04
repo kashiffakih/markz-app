@@ -98,6 +98,6 @@ class ProductModel with ChangeNotifier {
 
   getRandomProducts() async {
     randomProducts = await _productService.getRandomProducts();
-    print("random ${randomProducts![0].productPrices![0].toJson()}");
+    // print("random ${randomProducts![0].productPrices![0].toJson()}");
   }
 }

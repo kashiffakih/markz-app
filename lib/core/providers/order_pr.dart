@@ -32,7 +32,8 @@ class OrderModel with ChangeNotifier {
       [couponValue,
       gstAmount,
       platformFee,
-      gstNumber]) async {
+      gstNumber,
+      customDeliveryAmount]) async {
     return await _orderService.placedOrder(
         cartItems,
         cartTotal,
@@ -45,7 +46,8 @@ class OrderModel with ChangeNotifier {
         couponValue,
         gstAmount,
         platformFee,
-        gstNumber);
+        gstNumber,
+        customDeliveryAmount);
   }
 
   List<Order> _orders = [];

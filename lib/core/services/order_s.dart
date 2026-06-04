@@ -11,19 +11,19 @@ class OrderService {
   final ConfigModel _configModel = locator<ConfigModel>();
 
   Future<bool> placedOrder(
-    List<AddToCart> cartItems,
-    String cartTotal,
-    addressId,
-    isGift,
-    userWalletUsed,
-    couponId,
-    paymentOption,
-    deliveryMethod,
-    couponValue,
-    gstAmount,
-    platformFee,
-    gstNumber,
-  ) async {
+      List<AddToCart> cartItems,
+      String cartTotal,
+      addressId,
+      isGift,
+      userWalletUsed,
+      couponId,
+      paymentOption,
+      deliveryMethod,
+      couponValue,
+      gstAmount,
+      platformFee,
+      gstNumber,
+      [double? customDeliveryAmount]) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
     if (_configModel.user == null) {
@@ -95,10 +95,13 @@ class OrderService {
     final parsedUserWalletUsed =
         double.tryParse(userWalletUsed?.toString() ?? '0') ?? 0.0;
     final parsedAddressId = int.tryParse(addressId?.toString() ?? '0') ?? 0;
-    final parsedDeliveryAmount = double.tryParse(
-            _configModel.user?.companies?[0].deliveryCharges?.toString() ??
-                '0') ??
-        0.0;
+
+    // Use custom delivery amount if provided, otherwise fallback to config
+    final parsedDeliveryAmount = customDeliveryAmount ??
+        (double.tryParse(
+                _configModel.user?.companies?[0].deliveryCharges?.toString() ??
+                    '0') ??
+            0.0);
 
     // Get packaging charges
     final packagingCharges = double.tryParse(
