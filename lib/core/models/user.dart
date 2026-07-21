@@ -67,6 +67,10 @@ class User {
   String? visitingCardPath;
   String? shopImagePath;
   int? isApproved;
+  int? isBlocked;
+  String? blockedReason;
+  int? isRejected;
+  String? rejectionReason;
   String? activeRole;
 
   User(
@@ -198,7 +202,18 @@ class User {
     registrationDate = json['registration_date'];
     visitingCardPath = json['visiting_card_path'];
     shopImagePath = json['shop_image_path'];
-    isApproved = json['is_approved'];
+    isApproved = json['is_approved'] is bool ? (json['is_approved'] ? 1 : 0) : json['is_approved'];
+    if (isApproved == 1) {
+      isBlocked = 0;
+      blockedReason = null;
+      isRejected = 0;
+      rejectionReason = null;
+    } else {
+      isBlocked = json['is_blocked'] is bool ? (json['is_blocked'] ? 1 : 0) : json['is_blocked'];
+      blockedReason = json['blocked_reason'];
+      isRejected = json['is_rejected'] is bool ? (json['is_rejected'] ? 1 : 0) : json['is_rejected'];
+      rejectionReason = json['rejection_reason'];
+    }
     activeRole = json['active_role'];
     imagepath = json['imagepath'];
     location = json['location'] != null

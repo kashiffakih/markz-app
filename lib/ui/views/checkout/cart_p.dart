@@ -4949,7 +4949,9 @@ class _CartPageState extends State<CartPage> {
                                                           (() {
                                                             int cartTotal =
                                                                 _calculateSelectedItemsTotal();
-                                                            double deliveryCharges = (double.tryParse(_configModel
+                                                            double
+                                                                deliveryCharges =
+                                                                (double.tryParse(_configModel
                                                                             .user
                                                                             ?.companies?[0]
                                                                             .deliveryCharges
@@ -5391,8 +5393,9 @@ class _CartPageState extends State<CartPage> {
                                                                   gstAmount / 2;
 
                                                               int deliveryCharges =
-                                                                  (double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ?? '0') ??
-                                                                              0)
+                                                                  (double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ??
+                                                                              '0') ??
+                                                                          0)
                                                                       .toInt();
                                                               int packagingCharges = _configModel
                                                                           .user!
@@ -5445,8 +5448,8 @@ class _CartPageState extends State<CartPage> {
 
                                                               // Start PhonePe transaction
                                                               _startTransaction(
-                                                                  1,
-                                                                  // minumumPayable,
+                                                                  // 1,
+                                                                  minumumPayable,
                                                                   mobileNumber,
                                                                   payloadData,
                                                                   context);

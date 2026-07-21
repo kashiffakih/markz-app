@@ -1,8 +1,9 @@
 import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:aadab/core/models/user.dart';
 import 'package:aadab/core/providers/config_pr.dart';
 import 'package:aadab/core/services/firebase_api.dart';
 import 'package:aadab/locator.dart';
@@ -565,5 +566,33 @@ class AuthService {
       debugPrint('Error adding role: $e');
       return {'success': false, 'message': 'Network error. Please try again.'};
     }
+  }
+
+  /// Fetch fresh user details from server to ensure latest status (approved, blocked, rejected)
+  Future<User?> fetchFreshUserData() async {
+    if (_configModel.user == null || _configModel.user!.id == null) {
+      return null;
+    }
+
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+
+    try {
+      http.Response _response = await http.get(
+        Uri.parse('${_apiConfig['baseURL']}/users/${_configModel.user!.id}'),
+        headers: _apiConfig['headers'],
+      );
+
+      if (_response.statusCode == 200) {
+        Map<String, dynamic> _responseData = json.decode(_response.body);
+        if (_responseData['success'] == true && _responseData['data'] != null) {
+          User freshUser = User.fromJson(_responseData['data']);
+          _configModel.user = freshUser;
+          return freshUser;
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching fresh user data: $e');
+    }
+    return _configModel.user;
   }
 }

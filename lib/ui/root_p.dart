@@ -17,9 +17,9 @@ class _RootPageState extends State<RootPage> {
   final PermissionService _permissionService = PermissionService();
 
   authenticateUser(_, AuthModel authModel, ConfigModel configModel) async {
-    configModel.getApiConfig(domain: 'http://192.168.0.105:9090');
+    // configModel.getApiConfig(domain: 'http://192.168.0.105:9090');
     // configModel.getApiConfig(domain: 'http://localhost:7070');
-    // configModel.getApiConfig(domain: 'https://api.staging.aadab.online');
+    configModel.getApiConfig(domain: 'https://api.staging.aadab.online');
     // print(configModel.apiConfig['baseURL']);
     await configModel.fetchLoginData();
 
@@ -45,24 +45,21 @@ class _RootPageState extends State<RootPage> {
         // } else {
 
         // Check if all permissions are granted
-        bool allPermissionsGranted =
-            await _permissionService.areAllPermissionsGranted();
+        bool allPermissionsGranted = await _permissionService
+            .areAllPermissionsGranted();
 
         if (!allPermissionsGranted) {
           // Navigate to permissions page
-          Future.delayed(
-            Duration.zero,
-            () async {
-              final result = await Navigator.pushNamed(context, '/permissions');
-              if (result == true) {
-                // Permissions granted, navigate to home
-                Navigator.pushReplacementNamed(context, '/homePage');
-              } else {
-                // Permissions not granted, stay on permissions page or show message
-                Navigator.pushReplacementNamed(context, '/permissions');
-              }
-            },
-          );
+          Future.delayed(Duration.zero, () async {
+            final result = await Navigator.pushNamed(context, '/permissions');
+            if (result == true) {
+              // Permissions granted, navigate to home
+              Navigator.pushReplacementNamed(context, '/homePage');
+            } else {
+              // Permissions not granted, stay on permissions page or show message
+              Navigator.pushReplacementNamed(context, '/permissions');
+            }
+          });
         } else {
           // All permissions granted, navigate to home
           Future.delayed(
@@ -115,11 +112,7 @@ class _RootPageState extends State<RootPage> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Colors.white,
-              Color(0xffFFFDF7),
-              Color(0xffFFF9E6),
-            ],
+            colors: [Colors.white, Color(0xffFFFDF7), Color(0xffFFF9E6)],
           ),
         ),
         child: SafeArea(

@@ -35,6 +35,21 @@ class _RegisterPageState extends State<RegisterPage> {
   String stateValue = "";
   String cityValue = "";
 
+  // Bottom sheet wholesaler form state
+  bool _bsHasGst = false;
+  File? _bsVisitingCardImage;
+  File? _bsShopImage;
+  final Map<String, dynamic> _bsWholesalerData = {
+    'phone': '',
+    'gst_number': '',
+    'business_name': '',
+    'trade_name': '',
+    'address': '',
+    'pincode_business': '',
+    'state_business': '',
+    'registration_date': '',
+  };
+
   Map<String, dynamic> _registerData = {
     'first_name': '',
     'email': '',
@@ -490,7 +505,156 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                         ),
                       ),
-                      // GST Number
+                      // Business Name (Always required for Wholesalers)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Color(0xfff7f8f9),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xffe8ecf4)),
+                              borderRadius: BorderRadius.circular(7.66),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xffe8ecf4)),
+                              borderRadius: BorderRadius.circular(7.66),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                              borderRadius: BorderRadius.circular(7.66),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                              borderRadius: BorderRadius.circular(7.66),
+                            ),
+                            contentPadding: EdgeInsets.fromLTRB(
+                                17.94.w, 16.34.w, 17.94.w, 17.66.w),
+                            hintText: 'Business Name',
+                            hintStyle: TextStyle(color: Color(0xff8390a1)),
+                          ),
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 14.0.sp,
+                            fontWeight: FontWeight.w500,
+                            height: 1.25,
+                            color: Color(0xff000000),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Business Name is required';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            _registerData['business_name'] = value;
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 10),
+
+                      // Trade Name (Optional)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Color(0xfff7f8f9),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xffe8ecf4)),
+                              borderRadius: BorderRadius.circular(7.66),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xffe8ecf4)),
+                              borderRadius: BorderRadius.circular(7.66),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                              borderRadius: BorderRadius.circular(7.66),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                              borderRadius: BorderRadius.circular(7.66),
+                            ),
+                            contentPadding: EdgeInsets.fromLTRB(
+                                17.94.w, 16.34.w, 17.94.w, 17.66.w),
+                            hintText: 'Trade Name',
+                            hintStyle: TextStyle(color: Color(0xff8390a1)),
+                          ),
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 14.0.sp,
+                            fontWeight: FontWeight.w500,
+                            height: 1.25,
+                            color: Color(0xff000000),
+                          ),
+                          onSaved: (value) {
+                            _registerData['trade_name'] = value;
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 10),
+
+                      // Registration Date
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: TextFormField(
+                          readOnly: true,
+                          controller: TextEditingController(
+                            text: _registerData['registration_date'] ?? '',
+                          ),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Color(0xfff7f8f9),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xffe8ecf4)),
+                              borderRadius: BorderRadius.circular(7.66),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xffe8ecf4)),
+                              borderRadius: BorderRadius.circular(7.66),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                              borderRadius: BorderRadius.circular(7.66),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                              borderRadius: BorderRadius.circular(7.66),
+                            ),
+                            contentPadding: EdgeInsets.fromLTRB(
+                                17.94.w, 16.34.w, 17.94.w, 17.66.w),
+                            hintText: 'Registration Date',
+                            hintStyle: TextStyle(color: Color(0xff8390a1)),
+                            suffixIcon: Icon(Icons.calendar_today,
+                                color: Color(0xff8390a1)),
+                          ),
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 14.0.sp,
+                            fontWeight: FontWeight.w500,
+                            height: 1.25,
+                            color: Color(0xff000000),
+                          ),
+                          onTap: () async {
+                            DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(1900),
+                              lastDate: DateTime.now(),
+                            );
+                            if (pickedDate != null) {
+                              setState(() {
+                                _registerData['registration_date'] =
+                                    '${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}';
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 10),
+
+                      // GST Checkbox
                       Container(
                         margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
                         child: Row(
@@ -559,7 +723,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               color: Color(0xff000000),
                             ),
                             validator: (value) {
-                              if (_hasGst && (value == null || value.isEmpty)) {
+                              if (_hasGst && (value == null || value.trim().isEmpty)) {
                                 return 'GST Number is required';
                               }
                               return null;
@@ -570,175 +734,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                         ),
                       if (_hasGst) SizedBox(height: 10),
-                      if (_hasGst) ...[
-                        // Business Name
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Color(0xfff7f8f9),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Color(0xffe8ecf4)),
-                                borderRadius: BorderRadius.circular(7.66),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Color(0xffe8ecf4)),
-                                borderRadius: BorderRadius.circular(7.66),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.red),
-                                borderRadius: BorderRadius.circular(7.66),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.red),
-                                borderRadius: BorderRadius.circular(7.66),
-                              ),
-                              contentPadding: EdgeInsets.fromLTRB(
-                                  17.94.w, 16.34.w, 17.94.w, 17.66.w),
-                              hintText: 'Business Name',
-                              hintStyle: TextStyle(color: Color(0xff8390a1)),
-                            ),
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontSize: 14.0.sp,
-                              fontWeight: FontWeight.w500,
-                              height: 1.25,
-                              color: Color(0xff000000),
-                            ),
-                            validator: (value) {
-                              if (_hasGst && (value == null || value.isEmpty)) {
-                                return 'Business Name is required';
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _registerData['business_name'] = value;
-                            },
-                          ),
-                        ),
-                        SizedBox(height: 10),
-
-                        // Trade Name
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Color(0xfff7f8f9),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Color(0xffe8ecf4)),
-                                borderRadius: BorderRadius.circular(7.66),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Color(0xffe8ecf4)),
-                                borderRadius: BorderRadius.circular(7.66),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.red),
-                                borderRadius: BorderRadius.circular(7.66),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.red),
-                                borderRadius: BorderRadius.circular(7.66),
-                              ),
-                              contentPadding: EdgeInsets.fromLTRB(
-                                  17.94.w, 16.34.w, 17.94.w, 17.66.w),
-                              hintText: 'Trade Name',
-                              hintStyle: TextStyle(color: Color(0xff8390a1)),
-                            ),
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontSize: 14.0.sp,
-                              fontWeight: FontWeight.w500,
-                              height: 1.25,
-                              color: Color(0xff000000),
-                            ),
-                            // validator: (value) {
-                            //   if (_hasGst && (value == null || value.isEmpty)) {
-                            //     // Optional ?? Or required? Assuming optional for now unless specified
-                            //     // return 'Trade Name is required';
-                            //   }
-                            //   return null;
-                            // },
-                            onSaved: (value) {
-                              _registerData['trade_name'] = value;
-                            },
-                          ),
-                        ),
-                        SizedBox(height: 10),
-
-                        // Registration Date
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: TextFormField(
-                            readOnly: true,
-                            controller: TextEditingController(
-                              text: _registerData['registration_date'] ?? '',
-                            ),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Color(0xfff7f8f9),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Color(0xffe8ecf4)),
-                                borderRadius: BorderRadius.circular(7.66),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Color(0xffe8ecf4)),
-                                borderRadius: BorderRadius.circular(7.66),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.red),
-                                borderRadius: BorderRadius.circular(7.66),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.red),
-                                borderRadius: BorderRadius.circular(7.66),
-                              ),
-                              contentPadding: EdgeInsets.fromLTRB(
-                                  17.94.w, 16.34.w, 17.94.w, 17.66.w),
-                              hintText: 'Registration Date',
-                              hintStyle: TextStyle(color: Color(0xff8390a1)),
-                              suffixIcon: Icon(Icons.calendar_today,
-                                  color: Color(0xff8390a1)),
-                            ),
-                            style: MyGoogleFontStyle(
-                              fontFamily: 'Urbanist',
-                              fontSize: 14.0.sp,
-                              fontWeight: FontWeight.w500,
-                              height: 1.25,
-                              color: Color(0xff000000),
-                            ),
-                            validator: (value) {
-                              if (_hasGst && (value == null || value.isEmpty)) {
-                                return 'Registration Date is required';
-                              }
-                              return null;
-                            },
-                            onTap: () async {
-                              DateTime? pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(1900),
-                                lastDate: DateTime.now(),
-                              );
-                              if (pickedDate != null) {
-                                setState(() {
-                                  _registerData['registration_date'] =
-                                      '${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}';
-                                });
-                              }
-                            },
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                      ],
                       // Address
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -1193,8 +1188,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   ],
                 ),
               ),
-              // Or Register with section (hidden for Distributor/Wholesaler)
-              if (widget.argument?['role'] != 'Distributor') ...[
+              // Or Register with section (available for all roles including Distributor)
+              ...[
                 Container(
                   margin: EdgeInsets.fromLTRB(0.0.w, 0.0.w, 12.36.w, 0.0.w),
                   child: Text(
@@ -1243,13 +1238,25 @@ class _RegisterPageState extends State<RegisterPage> {
                           _isLoading = true;
                         });
 
+                        String displayName = userCredential.user?.displayName ?? googleAccount.displayName ?? '';
+                        String firstName = '';
+                        String lastName = '';
+                        if (displayName.trim().isNotEmpty) {
+                          List<String> parts = displayName.trim().split(RegExp(r'\s+'));
+                          firstName = parts.first;
+                          if (parts.length > 1) {
+                            lastName = parts.sublist(1).join(' ');
+                          }
+                        }
+
                         _loginData['email'] = userCredential.user?.email;
-                        _loginData['phone'] = userCredential.user?.phoneNumber;
-                        _loginData['first_name'] =
-                            userCredential.user?.displayName;
+                        _loginData['phone'] = userCredential.user?.phoneNumber ?? '';
+                        _loginData['first_name'] = firstName;
+                        _loginData['last_name'] = lastName;
                         _loginData['is_social_login'] = true;
                         _loginData['is_social_register'] = true;
                         _loginData['social_login_name'] = "GOOGLE";
+                        _loginData['role'] = widget.argument?['role'];
                         print('Google Login Data ${_loginData}');
                         var authModel =
                             Provider.of<AuthModel>(context, listen: false);
@@ -1259,6 +1266,36 @@ class _RegisterPageState extends State<RegisterPage> {
                         if (_configModel.isLoggedIn) {
                           // Mark as new user for welcome bonus (social registration)
                           await _configModel.setNewUserFlag(true);
+
+                          // If wholesaler, check status and show business details form
+                          if (widget.argument?['role'] == 'Distributor') {
+                            final user = _configModel.user;
+                            if (user?.isBlocked == 1) {
+                              await FirebaseAuth.instance.signOut();
+                              await GoogleSignIn().signOut();
+                              await _configModel.removeLoginData();
+                              setState(() => _isLoading = false);
+                              _showErrorDialog(
+                                  'Your wholesaler account has been blocked.\nReason: ${user?.blockedReason ?? "No reason provided"}');
+                              return;
+                            }
+                            if (user?.isRejected == 1) {
+                              await FirebaseAuth.instance.signOut();
+                              await GoogleSignIn().signOut();
+                              await _configModel.removeLoginData();
+                              setState(() => _isLoading = false);
+                              _showErrorDialog(
+                                  'Your wholesaler account request has been rejected.\nReason: ${user?.rejectionReason ?? "No reason provided"}');
+                              return;
+                            }
+
+                            setState(() => _isLoading = false);
+                            _showWholesalerRequestBottomSheet(
+                              userId: _configModel.user?.id?.toString() ?? '',
+                            );
+                            return;
+                          }
+
                           Navigator.pushReplacementNamed(
                             context,
                             '/',
@@ -1266,7 +1303,15 @@ class _RegisterPageState extends State<RegisterPage> {
                         } else {
                           String errorMessage =
                               loginResponse['message'] ?? 'Login failed';
-                          if (loginResponse['error'] ==
+                          if (loginResponse['error'] == 'ACCOUNT_BLOCKED' ||
+                              errorMessage.toLowerCase().contains('blocked')) {
+                            _showErrorDialog(
+                                'Your wholesaler account has been blocked.\nReason: ${loginResponse['blocked_reason'] ?? "No reason provided"}');
+                          } else if (loginResponse['error'] == 'ACCOUNT_REJECTED' ||
+                              errorMessage.toLowerCase().contains('rejected')) {
+                            _showErrorDialog(
+                                'Your wholesaler account request has been rejected.\nReason: ${loginResponse['rejection_reason'] ?? "No reason provided"}');
+                          } else if (loginResponse['error'] ==
                                   'EMAIL_ALREADY_EXISTS' ||
                               errorMessage
                                   .toLowerCase()
@@ -1313,6 +1358,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
               ],
+              SizedBox(height: 10),
               InkWell(
                 onTap: () {
                   Navigator.pushNamed(context, '/loginPage');
@@ -1359,6 +1405,761 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         ),
       ),
+    );
+  }
+
+  /// Picks an image for the wholesaler bottom sheet form
+  Future<void> _bsPickImage({required bool isVisitingCard, required StateSetter setModalState}) async {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Take a Photo'),
+                onTap: () async {
+                  Navigator.of(context).pop();
+                  final XFile? pickedFile = await _picker.pickImage(
+                    source: ImageSource.camera,
+                    imageQuality: 50,
+                  );
+                  if (pickedFile != null) {
+                    setModalState(() {
+                      if (isVisitingCard) {
+                        _bsVisitingCardImage = File(pickedFile.path);
+                      } else {
+                        _bsShopImage = File(pickedFile.path);
+                      }
+                    });
+                    setState(() {});
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Select from Gallery'),
+                onTap: () async {
+                  Navigator.of(context).pop();
+                  final XFile? pickedFile = await _picker.pickImage(
+                    source: ImageSource.gallery,
+                    imageQuality: 50,
+                  );
+                  if (pickedFile != null) {
+                    setModalState(() {
+                      if (isVisitingCard) {
+                        _bsVisitingCardImage = File(pickedFile.path);
+                      } else {
+                        _bsShopImage = File(pickedFile.path);
+                      }
+                    });
+                    setState(() {});
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  /// Show wholesaler request bottom sheet after Google sign-in
+  void _showWholesalerRequestBottomSheet({required String userId}) {
+    final bsFormKey = GlobalKey<FormState>();
+    bool bsLoading = false;
+    TextEditingController regDateController = TextEditingController(
+      text: _bsWholesalerData['registration_date'] ?? '',
+    );
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext bsContext) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.9,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(25),
+                  topRight: Radius.circular(25),
+                ),
+              ),
+              child: Column(
+                children: [
+                  // Handle bar
+                  Container(
+                    margin: EdgeInsets.only(top: 12),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Color(0xffDDDDDD),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  // Header
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(20, 16, 20, 0),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Color(0xFFF9A825).withOpacity(0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(Icons.store, color: Color(0xFFF9A825), size: 22),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Wholesaler Request',
+                                style: MyGoogleFontStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontSize: 18.0.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xff1e232c),
+                                ),
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                'Fill in your business details to complete registration',
+                                style: MyGoogleFontStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontSize: 12.0.sp,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xff8390a1),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(height: 24, color: Color(0xffF0F0F0)),
+                  // Scrollable form
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+                      child: Form(
+                        key: bsFormKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Phone Number (Required)
+                            _buildBsTextField(
+                              hintText: 'Phone Number',
+                              keyboardType: TextInputType.phone,
+                              maxLength: 10,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Phone number is required';
+                                }
+                                if (value.trim().length < 10) {
+                                  return 'Please enter a valid 10-digit phone number';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) => _bsWholesalerData['phone'] = value?.trim(),
+                            ),
+                            SizedBox(height: 10),
+                            // Business Name (Required)
+                            _buildBsTextField(
+                              hintText: 'Business Name',
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Business Name is required';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) => _bsWholesalerData['business_name'] = value,
+                            ),
+                            SizedBox(height: 10),
+                            // Trade Name (Optional)
+                            _buildBsTextField(
+                              hintText: 'Trade Name',
+                              onSaved: (value) => _bsWholesalerData['trade_name'] = value,
+                            ),
+                            SizedBox(height: 10),
+                            // Registration Date (Optional)
+                            TextFormField(
+                              readOnly: true,
+                              controller: regDateController,
+                              decoration: _bsInputDecoration(
+                                hintText: 'Registration Date',
+                                suffixIcon: Icon(Icons.calendar_today, color: Color(0xff8390a1)),
+                              ),
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 14.0.sp,
+                                fontWeight: FontWeight.w500,
+                                height: 1.25,
+                                color: Color(0xff000000),
+                              ),
+                              onTap: () async {
+                                DateTime? pickedDate = await showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(1900),
+                                  lastDate: DateTime.now(),
+                                );
+                                if (pickedDate != null) {
+                                  setModalState(() {
+                                    _bsWholesalerData['registration_date'] =
+                                        '${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}';
+                                    regDateController.text = _bsWholesalerData['registration_date'];
+                                  });
+                                }
+                              },
+                            ),
+                            SizedBox(height: 10),
+                            // GST Checkbox
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: _bsHasGst,
+                                  onChanged: (value) {
+                                    setModalState(() {
+                                      _bsHasGst = value!;
+                                      if (!_bsHasGst) {
+                                        _bsWholesalerData['gst_number'] = '';
+                                      }
+                                    });
+                                  },
+                                  activeColor: Color(0xff1A1A1A),
+                                ),
+                                Text(
+                                  'I have GST Number',
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontSize: 14.0.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xff1A1A1A),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (_bsHasGst) ...[
+                              _buildBsTextField(
+                                hintText: 'GST Number',
+                                textCapitalization: TextCapitalization.characters,
+                                validator: (value) {
+                                  if (_bsHasGst && (value == null || value.trim().isEmpty)) {
+                                    return 'GST Number is required';
+                                  }
+                                  return null;
+                                },
+                                onSaved: (value) => _bsWholesalerData['gst_number'] = value,
+                              ),
+                              SizedBox(height: 10),
+                            ],
+                            // Address
+                            _buildBsTextField(
+                              hintText: 'Business Address',
+                              maxLines: 3,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) return 'Address is required';
+                                return null;
+                              },
+                              onSaved: (value) => _bsWholesalerData['address'] = value,
+                            ),
+                            SizedBox(height: 10),
+                            // Pincode
+                            _buildBsTextField(
+                              hintText: 'Pincode',
+                              keyboardType: TextInputType.number,
+                              maxLength: 6,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) return 'Pincode required';
+                                if (value.length != 6) return 'Invalid pincode';
+                                return null;
+                              },
+                              onSaved: (value) => _bsWholesalerData['pincode_business'] = value,
+                            ),
+                            SizedBox(height: 10),
+                            // State & City picker
+                            CSCPickerPlus(
+                              layout: Layout.vertical,
+                              showStates: true,
+                              showCities: true,
+                              flagState: CountryFlag.DISABLE,
+                              dropdownDecoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(7.66),
+                                color: Color(0xfff7f8f9),
+                                border: Border.all(color: Color(0xffe8ecf4)),
+                              ),
+                              disabledDropdownDecoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(7.66),
+                                color: Color(0xfff7f8f9),
+                                border: Border.all(color: Color(0xffe8ecf4)),
+                              ),
+                              countrySearchPlaceholder: "Search Country",
+                              stateSearchPlaceholder: "Search State",
+                              citySearchPlaceholder: "Search City",
+                              countryDropdownLabel: "Select Country",
+                              stateDropdownLabel: "Select State",
+                              cityDropdownLabel: "Select City",
+                              defaultCountry: CscCountry.India,
+                              disableCountry: false,
+                              selectedItemStyle: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 14.0.sp,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xff000000),
+                              ),
+                              dropdownHeadingStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              dropdownItemStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                              ),
+                              dropdownDialogRadius: 10.0,
+                              searchBarRadius: 10.0,
+                              onCountryChanged: (value) {
+                                // Country value tracked by picker
+                              },
+                              onStateChanged: (value) {
+                                setModalState(() {
+                                  _bsWholesalerData['state_business'] = value?.toString() ?? "";
+                                });
+                              },
+                              onCityChanged: (value) {
+                                // City value tracked by picker
+                              },
+                            ),
+                            SizedBox(height: 16),
+                            // Upload Documents header
+                            Text(
+                              'Upload Documents',
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 16.0.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xff1e232c),
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            // Visiting Card
+                            Text(
+                              'Visiting Card',
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 13.0.sp,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xff8390a1),
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            InkWell(
+                              onTap: () => _bsPickImage(isVisitingCard: true, setModalState: setModalState),
+                              child: Container(
+                                padding: EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Color(0xffe8ecf4), width: 2),
+                                  color: Color(0xfff7f8f9),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: _bsVisitingCardImage != null
+                                    ? Stack(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(8),
+                                            child: Image.file(
+                                              _bsVisitingCardImage!,
+                                              height: 120,
+                                              width: double.infinity,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 4,
+                                            right: 4,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setModalState(() {
+                                                  _bsVisitingCardImage = null;
+                                                });
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.all(4),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.red,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: Icon(Icons.close, color: Colors.white, size: 16),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.cloud_upload_outlined, color: Color(0xff8390a1), size: 28),
+                                          SizedBox(width: 10),
+                                          Text(
+                                            'Tap to upload visiting card',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontSize: 14.0.sp,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xff8390a1),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                              ),
+                            ),
+                            SizedBox(height: 12),
+                            // Shop Image
+                            Text(
+                              'Shop Image',
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 13.0.sp,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xff8390a1),
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            InkWell(
+                              onTap: () => _bsPickImage(isVisitingCard: false, setModalState: setModalState),
+                              child: Container(
+                                padding: EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Color(0xffe8ecf4), width: 2),
+                                  color: Color(0xfff7f8f9),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: _bsShopImage != null
+                                    ? Stack(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(8),
+                                            child: Image.file(
+                                              _bsShopImage!,
+                                              height: 120,
+                                              width: double.infinity,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 4,
+                                            right: 4,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setModalState(() {
+                                                  _bsShopImage = null;
+                                                });
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.all(4),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.red,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: Icon(Icons.close, color: Colors.white, size: 16),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.cloud_upload_outlined, color: Color(0xff8390a1), size: 28),
+                                          SizedBox(width: 10),
+                                          Text(
+                                            'Tap to upload shop image',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontSize: 14.0.sp,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xff8390a1),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                              ),
+                            ),
+                            SizedBox(height: 24),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Submit button
+                  Container(
+                    padding: EdgeInsets.fromLTRB(20, 10, 20, 20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: Offset(0, -2),
+                        ),
+                      ],
+                    ),
+                    child: SafeArea(
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: ElevatedButton(
+                          onPressed: bsLoading
+                              ? null
+                              : () async {
+                                  if (bsFormKey.currentState!.validate()) {
+                                    bsFormKey.currentState!.save();
+                                    setModalState(() => bsLoading = true);
+
+                                    try {
+                                      var authModel = Provider.of<AuthModel>(context, listen: false);
+
+                                      // Upload documents
+                                      if (userId.isNotEmpty &&
+                                          (_bsVisitingCardImage != null || _bsShopImage != null)) {
+                                        await authModel.uploadWholesalerDocuments(
+                                          userId: userId,
+                                          visitingCardImage: _bsVisitingCardImage,
+                                          shopImage: _bsShopImage,
+                                        );
+                                      }
+
+                                      // Update user with business details
+                                      if (userId.isNotEmpty) {
+                                        await authModel.updateUser(
+                                          updateUserData: _bsWholesalerData,
+                                        );
+                                      }
+
+                                      // Close bottom sheet
+                                      Navigator.of(bsContext).pop();
+
+                                      // Logout user (wholesaler needs approval first)
+                                      await FirebaseAuth.instance.signOut();
+                                      await GoogleSignIn().signOut();
+                                      await _configModel.removeLoginData();
+
+                                      // Show pending approval dialog
+                                      _showWholesalerPendingDialog();
+                                    } catch (e) {
+                                      print('Wholesaler request error: $e');
+                                      setModalState(() => bsLoading = false);
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('Failed to submit. Please try again.'),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xff0f0f0f),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: bsLoading
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(
+                                  'Submit Wholesaler Request',
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontSize: 15.0.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// Builds a styled text field for the wholesaler bottom sheet
+  Widget _buildBsTextField({
+    required String hintText,
+    TextCapitalization textCapitalization = TextCapitalization.none,
+    TextInputType keyboardType = TextInputType.text,
+    int maxLines = 1,
+    int? maxLength,
+    String? Function(String?)? validator,
+    void Function(String?)? onSaved,
+  }) {
+    return TextFormField(
+      textCapitalization: textCapitalization,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      maxLength: maxLength,
+      decoration: _bsInputDecoration(hintText: hintText),
+      style: MyGoogleFontStyle(
+        fontFamily: 'Urbanist',
+        fontSize: 14.0.sp,
+        fontWeight: FontWeight.w500,
+        height: 1.25,
+        color: Color(0xff000000),
+      ),
+      validator: validator,
+      onSaved: onSaved,
+    );
+  }
+
+  /// Standard InputDecoration for the bottom sheet form
+  InputDecoration _bsInputDecoration({required String hintText, Widget? suffixIcon}) {
+    return InputDecoration(
+      filled: true,
+      fillColor: Color(0xfff7f8f9),
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Color(0xffe8ecf4)),
+        borderRadius: BorderRadius.circular(7.66),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Color(0xffe8ecf4)),
+        borderRadius: BorderRadius.circular(7.66),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.red),
+        borderRadius: BorderRadius.circular(7.66),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.red),
+        borderRadius: BorderRadius.circular(7.66),
+      ),
+      contentPadding: EdgeInsets.fromLTRB(17.94.w, 16.34.w, 17.94.w, 17.66.w),
+      hintText: hintText,
+      hintStyle: TextStyle(color: Color(0xff8390a1)),
+      counterText: '',
+      suffixIcon: suffixIcon,
+    );
+  }
+
+  /// Show "Pending Approval" dialog after wholesaler request
+  void _showWholesalerPendingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF9A825),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.hourglass_empty,
+                    color: Colors.white,
+                    size: 50,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Request Submitted!',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xff1e1e1e),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Your wholesaler request has been submitted successfully. Please wait for admin approval. You will be notified once your account is approved and ready to use.',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xff666666),
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+                Container(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(context, '/loginPage',
+                          arguments: {'role': widget.argument['role']});
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xffc9b758),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'Back to Login',
+                      style: MyGoogleFontStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

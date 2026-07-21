@@ -247,19 +247,17 @@ class ConfigModel with ChangeNotifier {
       currentAndroidVersionFromApi =
           responseData['currentAndroidVersionFromApi'];
 
-      // Initialize Active Role - Use API value first, then fall back to local logic
-      if (user?.activeRole != null && user!.activeRole!.isNotEmpty) {
-        // Use the role from API (persisted in database)
-        _activeRole = user!.activeRole!;
-      } else if (user?.roles?.any((r) => r.name == 'Distributor') ?? false) {
-        // Fallback: If user is a distributor, check approval status
-        if (user?.isApproved == 1) {
-          _activeRole = 'Distributor';
+      // Initialize Active Role
+      if (user?.isApproved == 1) {
+        if (user?.activeRole != null && user!.activeRole!.isNotEmpty) {
+          _activeRole = user!.activeRole!;
         } else {
-          _activeRole = 'User';
+          _activeRole = 'Distributor';
         }
       } else {
+        // Unapproved or rejected wholesalers cannot be active Distributors; default to User mode
         _activeRole = 'User';
+        user?.activeRole = 'User';
       }
     }
     notifyListeners();

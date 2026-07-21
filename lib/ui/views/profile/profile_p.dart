@@ -1,5 +1,6 @@
 import 'package:aadab/ui/root_p.dart';
-
+import 'package:aadab/locator.dart';
+import 'package:aadab/core/services/auth_s.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:aadab/ui/views/checkout/cart_p.dart';
 import 'package:aadab/ui/views/profile/address_p.dart';
@@ -794,127 +795,147 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _handleRoleSwitch(BuildContext context, ConfigModel configModel) async {
-    final user = configModel.user;
+    // Show loading spinner while fetching fresh user status from server
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Color(0xffc9b758)),
+        ),
+      ),
+    );
+
+    // Fetch fresh user data from API
+    final authService = locator<AuthService>();
+    final freshUser = await authService.fetchFreshUserData();
+
+    // Close loading spinner
+    if (context.mounted) {
+      Navigator.of(context, rootNavigator: true).pop();
+    }
+
+    final user = freshUser ?? configModel.user;
 
     if (configModel.activeRole == 'Distributor') {
-      // Trying to switch to User
-      final hasUserRole = user?.roles?.any((r) => r.name == 'User') ?? false;
+      // Switch directly to Customer (User) mode
+      configModel.switchRole('User');
+    } else {
+      // Trying to switch to Wholesaler (Distributor)
 
-      if (!hasUserRole) {
-        print('Check yes');
-
-        // User doesn't have User role - add it automatically
-        // final authService = locator<AuthService>();
-
-        // Show loading
+      // 1. Check if user account is blocked
+      if (user?.isBlocked == 1) {
         showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: Text('Become a Customer'),
-            content:
-                Text('You need to register as a customer to access this mode.'),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Text('Account Blocked'),
+            content: Text(
+              'Your account has been blocked/blacklisted by admin.\n\n${user?.blockedReason != null && user!.blockedReason!.trim().isNotEmpty ? "Reason: ${user.blockedReason}\n\n" : ""}Please contact support for assistance.',
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  Navigator.pushNamed(context, '/registerPage',
-                      arguments: {'role': 'User'});
-                },
-                child: Text('Register'),
+                child: const Text('OK'),
               ),
             ],
           ),
         );
-
-        // final result = await authService.addRole(role: 'User');
-
-        // Close loading dialog
-        // if (context.mounted) Navigator.pop(context);
-
-        // if (result['success'] == true) {
-        //   configModel.switchRole('User');
-        //   ScaffoldMessenger.of(context).showSnackBar(
-        //     SnackBar(content: Text('Switched to User mode')),
-        //   );
-        // } else {
-        //   ScaffoldMessenger.of(context).showSnackBar(
-        //     SnackBar(
-        //         content: Text(result['message'] ?? 'Failed to add User role')),
-        //   );
-        // }
-      } else {
-        // Has User role, switch
-        configModel.switchRole('User');
+        return;
       }
-    } else {
-      // Trying to switch to Distributor
+
       final isDistributorRole =
           user?.roles?.any((r) => r.name == 'Distributor') ?? false;
 
-      if (!isDistributorRole) {
-        // Not registered as Distributor - Go to Register
+      // 2. If approved wholesaler, switch role immediately
+      if (user?.isApproved == 1) {
+        configModel.switchRole('Distributor');
+        return;
+      }
+
+      // 3. Check if wholesaler request is rejected (only when not approved)
+      if (user?.isRejected == 1 || user?.isApproved == 2) {
         showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: Text('Become a Distributor'),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Text('Wholesaler Request Rejected'),
             content: Text(
-                'You need to register as a distributor to access this mode.'),
+              'Your wholesaler account request has been rejected by admin.\n\n${user?.rejectionReason != null && user!.rejectionReason!.trim().isNotEmpty ? "Reason: ${user.rejectionReason}\n\n" : ""}Please contact support for assistance.',
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  Navigator.pushNamed(context, '/registerPage',
-                      arguments: {'role': 'Distributor'});
-                },
-                child: Text('Register'),
+                child: const Text('OK'),
               ),
             ],
           ),
         );
-      } else {
-        // Has role, check approval
-        if (user?.isApproved == 1) {
-          configModel.switchRole('Distributor');
-        } else if (user?.isApproved == 0 || user?.isApproved == null) {
-          // Pending
-          showDialog(
-              context: context,
-              builder: (ctx) => AlertDialog(
-                    title: Text('Approval Pending'),
-                    content: Text(
-                        'Your distributor account is pending approval from admin.'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx),
-                        child: Text('OK'),
-                      )
-                    ],
-                  ));
-        } else {
-          // Rejected or others (2 usually means rejected/blocked)
-          showDialog(
-              context: context,
-              builder: (ctx) => AlertDialog(
-                    title: Text('Account Blocked/Rejected'),
-                    content: Text(
-                        'Your distributor account has been rejected or blocked. Please contact admin.'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx),
-                        child: Text('OK'),
-                      )
-                    ],
-                  ));
-        }
+        return;
       }
+
+      // 4. If pending approval with submitted business details
+      bool hasSubmittedBusinessDetails =
+          (user?.businessName != null && user!.businessName!.trim().isNotEmpty) ||
+          (user?.address != null && user!.address!.trim().isNotEmpty);
+
+      if (isDistributorRole && user?.isApproved == 0 && hasSubmittedBusinessDetails) {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Text('Approval Pending'),
+            content: const Text(
+                'Your wholesaler request has been submitted and is pending admin approval. Please wait for approval.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+
+      // 5. Not registered as Wholesaler or incomplete details -> Navigate to Register Page to fill business/document details
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text('Register as Wholesaler'),
+          content: const Text(
+              'To switch to Wholesaler view, please complete your business details and upload required documents.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xffc9b758),
+              ),
+              onPressed: () {
+                Navigator.pop(ctx);
+                Navigator.pushNamed(
+                  context,
+                  '/registerPage',
+                  arguments: {'role': 'Distributor'},
+                );
+              },
+              child: const Text('Fill Details', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      );
     }
   }
 }
