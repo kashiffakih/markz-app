@@ -1217,6 +1217,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           serverClientId:
                               '990776187523-31hv31ogtp5c4pdpf5t5f4d687ve4tct.apps.googleusercontent.com',
                         );
+                        await googleSignIn.signOut();
                         final googleAccount = await googleSignIn.signIn();
                         if (googleAccount == null) {
                           return;

@@ -232,6 +232,7 @@ class AuthService {
         serverClientId:
             '990776187523-31hv31ogtp5c4pdpf5t5f4d687ve4tct.apps.googleusercontent.com',
       );
+      await googleSignIn.signOut();
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
       final GoogleSignInAuthentication? googleAuth =

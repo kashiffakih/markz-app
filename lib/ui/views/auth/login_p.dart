@@ -860,6 +860,7 @@ class _LoginPageState extends State<LoginPage> {
                           serverClientId:
                               '990776187523-31hv31ogtp5c4pdpf5t5f4d687ve4tct.apps.googleusercontent.com',
                         );
+                        await googleSignIn.signOut();
                         final googleAccount = await googleSignIn.signIn();
                         if (googleAccount == null) {
                           setState(() => _isLoading = false);

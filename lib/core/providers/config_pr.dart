@@ -252,12 +252,16 @@ class ConfigModel with ChangeNotifier {
         if (user?.activeRole != null && user!.activeRole!.isNotEmpty) {
           _activeRole = user!.activeRole!;
         } else {
-          _activeRole = 'Distributor';
+          _activeRole = _loginData['role'] ?? 'User';
         }
       } else {
         // Unapproved or rejected wholesalers cannot be active Distributors; default to User mode
         _activeRole = 'User';
         user?.activeRole = 'User';
+      }
+      if (_loginData.isNotEmpty) {
+        _loginData['role'] = _activeRole;
+        saveLoginData(newLoginData: _loginData);
       }
     }
     notifyListeners();
@@ -276,6 +280,13 @@ class ConfigModel with ChangeNotifier {
 
   set activeRole(String role) {
     _activeRole = role;
+    if (user != null) {
+      user!.activeRole = role;
+    }
+    if (_loginData.isNotEmpty) {
+      _loginData['role'] = role;
+      saveLoginData(newLoginData: _loginData);
+    }
     notifyListeners();
   }
 
@@ -284,6 +295,10 @@ class ConfigModel with ChangeNotifier {
     // Also update user's activeRole so getter returns correct value
     if (user != null) {
       user!.activeRole = role;
+    }
+    if (_loginData.isNotEmpty) {
+      _loginData['role'] = role;
+      saveLoginData(newLoginData: _loginData);
     }
     notifyListeners();
 
