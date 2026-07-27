@@ -1186,7 +1186,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                               .end,
                                                       children: [
                                                         Text(
-                                                          '₹$offerPrice',
+                                                          '₹${offerPrice.toInt()}',
                                                           style:
                                                               MyGoogleFontStyle(
                                                             fontFamily:
@@ -1203,7 +1203,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                               EdgeInsets.only(
                                                                   bottom: 4.h),
                                                           child: Text(
-                                                            '₹$price',
+                                                            '₹${price.toInt()}',
                                                             style: TextStyle(
                                                               color: Colors
                                                                   .grey[500],
@@ -1263,7 +1263,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                   : Text(
                                                       (price != null &&
                                                               price > 0)
-                                                          ? '₹$price'
+                                                          ? '₹${price.toInt()}'
                                                           : 'Price not available',
                                                       style: MyGoogleFontStyle(
                                                         fontFamily: 'Urbanist',

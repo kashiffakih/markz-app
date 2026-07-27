@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   // UI Constants
   static const double _bannerCarouselHeightRatio = 0.3;
-  static const double _newArrivalsHeightRatio = 0.35;
+  static const double _newArrivalsHeightRatio = 0.40;
   static const double _inviteBannerHeight = 180.0;
   static const double _bottomNavBarHeight = 90.0;
   static const int _bottomNavIconSize = 23;
@@ -399,9 +399,11 @@ class _HomePageState extends State<HomePage>
       dynamic offerPriceValue;
 
       if (isDistributor) {
-        if (priceObj.distributorPrice != null && priceObj.distributorPrice! > 0) {
+        if (priceObj.distributorPrice != null &&
+            priceObj.distributorPrice! > 0) {
           priceValue = priceObj.distributorPrice;
-          offerPriceValue = (priceObj.distributorOfferPrice != null && priceObj.distributorOfferPrice! > 0)
+          offerPriceValue = (priceObj.distributorOfferPrice != null &&
+                  priceObj.distributorOfferPrice! > 0)
               ? priceObj.distributorOfferPrice
               : 0;
         } else {
@@ -1314,11 +1316,11 @@ class _HomePageState extends State<HomePage>
           height: _newArrivalsHeightRatio.sh,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 12.0.w),
+            padding: EdgeInsets.symmetric(horizontal: 12.0.w, vertical: 8.0.w),
             itemCount: tag.products!.length,
             itemBuilder: (context, index) {
               final product = tag.products![index];
-              print("product: ${product.productPrices!.first.toJson()}");
+              // print("product: ${product.productPrices!.first.toJson()}");
               final discountPrice = _calculateDiscountPercentage(product);
               return Padding(
                 padding: EdgeInsets.only(right: 12.0.w),

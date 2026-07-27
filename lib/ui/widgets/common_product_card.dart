@@ -327,12 +327,16 @@ class CommonProductCard extends StatelessWidget {
                               );
                             }
 
-                            final activePrice = (offerPrice != null && offerPrice > 0 && offerPrice < price) ? offerPrice : price;
+                            final activePrice = (offerPrice != null &&
+                                    offerPrice > 0 &&
+                                    offerPrice < price)
+                                ? offerPrice
+                                : price;
 
                             return Row(
                               children: [
                                 Text(
-                                  '₹$activePrice',
+                                  '₹${activePrice.toInt()}',
                                   style: TextStyle(
                                     fontFamily: 'Urbanist',
                                     fontSize: 16,
@@ -345,7 +349,7 @@ class CommonProductCard extends StatelessWidget {
                                     offerPrice < price) ...[
                                   SizedBox(width: 6),
                                   Text(
-                                    '₹$price',
+                                    '₹${price.toInt()}',
                                     style: TextStyle(
                                       fontFamily: 'Urbanist',
                                       fontSize: 12,
