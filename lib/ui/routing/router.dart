@@ -49,7 +49,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       });
     case updateApp:
       return MaterialPageRoute(builder: (BuildContext context) {
-        return UpdateAppPage();
+        return UpdateAppPage(
+          arguments: settings.arguments as Map<String, dynamic>?,
+        );
       });
     case allPages:
       return MaterialPageRoute(builder: (BuildContext context) {

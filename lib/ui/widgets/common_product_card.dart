@@ -1,4 +1,3 @@
-import 'package:aadab/locator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -298,13 +297,9 @@ class CommonProductCard extends StatelessWidget {
                             final isDistributor =
                                 configModel.activeRole == 'Distributor';
                             final priceObj = product.productPrices![0];
-                            print("check ${priceObj.distributorOfferPrice}");
-                            double? price = priceObj.price?.toDouble();
-                            double? offerPrice =
-                                priceObj.offerPrice?.toDouble();
-                            print("is role : ${isDistributor}  ");
-                            print(
-                                "distributorPrice: ${priceObj.distributorPrice}, distributorOfferPrice: ${priceObj.distributorOfferPrice}");
+                            double? price;
+                            double? offerPrice;
+
                             if (isDistributor == true) {
                               if (priceObj.distributorPrice != null &&
                                   priceObj.distributorPrice! > 0) {
@@ -315,15 +310,29 @@ class CommonProductCard extends StatelessWidget {
                                 offerPrice =
                                     priceObj.distributorOfferPrice!.toDouble();
                               }
+                            } else {
+                              price = priceObj.price?.toDouble();
+                              offerPrice = priceObj.offerPrice?.toDouble();
                             }
 
-                            print(
-                                "FINAL price : $price  offerPrice : $offerPrice");
+                            if (price == null || price <= 0) {
+                              return Text(
+                                '₹0',
+                                style: TextStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFFC7B456),
+                                ),
+                              );
+                            }
+
+                            final activePrice = (offerPrice != null && offerPrice > 0 && offerPrice < price) ? offerPrice : price;
 
                             return Row(
                               children: [
                                 Text(
-                                  '₹${offerPrice ?? price}',
+                                  '₹$activePrice',
                                   style: TextStyle(
                                     fontFamily: 'Urbanist',
                                     fontSize: 16,
@@ -332,8 +341,8 @@ class CommonProductCard extends StatelessWidget {
                                   ),
                                 ),
                                 if (offerPrice != null &&
-                                    offerPrice != 0 &&
-                                    price != offerPrice) ...[
+                                    offerPrice > 0 &&
+                                    offerPrice < price) ...[
                                   SizedBox(width: 6),
                                   Text(
                                     '₹$price',

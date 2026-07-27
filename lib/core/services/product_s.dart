@@ -110,7 +110,7 @@ class ProductService {
   getTags() async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
     http.Response _response = await http.get(
-      Uri.parse('${_apiConfig['baseURL']}/tags'),
+      Uri.parse('${_apiConfig['baseURL']}/tags?with_products=1'),
       headers: _apiConfig['headers'],
     );
     Map<String, dynamic> _responseData = json.decode(_response.body);

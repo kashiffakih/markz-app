@@ -58,6 +58,64 @@ class _ProductIdPageState extends State<ProductIdPage> {
     'is_add_to_cart': false
   };
 
+  void _sortSizesList(List<Map<String, dynamic>> list) {
+    list.sort((a, b) {
+      final valA = a['value']?.toString().trim() ?? '';
+      final valB = b['value']?.toString().trim() ?? '';
+
+      // Extract number from value string if present (e.g. '6', '28', '38 (L)', 'Size 7')
+      double? extractNum(String str) {
+        final match = RegExp(r'\d+(\.\d+)?').firstMatch(str);
+        if (match != null) {
+          return double.tryParse(match.group(0)!);
+        }
+        return null;
+      }
+
+      final numA = extractNum(valA);
+      final numB = extractNum(valB);
+
+      if (numA != null && numB != null) {
+        if (numA != numB) {
+          return numA.compareTo(numB);
+        }
+      }
+
+      // Standard clothing/shoe sizes ranking
+      final sizeOrder = {
+        'XXS': 1,
+        'XS': 2,
+        'S': 3,
+        'M': 4,
+        'L': 5,
+        'XL': 6,
+        'XXL': 7,
+        '2XL': 7,
+        'XXXL': 8,
+        '3XL': 8,
+        '4XL': 9,
+        '5XL': 10,
+        'FREE SIZE': 100,
+      };
+
+      final rankA = sizeOrder[valA.toUpperCase()];
+      final rankB = sizeOrder[valB.toUpperCase()];
+
+      if (rankA != null && rankB != null) {
+        return rankA.compareTo(rankB);
+      } else if (rankA != null) {
+        return -1;
+      } else if (rankB != null) {
+        return 1;
+      }
+
+      if (numA != null) return -1;
+      if (numB != null) return 1;
+
+      return valA.compareTo(valB);
+    });
+  }
+
   // Global keys for description sections to maintain state
   final _smallDescKey = GlobalKey();
   final _descKey = GlobalKey();
@@ -151,49 +209,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
         ? allPacks.where((pack) => pack['unit']?['name'] == unitName).toList()
         : allPacks.toList();
 
-    // Sort sizes
-    _sizes.sort((a, b) {
-      final valA = a['value']?.toString() ?? '';
-      final valB = b['value']?.toString() ?? '';
-
-      // Try numeric sort first
-      final numA = double.tryParse(valA);
-      final numB = double.tryParse(valB);
-
-      if (numA != null && numB != null) {
-        return numA.compareTo(numB);
-      }
-
-      // Standard sizes ranking
-      final sizeOrder = {
-        'XXS': 1,
-        'XS': 2,
-        'S': 3,
-        'M': 4,
-        'L': 5,
-        'XL': 6,
-        'XXL': 7,
-        '2XL': 7,
-        'XXXL': 8,
-        '3XL': 8,
-        '4XL': 9,
-        'Free Size': 100,
-      };
-
-      final rankA = sizeOrder[valA.toUpperCase()];
-      final rankB = sizeOrder[valB.toUpperCase()];
-
-      if (rankA != null && rankB != null) {
-        return rankA.compareTo(rankB);
-      } else if (rankA != null) {
-        return -1; // Known sizes come before unknown
-      } else if (rankB != null) {
-        return 1;
-      }
-
-      // Fallback to string sort
-      return valA.compareTo(valB);
-    });
+    _sortSizesList(_sizes);
 
     if (_sizes.isNotEmpty) {
       _cartData['kindOfFlower'] = _sizes[0]['value']?.toString() ?? '';
@@ -228,9 +244,8 @@ class _ProductIdPageState extends State<ProductIdPage> {
     final configModel = context.read<ConfigModel>();
     final isDistributor = configModel.activeRole == 'Distributor';
 
-    double price = double.tryParse(priceData['price']?.toString() ?? '0') ?? 0;
-    double offerPrice =
-        double.tryParse(priceData['offer_price']?.toString() ?? '0') ?? 0;
+    double price = 0;
+    double offerPrice = 0;
 
     if (isDistributor) {
       double? distPrice =
@@ -238,9 +253,16 @@ class _ProductIdPageState extends State<ProductIdPage> {
       double? distOfferPrice = double.tryParse(
           priceData['distributor_offer_price']?.toString() ?? '');
 
-      if (distPrice != null && distPrice > 0) price = distPrice;
-      if (distOfferPrice != null && distOfferPrice > 0)
-        offerPrice = distOfferPrice;
+      if (distPrice != null && distPrice > 0) {
+        price = distPrice;
+        if (distOfferPrice != null && distOfferPrice > 0) {
+          offerPrice = distOfferPrice;
+        }
+      }
+    } else {
+      price = double.tryParse(priceData['price']?.toString() ?? '0') ?? 0;
+      offerPrice =
+          double.tryParse(priceData['offer_price']?.toString() ?? '0') ?? 0;
     }
 
     return {'price': price, 'offer_price': offerPrice};
@@ -990,6 +1012,7 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                     unitName)
                                                 ?.toList() ??
                                             [];
+                                        _sortSizesList(_sizes);
                                         activeIndex = 0;
                                         _cartData['kindOfFlower'] = _sizes
                                                 .isNotEmpty
@@ -1238,8 +1261,9 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                       ],
                                                     )
                                                   : Text(
-                                                      _prices.isNotEmpty
-                                                          ? '₹${price ?? (_prices[0]['price'] ?? '0')}'
+                                                      (price != null &&
+                                                              price > 0)
+                                                          ? '₹$price'
                                                           : 'Price not available',
                                                       style: MyGoogleFontStyle(
                                                         fontFamily: 'Urbanist',
@@ -1256,7 +1280,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                       SizedBox(width: 20.0.w),
                                       Column(
                                         children: [
-                                          if ((addToCartModel.addToCarts
+                                          if (_prices.isNotEmpty &&
+                                              ((_getEffectivePrices(_prices[0])[
+                                                          'price'] ??
+                                                      0) >
+                                                  0) &&
+                                              (addToCartModel.addToCarts
                                                       ?.where((cart) =>
                                                           cart.productId ==
                                                               widget.arguments![
@@ -1433,7 +1462,12 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                 ),
                                               ),
                                             ),
-                                          if ((addToCartModel.addToCarts
+                                          if (_prices.isNotEmpty &&
+                                              ((_getEffectivePrices(_prices[0])[
+                                                          'price'] ??
+                                                      0) >
+                                                  0) &&
+                                              (addToCartModel.addToCarts
                                                       ?.where((cart) =>
                                                           cart.productId ==
                                                               widget.arguments![
@@ -2549,164 +2583,144 @@ class _ProductIdPageState extends State<ProductIdPage> {
                   ),
                   SizedBox(width: 8.0.w),
                   Expanded(
-                    child: currentPackQty <= 0
-                        ? TextButton(
-                            onPressed: _handleNotifyMe,
-                            style:
-                                TextButton.styleFrom(padding: EdgeInsets.zero),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20.0.w, vertical: 10.0.w),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFC7B456),
-                                borderRadius: BorderRadius.circular(10.0.r),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.notifications_active_outlined,
-                                    color: Colors.white,
-                                    size: 18.sp,
-                                  ),
-                                  SizedBox(width: 10.0.w),
-                                  Text(
-                                    'Notify Me',
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontSize: 14.0.sp,
-                                      fontWeight: FontWeight.w700,
+                    child: (() {
+                      bool hasValidPrice = false;
+                      if (_prices.isNotEmpty) {
+                        final effective = _getEffectivePrices(_prices[0]);
+                        if (effective['price'] != null &&
+                            effective['price']! > 0) {
+                          hasValidPrice = true;
+                        }
+                      }
+                      if (!hasValidPrice) {
+                        return const SizedBox.shrink();
+                      }
+                      return currentPackQty <= 0
+                          ? TextButton(
+                              onPressed: _handleNotifyMe,
+                              style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 20.0.w, vertical: 10.0.w),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFC7B456),
+                                  borderRadius: BorderRadius.circular(10.0.r),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.notifications_active_outlined,
                                       color: Colors.white,
+                                      size: 18.sp,
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        : TextButton(
-                            onPressed: () async {
-                              // Removed currentPackQty <= 0 check as it's handled by parent ternary
-                              if (_cartData['kindOfFlower'] == '' ||
-                                  _cartData['flavour'] == '') {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(20.0.r)),
-                                    title: Text(
-                                      _cartData['kindOfFlower'] == '' &&
-                                              _cartData['flavour'] != ''
-                                          ? 'Kindly choose size.'
-                                          : _cartData['flavour'] == '' &&
-                                                  _cartData['kindOfFlower'] !=
-                                                      ''
-                                              ? 'Kindly choose colour.'
-                                              : 'Kindly choose colour and size.',
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: Text(
-                                          'Ok',
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 16.0.sp),
-                                        ),
+                                    SizedBox(width: 10.0.w),
+                                    Text(
+                                      'Notify Me',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 14.0.sp,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
                                       ),
-                                    ],
-                                  ),
-                                );
-                              } else {
-                                // Check if the selected item is already in cart
-                                AddToCart? existingCartItem;
-                                try {
-                                  existingCartItem =
-                                      addToCartModel.addToCarts?.firstWhere(
-                                    (cart) =>
-                                        cart.productId ==
-                                            widget.arguments!['product']
-                                                ['id'] &&
-                                        cart.flavour == _cartData['flavour'] &&
-                                        cart.kindOfFlower ==
-                                            _cartData['kindOfFlower'],
-                                  );
-                                } catch (e) {
-                                  existingCartItem = null;
-                                }
-
-                                if (existingCartItem == null) {
-                                  // Item not in cart, show dialog to add
-                                  int tempQuantity = 1;
-                                  final BuildContext parentContext = context;
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : TextButton(
+                              onPressed: () async {
+                                // Removed currentPackQty <= 0 check as it's handled by parent ternary
+                                if (_cartData['kindOfFlower'] == '' ||
+                                    _cartData['flavour'] == '') {
                                   showDialog(
                                     context: context,
-                                    builder: (dialogContext) => StatefulBuilder(
-                                      builder:
-                                          (dialogContext, setDialogState) =>
-                                              AlertDialog(
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(20.0.r)),
-                                        title: Text('Add to Cart'),
-                                        content: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                                'This item is not in your cart. Please select quantity:'),
-                                            SizedBox(height: 10),
-                                            Text(
-                                                'Maximum available: $currentPackQty',
-                                                style: TextStyle(
-                                                  color: Colors.grey,
-                                                  fontSize: 12.0.sp,
-                                                )),
-                                            SizedBox(height: 20),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                IconButton(
-                                                  onPressed: () {
-                                                    if (tempQuantity > 1) {
-                                                      setDialogState(() {
-                                                        tempQuantity--;
-                                                      });
-                                                    }
-                                                  },
-                                                  icon: Container(
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                          color: Colors.grey),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5),
-                                                    ),
-                                                    child: Icon(Icons.remove,
-                                                        size: 20),
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 20),
-                                                  child: Text(
-                                                    tempQuantity.toString(),
-                                                    style: TextStyle(
-                                                      fontSize: 18.0.sp,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ),
-                                                // Hide plus button when quantity reaches available stock
-                                                if (tempQuantity <
-                                                    currentPackQty)
+                                    builder: (context) => AlertDialog(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20.0.r)),
+                                      title: Text(
+                                        _cartData['kindOfFlower'] == '' &&
+                                                _cartData['flavour'] != ''
+                                            ? 'Kindly choose size.'
+                                            : _cartData['flavour'] == '' &&
+                                                    _cartData['kindOfFlower'] !=
+                                                        ''
+                                                ? 'Kindly choose colour.'
+                                                : 'Kindly choose colour and size.',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: Text(
+                                            'Ok',
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 16.0.sp),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                } else {
+                                  // Check if the selected item is already in cart
+                                  AddToCart? existingCartItem;
+                                  try {
+                                    existingCartItem =
+                                        addToCartModel.addToCarts?.firstWhere(
+                                      (cart) =>
+                                          cart.productId ==
+                                              widget.arguments!['product']
+                                                  ['id'] &&
+                                          cart.flavour ==
+                                              _cartData['flavour'] &&
+                                          cart.kindOfFlower ==
+                                              _cartData['kindOfFlower'],
+                                    );
+                                  } catch (e) {
+                                    existingCartItem = null;
+                                  }
+
+                                  if (existingCartItem == null) {
+                                    // Item not in cart, show dialog to add
+                                    int tempQuantity = 1;
+                                    final BuildContext parentContext = context;
+                                    showDialog(
+                                      context: context,
+                                      builder: (dialogContext) =>
+                                          StatefulBuilder(
+                                        builder:
+                                            (dialogContext, setDialogState) =>
+                                                AlertDialog(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      20.0.r)),
+                                          title: Text('Add to Cart'),
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                  'This item is not in your cart. Please select quantity:'),
+                                              SizedBox(height: 10),
+                                              Text(
+                                                  'Maximum available: $currentPackQty',
+                                                  style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 12.0.sp,
+                                                  )),
+                                              SizedBox(height: 20),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
                                                   IconButton(
                                                     onPressed: () {
-                                                      if (tempQuantity <
-                                                          currentPackQty) {
+                                                      if (tempQuantity > 1) {
                                                         setDialogState(() {
-                                                          tempQuantity++;
+                                                          tempQuantity--;
                                                         });
                                                       }
                                                     },
@@ -2718,169 +2732,212 @@ class _ProductIdPageState extends State<ProductIdPage> {
                                                             BorderRadius
                                                                 .circular(5),
                                                       ),
-                                                      child: Icon(Icons.add,
+                                                      child: Icon(Icons.remove,
                                                           size: 20),
                                                     ),
                                                   ),
-                                              ],
+                                                  Padding(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 20),
+                                                    child: Text(
+                                                      tempQuantity.toString(),
+                                                      style: TextStyle(
+                                                        fontSize: 18.0.sp,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  // Hide plus button when quantity reaches available stock
+                                                  if (tempQuantity <
+                                                      currentPackQty)
+                                                    IconButton(
+                                                      onPressed: () {
+                                                        if (tempQuantity <
+                                                            currentPackQty) {
+                                                          setDialogState(() {
+                                                            tempQuantity++;
+                                                          });
+                                                        }
+                                                      },
+                                                      icon: Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          border: Border.all(
+                                                              color:
+                                                                  Colors.grey),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5),
+                                                        ),
+                                                        child: Icon(Icons.add,
+                                                            size: 20),
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(dialogContext),
+                                              child: Text(
+                                                'Cancel',
+                                                style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 16.0.sp),
+                                              ),
+                                            ),
+                                            TextButton(
+                                              onPressed: () async {
+                                                // Check if quantity exceeds available stock
+                                                if (currentPackQty > 0 &&
+                                                    tempQuantity >
+                                                        currentPackQty) {
+                                                  ScaffoldMessenger.of(
+                                                          parentContext)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                          'Only $currentPackQty items available in stock'),
+                                                      backgroundColor:
+                                                          Colors.orange,
+                                                      duration:
+                                                          Duration(seconds: 2),
+                                                    ),
+                                                  );
+                                                  return;
+                                                }
+
+                                                Navigator.pop(
+                                                    dialogContext); // Close dialog
+
+                                                // Add to cart with selected quantity
+                                                _cartData['points'] =
+                                                    _productPoints;
+
+                                                // Set product price safely
+                                                if (_prices.isNotEmpty) {
+                                                  final offerPrice =
+                                                      _prices[0]['offer_price'];
+                                                  final price =
+                                                      _prices[0]['price'];
+
+                                                  _cartData['product_price'] =
+                                                      (offerPrice != null &&
+                                                              offerPrice != 0)
+                                                          ? offerPrice
+                                                              .toString()
+                                                          : (price?.toString() ??
+                                                              '0');
+                                                } else {
+                                                  _cartData['product_price'] =
+                                                      '0';
+                                                }
+                                                _cartData['is_add_to_cart'] =
+                                                    true;
+
+                                                // Pass available quantity for validation
+                                                _cartData['available_qty'] =
+                                                    currentPackQty;
+
+                                                // Add item to cart with quantity
+                                                // First add the item to cart
+                                                await addToCartModel
+                                                    .getAddToCart(
+                                                        widget.arguments![
+                                                            'product']['id'],
+                                                        true,
+                                                        _cartData);
+
+                                                // If user selected more than 1, add additional quantities
+                                                if (tempQuantity > 1) {
+                                                  // Add the remaining quantity by calling the API multiple times
+                                                  // The API increments by 1 each time when type=true
+                                                  for (int i = 1;
+                                                      i < tempQuantity;
+                                                      i++) {
+                                                    await addToCartModel
+                                                        .getAddToCart(
+                                                            widget.arguments![
+                                                                    'product']
+                                                                ['id'],
+                                                            true,
+                                                            _cartData);
+                                                  }
+                                                }
+
+                                                // Navigate to cart using the parent context
+                                                if (mounted) {
+                                                  Navigator.push(
+                                                    parentContext,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          CartPage(isProfile: {
+                                                        'isProfile': false
+                                                      }),
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                              child: Text(
+                                                'Add & Proceed',
+                                                style: TextStyle(
+                                                    color: Color(0xFFC7B456),
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16.0.sp),
+                                              ),
                                             ),
                                           ],
                                         ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(dialogContext),
-                                            child: Text(
-                                              'Cancel',
-                                              style: TextStyle(
-                                                  color: Colors.grey,
-                                                  fontSize: 16.0.sp),
-                                            ),
-                                          ),
-                                          TextButton(
-                                            onPressed: () async {
-                                              // Check if quantity exceeds available stock
-                                              if (currentPackQty > 0 &&
-                                                  tempQuantity >
-                                                      currentPackQty) {
-                                                ScaffoldMessenger.of(
-                                                        parentContext)
-                                                    .showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                        'Only $currentPackQty items available in stock'),
-                                                    backgroundColor:
-                                                        Colors.orange,
-                                                    duration:
-                                                        Duration(seconds: 2),
-                                                  ),
-                                                );
-                                                return;
-                                              }
-
-                                              Navigator.pop(
-                                                  dialogContext); // Close dialog
-
-                                              // Add to cart with selected quantity
-                                              _cartData['points'] =
-                                                  _productPoints;
-
-                                              // Set product price safely
-                                              if (_prices.isNotEmpty) {
-                                                final offerPrice =
-                                                    _prices[0]['offer_price'];
-                                                final price =
-                                                    _prices[0]['price'];
-
-                                                _cartData['product_price'] =
-                                                    (offerPrice != null &&
-                                                            offerPrice != 0)
-                                                        ? offerPrice.toString()
-                                                        : (price?.toString() ??
-                                                            '0');
-                                              } else {
-                                                _cartData['product_price'] =
-                                                    '0';
-                                              }
-                                              _cartData['is_add_to_cart'] =
-                                                  true;
-
-                                              // Pass available quantity for validation
-                                              _cartData['available_qty'] =
-                                                  currentPackQty;
-
-                                              // Add item to cart with quantity
-                                              // First add the item to cart
-                                              await addToCartModel.getAddToCart(
-                                                  widget.arguments!['product']
-                                                      ['id'],
-                                                  true,
-                                                  _cartData);
-
-                                              // If user selected more than 1, add additional quantities
-                                              if (tempQuantity > 1) {
-                                                // Add the remaining quantity by calling the API multiple times
-                                                // The API increments by 1 each time when type=true
-                                                for (int i = 1;
-                                                    i < tempQuantity;
-                                                    i++) {
-                                                  await addToCartModel
-                                                      .getAddToCart(
-                                                          widget.arguments![
-                                                              'product']['id'],
-                                                          true,
-                                                          _cartData);
-                                                }
-                                              }
-
-                                              // Navigate to cart using the parent context
-                                              if (mounted) {
-                                                Navigator.push(
-                                                  parentContext,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        CartPage(isProfile: {
-                                                      'isProfile': false
-                                                    }),
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                            child: Text(
-                                              'Add & Proceed',
-                                              style: TextStyle(
-                                                  color: Color(0xFFC7B456),
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16.0.sp),
-                                            ),
-                                          ),
-                                        ],
+                                      ),
+                                    );
+                                  } else {
+                                    // Item already in cart, navigate directly
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => CartPage(
+                                            isProfile: {'isProfile': false}),
+                                      ),
+                                    );
+                                  }
+                                }
+                              },
+                              style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 20.0.w, vertical: 10.0.w),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFC7B456),
+                                  borderRadius: BorderRadius.circular(10.0.r),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/shopping-bag-03.png',
+                                      width: 18.0.w,
+                                      height: 17.0.w,
+                                    ),
+                                    SizedBox(width: 10.0.w),
+                                    Text(
+                                      'Buy Now',
+                                      style: MyGoogleFontStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: 14.0.sp,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
                                       ),
                                     ),
-                                  );
-                                } else {
-                                  // Item already in cart, navigate directly
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => CartPage(
-                                          isProfile: {'isProfile': false}),
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                            style:
-                                TextButton.styleFrom(padding: EdgeInsets.zero),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20.0.w, vertical: 10.0.w),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFC7B456),
-                                borderRadius: BorderRadius.circular(10.0.r),
+                                  ],
+                                ),
                               ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    'assets/images/shopping-bag-03.png',
-                                    width: 18.0.w,
-                                    height: 17.0.w,
-                                  ),
-                                  SizedBox(width: 10.0.w),
-                                  Text(
-                                    'Buy Now',
-                                    style: MyGoogleFontStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontSize: 14.0.sp,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                            );
+                    })(),
                   ),
                 ],
               ),

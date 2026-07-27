@@ -585,11 +585,8 @@ class ShopsPageState extends State<ShopsPage> {
                   final isDistributor = configModel.activeRole == 'Distributor';
                   final priceObj = product.productPrices![0];
 
-                  double price =
-                      double.tryParse(priceObj.price?.toString() ?? '0') ?? 0;
-                  double offerPrice =
-                      double.tryParse(priceObj.offerPrice?.toString() ?? '0') ??
-                          0;
+                  double price = 0;
+                  double offerPrice = 0;
 
                   if (isDistributor) {
                     double? distPrice = double.tryParse(
@@ -597,9 +594,15 @@ class ShopsPageState extends State<ShopsPage> {
                     double? distOfferPrice = double.tryParse(
                         priceObj.distributorOfferPrice?.toString() ?? '');
 
-                    if (distPrice != null && distPrice > 0) price = distPrice;
-                    if (distOfferPrice != null && distOfferPrice > 0)
-                      offerPrice = distOfferPrice;
+                    if (distPrice != null && distPrice > 0) {
+                      price = distPrice;
+                      if (distOfferPrice != null && distOfferPrice > 0) {
+                        offerPrice = distOfferPrice;
+                      }
+                    }
+                  } else {
+                    price = double.tryParse(priceObj.price?.toString() ?? '0') ?? 0;
+                    offerPrice = double.tryParse(priceObj.offerPrice?.toString() ?? '0') ?? 0;
                   }
 
                   if (price > 0 && offerPrice > 0 && offerPrice < price) {

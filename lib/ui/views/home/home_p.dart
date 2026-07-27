@@ -399,9 +399,14 @@ class _HomePageState extends State<HomePage>
       dynamic offerPriceValue;
 
       if (isDistributor) {
-        // Use distributor prices if available
-        priceValue = priceObj.distributorPrice ?? priceObj.price;
-        offerPriceValue = priceObj.distributorOfferPrice ?? priceObj.offerPrice;
+        if (priceObj.distributorPrice != null && priceObj.distributorPrice! > 0) {
+          priceValue = priceObj.distributorPrice;
+          offerPriceValue = (priceObj.distributorOfferPrice != null && priceObj.distributorOfferPrice! > 0)
+              ? priceObj.distributorOfferPrice
+              : 0;
+        } else {
+          return 0.0;
+        }
       } else {
         priceValue = priceObj.price;
         offerPriceValue = priceObj.offerPrice;

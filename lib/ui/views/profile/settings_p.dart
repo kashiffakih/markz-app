@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/providers/config_pr.dart';
 import 'package:aadab/core/providers/user_wallet_pr.dart';
-import 'package:aadab/locator.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 import 'package:aadab/ui/views/profile/setting_id.dart';
 
@@ -15,10 +14,12 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  final ConfigModel _configModel = locator<ConfigModel>();
-
   @override
   Widget build(BuildContext context) {
+    final ConfigModel _configModel = Provider.of<ConfigModel>(context);
+    final user = _configModel.user;
+    bool isDistributor = _configModel.activeRole == 'Distributor';
+
     return WillPopScope(
       onWillPop: () async {
         Navigator.pushNamed(context, '/profilePage');
@@ -85,11 +86,19 @@ class _SettingsPageState extends State<SettingsPage> {
                           // Edit Button
                           InkWell(
                             onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => SettingUpdatePage(
-                                          arguments: {
-                                            'user': _configModel.user!
-                                          })));
+                              if (_configModel.user != null) {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => SettingUpdatePage(
+                                            arguments: {
+                                              'user': _configModel.user!
+                                            })));
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'User profile loading, please try again.')),
+                                );
+                              }
                             },
                             child: Container(
                               padding: EdgeInsets.all(10.w),
@@ -118,7 +127,9 @@ class _SettingsPageState extends State<SettingsPage> {
                           Padding(
                             padding: EdgeInsets.only(bottom: 12.h, left: 4.w),
                             child: Text(
-                              'Personal Information',
+                              isDistributor
+                                  ? 'Business Information'
+                                  : 'Personal Information',
                               style: MyGoogleFontStyle(
                                 fontFamily: 'Urbanist',
                                 fontSize: 18.sp,
@@ -149,35 +160,139 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                             ),
                             child: Column(
-                              children: [
-                                _buildProfileRow(
-                                  icon: Icons.person_outline_rounded,
-                                  label: 'Full Name',
-                                  value:
-                                      _configModel.user!.firstName.toString(),
-                                ),
-                                Divider(height: 32.h, color: Colors.grey[100]),
-                                _buildProfileRow(
-                                  icon: Icons.email_outlined,
-                                  label: 'Email Address',
-                                  value: _configModel.user!.email.toString(),
-                                ),
-                                Divider(height: 32.h, color: Colors.grey[100]),
-                                _buildProfileRow(
-                                  icon: Icons.phone_iphone_rounded,
-                                  label: 'Phone Number',
-                                  value: _configModel.user!.phone.toString(),
-                                ),
-                                Divider(height: 32.h, color: Colors.grey[100]),
-                                _buildProfileRow(
-                                  icon: Icons.confirmation_number_outlined,
-                                  label: 'Referral Code',
-                                  value: _configModel.user!.referralCode
-                                          ?.toString() ??
-                                      'N/A',
-                                  isLast: true,
-                                ),
-                              ],
+                              children: isDistributor
+                                  ? [
+                                      if (user?.businessName != null &&
+                                          user!.businessName!.isNotEmpty) ...[
+                                        _buildProfileRow(
+                                          icon: Icons.business_rounded,
+                                          label: 'Business Name',
+                                          value: user.businessName.toString(),
+                                        ),
+                                        Divider(
+                                            height: 32.h,
+                                            color: Colors.grey[100]),
+                                      ],
+                                      if (user?.tradeName != null &&
+                                          user!.tradeName!.isNotEmpty) ...[
+                                        _buildProfileRow(
+                                          icon: Icons.store_rounded,
+                                          label: 'Trade Name',
+                                          value: user.tradeName.toString(),
+                                        ),
+                                        Divider(
+                                            height: 32.h,
+                                            color: Colors.grey[100]),
+                                      ],
+                                      if (user?.gstNumber != null &&
+                                          user!.gstNumber!.isNotEmpty) ...[
+                                        _buildProfileRow(
+                                          icon: Icons.receipt_long_rounded,
+                                          label: 'GST Number',
+                                          value: user.gstNumber.toString(),
+                                        ),
+                                        Divider(
+                                            height: 32.h,
+                                            color: Colors.grey[100]),
+                                      ],
+                                      _buildProfileRow(
+                                        icon: Icons.person_outline_rounded,
+                                        label: 'Contact Person',
+                                        value: user?.firstName?.toString() ??
+                                            'N/A',
+                                      ),
+                                      Divider(
+                                          height: 32.h,
+                                          color: Colors.grey[100]),
+                                      _buildProfileRow(
+                                        icon: Icons.phone_iphone_rounded,
+                                        label: 'Phone Number',
+                                        value: user?.phone?.toString() ?? 'N/A',
+                                      ),
+                                      Divider(
+                                          height: 32.h,
+                                          color: Colors.grey[100]),
+                                      _buildProfileRow(
+                                        icon: Icons.email_outlined,
+                                        label: 'Email Address',
+                                        value: user?.email?.toString() ?? 'N/A',
+                                      ),
+                                      if ((user?.address != null &&
+                                              user!.address!.isNotEmpty) ||
+                                          (user?.stateBusiness != null &&
+                                              user!.stateBusiness!
+                                                  .isNotEmpty)) ...[
+                                        Divider(
+                                            height: 32.h,
+                                            color: Colors.grey[100]),
+                                        _buildProfileRow(
+                                          icon: Icons.location_on_rounded,
+                                          label: 'Business Location',
+                                          value:
+                                              '${user.address ?? ''} ${user.city ?? ''} ${user.stateBusiness ?? user.state ?? ''}'
+                                                  .trim(),
+                                        ),
+                                      ],
+                                      Divider(
+                                          height: 32.h,
+                                          color: Colors.grey[100]),
+                                      _buildProfileRow(
+                                        icon:
+                                            Icons.confirmation_number_outlined,
+                                        label: 'Referral Code',
+                                        value: user?.referralCode?.toString() ??
+                                            'N/A',
+                                        isLast: true,
+                                      ),
+                                    ]
+                                  : [
+                                      _buildProfileRow(
+                                        icon: Icons.person_outline_rounded,
+                                        label: 'Full Name',
+                                        value: user?.firstName?.toString() ??
+                                            'N/A',
+                                      ),
+                                      Divider(
+                                          height: 32.h,
+                                          color: Colors.grey[100]),
+                                      _buildProfileRow(
+                                        icon: Icons.email_outlined,
+                                        label: 'Email Address',
+                                        value: user?.email?.toString() ?? 'N/A',
+                                      ),
+                                      Divider(
+                                          height: 32.h,
+                                          color: Colors.grey[100]),
+                                      _buildProfileRow(
+                                        icon: Icons.phone_iphone_rounded,
+                                        label: 'Phone Number',
+                                        value: user?.phone?.toString() ?? 'N/A',
+                                      ),
+                                      if (user?.address != null &&
+                                          user!.address!.isNotEmpty) ...[
+                                        Divider(
+                                            height: 32.h,
+                                            color: Colors.grey[100]),
+                                        _buildProfileRow(
+                                          icon: Icons.location_on_rounded,
+                                          label: 'Address',
+                                          value:
+                                              '${user.address} ${user.city ?? ''} ${user.state ?? ''}'
+                                                  .trim(),
+                                        ),
+                                      ],
+                                      Divider(
+                                          height: 32.h,
+                                          color: Colors.grey[100]),
+                                      _buildProfileRow(
+                                        icon:
+                                            Icons.confirmation_number_outlined,
+                                        label: 'Referral Code',
+                                        value: user?.referralCode?.toString() ??
+                                            'N/A',
+                                        isLast: true,
+                                      ),
+                                    ],
                             ),
                           ),
 

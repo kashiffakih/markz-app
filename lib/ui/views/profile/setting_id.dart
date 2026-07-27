@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:csc_picker_plus/csc_picker_plus.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:aadab/core/providers/config_pr.dart';
 import 'package:aadab/locator.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +27,10 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
 
   bool _hasGst = false;
 
+  File? _visitingCardImage;
+  File? _shopImage;
+  final ImagePicker _picker = ImagePicker();
+
   // CSC Picker values
   String? _selectedCountry;
   String? _selectedState;
@@ -43,7 +49,16 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
   @override
   void initState() {
     super.initState();
-    _user = widget.arguments['user'];
+    final ConfigModel configModel = locator<ConfigModel>();
+    if (widget.arguments != null &&
+        widget.arguments is Map &&
+        widget.arguments['user'] != null) {
+      _user = widget.arguments['user'];
+    } else if (configModel.user != null) {
+      _user = configModel.user!;
+    } else {
+      _user = User();
+    }
 
     // Initialize GST checkbox based on existing data
     _hasGst = _user.gstNumber != null && _user.gstNumber!.isNotEmpty;
@@ -83,8 +98,8 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
   @override
   Widget build(BuildContext context) {
     AuthModel _userModel = Provider.of<AuthModel>(context, listen: false);
-    final ConfigModel _configModel = locator<ConfigModel>();
-    bool isDistributor = _configModel.user?.activeRole == 'Distributor';
+    final ConfigModel _configModel = Provider.of<ConfigModel>(context);
+    bool isDistributor = _configModel.activeRole == 'Distributor';
 
     return Scaffold(
       body: Container(
@@ -217,152 +232,116 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                           ),
                         ],
 
-                        // Distributor-specific fields
-                        if (isDistributor) ...[
+                        // Business Details (for Distributors or if GST enabled)
+                        if (isDistributor || _hasGst) ...[
                           SizedBox(height: 24.h),
                           _buildSectionDivider('Business Details'),
                           SizedBox(height: 16.h),
 
-                          if (_hasGst) ...[
-                            // Business Name
-                            _buildLabel('Business Name'),
-                            SizedBox(height: 8.h),
-                            _buildTextField(
-                              controller: _businessNameController,
-                              hintText: 'Enter Business Name',
-                              icon: Icons.business_rounded,
-                              onSaved: (value) => _user.businessName = value,
-                            ),
+                          // Business Name
+                          _buildLabel('Business Name'),
+                          SizedBox(height: 8.h),
+                          _buildTextField(
+                            controller: _businessNameController,
+                            hintText: 'Enter Business Name',
+                            icon: Icons.business_rounded,
+                            onSaved: (value) => _user.businessName = value,
+                          ),
 
-                            SizedBox(height: 16.h),
+                          SizedBox(height: 16.h),
 
-                            // Trade Name
-                            _buildLabel('Trade Name'),
-                            SizedBox(height: 8.h),
-                            _buildTextField(
-                              controller: _tradeNameController,
-                              hintText: 'Enter Trade Name',
-                              icon: Icons.store_rounded,
-                              onSaved: (value) => _user.tradeName = value,
-                            ),
+                          // Trade Name
+                          _buildLabel('Trade Name'),
+                          SizedBox(height: 8.h),
+                          _buildTextField(
+                            controller: _tradeNameController,
+                            hintText: 'Enter Trade Name',
+                            icon: Icons.store_rounded,
+                            onSaved: (value) => _user.tradeName = value,
+                          ),
 
-                            SizedBox(height: 16.h),
+                          SizedBox(height: 16.h),
 
-                            // Registration Date
-                            _buildLabel('Registration Date'),
-                            SizedBox(height: 8.h),
-                            _buildDateField(),
+                          // Registration Date
+                          _buildLabel('Registration Date'),
+                          SizedBox(height: 8.h),
+                          _buildDateField(),
 
-                            SizedBox(height: 16.h),
+                          SizedBox(height: 16.h),
+                        ],
+
+                        // Address Section
+                        SizedBox(height: 24.h),
+                        _buildSectionDivider('Address Details'),
+                        SizedBox(height: 16.h),
+
+                        // Address
+                        _buildLabel('Address'),
+                        SizedBox(height: 8.h),
+                        _buildTextField(
+                          controller: _addressController,
+                          hintText: 'Enter Address',
+                          icon: Icons.location_on_rounded,
+                          maxLines: 3,
+                          onSaved: (value) => _user.address = value,
+                        ),
+
+                        SizedBox(height: 16.h),
+
+                        // Location (State & City)
+                        _buildLabel('Location'),
+                        SizedBox(height: 8.h),
+                        _buildCscPicker(isDistributor: isDistributor),
+
+                        SizedBox(height: 16.h),
+
+                        // Pincode
+                        _buildLabel('Pincode'),
+                        SizedBox(height: 8.h),
+                        _buildTextField(
+                          controller: _pincodeController,
+                          hintText: 'Enter Pincode',
+                          icon: Icons.pin_drop_rounded,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(6),
                           ],
+                          validator: (value) {
+                            if (value!.isNotEmpty && value.length != 6) {
+                              return 'Invalid pincode';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) => _user.pincodeBusiness = value,
+                        ),
 
-                          // Business Address
-                          _buildLabel('Business Address'),
-                          SizedBox(height: 8.h),
-                          _buildTextField(
-                            controller: _addressController,
-                            hintText: 'Enter Business Address',
-                            icon: Icons.location_on_rounded,
-                            maxLines: 3,
-                            onSaved: (value) => _user.address = value,
-                          ),
+                        // Documents Section (Visiting Card & Store/Shop Image) - ALWAYS VISIBLE
+                        SizedBox(height: 24.h),
+                        _buildSectionDivider('Business & Store Documents'),
+                        SizedBox(height: 16.h),
 
-                          SizedBox(height: 16.h),
+                        // Visiting Card Preview & Upload
+                        _buildLabel('Visiting Card'),
+                        SizedBox(height: 8.h),
+                        _buildImagePreview(
+                          label: 'Visiting Card',
+                          imagePath: _user.visitingCardPath,
+                          configModel: _configModel,
+                          isVisitingCard: true,
+                        ),
 
-                          // Location (State & City)
-                          _buildLabel('Location'),
-                          SizedBox(height: 8.h),
-                          _buildCscPicker(isDistributor: true),
+                        SizedBox(height: 16.h),
 
-                          SizedBox(height: 16.h),
-
-                          // Pincode
-                          _buildLabel('Pincode'),
-                          SizedBox(height: 8.h),
-                          _buildTextField(
-                            controller: _pincodeController,
-                            hintText: 'Enter Pincode',
-                            icon: Icons.pin_drop_rounded,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                              LengthLimitingTextInputFormatter(6),
-                            ],
-                            validator: (value) {
-                              if (value!.isNotEmpty && value.length != 6) {
-                                return 'Invalid pincode';
-                              }
-                              return null;
-                            },
-                            onSaved: (value) => _user.pincodeBusiness = value,
-                          ),
-
-                          SizedBox(height: 24.h),
-                          _buildSectionDivider('Documents'),
-                          SizedBox(height: 16.h),
-
-                          // Visiting Card Preview
-                          _buildLabel('Visiting Card'),
-                          SizedBox(height: 8.h),
-                          _buildImagePreview(
-                            label: 'Visiting Card',
-                            imagePath: _user.visitingCardPath,
-                            configModel: _configModel,
-                          ),
-
-                          SizedBox(height: 16.h),
-
-                          // Shop Image Preview
-                          _buildLabel('Shop Image'),
-                          SizedBox(height: 8.h),
-                          _buildImagePreview(
-                            label: 'Shop Image',
-                            imagePath: _user.shopImagePath,
-                            configModel: _configModel,
-                          ),
-                        ],
-
-                        // Address Section for regular users
-                        if (!isDistributor) ...[
-                          SizedBox(height: 24.h),
-                          _buildSectionDivider('Address'),
-                          SizedBox(height: 16.h),
-
-                          // Address
-                          _buildLabel('Address'),
-                          SizedBox(height: 8.h),
-                          _buildTextField(
-                            controller: _addressController,
-                            hintText: 'Enter Address',
-                            icon: Icons.location_on_rounded,
-                            maxLines: 3,
-                            onSaved: (value) => _user.address = value,
-                          ),
-
-                          SizedBox(height: 16.h),
-
-                          // Location (State & City)
-                          _buildLabel('Location'),
-                          SizedBox(height: 8.h),
-                          _buildCscPicker(isDistributor: false),
-
-                          SizedBox(height: 16.h),
-
-                          // Pincode
-                          _buildLabel('Pincode'),
-                          SizedBox(height: 8.h),
-                          _buildTextField(
-                            controller: _pincodeController,
-                            hintText: 'Enter Pincode',
-                            icon: Icons.pin_drop_rounded,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                              LengthLimitingTextInputFormatter(6),
-                            ],
-                            onSaved: (value) => _user.pincode = value,
-                          ),
-                        ],
+                        // Store / Shop Image Preview & Upload
+                        _buildLabel('Store / Shop Image'),
+                        SizedBox(height: 8.h),
+                        _buildImagePreview(
+                          label: 'Store / Shop Image',
+                          imagePath: _user.shopImagePath,
+                          configModel: _configModel,
+                          isVisitingCard: false,
+                        ),
 
                         SizedBox(height: 48.h),
 
@@ -585,6 +564,9 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
         showStates: true,
         showCities: true,
         flagState: CountryFlag.DISABLE,
+        currentState: _selectedState,
+        currentCity: _selectedCity,
+        currentCountry: _selectedCountry,
         dropdownDecoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10.r),
           color: Color(0xfff7f8f9),
@@ -598,9 +580,9 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
         countrySearchPlaceholder: "Search Country",
         stateSearchPlaceholder: "Search State",
         citySearchPlaceholder: "Search City",
-        countryDropdownLabel: _selectedCountry ?? "Select Country",
-        stateDropdownLabel: _selectedState ?? "Select State",
-        cityDropdownLabel: _selectedCity ?? "Select City",
+        countryDropdownLabel: "Select Country",
+        stateDropdownLabel: "Select State",
+        cityDropdownLabel: "Select City",
         defaultCountry: CscCountry.India,
         disableCountry: true,
         selectedItemStyle: MyGoogleFontStyle(
@@ -629,9 +611,7 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
         onStateChanged: (value) {
           setState(() {
             _selectedState = value;
-            if (isDistributor) {
-              _user.stateBusiness = value;
-            }
+            _user.stateBusiness = value;
             _user.state = value;
           });
         },
@@ -645,18 +625,138 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
     );
   }
 
-  // Image preview only (no upload functionality)
+  void _showImageSourceActionSheet(BuildContext context,
+      {required bool isVisitingCard}) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Container(
+            padding: EdgeInsets.all(20.w),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  isVisitingCard ? 'Select Visiting Card' : 'Select Shop Image',
+                  style: MyGoogleFontStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF1E232C),
+                  ),
+                ),
+                SizedBox(height: 20.h),
+                ListTile(
+                  leading: Container(
+                    padding: EdgeInsets.all(10.w),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEED056).withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.camera_alt_rounded,
+                        color: Color(0xFFEED056)),
+                  ),
+                  title: Text(
+                    'Take a Photo',
+                    style: MyGoogleFontStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    final XFile? pickedFile = await _picker.pickImage(
+                      source: ImageSource.camera,
+                      imageQuality: 70,
+                    );
+                    if (pickedFile != null) {
+                      setState(() {
+                        if (isVisitingCard) {
+                          _visitingCardImage = File(pickedFile.path);
+                        } else {
+                          _shopImage = File(pickedFile.path);
+                        }
+                      });
+                    }
+                  },
+                ),
+                ListTile(
+                  leading: Container(
+                    padding: EdgeInsets.all(10.w),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEED056).withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.photo_library_rounded,
+                        color: Color(0xFFEED056)),
+                  ),
+                  title: Text(
+                    'Select from Gallery',
+                    style: MyGoogleFontStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    final XFile? pickedFile = await _picker.pickImage(
+                      source: ImageSource.gallery,
+                      imageQuality: 70,
+                    );
+                    if (pickedFile != null) {
+                      setState(() {
+                        if (isVisitingCard) {
+                          _visitingCardImage = File(pickedFile.path);
+                        } else {
+                          _shopImage = File(pickedFile.path);
+                        }
+                      });
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildImagePreview({
     required String label,
     String? imagePath,
     required ConfigModel configModel,
+    required bool isVisitingCard,
   }) {
+    File? selectedLocalFile = isVisitingCard ? _visitingCardImage : _shopImage;
+
     String? imageUrl;
-    if (imagePath != null && imagePath.isNotEmpty) {
+    if (imagePath != null && imagePath.trim().isNotEmpty) {
       Map<String, dynamic> apiConfig = configModel.apiConfig;
-      String baseUrl = apiConfig['baseURL'] ?? '';
-      baseUrl = baseUrl.replaceAll('/api', '');
-      imageUrl = '$baseUrl/storage/$imagePath';
+      String baseUrl = (apiConfig['baseURL'] ?? '')
+          .toString()
+          .replaceAll(RegExp(r'/api/?$'), '');
+      if (baseUrl.endsWith('/')) {
+        baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+      }
+
+      String cleanPath = imagePath.trim().replaceAll(RegExp(r'^/+'), '');
+      if (cleanPath.startsWith('http://') || cleanPath.startsWith('https://')) {
+        imageUrl = cleanPath;
+      } else {
+        if (cleanPath.startsWith('storage/')) {
+          cleanPath = cleanPath.substring(8);
+        }
+        if (!cleanPath.startsWith('Aadab/')) {
+          cleanPath = 'Aadab/$cleanPath';
+        }
+        imageUrl = '$baseUrl/storage/$cleanPath';
+      }
     }
 
     return Container(
@@ -673,20 +773,87 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
         ],
         border: Border.all(color: Colors.grey.withOpacity(0.1)),
       ),
-      child: imageUrl != null
-          ? GestureDetector(
-              onTap: () => _showFullImage(context, imageUrl!),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10.r),
+      child: Column(
+        children: [
+          if (selectedLocalFile != null) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10.r),
+              child: GestureDetector(
+                onTap: () => _showLocalFullImage(context, selectedLocalFile),
+                child: Image.file(
+                  selectedLocalFile,
+                  height: 160.h,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            SizedBox(height: 12.h),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () =>
+                        _showLocalFullImage(context, selectedLocalFile),
+                    icon: Icon(Icons.visibility_outlined,
+                        size: 16.sp, color: const Color(0xFF1E232C)),
+                    label: Text(
+                      'View Image',
+                      style: TextStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 13.sp,
+                          color: const Color(0xFF1E232C),
+                          fontWeight: FontWeight.w600),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFFE8ECF4)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.r)),
+                      minimumSize: Size(double.infinity, 40.h),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _showImageSourceActionSheet(context,
+                        isVisitingCard: isVisitingCard),
+                    icon: Icon(Icons.upload_file_rounded,
+                        size: 16.sp, color: Colors.white),
+                    label: Text(
+                      'Upload Image',
+                      style: TextStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 13.sp,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFEED056),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.r)),
+                      minimumSize: Size(double.infinity, 40.h),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ] else if (imageUrl != null) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10.r),
+              child: GestureDetector(
+                onTap: () => _showFullImage(context, imageUrl!),
                 child: Image.network(
                   imageUrl,
-                  height: 150.h,
+                  height: 160.h,
                   width: double.infinity,
                   fit: BoxFit.cover,
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
                     return Container(
-                      height: 150.h,
+                      height: 160.h,
+                      color: const Color(0xFFF7F8F9),
                       child: Center(
                         child: CircularProgressIndicator(
                           value: loadingProgress.expectedTotalBytes != null
@@ -699,23 +866,112 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                     );
                   },
                   errorBuilder: (context, error, stackTrace) {
-                    return _buildNoImagePlaceholder(label);
+                    String imgUrl = imageUrl ?? '';
+                    String fallbackUrl = imgUrl;
+                    if (imgUrl.contains('/storage/Aadab/')) {
+                      fallbackUrl =
+                          imgUrl.replaceFirst('/storage/Aadab/', '/storage/');
+                    } else if (imgUrl.contains('/storage/')) {
+                      fallbackUrl =
+                          imgUrl.replaceFirst('/storage/', '/storage/Aadab/');
+                    }
+                    return Image.network(
+                      fallbackUrl,
+                      height: 160.h,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, err2, stack2) {
+                        return _buildNoImagePlaceholder(label,
+                            isVisitingCard: isVisitingCard);
+                      },
+                    );
                   },
                 ),
               ),
-            )
-          : _buildNoImagePlaceholder(label),
+            ),
+            SizedBox(height: 12.h),
+            ElevatedButton.icon(
+              onPressed: () => _showImageSourceActionSheet(context,
+                  isVisitingCard: isVisitingCard),
+              icon: Icon(Icons.upload_file_rounded,
+                  size: 16.sp, color: Colors.white),
+              label: Text(
+                'Upload Image',
+                style: TextStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 13.sp,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFEED056),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r)),
+                minimumSize: Size(double.infinity, 40.h),
+              ),
+            ),
+          ] else ...[
+            _buildNoImagePlaceholder(label, isVisitingCard: isVisitingCard),
+          ],
+        ],
+      ),
     );
   }
 
-  void _showFullImage(BuildContext context, String imageUrl) {
+  void _showLocalFullImage(BuildContext context, File localFile) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
         backgroundColor: Colors.transparent,
+        insetPadding: EdgeInsets.all(16.w),
         child: Stack(
+          alignment: Alignment.center,
           children: [
-            Center(
+            InteractiveViewer(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15.r),
+                child: Image.file(localFile, fit: BoxFit.contain),
+              ),
+            ),
+            Positioned(
+              top: 10,
+              right: 10,
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: const BoxDecoration(
+                    color: Colors.black87,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close, color: Colors.white, size: 20),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showFullImage(BuildContext context, String imageUrl) {
+    String fallbackUrl = imageUrl;
+    if (imageUrl.contains('/storage/Aadab/')) {
+      fallbackUrl = imageUrl.replaceFirst('/storage/Aadab/', '/storage/');
+    } else if (imageUrl.contains('/storage/')) {
+      fallbackUrl = imageUrl.replaceFirst('/storage/', '/storage/Aadab/');
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: EdgeInsets.all(16.w),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            InteractiveViewer(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15.r),
                 child: Image.network(
@@ -727,11 +983,49 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                       height: 300.h,
                       width: 300.w,
                       color: Colors.white,
-                      child: Center(
+                      child: const Center(
                         child: CircularProgressIndicator(
-                          color: const Color(0xFFEED056),
+                          color: Color(0xFFEED056),
                         ),
                       ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.network(
+                      fallbackUrl,
+                      fit: BoxFit.contain,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          height: 300.h,
+                          width: 300.w,
+                          color: Colors.white,
+                          child: const Center(
+                            child: CircularProgressIndicator(
+                              color: Color(0xFFEED056),
+                            ),
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, err2, stack2) {
+                        return Container(
+                          padding: EdgeInsets.all(20.w),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.broken_image_rounded,
+                                  size: 48, color: Colors.grey),
+                              const SizedBox(height: 8),
+                              const Text('Failed to load image',
+                                  style: TextStyle(color: Colors.grey)),
+                            ],
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
@@ -743,12 +1037,12 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
               child: GestureDetector(
                 onTap: () => Navigator.pop(context),
                 child: Container(
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
+                  padding: EdgeInsets.all(8.w),
+                  decoration: const BoxDecoration(
+                    color: Colors.black87,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.close, color: Colors.white, size: 20),
+                  child: const Icon(Icons.close, color: Colors.white, size: 20),
                 ),
               ),
             ),
@@ -758,27 +1052,57 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
     );
   }
 
-  Widget _buildNoImagePlaceholder(String label) {
-    return Container(
-      height: 100.h,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.image_not_supported_outlined,
-            color: Color(0xFF8391A1),
-            size: 28.sp,
-          ),
-          SizedBox(width: 10.w),
-          Text(
-            'No $label uploaded',
-            style: TextStyle(
-              fontFamily: 'Urbanist',
-              fontSize: 14.sp,
-              color: Color(0xFF8391A1),
+  Widget _buildNoImagePlaceholder(String label,
+      {required bool isVisitingCard}) {
+    return InkWell(
+      onTap: () =>
+          _showImageSourceActionSheet(context, isVisitingCard: isVisitingCard),
+      borderRadius: BorderRadius.circular(10.r),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 16.w),
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF7F8F9),
+          borderRadius: BorderRadius.circular(10.r),
+          border: Border.all(
+              color: const Color(0xFFEED056).withOpacity(0.4),
+              style: BorderStyle.solid),
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEED056).withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.add_a_photo_outlined,
+                color: const Color(0xFFEED056),
+                size: 26.sp,
+              ),
             ),
-          ),
-        ],
+            SizedBox(height: 8.h),
+            Text(
+              'Upload $label',
+              style: MyGoogleFontStyle(
+                fontFamily: 'Urbanist',
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF1E232C),
+              ),
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              'Tap to choose image from camera or gallery',
+              style: TextStyle(
+                fontFamily: 'Urbanist',
+                fontSize: 12.sp,
+                color: const Color(0xFF8391A1),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -821,22 +1145,38 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
               _user.gstNumber = null;
             }
 
-            _user.referedById = configModel.user!.referedById ?? 0;
+            _user.referedById = configModel.user?.referedById ?? 0;
 
             // Update user profile data
             Map<String, dynamic> response = await userModel.updateUser(
               updateUserData: _user.toJson(),
             );
 
-            // Image upload functionality is disabled
-            // To enable, uncomment the code below and add image picker functionality
-            // if (response['success'] == true && (_visitingCardImage != null || _shopImage != null)) {
-            //   await userModel.uploadWholesalerDocuments(
-            //     userId: _user.id.toString(),
-            //     visitingCardImage: _visitingCardImage,
-            //     shopImage: _shopImage,
-            //   );
-            // }
+            // Upload Visiting Card and/or Shop Image if selected
+            if (response['success'] == true &&
+                (_visitingCardImage != null || _shopImage != null)) {
+              Map<String, dynamic> docResponse =
+                  await userModel.uploadWholesalerDocuments(
+                userId: _user.id.toString(),
+                visitingCardImage: _visitingCardImage,
+                shopImage: _shopImage,
+              );
+
+              if (docResponse['success'] == true &&
+                  docResponse['data'] != null) {
+                final data = docResponse['data'];
+                if (data['visiting_card_path'] != null) {
+                  _user.visitingCardPath = data['visiting_card_path'];
+                  configModel.user?.visitingCardPath =
+                      data['visiting_card_path'];
+                }
+                if (data['shop_image_path'] != null) {
+                  _user.shopImagePath = data['shop_image_path'];
+                  configModel.user?.shopImagePath = data['shop_image_path'];
+                }
+                configModel.user = configModel.user;
+              }
+            }
 
             if (!mounted) return;
 

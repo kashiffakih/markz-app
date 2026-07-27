@@ -1,4 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:aadab/core/providers/auth_pr.dart';
@@ -16,20 +19,71 @@ class RootPage extends StatefulWidget {
 class _RootPageState extends State<RootPage> {
   final PermissionService _permissionService = PermissionService();
 
+  bool isVersionLower(String currentVersion, String minRequiredVersion) {
+    if (minRequiredVersion.isEmpty) return false;
+    String cleanCurrent = currentVersion.split('+')[0].trim();
+    String cleanRequired = minRequiredVersion.split('+')[0].trim();
+
+    List<int> currentParts =
+        cleanCurrent.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+    List<int> requiredParts =
+        cleanRequired.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+
+    int maxLength = currentParts.length > requiredParts.length
+        ? currentParts.length
+        : requiredParts.length;
+
+    for (int i = 0; i < maxLength; i++) {
+      int curr = i < currentParts.length ? currentParts[i] : 0;
+      int req = i < requiredParts.length ? requiredParts[i] : 0;
+      if (curr < req) return true;
+      if (curr > req) return false;
+    }
+    return false;
+  }
+
   authenticateUser(_, AuthModel authModel, ConfigModel configModel) async {
-    // configModel.getApiConfig(domain: 'http://192.168.0.105:9090');
-    // configModel.getApiConfig(domain: 'http://localhost:7070');
     configModel.getApiConfig(domain: 'https://api.staging.aadab.online');
-    // print(configModel.apiConfig['baseURL']);
     await configModel.fetchLoginData();
 
     String currentAppVersion = await getPackageDetails();
 
+    // Check version requirements from API
+    try {
+      final response = await http.get(
+        Uri.parse('${configModel.apiConfig['baseURL']}/settings/1'),
+        headers: configModel.apiConfig['headers'],
+      );
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        final settings = responseData['data'] ?? {};
+
+        final String minRequiredVersion = Platform.isIOS
+            ? (settings['min_ios_version'] ?? '1.0.0')
+            : (settings['min_android_version'] ?? '1.0.0');
+
+        if (isVersionLower(currentAppVersion, minRequiredVersion)) {
+          if (mounted) {
+            Navigator.pushReplacementNamed(
+              context,
+              '/updateApp',
+              arguments: {
+                'android_update_url': settings['android_update_url'],
+                'ios_update_url': settings['ios_update_url'],
+                'force_update_message': settings['force_update_message'],
+                'current_version': currentAppVersion,
+                'required_version': minRequiredVersion,
+              },
+            );
+          }
+          return;
+        }
+      }
+    } catch (e) {
+      debugPrint('Error checking version settings: $e');
+    }
+
     if (configModel.loginData.isEmpty) {
-      // Future.delayed(
-      //   Duration.zero,
-      //   () => Navigator.pushReplacementNamed(context, '/allPages'),
-      // );
       Future.delayed(
         Duration.zero,
         () => Navigator.pushReplacementNamed(context, '/splash2Page'),
@@ -37,37 +91,26 @@ class _RootPageState extends State<RootPage> {
     } else {
       await authModel.login(loginData: configModel.loginData);
       debugPrint('APP: $currentAppVersion');
-      debugPrint('API: ${configModel.currentAndroidVersionFromApi}');
 
       if (configModel.isLoggedIn) {
-        // if (currentAppVersion != configModel.currentAndroidVersionFromApi) {
-        //   Navigator.pushReplacementNamed(context, '/updateApp');
-        // } else {
-
-        // Check if all permissions are granted
-        bool allPermissionsGranted = await _permissionService
-            .areAllPermissionsGranted();
+        bool allPermissionsGranted =
+            await _permissionService.areAllPermissionsGranted();
 
         if (!allPermissionsGranted) {
-          // Navigate to permissions page
           Future.delayed(Duration.zero, () async {
             final result = await Navigator.pushNamed(context, '/permissions');
             if (result == true) {
-              // Permissions granted, navigate to home
               Navigator.pushReplacementNamed(context, '/homePage');
             } else {
-              // Permissions not granted, stay on permissions page or show message
               Navigator.pushReplacementNamed(context, '/permissions');
             }
           });
         } else {
-          // All permissions granted, navigate to home
           Future.delayed(
             Duration.zero,
             () => Navigator.pushReplacementNamed(context, '/homePage'),
           );
         }
-        // }
       } else {
         Future.delayed(
           Duration.zero,
