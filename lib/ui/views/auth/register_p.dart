@@ -1126,11 +1126,12 @@ class _RegisterPageState extends State<RegisterPage> {
                                   .register(registerData: _registerData);
                               print('Registration response: $response');
                               if (response['success'] == true) {
+                                final userId = response['userId'] ?? response['data']?['id'];
                                 // Upload wholesaler documents if this is a Distributor
                                 if (widget.argument['role'] == 'Distributor' &&
-                                    response['userId'] != null) {
+                                    userId != null) {
                                   print(
-                                      'Distributor registration - userId: ${response['userId']}');
+                                      'Distributor registration - userId: $userId');
                                   print(
                                       'Visiting card image: $_visitingCardImage');
                                   print('Shop image: $_shopImage');
@@ -1139,7 +1140,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     print('Uploading wholesaler documents...');
                                     var uploadResponse = await authModel
                                         .uploadWholesalerDocuments(
-                                      userId: response['userId'],
+                                      userId: userId.toString(),
                                       visitingCardImage: _visitingCardImage,
                                       shopImage: _shopImage,
                                     );
@@ -1151,7 +1152,11 @@ class _RegisterPageState extends State<RegisterPage> {
                                 }
                                 // Mark user as new for welcome bonus
                                 await _configModel.setNewUserFlag(true);
-                                _showSuccessDialog();
+                                if (widget.argument['role'] == 'Distributor') {
+                                  _showWholesalerPendingDialog();
+                                } else {
+                                  _showSuccessDialog();
+                                }
                               } else if (response['error'] ==
                                   'EMAIL_ALREADY_EXISTS') {
                                 _showAlreadyRegisteredDialog();
@@ -1290,9 +1295,30 @@ class _RegisterPageState extends State<RegisterPage> {
                               return;
                             }
 
-                            setState(() => _isLoading = false);
-                            _showWholesalerRequestBottomSheet(
-                              userId: _configModel.user?.id?.toString() ?? '',
+                            // Check if new wholesaler or incomplete profile (missing business name or address)
+                            bool isNewOrIncompleteWholesaler =
+                                (user?.businessName == null || user!.businessName!.isEmpty) ||
+                                (user.address == null || user.address!.isEmpty);
+
+                            if (isNewOrIncompleteWholesaler) {
+                              setState(() => _isLoading = false);
+                              _showWholesalerRequestBottomSheet(
+                                userId: _configModel.user?.id?.toString() ?? '',
+                              );
+                              return;
+                            } else if (user.isApproved != 1) {
+                              // Completed profile, but pending admin approval
+                              await FirebaseAuth.instance.signOut();
+                              await GoogleSignIn().signOut();
+                              await _configModel.removeLoginData();
+                              setState(() => _isLoading = false);
+                              _showWholesalerPendingDialog();
+                              return;
+                            }
+
+                            Navigator.pushReplacementNamed(
+                              context,
+                              '/',
                             );
                             return;
                           }
@@ -2135,8 +2161,21 @@ class _RegisterPageState extends State<RegisterPage> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/loginPage',
-                          arguments: {'role': widget.argument['role']});
+                      if (_configModel.isLoggedIn) {
+                        Navigator.of(context).pop();
+                        if (Navigator.of(context).canPop()) {
+                          Navigator.of(context).pop();
+                        } else {
+                          Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+                        }
+                      } else {
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          '/loginPage',
+                          (route) => false,
+                          arguments: {'role': widget.argument?['role']},
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xffc9b758),
@@ -2146,7 +2185,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       elevation: 0,
                     ),
                     child: Text(
-                      'Back to Login',
+                      _configModel.isLoggedIn ? 'Go to Profile' : 'Back to Login',
                       style: MyGoogleFontStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 16,
@@ -2241,8 +2280,21 @@ class _RegisterPageState extends State<RegisterPage> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/loginPage',
-                          arguments: {'role': widget.argument['role']});
+                      if (_configModel.isLoggedIn) {
+                        Navigator.of(context).pop();
+                        if (Navigator.of(context).canPop()) {
+                          Navigator.of(context).pop();
+                        } else {
+                          Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+                        }
+                      } else {
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          '/loginPage',
+                          (route) => false,
+                          arguments: {'role': widget.argument?['role']},
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xffc9b758),
@@ -2252,7 +2304,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       elevation: 0,
                     ),
                     child: Text(
-                      isWholesaler ? 'Back to Login' : 'Continue to Login',
+                      _configModel.isLoggedIn
+                          ? 'Go to Profile'
+                          : (isWholesaler ? 'Back to Login' : 'Continue to Login'),
                       style: MyGoogleFontStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 16,

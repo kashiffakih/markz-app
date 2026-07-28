@@ -883,7 +883,7 @@ class _ProfilePageState extends State<ProfilePage> {
           (user?.businessName != null && user!.businessName!.trim().isNotEmpty) ||
           (user?.address != null && user!.address!.trim().isNotEmpty);
 
-      if (isDistributorRole && user?.isApproved == 0 && hasSubmittedBusinessDetails) {
+      if ((isDistributorRole || hasSubmittedBusinessDetails) && (user?.isApproved == 0 || user?.isApproved == null) && hasSubmittedBusinessDetails) {
         showDialog(
           context: context,
           builder: (ctx) => AlertDialog(

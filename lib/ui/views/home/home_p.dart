@@ -80,9 +80,10 @@ class _HomePageState extends State<HomePage>
     if (configModel.user != null) {
       // Check if register bonus is NOT seen yet
       if ((configModel.user!.isRegisterBonusSeen ?? 0) == 0) {
-        _showWelcomeBonusDialog(configModel);
-        await _checkAndShowReferralPrompt(configModel);
+        await _showWelcomeBonusDialog(configModel);
       }
+      if (!mounted) return;
+      await _checkAndShowReferralPrompt(configModel);
     }
   }
 
