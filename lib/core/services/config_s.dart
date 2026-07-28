@@ -36,9 +36,13 @@ class ConfigService {
 
   Future<Map<String, dynamic>> fetchLoginData() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
-    String? _loginData = _prefs.get('loginData').toString();
-    if (_loginData != 'null') {
-      return json.decode(_prefs.get('loginData').toString());
+    String? _loginDataStr = _prefs.getString('loginData');
+    if (_loginDataStr != null && _loginDataStr.isNotEmpty && _loginDataStr != 'null') {
+      try {
+        return Map<String, dynamic>.from(json.decode(_loginDataStr));
+      } catch (e) {
+        print('Error decoding loginData: $e');
+      }
     }
     return {};
   }

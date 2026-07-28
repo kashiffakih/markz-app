@@ -78,19 +78,31 @@ class _HomePageState extends State<HomePage>
 
     // Check if user is logged in
     if (configModel.user != null) {
-      // Check if register bonus is NOT seen yet
+      // ONLY for newly registered users (isRegisterBonusSeen == 0)
       if ((configModel.user!.isRegisterBonusSeen ?? 0) == 0) {
+        // 1. Show Reward (Welcome Bonus) Popup
         await _showWelcomeBonusDialog(configModel);
+
+        if (!mounted) return;
+
+        // 2. Show Referral Popup right after Reward popup is closed
+        await _checkAndShowReferralPrompt(configModel);
       }
-      if (!mounted) return;
-      await _checkAndShowReferralPrompt(configModel);
     }
   }
 
   Future<void> _checkAndShowReferralPrompt(ConfigModel configModel) async {
+    if (configModel.user?.id == null) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    final String promptKey = 'has_seen_referral_prompt_${configModel.user!.id}';
+    if (prefs.getBool(promptKey) == true) {
+      return;
+    }
+    await prefs.setBool(promptKey, true);
+
     // Only proceed if user hasn't been referred yet
     if (configModel.user?.referedById == null) {
-      final prefs = await SharedPreferences.getInstance();
       String? pendingCode = prefs.getString('pending_referral_code');
 
       // Remove the code so it doesn't persist forever if ignored

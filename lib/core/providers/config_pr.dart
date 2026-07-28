@@ -164,6 +164,9 @@ class ConfigModel with ChangeNotifier {
 
   Future<void> saveLoginData(
       {required Map<String, dynamic>? newLoginData}) async {
+    if (newLoginData != null) {
+      _loginData = Map<String, dynamic>.from(newLoginData);
+    }
     await _configService.saveLoginData(newLoginData: newLoginData);
   }
 
