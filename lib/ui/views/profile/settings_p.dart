@@ -268,19 +268,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                         label: 'Phone Number',
                                         value: user?.phone?.toString() ?? 'N/A',
                                       ),
-                                      if (user?.address != null &&
-                                          user!.address!.isNotEmpty) ...[
-                                        Divider(
-                                            height: 32.h,
-                                            color: Colors.grey[100]),
-                                        _buildProfileRow(
-                                          icon: Icons.location_on_rounded,
-                                          label: 'Address',
-                                          value:
-                                              '${user.address} ${user.city ?? ''} ${user.state ?? ''}'
-                                                  .trim(),
-                                        ),
-                                      ],
                                       Divider(
                                           height: 32.h,
                                           color: Colors.grey[100]),

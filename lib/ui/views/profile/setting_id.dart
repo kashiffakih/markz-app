@@ -38,6 +38,7 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
 
   // Controllers for fields that need initial values
   late TextEditingController _nameController;
+  late TextEditingController _emailController;
   late TextEditingController _phoneController;
   late TextEditingController _gstController;
   late TextEditingController _businessNameController;
@@ -70,6 +71,7 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
 
     // Initialize controllers with existing values
     _nameController = TextEditingController(text: _user.firstName ?? '');
+    _emailController = TextEditingController(text: _user.email ?? '');
     _phoneController = TextEditingController(text: _user.phone ?? '');
     _gstController = TextEditingController(text: _user.gstNumber ?? '');
     _businessNameController =
@@ -85,6 +87,7 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
   @override
   void dispose() {
     _nameController.dispose();
+    _emailController.dispose();
     _phoneController.dispose();
     _gstController.dispose();
     _businessNameController.dispose();
@@ -183,57 +186,58 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                           onSaved: (value) => _user.firstName = value,
                         ),
 
-                        SizedBox(height: 20.h),
+                        SizedBox(height: 16.h),
 
-                        // Phone Number
+                        // Email Address (Read-Only)
+                        _buildLabel('Email Address'),
+                        SizedBox(height: 8.h),
+                        _buildTextField(
+                          controller: _emailController,
+                          hintText: 'Email address',
+                          icon: Icons.email_outlined,
+                          readOnly: true,
+                        ),
+
+                        SizedBox(height: 16.h),
+
+                        // Phone Number (Read-Only)
                         _buildLabel('Phone Number'),
                         SizedBox(height: 8.h),
                         _buildTextField(
                           controller: _phoneController,
-                          hintText: 'Enter your phone number',
+                          hintText: 'Phone number',
                           icon: Icons.phone_android_rounded,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(10),
-                          ],
-                          validator: (value) {
-                            if (value!.isEmpty) return "Phone cannot be empty";
-                            if (value.length != 10)
-                              return "Phone number must be 10 digits";
-                            return null;
-                          },
-                          onSaved: (value) => _user.phone = value,
+                          readOnly: true,
                         ),
 
                         SizedBox(height: 24.h),
 
-                        // GST Section - For all users
-                        _buildGstCheckbox(),
+                        // GST & Business Section - Only for Distributors (Wholesalers)
+                        if (isDistributor) ...[
+                          SizedBox(height: 24.h),
+                          _buildGstCheckbox(),
 
-                        if (_hasGst) ...[
-                          SizedBox(height: 16.h),
+                          if (_hasGst) ...[
+                            SizedBox(height: 16.h),
 
-                          // GST Number
-                          _buildLabel('GST Number'),
-                          SizedBox(height: 8.h),
-                          _buildTextField(
-                            controller: _gstController,
-                            hintText: 'Enter GST Number',
-                            icon: Icons.receipt_long_rounded,
-                            textCapitalization: TextCapitalization.characters,
-                            validator: (value) {
-                              if (_hasGst && (value == null || value.isEmpty)) {
-                                return 'GST Number is required';
-                              }
-                              return null;
-                            },
-                            onSaved: (value) => _user.gstNumber = value,
-                          ),
-                        ],
+                            // GST Number
+                            _buildLabel('GST Number'),
+                            SizedBox(height: 8.h),
+                            _buildTextField(
+                              controller: _gstController,
+                              hintText: 'Enter GST Number',
+                              icon: Icons.receipt_long_rounded,
+                              textCapitalization: TextCapitalization.characters,
+                              validator: (value) {
+                                if (_hasGst && (value == null || value.isEmpty)) {
+                                  return 'GST Number is required';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) => _user.gstNumber = value,
+                            ),
+                          ],
 
-                        // Business Details (for Distributors or if GST enabled)
-                        if (isDistributor || _hasGst) ...[
                           SizedBox(height: 24.h),
                           _buildSectionDivider('Business Details'),
                           SizedBox(height: 16.h),
@@ -268,80 +272,81 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
                           _buildDateField(),
 
                           SizedBox(height: 16.h),
+
+                          // Address Section
+                          _buildSectionDivider('Address Details'),
+                          SizedBox(height: 16.h),
+
+                          // Address
+                          _buildLabel('Address'),
+                          SizedBox(height: 8.h),
+                          _buildTextField(
+                            controller: _addressController,
+                            hintText: 'Enter Address',
+                            icon: Icons.location_on_rounded,
+                            maxLines: 3,
+                            onSaved: (value) => _user.address = value,
+                          ),
+
+                          SizedBox(height: 16.h),
+
+                          // Location (State & City)
+                          _buildLabel('Location'),
+                          SizedBox(height: 8.h),
+                          _buildCscPicker(isDistributor: isDistributor),
+
+                          SizedBox(height: 16.h),
+
+                          // Pincode
+                          _buildLabel('Pincode'),
+                          SizedBox(height: 8.h),
+                          _buildTextField(
+                            controller: _pincodeController,
+                            hintText: 'Enter Pincode',
+                            icon: Icons.pin_drop_rounded,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(6),
+                            ],
+                            validator: (value) {
+                              if (value!.isNotEmpty && value.length != 6) {
+                                return 'Invalid pincode';
+                              }
+                              return null;
+                            },
+                            onSaved: (value) => _user.pincodeBusiness = value,
+                          ),
                         ],
 
-                        // Address Section
-                        SizedBox(height: 24.h),
-                        _buildSectionDivider('Address Details'),
-                        SizedBox(height: 16.h),
+                        // Documents Section (Visiting Card & Store/Shop Image) - Only for Distributors (Wholesalers)
+                        if (isDistributor) ...[
+                          SizedBox(height: 24.h),
+                          _buildSectionDivider('Business & Store Documents'),
+                          SizedBox(height: 16.h),
 
-                        // Address
-                        _buildLabel('Address'),
-                        SizedBox(height: 8.h),
-                        _buildTextField(
-                          controller: _addressController,
-                          hintText: 'Enter Address',
-                          icon: Icons.location_on_rounded,
-                          maxLines: 3,
-                          onSaved: (value) => _user.address = value,
-                        ),
+                          // Visiting Card Preview & Upload
+                          _buildLabel('Visiting Card'),
+                          SizedBox(height: 8.h),
+                          _buildImagePreview(
+                            label: 'Visiting Card',
+                            imagePath: _user.visitingCardPath,
+                            configModel: _configModel,
+                            isVisitingCard: true,
+                          ),
 
-                        SizedBox(height: 16.h),
+                          SizedBox(height: 16.h),
 
-                        // Location (State & City)
-                        _buildLabel('Location'),
-                        SizedBox(height: 8.h),
-                        _buildCscPicker(isDistributor: isDistributor),
-
-                        SizedBox(height: 16.h),
-
-                        // Pincode
-                        _buildLabel('Pincode'),
-                        SizedBox(height: 8.h),
-                        _buildTextField(
-                          controller: _pincodeController,
-                          hintText: 'Enter Pincode',
-                          icon: Icons.pin_drop_rounded,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(6),
-                          ],
-                          validator: (value) {
-                            if (value!.isNotEmpty && value.length != 6) {
-                              return 'Invalid pincode';
-                            }
-                            return null;
-                          },
-                          onSaved: (value) => _user.pincodeBusiness = value,
-                        ),
-
-                        // Documents Section (Visiting Card & Store/Shop Image) - ALWAYS VISIBLE
-                        SizedBox(height: 24.h),
-                        _buildSectionDivider('Business & Store Documents'),
-                        SizedBox(height: 16.h),
-
-                        // Visiting Card Preview & Upload
-                        _buildLabel('Visiting Card'),
-                        SizedBox(height: 8.h),
-                        _buildImagePreview(
-                          label: 'Visiting Card',
-                          imagePath: _user.visitingCardPath,
-                          configModel: _configModel,
-                          isVisitingCard: true,
-                        ),
-
-                        SizedBox(height: 16.h),
-
-                        // Store / Shop Image Preview & Upload
-                        _buildLabel('Store / Shop Image'),
-                        SizedBox(height: 8.h),
-                        _buildImagePreview(
-                          label: 'Store / Shop Image',
-                          imagePath: _user.shopImagePath,
-                          configModel: _configModel,
-                          isVisitingCard: false,
-                        ),
+                          // Store / Shop Image Preview & Upload
+                          _buildLabel('Store / Shop Image'),
+                          SizedBox(height: 8.h),
+                          _buildImagePreview(
+                            label: 'Store / Shop Image',
+                            imagePath: _user.shopImagePath,
+                            configModel: _configModel,
+                            isVisitingCard: false,
+                          ),
+                        ],
 
                         SizedBox(height: 48.h),
 
@@ -381,10 +386,11 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
     void Function(String?)? onSaved,
     int maxLines = 1,
     TextCapitalization textCapitalization = TextCapitalization.none,
+    bool readOnly = false,
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: readOnly ? const Color(0xFFF5F6F8) : Colors.white,
         borderRadius: BorderRadius.circular(15.r),
         boxShadow: [
           BoxShadow(
@@ -397,6 +403,7 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
       ),
       child: TextFormField(
         controller: controller,
+        readOnly: readOnly,
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,
         maxLines: maxLines,
@@ -414,12 +421,15 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
           ),
           border: InputBorder.none,
           prefixIcon: Icon(icon, color: Color(0xFFEED056), size: 20.sp),
+          suffixIcon: readOnly
+              ? Icon(Icons.lock_outline_rounded, color: Color(0xFF8391A1), size: 18.sp)
+              : null,
         ),
         style: MyGoogleFontStyle(
           fontFamily: 'Urbanist',
           fontSize: 16.sp,
           fontWeight: FontWeight.w600,
-          color: const Color(0xFF1E232C),
+          color: readOnly ? const Color(0xFF6A707C) : const Color(0xFF1E232C),
         ),
         cursorColor: const Color(0xFFEED056),
         validator: validator,

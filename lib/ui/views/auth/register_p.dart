@@ -409,6 +409,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         validator: (value) {
                           if (value!.isEmpty) return 'Password cannot be empty';
+                          if (value.length < 6) return 'Password must be at least 6 characters';
                           _registerData['password'] =
                               value; // Update password for comparison
                           return null;
@@ -476,6 +477,8 @@ class _RegisterPageState extends State<RegisterPage> {
                         validator: (value) {
                           if (value!.isEmpty)
                             return 'Confirm password cannot be empty';
+                          if (value.length < 6)
+                            return 'Password must be at least 6 characters';
                           if (value != _registerData['password']) {
                             return 'Passwords do not match';
                           }
@@ -894,14 +897,15 @@ class _RegisterPageState extends State<RegisterPage> {
                                         value != null ? value.toString() : "";
                                     _registerData['state_business'] =
                                         stateValue;
+                                    _registerData['state'] = stateValue;
                                   });
                                 },
                                 onCityChanged: (value) {
                                   setState(() {
                                     cityValue =
                                         value != null ? value.toString() : "";
-                                    // Optionally save city if you have a field for it
-                                    // _registerData['city_business'] = cityValue;
+                                    _registerData['city_business'] = cityValue;
+                                    _registerData['city'] = cityValue;
                                   });
                                 },
                               ),
