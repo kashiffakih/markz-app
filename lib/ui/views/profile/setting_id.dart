@@ -188,26 +188,44 @@ class _SettingUpdatePageState extends State<SettingUpdatePage> {
 
                         SizedBox(height: 16.h),
 
-                        // Email Address (Read-Only)
+                        // Email Address
                         _buildLabel('Email Address'),
                         SizedBox(height: 8.h),
                         _buildTextField(
                           controller: _emailController,
                           hintText: 'Email address',
                           icon: Icons.email_outlined,
-                          readOnly: true,
+                          validator: (value) {
+                            if (value != null && value.trim().isNotEmpty) {
+                              String emailPattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
+                              if (!RegExp(emailPattern).hasMatch(value.trim())) {
+                                return 'Please enter a valid email address';
+                              }
+                            }
+                            return null;
+                          },
+                          onSaved: (value) => _user.email = value?.trim(),
                         ),
 
                         SizedBox(height: 16.h),
 
-                        // Phone Number (Read-Only)
+                        // Phone Number
                         _buildLabel('Phone Number'),
                         SizedBox(height: 8.h),
                         _buildTextField(
                           controller: _phoneController,
                           hintText: 'Phone number',
                           icon: Icons.phone_android_rounded,
-                          readOnly: true,
+                          keyboardType: TextInputType.phone,
+                          validator: (value) {
+                            if (value != null && value.trim().isNotEmpty) {
+                              if (value.trim().length < 10) {
+                                return 'Please enter a valid 10-digit phone number';
+                              }
+                            }
+                            return null;
+                          },
+                          onSaved: (value) => _user.phone = value?.trim(),
                         ),
 
                         SizedBox(height: 24.h),

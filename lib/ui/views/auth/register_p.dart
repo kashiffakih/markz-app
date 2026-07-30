@@ -1973,9 +1973,20 @@ class _RegisterPageState extends State<RegisterPage> {
 
                                       // Update user with business details
                                       if (userId.isNotEmpty) {
-                                        await authModel.updateUser(
+                                        final updateRes = await authModel.updateUser(
                                           updateUserData: _bsWholesalerData,
                                         );
+
+                                        if (updateRes['success'] != true) {
+                                          setModalState(() => bsLoading = false);
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(updateRes['message'] ?? 'Failed to submit details. Please try again.'),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                          return;
+                                        }
                                       }
 
                                       // Close bottom sheet
