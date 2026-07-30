@@ -51,6 +51,10 @@ class _LoginPageState extends State<LoginPage> {
   File? _bsVisitingCardImage;
   File? _bsShopImage;
   final Map<String, dynamic> _bsWholesalerData = {
+    'first_name': '',
+    'email': '',
+    'password': '',
+    'confirm_password': '',
     'phone': '',
     'gst_number': '',
     'business_name': '',
@@ -1132,6 +1136,9 @@ class _LoginPageState extends State<LoginPage> {
       text: _bsWholesalerData['registration_date'] ?? '',
     );
 
+    bool bsObscurePassword = true;
+    bool bsObscureConfirmPassword = true;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1216,6 +1223,34 @@ class _LoginPageState extends State<LoginPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Full Name (Required)
+                            _buildBsTextField(
+                              hintText: 'Full Name',
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Full name cannot be empty';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) => _bsWholesalerData['first_name'] = value?.trim(),
+                            ),
+                            const SizedBox(height: 10),
+                            // Email (Required)
+                            _buildBsTextField(
+                              hintText: 'Email',
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Email cannot be empty';
+                                }
+                                if (!_isValidEmail(value.trim())) {
+                                  return 'Please enter a valid email address';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) => _bsWholesalerData['email'] = value?.trim(),
+                            ),
+                            const SizedBox(height: 10),
                             // Phone Number (Required)
                             _buildBsTextField(
                               hintText: 'Phone Number',
@@ -1231,6 +1266,67 @@ class _LoginPageState extends State<LoginPage> {
                                 return null;
                               },
                               onSaved: (value) => _bsWholesalerData['phone'] = value?.trim(),
+                            ),
+                            const SizedBox(height: 10),
+                            // Password (Required)
+                            _buildBsTextField(
+                              hintText: 'Password',
+                              obscureText: bsObscurePassword,
+                              suffixIcon: GestureDetector(
+                                onTap: () {
+                                  setModalState(() {
+                                    bsObscurePassword = !bsObscurePassword;
+                                  });
+                                },
+                                child: Icon(
+                                  bsObscurePassword ? Icons.visibility_off : Icons.visibility,
+                                  color: const Color(0xff8390a1),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Password cannot be empty';
+                                }
+                                if (value.length < 6) {
+                                  return 'Password must be at least 6 characters';
+                                }
+                                _bsWholesalerData['password'] = value;
+                                return null;
+                              },
+                              onChanged: (value) {
+                                _bsWholesalerData['password'] = value;
+                              },
+                              onSaved: (value) => _bsWholesalerData['password'] = value,
+                            ),
+                            const SizedBox(height: 10),
+                            // Confirm Password (Required)
+                            _buildBsTextField(
+                              hintText: 'Confirm Password',
+                              obscureText: bsObscureConfirmPassword,
+                              suffixIcon: GestureDetector(
+                                onTap: () {
+                                  setModalState(() {
+                                    bsObscureConfirmPassword = !bsObscureConfirmPassword;
+                                  });
+                                },
+                                child: Icon(
+                                  bsObscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                                  color: const Color(0xff8390a1),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Confirm password cannot be empty';
+                                }
+                                if (value.length < 6) {
+                                  return 'Password must be at least 6 characters';
+                                }
+                                if (value != _bsWholesalerData['password']) {
+                                  return 'Passwords do not match';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) => _bsWholesalerData['confirm_password'] = value,
                             ),
                             const SizedBox(height: 10),
                             // Business Name (Required)
@@ -1669,15 +1765,19 @@ class _LoginPageState extends State<LoginPage> {
     TextInputType keyboardType = TextInputType.text,
     int maxLines = 1,
     int? maxLength,
+    bool obscureText = false,
+    Widget? suffixIcon,
+    void Function(String)? onChanged,
     String? Function(String?)? validator,
     void Function(String?)? onSaved,
   }) {
     return TextFormField(
+      obscureText: obscureText,
       textCapitalization: textCapitalization,
       keyboardType: keyboardType,
       maxLines: maxLines,
       maxLength: maxLength,
-      decoration: _bsInputDecoration(hintText: hintText),
+      decoration: _bsInputDecoration(hintText: hintText, suffixIcon: suffixIcon),
       style: MyGoogleFontStyle(
         fontFamily: 'Urbanist',
         fontSize: 14.0.sp,
@@ -1686,6 +1786,7 @@ class _LoginPageState extends State<LoginPage> {
         color: const Color(0xff000000),
       ),
       validator: validator,
+      onChanged: onChanged,
       onSaved: onSaved,
     );
   }
