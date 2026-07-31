@@ -53,7 +53,7 @@ class _RootPageState extends State<RootPage> {
       final response = await http.get(
         Uri.parse('${configModel.apiConfig['baseURL']}/settings/1'),
         headers: configModel.apiConfig['headers'],
-      );
+      ).timeout(const Duration(seconds: 5));
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         final settings = responseData['data'] ?? {};

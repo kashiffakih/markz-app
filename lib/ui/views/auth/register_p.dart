@@ -409,7 +409,8 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         validator: (value) {
                           if (value!.isEmpty) return 'Password cannot be empty';
-                          if (value.length < 6) return 'Password must be at least 6 characters';
+                          if (value.length < 6)
+                            return 'Password must be at least 6 characters';
                           _registerData['password'] =
                               value; // Update password for comparison
                           return null;
@@ -726,7 +727,8 @@ class _RegisterPageState extends State<RegisterPage> {
                               color: Color(0xff000000),
                             ),
                             validator: (value) {
-                              if (_hasGst && (value == null || value.trim().isEmpty)) {
+                              if (_hasGst &&
+                                  (value == null || value.trim().isEmpty)) {
                                 return 'GST Number is required';
                               }
                               return null;
@@ -1130,7 +1132,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                   .register(registerData: _registerData);
                               print('Registration response: $response');
                               if (response['success'] == true) {
-                                final userId = response['userId'] ?? response['data']?['id'];
+                                final userId = response['userId'] ??
+                                    response['data']?['id'];
                                 // Upload wholesaler documents if this is a Distributor
                                 if (widget.argument['role'] == 'Distributor' &&
                                     userId != null) {
@@ -1197,8 +1200,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   ],
                 ),
               ),
-              // Or Register with section (available for all roles including Distributor)
-              ...[
+              // Or Register with section (hidden for Distributor role)
+              if (widget.argument?['role'] != 'Distributor' &&
+                  widget.argument != 'Distributor') ...[
                 Container(
                   margin: EdgeInsets.fromLTRB(0.0.w, 0.0.w, 12.36.w, 0.0.w),
                   child: Text(
@@ -1248,11 +1252,14 @@ class _RegisterPageState extends State<RegisterPage> {
                           _isLoading = true;
                         });
 
-                        String displayName = userCredential.user?.displayName ?? googleAccount.displayName ?? '';
+                        String displayName = userCredential.user?.displayName ??
+                            googleAccount.displayName ??
+                            '';
                         String firstName = '';
                         String lastName = '';
                         if (displayName.trim().isNotEmpty) {
-                          List<String> parts = displayName.trim().split(RegExp(r'\s+'));
+                          List<String> parts =
+                              displayName.trim().split(RegExp(r'\s+'));
                           firstName = parts.first;
                           if (parts.length > 1) {
                             lastName = parts.sublist(1).join(' ');
@@ -1260,7 +1267,8 @@ class _RegisterPageState extends State<RegisterPage> {
                         }
 
                         _loginData['email'] = userCredential.user?.email;
-                        _loginData['phone'] = userCredential.user?.phoneNumber ?? '';
+                        _loginData['phone'] =
+                            userCredential.user?.phoneNumber ?? '';
                         _loginData['first_name'] = firstName;
                         _loginData['last_name'] = lastName;
                         _loginData['is_social_login'] = true;
@@ -1299,18 +1307,26 @@ class _RegisterPageState extends State<RegisterPage> {
                               return;
                             }
 
-                            // Check if new wholesaler or incomplete profile (missing business name or address)
-                            bool isNewOrIncompleteWholesaler =
-                                (user?.businessName == null || user!.businessName!.isEmpty) ||
-                                (user.address == null || user.address!.isEmpty);
+                            // Check if submitted business details (business name or address)
+                            bool hasSubmittedBusinessDetails =
+                                (user?.businessName != null &&
+                                        user!.businessName!
+                                            .trim()
+                                            .isNotEmpty) ||
+                                    (user?.address != null &&
+                                        user!.address!.trim().isNotEmpty);
 
-                            if (isNewOrIncompleteWholesaler) {
+                            if (!hasSubmittedBusinessDetails) {
                               setState(() => _isLoading = false);
                               _showWholesalerRequestBottomSheet(
                                 userId: _configModel.user?.id?.toString() ?? '',
+                                isFromGoogle: true,
+                                googleName: displayName,
+                                googleEmail: userCredential.user?.email ??
+                                    googleAccount.email,
                               );
                               return;
-                            } else if (user.isApproved != 1) {
+                            } else if (user?.isApproved != 1) {
                               // Completed profile, but pending admin approval
                               await FirebaseAuth.instance.signOut();
                               await GoogleSignIn().signOut();
@@ -1338,7 +1354,8 @@ class _RegisterPageState extends State<RegisterPage> {
                               errorMessage.toLowerCase().contains('blocked')) {
                             _showErrorDialog(
                                 'Your wholesaler account has been blocked.\nReason: ${loginResponse['blocked_reason'] ?? "No reason provided"}');
-                          } else if (loginResponse['error'] == 'ACCOUNT_REJECTED' ||
+                          } else if (loginResponse['error'] ==
+                                  'ACCOUNT_REJECTED' ||
                               errorMessage.toLowerCase().contains('rejected')) {
                             _showErrorDialog(
                                 'Your wholesaler account request has been rejected.\nReason: ${loginResponse['rejection_reason'] ?? "No reason provided"}');
@@ -1440,7 +1457,9 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   /// Picks an image for the wholesaler bottom sheet form
-  Future<void> _bsPickImage({required bool isVisitingCard, required StateSetter setModalState}) async {
+  Future<void> _bsPickImage(
+      {required bool isVisitingCard,
+      required StateSetter setModalState}) async {
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -1497,12 +1516,53 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   /// Show wholesaler request bottom sheet after Google sign-in
-  void _showWholesalerRequestBottomSheet({required String userId}) {
+  void _showWholesalerRequestBottomSheet({
+    required String userId,
+    bool isFromGoogle = true,
+    String? googleName,
+    String? googleEmail,
+  }) {
     final bsFormKey = GlobalKey<FormState>();
     bool bsLoading = false;
     TextEditingController regDateController = TextEditingController(
       text: _bsWholesalerData['registration_date'] ?? '',
     );
+
+    bool bsObscurePassword = true;
+    bool bsObscureConfirmPassword = true;
+
+    final user = _configModel.user;
+    String resolvedGoogleFullName =
+        (googleName != null && googleName.trim().isNotEmpty)
+            ? googleName.trim()
+            : (user != null
+                ? '${user.firstName ?? ''} ${user.lastName ?? ''}'.trim()
+                : (_loginData['first_name'] ?? ''));
+
+    String resolvedGoogleEmail =
+        (googleEmail != null && googleEmail.trim().isNotEmpty)
+            ? googleEmail.trim()
+            : (user?.email ?? _loginData['email'] ?? '');
+
+    String initialName = (_bsWholesalerData['first_name'] != null &&
+            _bsWholesalerData['first_name'].toString().trim().isNotEmpty)
+        ? _bsWholesalerData['first_name'].toString().trim()
+        : resolvedGoogleFullName;
+
+    String initialEmail = (_bsWholesalerData['email'] != null &&
+            _bsWholesalerData['email'].toString().trim().isNotEmpty)
+        ? _bsWholesalerData['email'].toString().trim()
+        : resolvedGoogleEmail;
+
+    TextEditingController fullNameController =
+        TextEditingController(text: initialName);
+    TextEditingController emailController =
+        TextEditingController(text: initialEmail);
+
+    if (isFromGoogle) {
+      _bsWholesalerData['first_name'] = initialName;
+      _bsWholesalerData['email'] = initialEmail;
+    }
 
     showModalBottomSheet(
       context: context,
@@ -1546,7 +1606,8 @@ class _RegisterPageState extends State<RegisterPage> {
                             color: Color(0xFFF9A825).withOpacity(0.15),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(Icons.store, color: Color(0xFFF9A825), size: 22),
+                          child: Icon(Icons.store,
+                              color: Color(0xFFF9A825), size: 22),
                         ),
                         SizedBox(width: 12),
                         Expanded(
@@ -1588,6 +1649,41 @@ class _RegisterPageState extends State<RegisterPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Full Name (Required)
+                            _buildBsTextField(
+                              hintText: 'Full Name',
+                              controller: fullNameController,
+                              readOnly: isFromGoogle,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Full name cannot be empty';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) =>
+                                  _bsWholesalerData['first_name'] =
+                                      value?.trim() ?? fullNameController.text,
+                            ),
+                            SizedBox(height: 10),
+                            // Email (Required)
+                            _buildBsTextField(
+                              hintText: 'Email',
+                              keyboardType: TextInputType.emailAddress,
+                              controller: emailController,
+                              readOnly: isFromGoogle,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Email cannot be empty';
+                                }
+                                if (!_isValidEmail(value.trim())) {
+                                  return 'Please enter a valid email address';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) => _bsWholesalerData['email'] =
+                                  value?.trim() ?? emailController.text,
+                            ),
+                            SizedBox(height: 10),
                             // Phone Number (Required)
                             _buildBsTextField(
                               hintText: 'Phone Number',
@@ -1602,7 +1698,76 @@ class _RegisterPageState extends State<RegisterPage> {
                                 }
                                 return null;
                               },
-                              onSaved: (value) => _bsWholesalerData['phone'] = value?.trim(),
+                              onSaved: (value) =>
+                                  _bsWholesalerData['phone'] = value?.trim(),
+                            ),
+                            SizedBox(height: 10),
+                            // Password (Required)
+                            _buildBsTextField(
+                              hintText: 'Password',
+                              obscureText: bsObscurePassword,
+                              suffixIcon: GestureDetector(
+                                onTap: () {
+                                  setModalState(() {
+                                    bsObscurePassword = !bsObscurePassword;
+                                  });
+                                },
+                                child: Icon(
+                                  bsObscurePassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Color(0xff8390a1),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Password cannot be empty';
+                                }
+                                if (value.length < 6) {
+                                  return 'Password must be at least 6 characters';
+                                }
+                                _bsWholesalerData['password'] = value;
+                                return null;
+                              },
+                              onChanged: (value) {
+                                _bsWholesalerData['password'] = value;
+                              },
+                              onSaved: (value) =>
+                                  _bsWholesalerData['password'] = value,
+                            ),
+                            SizedBox(height: 10),
+                            // Confirm Password (Required)
+                            _buildBsTextField(
+                              hintText: 'Confirm Password',
+                              obscureText: bsObscureConfirmPassword,
+                              suffixIcon: GestureDetector(
+                                onTap: () {
+                                  setModalState(() {
+                                    bsObscureConfirmPassword =
+                                        !bsObscureConfirmPassword;
+                                  });
+                                },
+                                child: Icon(
+                                  bsObscureConfirmPassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Color(0xff8390a1),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Confirm password cannot be empty';
+                                }
+                                if (value.length < 6) {
+                                  return 'Password must be at least 6 characters';
+                                }
+                                if (value != _bsWholesalerData['password']) {
+                                  return 'Passwords do not match';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) =>
+                                  _bsWholesalerData['confirm_password'] = value,
                             ),
                             SizedBox(height: 10),
                             // Business Name (Required)
@@ -1614,13 +1779,15 @@ class _RegisterPageState extends State<RegisterPage> {
                                 }
                                 return null;
                               },
-                              onSaved: (value) => _bsWholesalerData['business_name'] = value,
+                              onSaved: (value) =>
+                                  _bsWholesalerData['business_name'] = value,
                             ),
                             SizedBox(height: 10),
                             // Trade Name (Optional)
                             _buildBsTextField(
                               hintText: 'Trade Name',
-                              onSaved: (value) => _bsWholesalerData['trade_name'] = value,
+                              onSaved: (value) =>
+                                  _bsWholesalerData['trade_name'] = value,
                             ),
                             SizedBox(height: 10),
                             // Registration Date (Optional)
@@ -1629,7 +1796,8 @@ class _RegisterPageState extends State<RegisterPage> {
                               controller: regDateController,
                               decoration: _bsInputDecoration(
                                 hintText: 'Registration Date',
-                                suffixIcon: Icon(Icons.calendar_today, color: Color(0xff8390a1)),
+                                suffixIcon: Icon(Icons.calendar_today,
+                                    color: Color(0xff8390a1)),
                               ),
                               style: MyGoogleFontStyle(
                                 fontFamily: 'Urbanist',
@@ -1649,7 +1817,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                   setModalState(() {
                                     _bsWholesalerData['registration_date'] =
                                         '${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}';
-                                    regDateController.text = _bsWholesalerData['registration_date'];
+                                    regDateController.text =
+                                        _bsWholesalerData['registration_date'];
                                   });
                                 }
                               },
@@ -1684,14 +1853,17 @@ class _RegisterPageState extends State<RegisterPage> {
                             if (_bsHasGst) ...[
                               _buildBsTextField(
                                 hintText: 'GST Number',
-                                textCapitalization: TextCapitalization.characters,
+                                textCapitalization:
+                                    TextCapitalization.characters,
                                 validator: (value) {
-                                  if (_bsHasGst && (value == null || value.trim().isEmpty)) {
+                                  if (_bsHasGst &&
+                                      (value == null || value.trim().isEmpty)) {
                                     return 'GST Number is required';
                                   }
                                   return null;
                                 },
-                                onSaved: (value) => _bsWholesalerData['gst_number'] = value,
+                                onSaved: (value) =>
+                                    _bsWholesalerData['gst_number'] = value,
                               ),
                               SizedBox(height: 10),
                             ],
@@ -1700,10 +1872,12 @@ class _RegisterPageState extends State<RegisterPage> {
                               hintText: 'Business Address',
                               maxLines: 3,
                               validator: (value) {
-                                if (value == null || value.isEmpty) return 'Address is required';
+                                if (value == null || value.isEmpty)
+                                  return 'Address is required';
                                 return null;
                               },
-                              onSaved: (value) => _bsWholesalerData['address'] = value,
+                              onSaved: (value) =>
+                                  _bsWholesalerData['address'] = value,
                             ),
                             SizedBox(height: 10),
                             // Pincode
@@ -1712,11 +1886,13 @@ class _RegisterPageState extends State<RegisterPage> {
                               keyboardType: TextInputType.number,
                               maxLength: 6,
                               validator: (value) {
-                                if (value == null || value.isEmpty) return 'Pincode required';
+                                if (value == null || value.isEmpty)
+                                  return 'Pincode required';
                                 if (value.length != 6) return 'Invalid pincode';
                                 return null;
                               },
-                              onSaved: (value) => _bsWholesalerData['pincode_business'] = value,
+                              onSaved: (value) =>
+                                  _bsWholesalerData['pincode_business'] = value,
                             ),
                             SizedBox(height: 10),
                             // State & City picker
@@ -1765,7 +1941,8 @@ class _RegisterPageState extends State<RegisterPage> {
                               },
                               onStateChanged: (value) {
                                 setModalState(() {
-                                  _bsWholesalerData['state_business'] = value?.toString() ?? "";
+                                  _bsWholesalerData['state_business'] =
+                                      value?.toString() ?? "";
                                 });
                               },
                               onCityChanged: (value) {
@@ -1796,11 +1973,14 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             SizedBox(height: 8),
                             InkWell(
-                              onTap: () => _bsPickImage(isVisitingCard: true, setModalState: setModalState),
+                              onTap: () => _bsPickImage(
+                                  isVisitingCard: true,
+                                  setModalState: setModalState),
                               child: Container(
                                 padding: EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xffe8ecf4), width: 2),
+                                  border: Border.all(
+                                      color: Color(0xffe8ecf4), width: 2),
                                   color: Color(0xfff7f8f9),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -1808,7 +1988,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                     ? Stack(
                                         children: [
                                           ClipRRect(
-                                            borderRadius: BorderRadius.circular(8),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
                                             child: Image.file(
                                               _bsVisitingCardImage!,
                                               height: 120,
@@ -1831,16 +2012,21 @@ class _RegisterPageState extends State<RegisterPage> {
                                                   color: Colors.red,
                                                   shape: BoxShape.circle,
                                                 ),
-                                                child: Icon(Icons.close, color: Colors.white, size: 16),
+                                                child: Icon(Icons.close,
+                                                    color: Colors.white,
+                                                    size: 16),
                                               ),
                                             ),
                                           ),
                                         ],
                                       )
                                     : Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
-                                          Icon(Icons.cloud_upload_outlined, color: Color(0xff8390a1), size: 28),
+                                          Icon(Icons.cloud_upload_outlined,
+                                              color: Color(0xff8390a1),
+                                              size: 28),
                                           SizedBox(width: 10),
                                           Text(
                                             'Tap to upload visiting card',
@@ -1868,11 +2054,14 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             SizedBox(height: 8),
                             InkWell(
-                              onTap: () => _bsPickImage(isVisitingCard: false, setModalState: setModalState),
+                              onTap: () => _bsPickImage(
+                                  isVisitingCard: false,
+                                  setModalState: setModalState),
                               child: Container(
                                 padding: EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xffe8ecf4), width: 2),
+                                  border: Border.all(
+                                      color: Color(0xffe8ecf4), width: 2),
                                   color: Color(0xfff7f8f9),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -1880,7 +2069,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                     ? Stack(
                                         children: [
                                           ClipRRect(
-                                            borderRadius: BorderRadius.circular(8),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
                                             child: Image.file(
                                               _bsShopImage!,
                                               height: 120,
@@ -1903,16 +2093,21 @@ class _RegisterPageState extends State<RegisterPage> {
                                                   color: Colors.red,
                                                   shape: BoxShape.circle,
                                                 ),
-                                                child: Icon(Icons.close, color: Colors.white, size: 16),
+                                                child: Icon(Icons.close,
+                                                    color: Colors.white,
+                                                    size: 16),
                                               ),
                                             ),
                                           ),
                                         ],
                                       )
                                     : Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
-                                          Icon(Icons.cloud_upload_outlined, color: Color(0xff8390a1), size: 28),
+                                          Icon(Icons.cloud_upload_outlined,
+                                              color: Color(0xff8390a1),
+                                              size: 28),
                                           SizedBox(width: 10),
                                           Text(
                                             'Tap to upload shop image',
@@ -1959,29 +2154,39 @@ class _RegisterPageState extends State<RegisterPage> {
                                     setModalState(() => bsLoading = true);
 
                                     try {
-                                      var authModel = Provider.of<AuthModel>(context, listen: false);
+                                      var authModel = Provider.of<AuthModel>(
+                                          context,
+                                          listen: false);
 
                                       // Upload documents
                                       if (userId.isNotEmpty &&
-                                          (_bsVisitingCardImage != null || _bsShopImage != null)) {
-                                        await authModel.uploadWholesalerDocuments(
+                                          (_bsVisitingCardImage != null ||
+                                              _bsShopImage != null)) {
+                                        await authModel
+                                            .uploadWholesalerDocuments(
                                           userId: userId,
-                                          visitingCardImage: _bsVisitingCardImage,
+                                          visitingCardImage:
+                                              _bsVisitingCardImage,
                                           shopImage: _bsShopImage,
                                         );
                                       }
 
                                       // Update user with business details
                                       if (userId.isNotEmpty) {
-                                        final updateRes = await authModel.updateUser(
+                                        final updateRes =
+                                            await authModel.updateUser(
                                           updateUserData: _bsWholesalerData,
                                         );
 
                                         if (updateRes['success'] != true) {
-                                          setModalState(() => bsLoading = false);
-                                          ScaffoldMessenger.of(context).showSnackBar(
+                                          setModalState(
+                                              () => bsLoading = false);
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
                                             SnackBar(
-                                              content: Text(updateRes['message'] ?? 'Failed to submit details. Please try again.'),
+                                              content: Text(updateRes[
+                                                      'message'] ??
+                                                  'Failed to submit details. Please try again.'),
                                               backgroundColor: Colors.red,
                                             ),
                                           );
@@ -2002,9 +2207,11 @@ class _RegisterPageState extends State<RegisterPage> {
                                     } catch (e) {
                                       print('Wholesaler request error: $e');
                                       setModalState(() => bsLoading = false);
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
                                         SnackBar(
-                                          content: Text('Failed to submit. Please try again.'),
+                                          content: Text(
+                                              'Failed to submit. Please try again.'),
                                           backgroundColor: Colors.red,
                                         ),
                                       );
@@ -2056,32 +2263,45 @@ class _RegisterPageState extends State<RegisterPage> {
     TextInputType keyboardType = TextInputType.text,
     int maxLines = 1,
     int? maxLength,
+    bool obscureText = false,
+    bool readOnly = false,
+    Widget? suffixIcon,
+    TextEditingController? controller,
+    String? initialValue,
+    void Function(String)? onChanged,
     String? Function(String?)? validator,
     void Function(String?)? onSaved,
   }) {
     return TextFormField(
+      controller: controller,
+      initialValue: controller == null ? initialValue : null,
+      readOnly: readOnly,
+      obscureText: obscureText,
       textCapitalization: textCapitalization,
       keyboardType: keyboardType,
       maxLines: maxLines,
       maxLength: maxLength,
-      decoration: _bsInputDecoration(hintText: hintText),
+      decoration: _bsInputDecoration(
+          hintText: hintText, suffixIcon: suffixIcon, readOnly: readOnly),
       style: MyGoogleFontStyle(
         fontFamily: 'Urbanist',
         fontSize: 14.0.sp,
         fontWeight: FontWeight.w500,
         height: 1.25,
-        color: Color(0xff000000),
+        color: readOnly ? Color(0xff8390a1) : Color(0xff000000),
       ),
       validator: validator,
+      onChanged: onChanged,
       onSaved: onSaved,
     );
   }
 
   /// Standard InputDecoration for the bottom sheet form
-  InputDecoration _bsInputDecoration({required String hintText, Widget? suffixIcon}) {
+  InputDecoration _bsInputDecoration(
+      {required String hintText, Widget? suffixIcon, bool readOnly = false}) {
     return InputDecoration(
       filled: true,
-      fillColor: Color(0xfff7f8f9),
+      fillColor: readOnly ? Color(0xffeef0f2) : Color(0xfff7f8f9),
       enabledBorder: OutlineInputBorder(
         borderSide: BorderSide(color: Color(0xffe8ecf4)),
         borderRadius: BorderRadius.circular(7.66),
@@ -2181,7 +2401,8 @@ class _RegisterPageState extends State<RegisterPage> {
                         if (Navigator.of(context).canPop()) {
                           Navigator.of(context).pop();
                         } else {
-                          Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+                          Navigator.pushNamedAndRemoveUntil(
+                              context, '/', (route) => false);
                         }
                       } else {
                         Navigator.pushNamedAndRemoveUntil(
@@ -2200,7 +2421,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       elevation: 0,
                     ),
                     child: Text(
-                      _configModel.isLoggedIn ? 'Go to Profile' : 'Back to Login',
+                      _configModel.isLoggedIn
+                          ? 'Go to Profile'
+                          : 'Back to Login',
                       style: MyGoogleFontStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 16,
@@ -2300,7 +2523,8 @@ class _RegisterPageState extends State<RegisterPage> {
                         if (Navigator.of(context).canPop()) {
                           Navigator.of(context).pop();
                         } else {
-                          Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+                          Navigator.pushNamedAndRemoveUntil(
+                              context, '/', (route) => false);
                         }
                       } else {
                         Navigator.pushNamedAndRemoveUntil(
@@ -2321,7 +2545,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: Text(
                       _configModel.isLoggedIn
                           ? 'Go to Profile'
-                          : (isWholesaler ? 'Back to Login' : 'Continue to Login'),
+                          : (isWholesaler
+                              ? 'Back to Login'
+                              : 'Continue to Login'),
                       style: MyGoogleFontStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 16,

@@ -18,6 +18,10 @@ import 'package:aadab/core/providers/user_address_pr.dart';
 import 'package:aadab/core/providers/user_wallet_pr.dart';
 import 'package:aadab/core/providers/wish_list_pr.dart';
 
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:csc_picker_plus/csc_picker_plus.dart';
+import 'package:aadab/core/providers/auth_pr.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 import 'package:aadab/ui/views/profile/widgets/photo_picker_w.dart';
 import 'package:aadab/ui/views/products/shops_p.dart';
@@ -37,6 +41,26 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   static const double _bottomNavBarHeight = 90.0;
   static const int _bottomNavIconSize = 23;
+
+  final ImagePicker _bsPicker = ImagePicker();
+  bool _bsHasGst = false;
+  File? _bsVisitingCardImage;
+  File? _bsShopImage;
+  final Map<String, dynamic> _bsWholesalerData = {
+    'first_name': '',
+    'email': '',
+    'password': '',
+    'confirm_password': '',
+    'phone': '',
+    'gst_number': '',
+    'business_name': '',
+    'trade_name': '',
+    'address': '',
+    'pincode_business': '',
+    'state_business': '',
+    'registration_date': '',
+    'role': 'Distributor',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -925,10 +949,8 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               onPressed: () {
                 Navigator.pop(ctx);
-                Navigator.pushNamed(
-                  context,
-                  '/registerPage',
-                  arguments: {'role': 'Distributor'},
+                _showWholesalerRequestBottomSheet(
+                  userId: configModel.user?.id?.toString() ?? '',
                 );
               },
               child: const Text('Fill Details', style: TextStyle(color: Colors.white)),
@@ -937,6 +959,711 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       );
     }
+  }
+
+  Future<void> _bsPickImage({required bool isVisitingCard, required StateSetter setModalState}) async {
+    final XFile? pickedFile = await _bsPicker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+    if (pickedFile != null) {
+      setModalState(() {
+        if (isVisitingCard) {
+          _bsVisitingCardImage = File(pickedFile.path);
+        } else {
+          _bsShopImage = File(pickedFile.path);
+        }
+      });
+    }
+  }
+
+  bool _isValidEmail(String input) {
+    String emailPattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
+    return RegExp(emailPattern).hasMatch(input);
+  }
+
+  void _showWholesalerPendingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: const Text('Wholesaler Request Submitted'),
+        content: const Text(
+            'Your wholesaler account request has been submitted successfully and is pending admin approval.'),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xffc9b758),
+            ),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('OK', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showWholesalerRequestBottomSheet({required String userId}) {
+    final bsFormKey = GlobalKey<FormState>();
+    bool bsLoading = false;
+    TextEditingController regDateController = TextEditingController(
+      text: _bsWholesalerData['registration_date'] ?? '',
+    );
+
+    final configModel = Provider.of<ConfigModel>(context, listen: false);
+    final user = configModel.user;
+
+    String initialFullName = user != null
+        ? '${user.firstName ?? ''} ${user.lastName ?? ''}'.trim()
+        : '';
+    String initialEmail = user?.email ?? '';
+
+    TextEditingController fullNameController = TextEditingController(text: initialFullName);
+    TextEditingController emailController = TextEditingController(text: initialEmail);
+
+    _bsWholesalerData['first_name'] = initialFullName;
+    _bsWholesalerData['email'] = initialEmail;
+    _bsWholesalerData['role'] = 'Distributor';
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext bsContext) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.9,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(25),
+                  topRight: Radius.circular(25),
+                ),
+              ),
+              child: Column(
+                children: [
+                  // Handle bar
+                  Container(
+                    margin: const EdgeInsets.only(top: 12),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: const Color(0xffDDDDDD),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  // Header
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(20.w, 16.w, 20.w, 0),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF9A825).withOpacity(0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.store, color: Color(0xFFF9A825), size: 22),
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Wholesaler Request',
+                                style: MyGoogleFontStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontSize: 18.0.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xff1e232c),
+                                ),
+                              ),
+                              SizedBox(height: 2.h),
+                              Text(
+                                'Fill in your business details to complete registration',
+                                style: MyGoogleFontStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontSize: 12.0.sp,
+                                  fontWeight: FontWeight.w400,
+                                  color: const Color(0xff8390a1),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 24, color: Color(0xffF0F0F0)),
+                  // Scrollable form
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 20.w),
+                      child: Form(
+                        key: bsFormKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Full Name (Required, ReadOnly)
+                            _buildBsTextField(
+                              hintText: 'Full Name',
+                              controller: fullNameController,
+                              readOnly: true,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Full name cannot be empty';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) => _bsWholesalerData['first_name'] = value?.trim() ?? fullNameController.text,
+                            ),
+                            SizedBox(height: 10.h),
+                            // Email (Required, ReadOnly)
+                            _buildBsTextField(
+                              hintText: 'Email',
+                              keyboardType: TextInputType.emailAddress,
+                              controller: emailController,
+                              readOnly: true,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Email cannot be empty';
+                                }
+                                if (!_isValidEmail(value.trim())) {
+                                  return 'Please enter a valid email address';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) => _bsWholesalerData['email'] = value?.trim() ?? emailController.text,
+                            ),
+                            SizedBox(height: 10.h),
+                            // Phone Number (Required)
+                            _buildBsTextField(
+                              hintText: 'Phone Number',
+                              keyboardType: TextInputType.phone,
+                              maxLength: 10,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Phone number is required';
+                                }
+                                if (value.trim().length < 10) {
+                                  return 'Please enter a valid 10-digit phone number';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) => _bsWholesalerData['phone'] = value?.trim(),
+                            ),
+                            SizedBox(height: 10.h),
+                            // Business Name (Required)
+                            _buildBsTextField(
+                              hintText: 'Business Name',
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Business Name is required';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) => _bsWholesalerData['business_name'] = value,
+                            ),
+                            SizedBox(height: 10.h),
+                            // Trade Name (Optional)
+                            _buildBsTextField(
+                              hintText: 'Trade Name',
+                              onSaved: (value) => _bsWholesalerData['trade_name'] = value,
+                            ),
+                            SizedBox(height: 10.h),
+                            // Registration Date (Optional)
+                            TextFormField(
+                              readOnly: true,
+                              controller: regDateController,
+                              decoration: _bsInputDecoration(
+                                hintText: 'Registration Date',
+                                suffixIcon: const Icon(Icons.calendar_today, color: Color(0xff8390a1)),
+                              ),
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 14.0.sp,
+                                fontWeight: FontWeight.w500,
+                                height: 1.25,
+                                color: const Color(0xff000000),
+                              ),
+                              onTap: () async {
+                                DateTime? pickedDate = await showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(1900),
+                                  lastDate: DateTime.now(),
+                                );
+                                if (pickedDate != null) {
+                                  setModalState(() {
+                                    _bsWholesalerData['registration_date'] =
+                                        '${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}';
+                                    regDateController.text = _bsWholesalerData['registration_date'];
+                                  });
+                                }
+                              },
+                            ),
+                            SizedBox(height: 10.h),
+                            // GST Checkbox
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: _bsHasGst,
+                                  onChanged: (value) {
+                                    setModalState(() {
+                                      _bsHasGst = value!;
+                                      if (!_bsHasGst) {
+                                        _bsWholesalerData['gst_number'] = '';
+                                      }
+                                    });
+                                  },
+                                  activeColor: const Color(0xff1A1A1A),
+                                ),
+                                Text(
+                                  'I have GST Number',
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontSize: 14.0.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xff1A1A1A),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (_bsHasGst) ...[
+                              _buildBsTextField(
+                                hintText: 'GST Number',
+                                textCapitalization: TextCapitalization.characters,
+                                validator: (value) {
+                                  if (_bsHasGst && (value == null || value.trim().isEmpty)) {
+                                    return 'GST Number is required';
+                                  }
+                                  return null;
+                                },
+                                onSaved: (value) => _bsWholesalerData['gst_number'] = value,
+                              ),
+                              SizedBox(height: 10.h),
+                            ],
+                            // Address
+                            _buildBsTextField(
+                              hintText: 'Business Address',
+                              maxLines: 3,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) return 'Address is required';
+                                return null;
+                              },
+                              onSaved: (value) => _bsWholesalerData['address'] = value,
+                            ),
+                            SizedBox(height: 10.h),
+                            // Pincode
+                            _buildBsTextField(
+                              hintText: 'Pincode',
+                              keyboardType: TextInputType.number,
+                              maxLength: 6,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) return 'Pincode required';
+                                if (value.length != 6) return 'Invalid pincode';
+                                return null;
+                              },
+                              onSaved: (value) => _bsWholesalerData['pincode_business'] = value,
+                            ),
+                            SizedBox(height: 10.h),
+                            // State & City picker
+                            CSCPickerPlus(
+                              layout: Layout.vertical,
+                              showStates: true,
+                              showCities: true,
+                              flagState: CountryFlag.DISABLE,
+                              dropdownDecoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(7.66),
+                                color: const Color(0xfff7f8f9),
+                                border: Border.all(color: const Color(0xffe8ecf4)),
+                              ),
+                              disabledDropdownDecoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(7.66),
+                                color: const Color(0xfff7f8f9),
+                                border: Border.all(color: const Color(0xffe8ecf4)),
+                              ),
+                              countrySearchPlaceholder: "Search Country",
+                              stateSearchPlaceholder: "Search State",
+                              citySearchPlaceholder: "Search City",
+                              countryDropdownLabel: "Select Country",
+                              stateDropdownLabel: "Select State",
+                              cityDropdownLabel: "Select City",
+                              defaultCountry: CscCountry.India,
+                              disableCountry: false,
+                              selectedItemStyle: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 14.0.sp,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xff000000),
+                              ),
+                              dropdownHeadingStyle: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              dropdownItemStyle: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                              ),
+                              dropdownDialogRadius: 10.0,
+                              searchBarRadius: 10.0,
+                              onCountryChanged: (value) {
+                                // Country value tracked by picker
+                              },
+                              onStateChanged: (value) {
+                                setModalState(() {
+                                  _bsWholesalerData['state_business'] = value?.toString() ?? "";
+                                });
+                              },
+                              onCityChanged: (value) {
+                                // City value tracked by picker
+                              },
+                            ),
+                            SizedBox(height: 16.h),
+                            // Upload Documents header
+                            Text(
+                              'Upload Documents',
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 16.0.sp,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xff1e232c),
+                              ),
+                            ),
+                            SizedBox(height: 10.h),
+                            // Visiting Card
+                            Text(
+                              'Visiting Card',
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 13.0.sp,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xff8390a1),
+                              ),
+                            ),
+                            SizedBox(height: 8.h),
+                            InkWell(
+                              onTap: () => _bsPickImage(isVisitingCard: true, setModalState: setModalState),
+                              child: Container(
+                                padding: EdgeInsets.all(16.w),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: const Color(0xffe8ecf4), width: 2),
+                                  color: const Color(0xfff7f8f9),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: _bsVisitingCardImage != null
+                                    ? Stack(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(8),
+                                            child: Image.file(
+                                              _bsVisitingCardImage!,
+                                              height: 120.h,
+                                              width: double.infinity,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 4,
+                                            right: 4,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setModalState(() {
+                                                  _bsVisitingCardImage = null;
+                                                });
+                                              },
+                                              child: Container(
+                                                padding: const EdgeInsets.all(4),
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.red,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: const Icon(Icons.close, color: Colors.white, size: 16),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(Icons.cloud_upload_outlined, color: Color(0xff8390a1), size: 28),
+                                          SizedBox(width: 10.w),
+                                          Text(
+                                            'Tap to upload visiting card',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontSize: 14.0.sp,
+                                              fontWeight: FontWeight.w500,
+                                              color: const Color(0xff8390a1),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                              ),
+                            ),
+                            SizedBox(height: 12.h),
+                            // Shop Image
+                            Text(
+                              'Shop Image',
+                              style: MyGoogleFontStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 13.0.sp,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xff8390a1),
+                              ),
+                            ),
+                            SizedBox(height: 8.h),
+                            InkWell(
+                              onTap: () => _bsPickImage(isVisitingCard: false, setModalState: setModalState),
+                              child: Container(
+                                padding: EdgeInsets.all(16.w),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: const Color(0xffe8ecf4), width: 2),
+                                  color: const Color(0xfff7f8f9),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: _bsShopImage != null
+                                    ? Stack(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(8),
+                                            child: Image.file(
+                                              _bsShopImage!,
+                                              height: 120.h,
+                                              width: double.infinity,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 4,
+                                            right: 4,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setModalState(() {
+                                                  _bsShopImage = null;
+                                                });
+                                              },
+                                              child: Container(
+                                                padding: const EdgeInsets.all(4),
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.red,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: const Icon(Icons.close, color: Colors.white, size: 16),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(Icons.cloud_upload_outlined, color: Color(0xff8390a1), size: 28),
+                                          SizedBox(width: 10.w),
+                                          Text(
+                                            'Tap to upload shop image',
+                                            style: MyGoogleFontStyle(
+                                              fontFamily: 'Urbanist',
+                                              fontSize: 14.0.sp,
+                                              fontWeight: FontWeight.w500,
+                                              color: const Color(0xff8390a1),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                              ),
+                            ),
+                            SizedBox(height: 24.h),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Submit button
+                  Container(
+                    padding: EdgeInsets.fromLTRB(20.w, 10.w, 20.w, 20.w),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, -2),
+                        ),
+                      ],
+                    ),
+                    child: SafeArea(
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 52.h,
+                        child: ElevatedButton(
+                          onPressed: bsLoading
+                              ? null
+                              : () async {
+                                  if (bsFormKey.currentState!.validate()) {
+                                    bsFormKey.currentState!.save();
+                                    setModalState(() => bsLoading = true);
+
+                                    try {
+                                      var authModel = Provider.of<AuthModel>(context, listen: false);
+
+                                      // Upload documents
+                                      if (userId.isNotEmpty &&
+                                          (_bsVisitingCardImage != null || _bsShopImage != null)) {
+                                        await authModel.uploadWholesalerDocuments(
+                                          userId: userId,
+                                          visitingCardImage: _bsVisitingCardImage,
+                                          shopImage: _bsShopImage,
+                                        );
+                                      }
+
+                                      // Update user with business details
+                                      if (userId.isNotEmpty) {
+                                        final updateRes = await authModel.updateUser(
+                                          updateUserData: _bsWholesalerData,
+                                        );
+
+                                        if (updateRes['success'] != true) {
+                                          setModalState(() => bsLoading = false);
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(updateRes['message'] ?? 'Failed to submit details. Please try again.'),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                          return;
+                                        }
+                                      }
+
+                                      // Close bottom sheet
+                                      Navigator.of(bsContext).pop();
+
+                                      // Show pending approval dialog
+                                      _showWholesalerPendingDialog();
+                                    } catch (e) {
+                                      print('Wholesaler request error: $e');
+                                      setModalState(() => bsLoading = false);
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Failed to submit. Please try again.'),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xffc9b758),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: bsLoading
+                              ? const SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2.5,
+                                  ),
+                                )
+                              : Text(
+                                  'Submit Wholesaler Request',
+                                  style: MyGoogleFontStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontSize: 16.0.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildBsTextField({
+    required String hintText,
+    TextCapitalization textCapitalization = TextCapitalization.none,
+    TextInputType keyboardType = TextInputType.text,
+    int maxLines = 1,
+    int? maxLength,
+    bool obscureText = false,
+    bool readOnly = false,
+    Widget? suffixIcon,
+    TextEditingController? controller,
+    String? initialValue,
+    void Function(String)? onChanged,
+    String? Function(String?)? validator,
+    void Function(String?)? onSaved,
+  }) {
+    return TextFormField(
+      controller: controller,
+      initialValue: controller == null ? initialValue : null,
+      readOnly: readOnly,
+      obscureText: obscureText,
+      textCapitalization: textCapitalization,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      maxLength: maxLength,
+      decoration: _bsInputDecoration(hintText: hintText, suffixIcon: suffixIcon, readOnly: readOnly),
+      style: MyGoogleFontStyle(
+        fontFamily: 'Urbanist',
+        fontSize: 14.0.sp,
+        fontWeight: FontWeight.w500,
+        height: 1.25,
+        color: readOnly ? const Color(0xff8390a1) : const Color(0xff000000),
+      ),
+      validator: validator,
+      onChanged: onChanged,
+      onSaved: onSaved,
+    );
+  }
+
+  InputDecoration _bsInputDecoration({required String hintText, Widget? suffixIcon, bool readOnly = false}) {
+    return InputDecoration(
+      filled: true,
+      fillColor: readOnly ? const Color(0xffeef0f2) : const Color(0xfff7f8f9),
+      enabledBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Color(0xffe8ecf4)),
+        borderRadius: BorderRadius.circular(7.66),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Color(0xffe8ecf4)),
+        borderRadius: BorderRadius.circular(7.66),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Colors.red),
+        borderRadius: BorderRadius.circular(7.66),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Colors.red),
+        borderRadius: BorderRadius.circular(7.66),
+      ),
+      contentPadding: EdgeInsets.fromLTRB(17.94.w, 16.34.w, 17.94.w, 17.66.w),
+      hintText: hintText,
+      hintStyle: const TextStyle(color: Color(0xff8390a1)),
+      counterText: '',
+      suffixIcon: suffixIcon,
+    );
   }
 }
 

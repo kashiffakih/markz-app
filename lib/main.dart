@@ -28,20 +28,37 @@ import 'package:aadab/ui/widgets/network_status_overlay.dart';
 Future<void> main() async {
   setupLocator();
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
 
-  // Initialize Firebase notifications
-  final firebaseApi = FirebaseApi();
-  await firebaseApi.initNotifications();
-
-  // Initialize connectivity service before running the app
-  final connectivityService = ConnectivityService();
-  await connectivityService.initialize();
-
-  // Small delay to ensure service is ready
-  await Future.delayed(Duration(milliseconds: 100));
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    debugPrint('Firebase initialization error: $e');
+  }
 
   runApp(const MyApp());
+
+  // Initialize background services asynchronously so runApp is never blocked
+  Future.microtask(() async {
+    try {
+      final firebaseApi = FirebaseApi();
+      await firebaseApi.initNotifications().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () => debugPrint('Firebase initNotifications timed out'),
+      );
+    } catch (e) {
+      debugPrint('Firebase notifications init error: $e');
+    }
+
+    try {
+      final connectivityService = ConnectivityService();
+      await connectivityService.initialize().timeout(
+        const Duration(seconds: 3),
+        onTimeout: () => debugPrint('ConnectivityService initialize timed out'),
+      );
+    } catch (e) {
+      debugPrint('Connectivity service init error: $e');
+    }
+  });
 }
 
 class MyApp extends StatefulWidget {
