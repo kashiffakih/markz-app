@@ -903,11 +903,13 @@ class _ProfilePageState extends State<ProfilePage> {
       }
 
       // 4. If pending approval with submitted business details
-      bool hasSubmittedBusinessDetails =
-          (user?.businessName != null && user!.businessName!.trim().isNotEmpty) ||
+      bool hasSubmittedBusinessDetails = (user?.businessName != null &&
+              user!.businessName!.trim().isNotEmpty) ||
           (user?.address != null && user!.address!.trim().isNotEmpty);
 
-      if ((isDistributorRole || hasSubmittedBusinessDetails) && (user?.isApproved == 0 || user?.isApproved == null) && hasSubmittedBusinessDetails) {
+      if ((isDistributorRole || hasSubmittedBusinessDetails) &&
+          (user?.isApproved == 0 || user?.isApproved == null) &&
+          hasSubmittedBusinessDetails) {
         showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
@@ -953,7 +955,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   userId: configModel.user?.id?.toString() ?? '',
                 );
               },
-              child: const Text('Fill Details', style: TextStyle(color: Colors.white)),
+              child: const Text('Fill Details',
+                  style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
@@ -961,7 +964,9 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Future<void> _bsPickImage({required bool isVisitingCard, required StateSetter setModalState}) async {
+  Future<void> _bsPickImage(
+      {required bool isVisitingCard,
+      required StateSetter setModalState}) async {
     final XFile? pickedFile = await _bsPicker.pickImage(
       source: ImageSource.gallery,
       imageQuality: 80,
@@ -1009,6 +1014,8 @@ class _ProfilePageState extends State<ProfilePage> {
   void _showWholesalerRequestBottomSheet({required String userId}) {
     final bsFormKey = GlobalKey<FormState>();
     bool bsLoading = false;
+    bool bsObscurePassword = true;
+    bool bsObscureConfirmPassword = true;
     TextEditingController regDateController = TextEditingController(
       text: _bsWholesalerData['registration_date'] ?? '',
     );
@@ -1021,8 +1028,10 @@ class _ProfilePageState extends State<ProfilePage> {
         : '';
     String initialEmail = user?.email ?? '';
 
-    TextEditingController fullNameController = TextEditingController(text: initialFullName);
-    TextEditingController emailController = TextEditingController(text: initialEmail);
+    TextEditingController fullNameController =
+        TextEditingController(text: initialFullName);
+    TextEditingController emailController =
+        TextEditingController(text: initialEmail);
 
     _bsWholesalerData['first_name'] = initialFullName;
     _bsWholesalerData['email'] = initialEmail;
@@ -1070,7 +1079,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             color: const Color(0xFFF9A825).withOpacity(0.15),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.store, color: Color(0xFFF9A825), size: 22),
+                          child: const Icon(Icons.store,
+                              color: Color(0xFFF9A825), size: 22),
                         ),
                         SizedBox(width: 12.w),
                         Expanded(
@@ -1123,7 +1133,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                 }
                                 return null;
                               },
-                              onSaved: (value) => _bsWholesalerData['first_name'] = value?.trim() ?? fullNameController.text,
+                              onSaved: (value) =>
+                                  _bsWholesalerData['first_name'] =
+                                      value?.trim() ?? fullNameController.text,
                             ),
                             SizedBox(height: 10.h),
                             // Email (Required, ReadOnly)
@@ -1141,7 +1153,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                 }
                                 return null;
                               },
-                              onSaved: (value) => _bsWholesalerData['email'] = value?.trim() ?? emailController.text,
+                              onSaved: (value) => _bsWholesalerData['email'] =
+                                  value?.trim() ?? emailController.text,
                             ),
                             SizedBox(height: 10.h),
                             // Phone Number (Required)
@@ -1158,7 +1171,76 @@ class _ProfilePageState extends State<ProfilePage> {
                                 }
                                 return null;
                               },
-                              onSaved: (value) => _bsWholesalerData['phone'] = value?.trim(),
+                              onSaved: (value) =>
+                                  _bsWholesalerData['phone'] = value?.trim(),
+                            ),
+                            SizedBox(height: 10.h),
+                            // Password (Required)
+                            _buildBsTextField(
+                              hintText: 'Password',
+                              obscureText: bsObscurePassword,
+                              suffixIcon: GestureDetector(
+                                onTap: () {
+                                  setModalState(() {
+                                    bsObscurePassword = !bsObscurePassword;
+                                  });
+                                },
+                                child: Icon(
+                                  bsObscurePassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: const Color(0xff8390a1),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Password cannot be empty';
+                                }
+                                if (value.length < 6) {
+                                  return 'Password must be at least 6 characters';
+                                }
+                                _bsWholesalerData['password'] = value;
+                                return null;
+                              },
+                              onChanged: (value) {
+                                _bsWholesalerData['password'] = value;
+                              },
+                              onSaved: (value) =>
+                                  _bsWholesalerData['password'] = value,
+                            ),
+                            SizedBox(height: 10.h),
+                            // Confirm Password (Required)
+                            _buildBsTextField(
+                              hintText: 'Confirm Password',
+                              obscureText: bsObscureConfirmPassword,
+                              suffixIcon: GestureDetector(
+                                onTap: () {
+                                  setModalState(() {
+                                    bsObscureConfirmPassword =
+                                        !bsObscureConfirmPassword;
+                                  });
+                                },
+                                child: Icon(
+                                  bsObscureConfirmPassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: const Color(0xff8390a1),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Confirm password cannot be empty';
+                                }
+                                if (value.length < 6) {
+                                  return 'Password must be at least 6 characters';
+                                }
+                                if (value != _bsWholesalerData['password']) {
+                                  return 'Passwords do not match';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) =>
+                                  _bsWholesalerData['confirm_password'] = value,
                             ),
                             SizedBox(height: 10.h),
                             // Business Name (Required)
@@ -1170,13 +1252,15 @@ class _ProfilePageState extends State<ProfilePage> {
                                 }
                                 return null;
                               },
-                              onSaved: (value) => _bsWholesalerData['business_name'] = value,
+                              onSaved: (value) =>
+                                  _bsWholesalerData['business_name'] = value,
                             ),
                             SizedBox(height: 10.h),
                             // Trade Name (Optional)
                             _buildBsTextField(
                               hintText: 'Trade Name',
-                              onSaved: (value) => _bsWholesalerData['trade_name'] = value,
+                              onSaved: (value) =>
+                                  _bsWholesalerData['trade_name'] = value,
                             ),
                             SizedBox(height: 10.h),
                             // Registration Date (Optional)
@@ -1185,7 +1269,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               controller: regDateController,
                               decoration: _bsInputDecoration(
                                 hintText: 'Registration Date',
-                                suffixIcon: const Icon(Icons.calendar_today, color: Color(0xff8390a1)),
+                                suffixIcon: const Icon(Icons.calendar_today,
+                                    color: Color(0xff8390a1)),
                               ),
                               style: MyGoogleFontStyle(
                                 fontFamily: 'Urbanist',
@@ -1205,7 +1290,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                   setModalState(() {
                                     _bsWholesalerData['registration_date'] =
                                         '${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}';
-                                    regDateController.text = _bsWholesalerData['registration_date'];
+                                    regDateController.text =
+                                        _bsWholesalerData['registration_date'];
                                   });
                                 }
                               },
@@ -1240,14 +1326,17 @@ class _ProfilePageState extends State<ProfilePage> {
                             if (_bsHasGst) ...[
                               _buildBsTextField(
                                 hintText: 'GST Number',
-                                textCapitalization: TextCapitalization.characters,
+                                textCapitalization:
+                                    TextCapitalization.characters,
                                 validator: (value) {
-                                  if (_bsHasGst && (value == null || value.trim().isEmpty)) {
+                                  if (_bsHasGst &&
+                                      (value == null || value.trim().isEmpty)) {
                                     return 'GST Number is required';
                                   }
                                   return null;
                                 },
-                                onSaved: (value) => _bsWholesalerData['gst_number'] = value,
+                                onSaved: (value) =>
+                                    _bsWholesalerData['gst_number'] = value,
                               ),
                               SizedBox(height: 10.h),
                             ],
@@ -1256,10 +1345,12 @@ class _ProfilePageState extends State<ProfilePage> {
                               hintText: 'Business Address',
                               maxLines: 3,
                               validator: (value) {
-                                if (value == null || value.isEmpty) return 'Address is required';
+                                if (value == null || value.isEmpty)
+                                  return 'Address is required';
                                 return null;
                               },
-                              onSaved: (value) => _bsWholesalerData['address'] = value,
+                              onSaved: (value) =>
+                                  _bsWholesalerData['address'] = value,
                             ),
                             SizedBox(height: 10.h),
                             // Pincode
@@ -1268,11 +1359,13 @@ class _ProfilePageState extends State<ProfilePage> {
                               keyboardType: TextInputType.number,
                               maxLength: 6,
                               validator: (value) {
-                                if (value == null || value.isEmpty) return 'Pincode required';
+                                if (value == null || value.isEmpty)
+                                  return 'Pincode required';
                                 if (value.length != 6) return 'Invalid pincode';
                                 return null;
                               },
-                              onSaved: (value) => _bsWholesalerData['pincode_business'] = value,
+                              onSaved: (value) =>
+                                  _bsWholesalerData['pincode_business'] = value,
                             ),
                             SizedBox(height: 10.h),
                             // State & City picker
@@ -1284,12 +1377,14 @@ class _ProfilePageState extends State<ProfilePage> {
                               dropdownDecoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(7.66),
                                 color: const Color(0xfff7f8f9),
-                                border: Border.all(color: const Color(0xffe8ecf4)),
+                                border:
+                                    Border.all(color: const Color(0xffe8ecf4)),
                               ),
                               disabledDropdownDecoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(7.66),
                                 color: const Color(0xfff7f8f9),
-                                border: Border.all(color: const Color(0xffe8ecf4)),
+                                border:
+                                    Border.all(color: const Color(0xffe8ecf4)),
                               ),
                               countrySearchPlaceholder: "Search Country",
                               stateSearchPlaceholder: "Search State",
@@ -1321,7 +1416,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               },
                               onStateChanged: (value) {
                                 setModalState(() {
-                                  _bsWholesalerData['state_business'] = value?.toString() ?? "";
+                                  _bsWholesalerData['state_business'] =
+                                      value?.toString() ?? "";
                                 });
                               },
                               onCityChanged: (value) {
@@ -1352,11 +1448,14 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             SizedBox(height: 8.h),
                             InkWell(
-                              onTap: () => _bsPickImage(isVisitingCard: true, setModalState: setModalState),
+                              onTap: () => _bsPickImage(
+                                  isVisitingCard: true,
+                                  setModalState: setModalState),
                               child: Container(
                                 padding: EdgeInsets.all(16.w),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: const Color(0xffe8ecf4), width: 2),
+                                  border: Border.all(
+                                      color: const Color(0xffe8ecf4), width: 2),
                                   color: const Color(0xfff7f8f9),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -1364,7 +1463,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ? Stack(
                                         children: [
                                           ClipRRect(
-                                            borderRadius: BorderRadius.circular(8),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
                                             child: Image.file(
                                               _bsVisitingCardImage!,
                                               height: 120.h,
@@ -1382,21 +1482,28 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 });
                                               },
                                               child: Container(
-                                                padding: const EdgeInsets.all(4),
+                                                padding:
+                                                    const EdgeInsets.all(4),
                                                 decoration: const BoxDecoration(
                                                   color: Colors.red,
                                                   shape: BoxShape.circle,
                                                 ),
-                                                child: const Icon(Icons.close, color: Colors.white, size: 16),
+                                                child: const Icon(Icons.close,
+                                                    color: Colors.white,
+                                                    size: 16),
                                               ),
                                             ),
                                           ),
                                         ],
                                       )
                                     : Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
-                                          const Icon(Icons.cloud_upload_outlined, color: Color(0xff8390a1), size: 28),
+                                          const Icon(
+                                              Icons.cloud_upload_outlined,
+                                              color: Color(0xff8390a1),
+                                              size: 28),
                                           SizedBox(width: 10.w),
                                           Text(
                                             'Tap to upload visiting card',
@@ -1424,11 +1531,14 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             SizedBox(height: 8.h),
                             InkWell(
-                              onTap: () => _bsPickImage(isVisitingCard: false, setModalState: setModalState),
+                              onTap: () => _bsPickImage(
+                                  isVisitingCard: false,
+                                  setModalState: setModalState),
                               child: Container(
                                 padding: EdgeInsets.all(16.w),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: const Color(0xffe8ecf4), width: 2),
+                                  border: Border.all(
+                                      color: const Color(0xffe8ecf4), width: 2),
                                   color: const Color(0xfff7f8f9),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -1436,7 +1546,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ? Stack(
                                         children: [
                                           ClipRRect(
-                                            borderRadius: BorderRadius.circular(8),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
                                             child: Image.file(
                                               _bsShopImage!,
                                               height: 120.h,
@@ -1454,21 +1565,28 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 });
                                               },
                                               child: Container(
-                                                padding: const EdgeInsets.all(4),
+                                                padding:
+                                                    const EdgeInsets.all(4),
                                                 decoration: const BoxDecoration(
                                                   color: Colors.red,
                                                   shape: BoxShape.circle,
                                                 ),
-                                                child: const Icon(Icons.close, color: Colors.white, size: 16),
+                                                child: const Icon(Icons.close,
+                                                    color: Colors.white,
+                                                    size: 16),
                                               ),
                                             ),
                                           ),
                                         ],
                                       )
                                     : Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
-                                          const Icon(Icons.cloud_upload_outlined, color: Color(0xff8390a1), size: 28),
+                                          const Icon(
+                                              Icons.cloud_upload_outlined,
+                                              color: Color(0xff8390a1),
+                                              size: 28),
                                           SizedBox(width: 10.w),
                                           Text(
                                             'Tap to upload shop image',
@@ -1515,29 +1633,39 @@ class _ProfilePageState extends State<ProfilePage> {
                                     setModalState(() => bsLoading = true);
 
                                     try {
-                                      var authModel = Provider.of<AuthModel>(context, listen: false);
+                                      var authModel = Provider.of<AuthModel>(
+                                          context,
+                                          listen: false);
 
                                       // Upload documents
                                       if (userId.isNotEmpty &&
-                                          (_bsVisitingCardImage != null || _bsShopImage != null)) {
-                                        await authModel.uploadWholesalerDocuments(
+                                          (_bsVisitingCardImage != null ||
+                                              _bsShopImage != null)) {
+                                        await authModel
+                                            .uploadWholesalerDocuments(
                                           userId: userId,
-                                          visitingCardImage: _bsVisitingCardImage,
+                                          visitingCardImage:
+                                              _bsVisitingCardImage,
                                           shopImage: _bsShopImage,
                                         );
                                       }
 
                                       // Update user with business details
                                       if (userId.isNotEmpty) {
-                                        final updateRes = await authModel.updateUser(
+                                        final updateRes =
+                                            await authModel.updateUser(
                                           updateUserData: _bsWholesalerData,
                                         );
 
                                         if (updateRes['success'] != true) {
-                                          setModalState(() => bsLoading = false);
-                                          ScaffoldMessenger.of(context).showSnackBar(
+                                          setModalState(
+                                              () => bsLoading = false);
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
                                             SnackBar(
-                                              content: Text(updateRes['message'] ?? 'Failed to submit details. Please try again.'),
+                                              content: Text(updateRes[
+                                                      'message'] ??
+                                                  'Failed to submit details. Please try again.'),
                                               backgroundColor: Colors.red,
                                             ),
                                           );
@@ -1553,9 +1681,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                     } catch (e) {
                                       print('Wholesaler request error: $e');
                                       setModalState(() => bsLoading = false);
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
                                         const SnackBar(
-                                          content: Text('Failed to submit. Please try again.'),
+                                          content: Text(
+                                              'Failed to submit. Please try again.'),
                                           backgroundColor: Colors.red,
                                         ),
                                       );
@@ -1624,7 +1754,8 @@ class _ProfilePageState extends State<ProfilePage> {
       keyboardType: keyboardType,
       maxLines: maxLines,
       maxLength: maxLength,
-      decoration: _bsInputDecoration(hintText: hintText, suffixIcon: suffixIcon, readOnly: readOnly),
+      decoration: _bsInputDecoration(
+          hintText: hintText, suffixIcon: suffixIcon, readOnly: readOnly),
       style: MyGoogleFontStyle(
         fontFamily: 'Urbanist',
         fontSize: 14.0.sp,
@@ -1638,7 +1769,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  InputDecoration _bsInputDecoration({required String hintText, Widget? suffixIcon, bool readOnly = false}) {
+  InputDecoration _bsInputDecoration(
+      {required String hintText, Widget? suffixIcon, bool readOnly = false}) {
     return InputDecoration(
       filled: true,
       fillColor: readOnly ? const Color(0xffeef0f2) : const Color(0xfff7f8f9),
