@@ -1350,7 +1350,15 @@ class _RegisterPageState extends State<RegisterPage> {
                         } else {
                           String errorMessage =
                               loginResponse['message'] ?? 'Login failed';
-                          if (loginResponse['error'] == 'ACCOUNT_BLOCKED' ||
+                          if (loginResponse['error'] == 'WHOLESALER_NOT_REGISTERED') {
+                            _showWholesalerRequestBottomSheet(
+                              userId: '',
+                              isFromGoogle: true,
+                              googleName: displayName,
+                              googleEmail: userCredential.user?.email ??
+                                  googleAccount.email,
+                            );
+                          } else if (loginResponse['error'] == 'ACCOUNT_BLOCKED' ||
                               errorMessage.toLowerCase().contains('blocked')) {
                             _showErrorDialog(
                                 'Your wholesaler account has been blocked.\nReason: ${loginResponse['blocked_reason'] ?? "No reason provided"}');
@@ -2193,20 +2201,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                           context,
                                           listen: false);
 
-                                      // Upload documents
-                                      if (userId.isNotEmpty &&
-                                          (_bsVisitingCardImage != null ||
-                                              _bsShopImage != null)) {
-                                        await authModel
-                                            .uploadWholesalerDocuments(
-                                          userId: userId,
-                                          visitingCardImage:
-                                              _bsVisitingCardImage,
-                                          shopImage: _bsShopImage,
-                                        );
-                                      }
-
-                                      // Update user with business details
+                                      // Register or Update user with business details
                                       if (userId.isNotEmpty) {
                                         final updateRes =
                                             await authModel.updateUser(
@@ -2222,6 +2217,53 @@ class _RegisterPageState extends State<RegisterPage> {
                                           });
                                           return;
                                         }
+                                      } else if (isFromGoogle) {
+                                        _bsWholesalerData['is_social_login'] = true;
+                                        _bsWholesalerData['is_social_register'] = true;
+                                        _bsWholesalerData['social_login_name'] = 'GOOGLE';
+                                        _bsWholesalerData['role'] = 'Distributor';
+                                        
+                                        String firstName = googleName ?? '';
+                                        String lastName = '';
+                                        if (firstName.isNotEmpty) {
+                                          List<String> parts = firstName.trim().split(RegExp(r'\s+'));
+                                          firstName = parts.first;
+                                          if (parts.length > 1) {
+                                            lastName = parts.sublist(1).join(' ');
+                                          }
+                                        }
+                                        _bsWholesalerData['first_name'] = firstName;
+                                        _bsWholesalerData['last_name'] = lastName;
+
+                                        final registerRes = await authModel.register(
+                                          registerData: _bsWholesalerData,
+                                        );
+
+                                        if (registerRes['success'] != true) {
+                                          setModalState(() {
+                                            bsLoading = false;
+                                            bsErrorMessage = registerRes['message'] ??
+                                                'Failed to submit details. Please try again.';
+                                          });
+                                          return;
+                                        }
+
+                                        if (registerRes['data'] != null && registerRes['data']['id'] != null) {
+                                          userId = registerRes['data']['id'].toString();
+                                        }
+                                      }
+
+                                      // Upload documents
+                                      if (userId.isNotEmpty &&
+                                          (_bsVisitingCardImage != null ||
+                                              _bsShopImage != null)) {
+                                        await authModel
+                                            .uploadWholesalerDocuments(
+                                          userId: userId,
+                                          visitingCardImage:
+                                              _bsVisitingCardImage,
+                                          shopImage: _bsShopImage,
+                                        );
                                       }
 
                                       // Close bottom sheet

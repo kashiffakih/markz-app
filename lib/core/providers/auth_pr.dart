@@ -57,15 +57,28 @@ class AuthModel with ChangeNotifier {
     } catch (e) {
       // Check if it's a duplicate user error
       String errorMessage = e.toString().toLowerCase();
-      if (errorMessage.contains('already exists') ||
-          errorMessage.contains('duplicate') ||
-          errorMessage.contains('already registered')) {
+      // Pass through validation errors directly
+      if (errorMessage.contains('validation failed')) {
+        // Extract the actual message after "Validation failed: "
+        String actualMessage = e.toString().replaceFirst(RegExp(r'^Exception: Validation failed: '), '');
         return {
           'success': false,
-          'message': 'User already registered',
+          'message': actualMessage,
+          'error': 'VALIDATION_ERROR'
+        };
+      }
+
+      if (errorMessage.contains('already exists') ||
+          errorMessage.contains('duplicate') ||
+          errorMessage.contains('already registered') ||
+          errorMessage.contains('has already been taken')) {
+        return {
+          'success': false,
+          'message': 'User already registered with this email or phone.',
           'error': 'EMAIL_ALREADY_EXISTS'
         };
       }
+
       return {
         'success': false,
         'message': 'Registration failed',

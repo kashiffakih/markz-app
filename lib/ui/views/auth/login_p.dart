@@ -975,7 +975,16 @@ class _LoginPageState extends State<LoginPage> {
                                 _configModel.loginFailedMessage;
                             String errorCode = loginResult['error'] ?? '';
 
-                            if (errorCode == 'ACCOUNT_BLOCKED' ||
+                            if (errorCode == 'WHOLESALER_NOT_REGISTERED') {
+                              setState(() => _isLoading = false);
+                              _showWholesalerRequestBottomSheet(
+                                userId: '',
+                                isFromGoogle: true,
+                                googleName: displayName,
+                                googleEmail: userCredential.user?.email ??
+                                    googleAccount.email,
+                              );
+                            } else if (errorCode == 'ACCOUNT_BLOCKED' ||
                                 errorMessage
                                     .toLowerCase()
                                     .contains('blocked')) {
@@ -1855,20 +1864,7 @@ class _LoginPageState extends State<LoginPage> {
                                           context,
                                           listen: false);
 
-                                      // Upload documents
-                                      if (userId.isNotEmpty &&
-                                          (_bsVisitingCardImage != null ||
-                                              _bsShopImage != null)) {
-                                        await authModel
-                                            .uploadWholesalerDocuments(
-                                          userId: userId,
-                                          visitingCardImage:
-                                              _bsVisitingCardImage,
-                                          shopImage: _bsShopImage,
-                                        );
-                                      }
-
-                                      // Update user with business details
+                                      // Register or Update user with business details
                                       if (userId.isNotEmpty) {
                                         final updateRes =
                                             await authModel.updateUser(
@@ -1884,6 +1880,53 @@ class _LoginPageState extends State<LoginPage> {
                                           });
                                           return;
                                         }
+                                      } else if (isFromGoogle) {
+                                        _bsWholesalerData['is_social_login'] = true;
+                                        _bsWholesalerData['is_social_register'] = true;
+                                        _bsWholesalerData['social_login_name'] = 'GOOGLE';
+                                        _bsWholesalerData['role'] = 'Distributor';
+                                        
+                                        String firstName = googleName ?? '';
+                                        String lastName = '';
+                                        if (firstName.isNotEmpty) {
+                                          List<String> parts = firstName.trim().split(RegExp(r'\s+'));
+                                          firstName = parts.first;
+                                          if (parts.length > 1) {
+                                            lastName = parts.sublist(1).join(' ');
+                                          }
+                                        }
+                                        _bsWholesalerData['first_name'] = firstName;
+                                        _bsWholesalerData['last_name'] = lastName;
+
+                                        final registerRes = await authModel.register(
+                                          registerData: _bsWholesalerData,
+                                        );
+
+                                        if (registerRes['success'] != true) {
+                                          setModalState(() {
+                                            bsLoading = false;
+                                            bsErrorMessage = registerRes['message'] ??
+                                                'Failed to submit details. Please try again.';
+                                          });
+                                          return;
+                                        }
+
+                                        if (registerRes['data'] != null && registerRes['data']['id'] != null) {
+                                          userId = registerRes['data']['id'].toString();
+                                        }
+                                      }
+
+                                      // Upload documents
+                                      if (userId.isNotEmpty &&
+                                          (_bsVisitingCardImage != null ||
+                                              _bsShopImage != null)) {
+                                        await authModel
+                                            .uploadWholesalerDocuments(
+                                          userId: userId,
+                                          visitingCardImage:
+                                              _bsVisitingCardImage,
+                                          shopImage: _bsShopImage,
+                                        );
                                       }
 
                                       // Close bottom sheet
