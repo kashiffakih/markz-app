@@ -62,16 +62,12 @@ class AuthService {
           // Force refresh FCM token on login to ensure fresh token
           _refreshFcmTokenOnLogin();
 
-          return {
-            'success': true,
-            'message': _responseData['message'] ?? 'Login successful'
-          };
+          _responseData['message'] = _responseData['message'] ?? 'Login successful';
+          return _responseData;
         } else {
           _configModel.saveUserData(responseData: _responseData);
-          return {
-            'success': false,
-            'message': _responseData['message'] ?? 'Login failed'
-          };
+          _responseData['message'] = _responseData['message'] ?? 'Login failed';
+          return _responseData;
         }
       } else {
         // Handle non-JSON response

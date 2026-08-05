@@ -991,19 +991,15 @@ class _LoginPageState extends State<LoginPage> {
                                 errorMessage
                                     .toLowerCase()
                                     .contains('pending approval')) {
-                              final user = _configModel.user;
-                              bool hasSubmittedBusinessDetails =
-                                  (user?.businessName != null &&
-                                          user!.businessName!
-                                              .trim()
-                                              .isNotEmpty) ||
-                                      (user?.address != null &&
-                                          user!.address!.trim().isNotEmpty);
+                              bool hasSubmittedBusinessDetails = loginResult[
+                                      'has_submitted_business_details'] ??
+                                  false;
 
                               if (!hasSubmittedBusinessDetails) {
                                 setState(() => _isLoading = false);
                                 _showWholesalerRequestBottomSheet(
-                                  userId: user?.id?.toString() ?? '',
+                                  userId:
+                                      loginResult['user_id']?.toString() ?? '',
                                   isFromGoogle: true,
                                   googleName: displayName,
                                   googleEmail: userCredential.user?.email ??
@@ -1194,6 +1190,7 @@ class _LoginPageState extends State<LoginPage> {
 
     bool bsObscurePassword = true;
     bool bsObscureConfirmPassword = true;
+    String? bsErrorMessage;
 
     final user = _configModel.user;
     String resolvedGoogleFullName =
@@ -1304,6 +1301,40 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   const Divider(height: 24, color: Color(0xffF0F0F0)),
+                  // Inline error message banner
+                  if (bsErrorMessage != null)
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 20.w),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.red.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.error_outline,
+                              color: Colors.red.shade700, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              bsErrorMessage!,
+                              style: TextStyle(
+                                color: Colors.red.shade700,
+                                fontSize: 13.sp,
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setModalState(() => bsErrorMessage = null);
+                            },
+                            child: Icon(Icons.close,
+                                color: Colors.red.shade700, size: 18),
+                          ),
+                        ],
+                      ),
+                    ),
                   // Scrollable form
                   Expanded(
                     child: SingleChildScrollView(
@@ -1839,9 +1870,20 @@ class _LoginPageState extends State<LoginPage> {
 
                                       // Update user with business details
                                       if (userId.isNotEmpty) {
-                                        await authModel.updateUser(
+                                        final updateRes =
+                                            await authModel.updateUser(
                                           updateUserData: _bsWholesalerData,
                                         );
+
+                                        if (updateRes['success'] != true) {
+                                          setModalState(() {
+                                            bsLoading = false;
+                                            bsErrorMessage = updateRes[
+                                                    'message'] ??
+                                                'Failed to submit details. Please try again.';
+                                          });
+                                          return;
+                                        }
                                       }
 
                                       // Close bottom sheet
@@ -1856,15 +1898,11 @@ class _LoginPageState extends State<LoginPage> {
                                       _showWholesalerPendingDialog();
                                     } catch (e) {
                                       print('Wholesaler request error: $e');
-                                      setModalState(() => bsLoading = false);
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Failed to submit. Please try again.'),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
+                                      setModalState(() {
+                                        bsLoading = false;
+                                        bsErrorMessage =
+                                            'Failed to submit. Please try again.';
+                                      });
                                     }
                                   }
                                 },

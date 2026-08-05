@@ -1530,6 +1530,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     bool bsObscurePassword = true;
     bool bsObscureConfirmPassword = true;
+    String? bsErrorMessage;
 
     final user = _configModel.user;
     String resolvedGoogleFullName =
@@ -1640,6 +1641,40 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
                   Divider(height: 24, color: Color(0xffF0F0F0)),
+                  // Inline error message banner
+                  if (bsErrorMessage != null)
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.red.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.error_outline,
+                              color: Colors.red.shade700, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              bsErrorMessage!,
+                              style: TextStyle(
+                                color: Colors.red.shade700,
+                                fontSize: 13.sp,
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setModalState(() => bsErrorMessage = null);
+                            },
+                            child: Icon(Icons.close,
+                                color: Colors.red.shade700, size: 18),
+                          ),
+                        ],
+                      ),
+                    ),
                   // Scrollable form
                   Expanded(
                     child: SingleChildScrollView(
@@ -2179,17 +2214,12 @@ class _RegisterPageState extends State<RegisterPage> {
                                         );
 
                                         if (updateRes['success'] != true) {
-                                          setModalState(
-                                              () => bsLoading = false);
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(updateRes[
-                                                      'message'] ??
-                                                  'Failed to submit details. Please try again.'),
-                                              backgroundColor: Colors.red,
-                                            ),
-                                          );
+                                          setModalState(() {
+                                            bsLoading = false;
+                                            bsErrorMessage = updateRes[
+                                                    'message'] ??
+                                                'Failed to submit details. Please try again.';
+                                          });
                                           return;
                                         }
                                       }
@@ -2206,15 +2236,11 @@ class _RegisterPageState extends State<RegisterPage> {
                                       _showWholesalerPendingDialog();
                                     } catch (e) {
                                       print('Wholesaler request error: $e');
-                                      setModalState(() => bsLoading = false);
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                              'Failed to submit. Please try again.'),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
+                                      setModalState(() {
+                                        bsLoading = false;
+                                        bsErrorMessage =
+                                            'Failed to submit. Please try again.';
+                                      });
                                     }
                                   }
                                 },

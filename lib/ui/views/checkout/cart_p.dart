@@ -577,10 +577,13 @@ class _CartPageState extends State<CartPage> {
   double _calculateTotalPayable() {
     final configModel = Provider.of<ConfigModel>(context, listen: false);
     int cartTotal = _calculateSelectedItemsTotal();
-    double deliveryCharges = double.tryParse(
-            configModel.user?.companies?[0].deliveryCharges?.toString() ??
-                '0') ??
-        0;
+    // Hide delivery charges for Distributors (wholesalers)
+    double deliveryCharges = _activeRole == 'Distributor'
+        ? 0
+        : (double.tryParse(
+                configModel.user?.companies?[0].deliveryCharges?.toString() ??
+                    '0') ??
+            0);
     double packagingCharges = double.tryParse(
             configModel.user?.companies?[0].packagingCharges?.toString() ??
                 '0') ??
@@ -4397,7 +4400,9 @@ class _CartPageState extends State<CartPage> {
                                                   ),
                                                 ),
                                               SizedBox(height: 14),
-                                              if (isLoadingShipping ||
+                                              // Hide delivery charges row for Distributors (wholesalers)
+                                              if (_activeRole != 'Distributor' &&
+                                                  (isLoadingShipping ||
                                                   (double.tryParse(_configModel
                                                                   .user
                                                                   ?.companies?[
@@ -4406,7 +4411,7 @@ class _CartPageState extends State<CartPage> {
                                                                   ?.toString() ??
                                                               '0') ??
                                                           0) >
-                                                      0)
+                                                      0))
                                                 Row(
                                                   children: [
                                                     Expanded(
@@ -4447,7 +4452,8 @@ class _CartPageState extends State<CartPage> {
                                                           )
                                                   ],
                                                 ),
-                                              if ((double.tryParse(_configModel
+                                              if (_activeRole != 'Distributor' &&
+                                                  (double.tryParse(_configModel
                                                               .user
                                                               ?.companies?[0]
                                                               .deliveryCharges
@@ -4955,9 +4961,11 @@ class _CartPageState extends State<CartPage> {
                                                           (() {
                                                             int cartTotal =
                                                                 _calculateSelectedItemsTotal();
+                                                            // Hide delivery charges for Distributors (wholesalers)
                                                             double
-                                                                deliveryCharges =
-                                                                (double.tryParse(_configModel
+                                                                deliveryCharges = _activeRole == 'Distributor'
+                                                                    ? 0
+                                                                    : (double.tryParse(_configModel
                                                                             .user
                                                                             ?.companies?[0]
                                                                             .deliveryCharges
@@ -5398,8 +5406,10 @@ class _CartPageState extends State<CartPage> {
                                                                   cgstAmount =
                                                                   gstAmount / 2;
 
-                                                              int deliveryCharges =
-                                                                  (double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ??
+                                                              // Hide delivery charges for Distributors (wholesalers)
+                                                              int deliveryCharges = _activeRole == 'Distributor'
+                                                                  ? 0
+                                                                  : (double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ??
                                                                               '0') ??
                                                                           0)
                                                                       .toInt();

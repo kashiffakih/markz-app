@@ -1016,6 +1016,7 @@ class _ProfilePageState extends State<ProfilePage> {
     bool bsLoading = false;
     bool bsObscurePassword = true;
     bool bsObscureConfirmPassword = true;
+    String? bsErrorMessage;
     TextEditingController regDateController = TextEditingController(
       text: _bsWholesalerData['registration_date'] ?? '',
     );
@@ -1114,6 +1115,40 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   const Divider(height: 24, color: Color(0xffF0F0F0)),
                   // Scrollable form
+                  // Inline error message banner
+                  if (bsErrorMessage != null)
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 20.w),
+                      padding: EdgeInsets.all(12.w),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.red.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.error_outline,
+                              color: Colors.red.shade700, size: 20),
+                          SizedBox(width: 8.w),
+                          Expanded(
+                            child: Text(
+                              bsErrorMessage!,
+                              style: TextStyle(
+                                color: Colors.red.shade700,
+                                fontSize: 13.sp,
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setModalState(() => bsErrorMessage = null);
+                            },
+                            child: Icon(Icons.close,
+                                color: Colors.red.shade700, size: 18),
+                          ),
+                        ],
+                      ),
+                    ),
                   Expanded(
                     child: SingleChildScrollView(
                       padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 20.w),
@@ -1658,17 +1693,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                         );
 
                                         if (updateRes['success'] != true) {
-                                          setModalState(
-                                              () => bsLoading = false);
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(updateRes[
-                                                      'message'] ??
-                                                  'Failed to submit details. Please try again.'),
-                                              backgroundColor: Colors.red,
-                                            ),
-                                          );
+                                          setModalState(() {
+                                            bsLoading = false;
+                                            bsErrorMessage = updateRes[
+                                                    'message'] ??
+                                                'Failed to submit details. Please try again.';
+                                          });
                                           return;
                                         }
                                       }
@@ -1680,15 +1710,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                       _showWholesalerPendingDialog();
                                     } catch (e) {
                                       print('Wholesaler request error: $e');
-                                      setModalState(() => bsLoading = false);
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Failed to submit. Please try again.'),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
+                                      setModalState(() {
+                                        bsLoading = false;
+                                        bsErrorMessage =
+                                            'Failed to submit. Please try again.';
+                                      });
                                     }
                                   }
                                 },

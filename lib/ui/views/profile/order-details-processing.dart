@@ -808,8 +808,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               'SGST 2.5%', (double.parse(abc) / 2).toStringAsFixed(2)),
         ] else
           _buildCostRow('IGST 5%', abc),
-        _buildCostRow(
-            'Delivery charge', order['delivery_amount']?.toString() ?? '0'),
+        if (locator<ConfigModel>().activeRole != 'Distributor')
+          _buildCostRow(
+              'Delivery charge', order['delivery_amount']?.toString() ?? '0'),
         _buildCostRow(
             'Packing charge', order['packaging_amount']?.toString() ?? '0'),
         if ((double.tryParse(order['platform_fee']?.toString() ?? '0') ?? 0) >
