@@ -10,7 +10,7 @@ import 'package:http/http.dart' as http;
 class OrderService {
   final ConfigModel _configModel = locator<ConfigModel>();
 
-  Future<bool> placedOrder(
+  Future<dynamic> placedOrder(
       List<AddToCart> cartItems,
       String cartTotal,
       addressId,
@@ -23,7 +23,8 @@ class OrderService {
       gstAmount,
       platformFee,
       gstNumber,
-      [double? customDeliveryAmount]) async {
+      [double? customDeliveryAmount,
+      String paymentStatus = 'paid']) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
     if (_configModel.user == null) {
@@ -159,7 +160,8 @@ class OrderService {
         deliveryMethod: deliveryMethod.toString(),
         platformFee: double.tryParse(platformFee?.toString() ?? '0') ?? 0.0,
         addressId: parsedAddressId,
-        gstNumber: gstNumber);
+        gstNumber: gstNumber,
+        paymentStatus: paymentStatus);
 
     var _orderJson = order.toJson();
     _orderJson['order_details'] = orderDetails;
@@ -179,25 +181,61 @@ class OrderService {
         Map<String, dynamic> _responseData = json.decode(_response.body);
         print('Place order: $_responseData');
 
+        bool isSuccess = false;
         // Check if success field exists and return it, otherwise check status code
         if (_responseData.containsKey('success')) {
-          return _responseData['success'] == true;
+          isSuccess = _responseData['success'] == true;
         } else if (_responseData.containsKey('status')) {
-          return _responseData['status'] == 'success' ||
+          isSuccess = _responseData['status'] == 'success' ||
               _responseData['status'] == true;
         } else if (_responseData.containsKey('data')) {
           // Sometimes the API returns data object on success
-          return _responseData['data'] != null;
+          isSuccess = _responseData['data'] != null;
+        } else {
+          isSuccess = true;
         }
-
-        // If response is 200/201 but no explicit success field, assume success
-        return true;
+        
+        return {
+          'success': isSuccess,
+          'data': _responseData['data']
+        };
       } else {
         // print('Order placement failed with status: ${_response.statusCode}');
-        return false;
+        return { 'success': false };
       }
     } catch (e) {
       // print('Error placing order: $e');
+      return { 'success': false };
+    }
+  }
+
+  Future<bool> confirmPayment({
+    required int orderId,
+    required String txnId,
+    required String paymentMode,
+    String? response,
+  }) async {
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+
+    try {
+      http.Response _response = await http.post(
+        Uri.parse('${_apiConfig['baseURL']}/orders/confirm_payment'),
+        body: json.encode({
+          'order_id': orderId,
+          'txnid': txnId,
+          'paymentmode': paymentMode,
+          'response': response ?? '',
+        }),
+        headers: _apiConfig['headers'],
+      );
+
+      if (_response.statusCode == 200 || _response.statusCode == 201) {
+        Map<String, dynamic> _responseData = json.decode(_response.body);
+        return _responseData['success'] == true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('Error confirming payment: $e');
       return false;
     }
   }

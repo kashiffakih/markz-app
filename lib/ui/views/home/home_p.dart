@@ -13,6 +13,7 @@ import 'package:aadab/core/providers/product_pr.dart';
 import 'package:aadab/core/providers/wish_list_pr.dart';
 import 'package:aadab/locator.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
+import 'package:aadab/core/services/order_s.dart';
 
 import 'package:aadab/ui/views/products/shops_p.dart';
 import 'package:badges/badges.dart' as badges;
@@ -25,6 +26,9 @@ import 'package:aadab/core/providers/auth_pr.dart';
 import 'package:aadab/ui/widgets/common_product_card.dart';
 import 'package:aadab/core/providers/notification_pr.dart';
 import 'package:aadab/ui/views/profile/notifications_p.dart';
+import 'package:aadab/core/services/offline_order_s.dart';
+import 'package:aadab/core/providers/order_pr.dart';
+import 'package:aadab/core/models/add_to_cart.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -51,6 +55,7 @@ class _HomePageState extends State<HomePage>
   List<String> bannerUrls = [];
   int _current = 0;
   bool _isLoading = true;
+  bool _isRetrying = false;
   String? _errorMessage;
 
   Map<String, dynamic> _cartData = {
@@ -66,6 +71,66 @@ class _HomePageState extends State<HomePage>
     super.initState();
     _initializeData();
     _checkAndShowWelcomeBonus();
+    _retryFailedOrders();
+  }
+
+  Future<void> _retryFailedOrders() async {
+    if (_isRetrying) return;
+    _isRetrying = true;
+
+    try {
+      final offlineService = locator<OfflineOrderService>();
+      final failedOrders = await offlineService.getFailedOrders();
+      if (failedOrders.isEmpty) return;
+
+      final orderModel = Provider.of<OrderModel>(context, listen: false);
+      
+      // Iterate backwards so removing items doesn't mess up indices
+      for (int i = failedOrders.length - 1; i >= 0; i--) {
+        final orderData = failedOrders[i];
+        
+        List<AddToCart> cartItems = [];
+        if (orderData['cartItems'] != null) {
+          cartItems = (orderData['cartItems'] as List).map((e) => AddToCart.fromJson(e)).toList();
+        }
+        
+        if (orderData['isConfirmPayment'] == true) {
+          final response = await orderModel.confirmPayment(
+            orderId: orderData['orderId'], 
+            txnId: orderData['txnId'] ?? '', 
+            paymentMode: orderData['paymentOption'] ?? 'Online Payment'
+          );
+          if (response) {
+             await offlineService.removeFailedOrder(i);
+          }
+        } else {
+          final response = await orderModel.placedOrder(
+            cartItems,
+            orderData['cartTotal'],
+            orderData['addressId'],
+            orderData['isGift'],
+            orderData['userWalletUsed'],
+            orderData['couponId'],
+            orderData['paymentOption'],
+            orderData['deliveryMethod'],
+            orderData['couponValue'],
+            orderData['gstAmount'],
+            orderData['platformFee'],
+            orderData['gstNumber'],
+          );
+          
+          if (response != null && response is Map && response['success'] == true) {
+            await offlineService.removeFailedOrder(i);
+          } else if (response == true) { // Fallback for any old bool returns
+            await offlineService.removeFailedOrder(i);
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint("Error retrying failed orders: $e");
+    } finally {
+      _isRetrying = false;
+    }
   }
 
   Future<void> _checkAndShowWelcomeBonus() async {

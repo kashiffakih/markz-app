@@ -8,6 +8,9 @@ import 'package:aadab/core/models/order.dart';
 import 'package:aadab/core/providers/order_pr.dart';
 import 'package:aadab/ui/shared/font_sh.dart';
 import 'package:aadab/ui/views/profile/order-details-processing.dart';
+import 'package:aadab/core/services/phonepe_s.dart';
+import 'package:aadab/core/services/order_s.dart';
+import 'package:aadab/core/services/offline_order_s.dart';
 
 class OrdersPage extends StatefulWidget {
   final isProfile;
@@ -23,6 +26,8 @@ class _OrdersPageState extends State<OrdersPage> {
   bool _isPageLoading = false;
 
   final ConfigModel _configModel = locator<ConfigModel>();
+  final PhonePeService _phonePeService = locator<PhonePeService>();
+  bool _isRetryingPayment = false;
 
   // Filter State
   List<String> _selectedStatuses = [];
@@ -37,6 +42,7 @@ class _OrdersPageState extends State<OrdersPage> {
   @override
   void initState() {
     super.initState();
+    _phonePeService.initializePhonePe();
     _loadOrders();
   }
 
@@ -52,6 +58,70 @@ class _OrdersPageState extends State<OrdersPage> {
       }
     } finally {
       if (mounted) setState(() => _isPageLoading = false);
+    }
+  }
+
+  Future<void> _retryPayment(Order order) async {
+    if (_isRetryingPayment) return;
+    
+    setState(() {
+      _isRetryingPayment = true;
+    });
+
+    try {
+      final merchantOrderId = order.id.toString();
+      final amount = double.tryParse(order.totalAmount.toString()) ?? 0.0;
+      
+      var payment = await _phonePeService.startTransaction(
+        merchantOrderId: merchantOrderId,
+        amount: (amount * 100).toInt(),
+      );
+
+      if (!mounted) return;
+
+      if (payment?.state == 'COMPLETED') {
+        String finalPaymentDetails = 'Online Payment - Transaction ID: ${payment!.transactionId}';
+        if (payment.transactionId != null) {
+          finalPaymentDetails += ', Order ID: ${payment.transactionId}';
+        }
+
+        final orderModel = Provider.of<OrderModel>(context, listen: false);
+        final confirmResponse = await orderModel.confirmPayment(
+           orderId: order.id!, 
+           txnId: payment.transactionId ?? '', 
+           paymentMode: finalPaymentDetails
+        );
+        
+        if (confirmResponse) {
+          _loadOrders();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Payment successful!')),
+          );
+        } else {
+           final orderData = {
+            'isConfirmPayment': true,
+            'orderId': order.id,
+            'txnId': payment.transactionId,
+            'paymentOption': finalPaymentDetails,
+          };
+          locator<OfflineOrderService>().saveFailedOrder(orderData);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Payment successful but confirmation pending. It will be updated shortly.')),
+          );
+        }
+      } else if (payment?.state == 'FAILED' || payment?.state == 'FAILURE') {
+         ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Payment failed. Please try again.')),
+         );
+      }
+    } catch (e) {
+      debugPrint("Retry payment error: $e");
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isRetryingPayment = false;
+        });
+      }
     }
   }
 
@@ -597,7 +667,32 @@ class _OrdersPageState extends State<OrdersPage> {
                               : Colors.black,
                 ),
               ),
-              InkWell(
+              Row(
+                children: [
+                  if (order.paymentStatus == 'pending') ...[
+                    InkWell(
+                      onTap: () => _retryPayment(order),
+                      child: Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.w),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFEED056),
+                          borderRadius: BorderRadius.circular(20.r),
+                        ),
+                        child: Text(
+                          'Pay Now',
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+                  ],
+                  InkWell(
                 onTap: () {
                   final filteredImages = order.orderDetails?.isNotEmpty == true
                       ? order.orderDetails?.first.product?.productImages ?? []
@@ -644,12 +739,28 @@ class _OrdersPageState extends State<OrdersPage> {
           ),
         ],
       ),
-    );
+          if (_isRetryingPayment) ...[
+            SizedBox(height: 12.w),
+            Center(
+              child: SizedBox(
+                width: 20.w,
+                height: 20.w,
+                child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEED056))),
+              ),
+            ),
+          ]
+        ],
+      ),
+  );
   }
 
   // Removed _getFilteredOrders as logic is moved to _buildOrderList
 
   String _getOrderStatus(Order order) {
+    if (order.paymentStatus == 'pending') {
+      return 'Payment Pending';
+    }
+
     // If orderStatuses is empty or null, it's "Order Placed"
     if (order.orderStatuses == null || order.orderStatuses!.isEmpty) {
       return 'Order Placed';

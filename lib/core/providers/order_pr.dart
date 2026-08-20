@@ -20,7 +20,7 @@ class OrderModel with ChangeNotifier {
 
   Order? get order => _order;
 
-  Future<bool> placedOrder(
+  Future<dynamic> placedOrder(
       List<AddToCart> cartItems,
       String cartTotal,
       addressId,
@@ -33,7 +33,8 @@ class OrderModel with ChangeNotifier {
       gstAmount,
       platformFee,
       gstNumber,
-      customDeliveryAmount]) async {
+      double? customDeliveryAmount,
+      String paymentStatus = 'paid']) async {
     return await _orderService.placedOrder(
         cartItems,
         cartTotal,
@@ -47,7 +48,8 @@ class OrderModel with ChangeNotifier {
         gstAmount,
         platformFee,
         gstNumber,
-        customDeliveryAmount);
+        customDeliveryAmount,
+        paymentStatus);
   }
 
   List<Order> _orders = [];
@@ -76,5 +78,18 @@ class OrderModel with ChangeNotifier {
   // Cancel order
   Future<bool> cancelOrder(int orderId) async {
     return await _orderService.cancelOrder(orderId);
+  }
+
+  // Confirm payment
+  Future<bool> confirmPayment({
+    required int orderId,
+    required String txnId,
+    required String paymentMode,
+  }) async {
+    return await _orderService.confirmPayment(
+      orderId: orderId,
+      txnId: txnId,
+      paymentMode: paymentMode,
+    );
   }
 }

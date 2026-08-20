@@ -7,6 +7,7 @@ import 'package:aadab/core/models/payment_response.dart';
 
 import 'package:aadab/core/services/phonepe_s.dart';
 import 'package:aadab/core/services/product_s.dart';
+import 'package:aadab/core/services/offline_order_s.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -744,9 +745,53 @@ class _CartPageState extends State<CartPage> {
       _isLoading = true;
     });
 
-    // try {
-    // Generate unique merchant order ID as per V2 documentation
-    final merchantOrderId = DateTime.now().millisecondsSinceEpoch.toString();
+    // 1. Create Pending Order First
+    final selectedItems = _getSelectedCartItems();
+    String paymentDetails = 'PhonePe Payment - Pending';
+
+    final orderResponse = await orderModel.placedOrder(
+      selectedItems,
+      payload['cartTotal'],
+      payload['addressId'],
+      payload['isGift'],
+      payload['useWalletPoint'],
+      payload['couponId'],
+      paymentDetails,
+      payload['deliveryMethod'],
+      payload['couponValue'],
+      payload['gstAmount'],
+      payload['platformFee'],
+      payload['gstNumber'],
+      null, // customDeliveryAmount
+      'pending' // paymentStatus
+    );
+
+    if (orderResponse == null || (orderResponse is bool && orderResponse == false) || (orderResponse is Map && orderResponse['success'] == false)) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to initialize order. Please try again.')),
+        );
+      }
+      return;
+    }
+
+    int? orderId;
+    if (orderResponse is Map && orderResponse['data'] != null) {
+       orderId = orderResponse['data']['id'];
+    }
+
+    if (orderId == null) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to retrieve order ID. Please try again.')),
+        );
+      }
+      return;
+    }
+
+    final merchantOrderId = orderId.toString();
 
     debugPrint("PhonePe V2 Transaction Details:");
     debugPrint("Amount: ${amount * 100} paisa");
@@ -755,7 +800,6 @@ class _CartPageState extends State<CartPage> {
     // Start transaction using V2 documentation compliant method
     payment = await _phonePeService.startTransaction(
       merchantOrderId: merchantOrderId,
-      // amount: 100, // Amount in paisa as per docs
       amount: amount * 100, // Amount in paisa as per docs
     );
 
@@ -774,32 +818,18 @@ class _CartPageState extends State<CartPage> {
       payload['merchant_id'] = payment?.merchantId.toString();
       payload['utr'] = payment?.paymentInstrument?.utr.toString();
 
-      // Use the pre-stored orderModel reference
-      final OrderModel _orderModel = orderModel;
-
       // Create payment details string with transaction info
-      String paymentDetails =
+      String finalPaymentDetails =
           'Online Payment - Transaction ID: ${payment!.transactionId}';
       if (payment!.transactionId != null) {
-        paymentDetails += ', Order ID: ${payment!.transactionId}';
+        finalPaymentDetails += ', Order ID: ${payment!.transactionId}';
       }
 
-      // Use selected items only for the order
-      final selectedItems = _getSelectedCartItems();
-
-      bool orderResponse = await _orderModel.placedOrder(
-        selectedItems,
-        payload['cartTotal'],
-        payload['addressId'],
-        payload['isGift'],
-        payload['useWalletPoint'],
-        payload['couponId'],
-        paymentDetails,
-        payload['deliveryMethod'],
-        payload['couponValue'],
-        payload['gstAmount'],
-        payload['platformFee'],
-        payload['gstNumber'], // Add GST Number
+      // Call confirm payment
+      final confirmResponse = await orderModel.confirmPayment(
+         orderId: orderId, 
+         txnId: payment!.transactionId ?? '', 
+         paymentMode: finalPaymentDetails
       );
 
       if (mounted) {
@@ -807,8 +837,39 @@ class _CartPageState extends State<CartPage> {
           _isLoading = false;
         });
       }
-      if (orderResponse == true) {
+      
+      if (confirmResponse) {
         navigator.pushNamed('/successPage');
+      } else {
+        // Save to offline storage for retry
+        final orderData = {
+          'isConfirmPayment': true,
+          'orderId': orderId,
+          'txnId': payment!.transactionId,
+          'paymentOption': finalPaymentDetails,
+        };
+        locator<OfflineOrderService>().saveFailedOrder(orderData);
+
+        if (mounted) {
+           showDialog(
+             context: context,
+             builder: (context) => AlertDialog(
+               shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+               title: Text("Payment Confirmed"),
+               content: Text("Your payment was successful (Txn ID: ${payment?.transactionId}). We are finalizing your order in the background. It will appear in your orders list shortly."),
+               actions: [
+                 TextButton(
+                   onPressed: () {
+                      Navigator.pop(context);
+                      navigator.pushNamed('/successPage');
+                   },
+                   child: Text("OK", style: TextStyle(color: Colors.black)),
+                 ),
+               ],
+             ),
+           );
+        }
       }
     } else if (payment?.state == 'PENDING') {
       if (mounted) {
@@ -5088,6 +5149,8 @@ class _CartPageState extends State<CartPage> {
                                                               0.89, 0, 0, 0),
                                                       child: TextButton(
                                                         onPressed: () async {
+                                                          if (_isLoading) return;
+
                                                           if (paymentOption ==
                                                               '') {
                                                             showDialog(

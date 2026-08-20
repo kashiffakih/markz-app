@@ -47,6 +47,7 @@ class Order {
   String? rpySignature;
   String? rpyCode;
   String? rpyMessage;
+  String? paymentStatus;
   bool? isGift;
   String? deliveryMethod;
   num? platformFee;
@@ -106,7 +107,7 @@ class Order {
       this.rpyOrderId,
       this.rpySignature,
       this.rpyCode,
-      this.rpyMessage,
+      this.rpyMessage, this.paymentStatus,
       this.isGift,
       this.deliveryMethod,
       this.platformFee,
@@ -169,6 +170,7 @@ class Order {
     rpySignature = json['rpy_signature'];
     rpyCode = json['rpy_code'];
     rpyMessage = json['rpy_message'];
+    paymentStatus = json['payment_status'];
     deliveryMethod = json['delivery_method'];
     platformFee = json['platform_fee'] != null
         ? num.tryParse(json['platform_fee'].toString())
@@ -286,6 +288,7 @@ class Order {
     data['rpy_signature'] = this.rpySignature;
     data['rpy_code'] = this.rpyCode;
     data['rpy_message'] = this.rpyMessage;
+    data['payment_status'] = this.paymentStatus;
     data['is_gift'] = this.isGift;
     data['delivery_method'] = this.deliveryMethod;
     data['platform_fee'] = this.platformFee;

@@ -776,7 +776,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       0.3)
                                   .toStringAsFixed(0);
                               var addressId = widget.arguments['address']['id'];
-                              bool response = await _orderModel.placedOrder(
+                              dynamic response = await _orderModel.placedOrder(
                                 widget.arguments['cartItems'],
                                 widget.arguments['cartTotal'].toString(),
                                 addressId,
@@ -787,7 +787,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 deliveryMethod,
                                 widget.arguments['couponValue'].toString(),
                               );
-                              if (response == true) {
+                              if (response != null && response is Map && response['success'] == true) {
+                                Navigator.pushNamed(context, '/successPage');
+                              } else if (response == true) {
                                 Navigator.pushNamed(context, '/successPage');
                               }
                             },
