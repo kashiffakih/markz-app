@@ -59,10 +59,11 @@ class Order {
   UserAddress? address;
   String? gstNumber;
   String? role;
-  // String? delhiveryWaybill;
-  // String? delhiveryOrderId;
-  // String? delhiveryTrackingUrl;
-  // String? shippingLabelUrl;
+  String? delhiveryWaybill;
+  String? delhiveryOrderId;
+  String? delhiveryTrackingUrl;
+  String? shippingLabelUrl;
+  String? expectedDeliveryDate;
 
   Order(
       {this.id,
@@ -120,10 +121,11 @@ class Order {
       this.address,
       this.gstNumber,
       this.role,
-      // this.delhiveryWaybill,
-      // this.delhiveryOrderId,
-      // this.delhiveryTrackingUrl,
-      // this.shippingLabelUrl
+      this.delhiveryWaybill,
+      this.delhiveryOrderId,
+      this.delhiveryTrackingUrl,
+      this.shippingLabelUrl,
+      this.expectedDeliveryDate
       });
 
   Order.fromJson(Map<String, dynamic> json) {
@@ -179,10 +181,11 @@ class Order {
     isGift = json['is_gift'] == 1 || json['is_gift'] == true;
     gstNumber = json['gst_number'];
     role = json['role'];
-    // delhiveryWaybill = json['delhivery_waybill'];
-    // delhiveryOrderId = json['delhivery_order_id'];
-    // delhiveryTrackingUrl = json['delhivery_tracking_url'];
-    // shippingLabelUrl = json['shipping_label_url'];
+    delhiveryWaybill = json['delhivery_waybill'];
+    delhiveryOrderId = json['delhivery_order_id'];
+    delhiveryTrackingUrl = json['delhivery_tracking_url'];
+    shippingLabelUrl = json['shipping_label_url'];
+    expectedDeliveryDate = json['expected_delivery_date'];
 
     // Parse user with error handling
     try {
@@ -311,10 +314,11 @@ class Order {
     if (this.address != null) {
       data['address'] = this.address!.toJson();
     }
-    // data['delhivery_waybill'] = this.delhiveryWaybill;
-    // data['delhivery_order_id'] = this.delhiveryOrderId;
-    // data['delhivery_tracking_url'] = this.delhiveryTrackingUrl;
-    // data['shipping_label_url'] = this.shippingLabelUrl;
+    data['delhivery_waybill'] = this.delhiveryWaybill;
+    data['delhivery_order_id'] = this.delhiveryOrderId;
+    data['delhivery_tracking_url'] = this.delhiveryTrackingUrl;
+    data['shipping_label_url'] = this.shippingLabelUrl;
+    data['expected_delivery_date'] = this.expectedDeliveryDate;
     return data;
   }
 }

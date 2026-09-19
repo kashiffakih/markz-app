@@ -24,7 +24,8 @@ class OrderService {
       platformFee,
       gstNumber,
       [double? customDeliveryAmount,
-      String paymentStatus = 'paid']) async {
+      String paymentStatus = 'paid',
+      String? expectedDeliveryDate]) async {
     Map<String, dynamic> _apiConfig = _configModel.apiConfig;
 
     if (_configModel.user == null) {
@@ -161,7 +162,8 @@ class OrderService {
         platformFee: double.tryParse(platformFee?.toString() ?? '0') ?? 0.0,
         addressId: parsedAddressId,
         gstNumber: gstNumber,
-        paymentStatus: paymentStatus);
+        paymentStatus: paymentStatus,
+        expectedDeliveryDate: expectedDeliveryDate);
 
     var _orderJson = order.toJson();
     _orderJson['order_details'] = orderDetails;
@@ -208,6 +210,71 @@ class OrderService {
       return { 'success': false };
     }
   }
+
+  Future<bool> checkServiceability(String pincode) async {
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    try {
+      http.Response _response = await http.get(
+        Uri.parse('${_apiConfig['baseURL']}/delhivery/serviceability?pincode=$pincode'),
+        headers: _apiConfig['headers'],
+      );
+
+      if (_response.statusCode == 200) {
+        Map<String, dynamic> _responseData = json.decode(_response.body);
+        if (_responseData['delivery_codes'] != null && _responseData['delivery_codes'].length > 0) {
+           return true; // Serviceable
+        }
+      }
+      return false;
+    } catch (e) {
+      debugPrint('Error checking serviceability: $e');
+      return false;
+    }
+  }
+
+  Future<double?> getShippingCost(String pincode, double weight, {String paymentMode = 'Prepaid'}) async {
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    try {
+      http.Response _response = await http.get(
+        Uri.parse('${_apiConfig['baseURL']}/delhivery/shipping_cost?pincode=$pincode&weight=$weight&payment_mode=$paymentMode'),
+        headers: _apiConfig['headers'],
+      );
+
+      if (_response.statusCode == 200) {
+        // the response is an array of objects
+        List<dynamic> _responseData = json.decode(_response.body);
+        if (_responseData.isNotEmpty && _responseData[0]['total_amount'] != null) {
+          return double.tryParse(_responseData[0]['total_amount'].toString());
+        }
+      }
+      return null;
+    } catch (e) {
+      debugPrint('Error getting shipping cost: $e');
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getExpectedTAT(String originPin, String destinationPin, {String mot = 'S'}) async {
+    Map<String, dynamic> _apiConfig = _configModel.apiConfig;
+    try {
+      http.Response _response = await http.get(
+        Uri.parse('${_apiConfig['baseURL']}/delhivery/expected_tat?origin_pin=$originPin&destination_pin=$destinationPin&mot=$mot'),
+        headers: _apiConfig['headers'],
+      );
+
+      if (_response.statusCode == 200) {
+        Map<String, dynamic> _responseData = json.decode(_response.body);
+        if (_responseData['success'] == true && _responseData['data'] != null) {
+          return _responseData['data'];
+        }
+      }
+      return null;
+    } catch (e) {
+      debugPrint('Error getting expected TAT: $e');
+      return null;
+    }
+  }
+
 
   Future<bool> confirmPayment({
     required int orderId,

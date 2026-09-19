@@ -34,7 +34,7 @@ class OrderModel with ChangeNotifier {
       platformFee,
       gstNumber,
       double? customDeliveryAmount,
-      String paymentStatus = 'paid']) async {
+      String paymentStatus = 'paid', String? expectedDeliveryDate]) async {
     return await _orderService.placedOrder(
         cartItems,
         cartTotal,
@@ -49,7 +49,8 @@ class OrderModel with ChangeNotifier {
         platformFee,
         gstNumber,
         customDeliveryAmount,
-        paymentStatus);
+        paymentStatus,
+        expectedDeliveryDate);
   }
 
   List<Order> _orders = [];
@@ -91,5 +92,18 @@ class OrderModel with ChangeNotifier {
       txnId: txnId,
       paymentMode: paymentMode,
     );
+  }
+
+  // Check serviceability
+  Future<bool> checkServiceability(String pincode) async {
+    return await _orderService.checkServiceability(pincode);
+  }
+
+  Future<double?> getShippingCost(String pincode, double weight, {String paymentMode = 'Prepaid'}) async {
+    return await _orderService.getShippingCost(pincode, weight, paymentMode: paymentMode);
+  }
+
+  Future<Map<String, dynamic>?> getExpectedTAT(String originPin, String destinationPin, {String mot = 'S'}) async {
+    return await _orderService.getExpectedTAT(originPin, destinationPin, mot: mot);
   }
 }

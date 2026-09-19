@@ -71,23 +71,22 @@ class _CartPageState extends State<CartPage> {
   final PhonePeService _phonePeService = locator<PhonePeService>();
   String result = "";
 
-  // double? delhiveryShippingCost;
+  double? delhiveryShippingCost;
+  String? expectedTAT;
+  bool isDelhiveryServiceable = true;
   bool isLoadingShipping = false;
 
   void _calculateShippingCost() async {
-    // Commented out Delhivery calculation
-    /*
-    print("Checbh");
     if (address.pincode != null) {
       setState(() {
         isLoadingShipping = true;
       });
 
       try {
-        final DelhiveryService _delhiveryService = locator<DelhiveryService>();
+        final orderModel = Provider.of<OrderModel>(context, listen: false);
+        final configModel = Provider.of<ConfigModel>(context, listen: false);
         String pincode = address.pincode.toString();
-
-        print("pincode qwer $pincode");
+        String originPin = configModel.user?.companies?[0].pincode ?? '110001';
 
         final selectedItems = _getSelectedCartItems();
         int totalWeight = 0;
@@ -96,26 +95,31 @@ class _CartPageState extends State<CartPage> {
         }
         if (totalWeight == 0) totalWeight = 500; // Minimum weight
 
-        var response = await _delhiveryService.calculateShippingCost(
-            pincode, totalWeight, 'Prepaid');
+        var cost = await orderModel.getShippingCost(pincode, totalWeight.toDouble());
+        var tatData = await orderModel.getExpectedTAT(originPin, pincode);
 
-        print("checqwqwqwq $response");
-
-        if (response != null && response['total_amount'] != null) {
-          setState(() {
-            delhiveryShippingCost =
-                double.tryParse(response['total_amount'].toString());
-          });
-        }
+        setState(() {
+          delhiveryShippingCost = cost;
+          isDelhiveryServiceable = true;
+          if (tatData != null && tatData['expected_delivery_date'] != null) {
+             expectedTAT = tatData['expected_delivery_date'];
+          }
+        });
       } catch (e) {
         debugPrint('Error calculating Delhivery cost: $e');
+        if (mounted) {
+          setState(() {
+            isDelhiveryServiceable = false;
+          });
+        }
       } finally {
-        setState(() {
-          isLoadingShipping = false;
-        });
+        if (mounted) {
+          setState(() {
+            isLoadingShipping = false;
+          });
+        }
       }
     }
-    */
   }
 
   // Helper to get active role
@@ -581,7 +585,7 @@ class _CartPageState extends State<CartPage> {
     // Hide delivery charges for Distributors (wholesalers)
     double deliveryCharges = _activeRole == 'Distributor'
         ? 0
-        : (double.tryParse(
+        : (delhiveryShippingCost ?? double.tryParse(
                 configModel.user?.companies?[0].deliveryCharges?.toString() ??
                     '0') ??
             0);
@@ -762,8 +766,9 @@ class _CartPageState extends State<CartPage> {
       payload['gstAmount'],
       payload['platformFee'],
       payload['gstNumber'],
-      null, // customDeliveryAmount
-      'pending' // paymentStatus
+      payload['customDeliveryAmount'],
+      'pending', // paymentStatus
+      payload['expectedDeliveryDate']
     );
 
     if (orderResponse == null || (orderResponse is bool && orderResponse == false) || (orderResponse is Map && orderResponse['success'] == false)) {
@@ -4464,7 +4469,7 @@ class _CartPageState extends State<CartPage> {
                                               // Hide delivery charges row for Distributors (wholesalers)
                                               if (_activeRole != 'Distributor' &&
                                                   (isLoadingShipping ||
-                                                  (double.tryParse(_configModel
+                                                  (delhiveryShippingCost ?? double.tryParse(_configModel
                                                                   .user
                                                                   ?.companies?[
                                                                       0]
@@ -4497,7 +4502,9 @@ class _CartPageState extends State<CartPage> {
                                                                     .orange,
                                                                 fontSize: 12))
                                                         : Text(
-                                                            'RS ${double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ?? '0')?.toStringAsFixed(2) ?? '0'}',
+                                                            delhiveryShippingCost != null
+                                                                ? 'RS ${delhiveryShippingCost!.toStringAsFixed(2)}'
+                                                                : 'RS ${double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ?? '0')?.toStringAsFixed(2) ?? '0'}',
                                                             textAlign:
                                                                 TextAlign.right,
                                                             style:
@@ -4514,7 +4521,7 @@ class _CartPageState extends State<CartPage> {
                                                   ],
                                                 ),
                                               if (_activeRole != 'Distributor' &&
-                                                  (double.tryParse(_configModel
+                                                  (delhiveryShippingCost ?? double.tryParse(_configModel
                                                               .user
                                                               ?.companies?[0]
                                                               .deliveryCharges
@@ -4523,6 +4530,51 @@ class _CartPageState extends State<CartPage> {
                                                       0) >
                                                   0)
                                                 SizedBox(height: 14),
+                                              if (_activeRole != 'Distributor' && expectedTAT != null) ...[
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        'Expected Delivery',
+                                                        style: MyGoogleFontStyle(
+                                                          fontFamily: 'Urbanist',
+                                                          fontSize: 14,
+                                                          fontWeight: FontWeight.w500,
+                                                          color: Color(0xff666666),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      expectedTAT!,
+                                                      textAlign: TextAlign.right,
+                                                      style: MyGoogleFontStyle(
+                                                        fontFamily: 'Inter',
+                                                        fontWeight: FontWeight.w700,
+                                                        color: Color(0xff303030),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                                SizedBox(height: 14),
+                                              ],
+                                              if (!isDelhiveryServiceable) ...[
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        'Note: Delhivery does not service this pincode. Your order will be shipped via an alternative courier, and you will need to pay the delivery charges directly to them upon receipt.',
+                                                        style: MyGoogleFontStyle(
+                                                          fontFamily: 'Urbanist',
+                                                          fontSize: 12,
+                                                          fontWeight: FontWeight.w500,
+                                                          color: Colors.red[700],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(height: 14),
+                                              ],
                                               if ((_configModel
                                                           .user
                                                           ?.companies?[0]
@@ -5442,6 +5494,10 @@ class _CartPageState extends State<CartPage> {
                                                                 'gstNumber':
                                                                     _gstController
                                                                         .text, // Add GST Number
+                                                                'customDeliveryAmount':
+                                                                    delhiveryShippingCost,
+                                                                'expectedDeliveryDate':
+                                                                    expectedTAT,
                                                               };
 
                                                               // Add gstAmount to payloadData for online payment
@@ -5472,10 +5528,9 @@ class _CartPageState extends State<CartPage> {
                                                               // Hide delivery charges for Distributors (wholesalers)
                                                               int deliveryCharges = _activeRole == 'Distributor'
                                                                   ? 0
-                                                                  : (double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ??
-                                                                              '0') ??
-                                                                          0)
-                                                                      .toInt();
+                                                                  : (delhiveryShippingCost?.toInt() ?? double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ??
+                                                                              '0')?.toInt() ??
+                                                                          0);
                                                               int packagingCharges = _configModel
                                                                           .user!
                                                                           .companies![
@@ -5568,7 +5623,9 @@ class _CartPageState extends State<CartPage> {
                                                                     0,
                                                                 _gstController
                                                                     .text,
-                                                                null,
+                                                                delhiveryShippingCost,
+                                                                'pending',
+                                                                expectedTAT,
                                                               );
 
                                                               if (response ==

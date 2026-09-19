@@ -271,14 +271,13 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     ),
                   ),
                 ),
-              /*
-              if (widget.arguments?['order']['delhivery_waybill'] != null) ...[
+              if (widget.arguments?['order'] != null && widget.arguments!['order'].delhiveryWaybill != null) ...[
                 SizedBox(width: 8.w),
                 InkWell(
                   onTap: () async {
                     try {
                       final waybill =
-                          widget.arguments?['order']['delhivery_waybill'];
+                          widget.arguments!['order'].delhiveryWaybill;
                       final trackingUrl =
                           'https://www.delhivery.com/track/package/$waybill';
                       print('Opening tracking URL: $trackingUrl');
@@ -319,7 +318,6 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   ),
                 ),
               ],
-              */
             ],
           ),
           SizedBox(height: 12.w),

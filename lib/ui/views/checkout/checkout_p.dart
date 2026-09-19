@@ -59,6 +59,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   bool isGift = false;
+  bool isPlacingOrder = false;
+
   @override
   Widget build(BuildContext context) {
     final OrderModel _orderModel = Provider.of<OrderModel>(context);
@@ -564,8 +566,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           ),
                                         ),
                                         Text(
-                                          'RS' +
-                                              ' ' +
+                                          'RS ' +
                                               _configModel.user!.companies![0]
                                                   .deliveryCharges
                                                   .toString(),
@@ -578,6 +579,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                         )
                                       ],
                                     ),
+
                                     SizedBox(
                                       height: 10,
                                     ),
@@ -722,8 +724,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           ),
                                         ),
                                         Text(
-                                          'RS' +
-                                              ' ' +
+                                          'RS ' +
                                               (int.parse(widget.arguments['cartTotal'].toString()) +
                                                       int.parse(_configModel
                                                           .user!
@@ -769,13 +770,35 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         child: Container(
                           margin: EdgeInsets.fromLTRB(0.89, 0, 0, 0),
                           child: TextButton(
-                            onPressed: () async {
+                            onPressed: isPlacingOrder ? null : () async {
+                              setState(() {
+                                isPlacingOrder = true;
+                              });
+                              var address = widget.arguments['address'];
+                              var pincode = address['pincode'];
+                              
+                              if (pincode != null) {
+                                bool isServiceable = await _orderModel.checkServiceability(pincode.toString());
+                                if (!isServiceable) {
+                                  setState(() {
+                                    isPlacingOrder = false;
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Delivery is not serviceable at the provided pincode ($pincode).'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                  return;
+                                }
+                              }
+
                               var userWalletUsed = (int.parse(_userWaletModel
                                           .totaRemainingPoint
                                           .toString()) *
                                       0.3)
                                   .toStringAsFixed(0);
-                              var addressId = widget.arguments['address']['id'];
+                              var addressId = address['id'];
                               dynamic response = await _orderModel.placedOrder(
                                 widget.arguments['cartItems'],
                                 widget.arguments['cartTotal'].toString(),
@@ -787,10 +810,22 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 deliveryMethod,
                                 widget.arguments['couponValue'].toString(),
                               );
+                              
+                              setState(() {
+                                isPlacingOrder = false;
+                              });
+
                               if (response != null && response is Map && response['success'] == true) {
                                 Navigator.pushNamed(context, '/successPage');
                               } else if (response == true) {
                                 Navigator.pushNamed(context, '/successPage');
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Failed to place order.'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
                               }
                             },
                             style: TextButton.styleFrom(
@@ -800,11 +835,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               width: 321,
                               height: 53,
                               decoration: BoxDecoration(
-                                color: Color(0xff1e1e1e),
+                                color: isPlacingOrder ? Colors.grey : Color(0xff1e1e1e),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Center(
-                                child: Text(
+                                child: isPlacingOrder
+                                  ? CircularProgressIndicator(color: Colors.white)
+                                  : Text(
                                   'Paid/Continue',
                                   style: MyGoogleFontStyle(
                                     fontFamily: 'Urbanist',
