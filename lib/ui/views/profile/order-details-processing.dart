@@ -271,13 +271,13 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     ),
                   ),
                 ),
-              if (widget.arguments?['order'] != null && widget.arguments!['order'].delhiveryWaybill != null) ...[
+              if (widget.arguments?['order'] != null && widget.arguments!['order']['delhivery_waybill'] != null) ...[
                 SizedBox(width: 8.w),
                 InkWell(
                   onTap: () async {
                     try {
                       final waybill =
-                          widget.arguments!['order'].delhiveryWaybill;
+                          widget.arguments!['order']['delhivery_waybill'];
                       final trackingUrl =
                           'https://www.delhivery.com/track/package/$waybill';
                       print('Opening tracking URL: $trackingUrl');

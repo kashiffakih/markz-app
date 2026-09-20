@@ -669,7 +669,7 @@ class _OrdersPageState extends State<OrdersPage> {
               ),
               Row(
                 children: [
-                  if (order.paymentStatus == 'pending') ...[
+                  if (order.paymentStatus == 'pending' && status != 'Cancelled') ...[
                     InkWell(
                       onTap: () => _retryPayment(order),
                       child: Container(
@@ -757,6 +757,13 @@ class _OrdersPageState extends State<OrdersPage> {
   // Removed _getFilteredOrders as logic is moved to _buildOrderList
 
   String _getOrderStatus(Order order) {
+    // First check if it was cancelled
+    if (order.orderStatuses != null && order.orderStatuses!.isNotEmpty) {
+      var latestStatus = order.orderStatuses!.last;
+      String? statusName = latestStatus.status?.name;
+      if (statusName == 'Cancelled') return 'Cancelled';
+    }
+
     if (order.paymentStatus == 'pending') {
       return 'Payment Pending';
     }
@@ -771,7 +778,6 @@ class _OrdersPageState extends State<OrdersPage> {
     String? statusName = latestStatus.status?.name;
 
     // Return the status name if it matches our expected statuses
-    if (statusName == 'Cancelled') return 'Cancelled';
     if (statusName == 'Delivered') return 'Delivered';
     if (statusName == 'Order Processing') return 'Order Processing';
 

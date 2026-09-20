@@ -5594,7 +5594,7 @@ class _CartPageState extends State<CartPage> {
                                                               final selectedTotal =
                                                                   _calculateSelectedItemsTotal();
 
-                                                              bool response =
+                                                              dynamic response =
                                                                   await _orderModel
                                                                       .placedOrder(
                                                                 selectedItems,
@@ -5628,8 +5628,15 @@ class _CartPageState extends State<CartPage> {
                                                                 expectedTAT,
                                                               );
 
-                                                              if (response ==
-                                                                  true) {
+                                                              bool isSuccess =
+                                                                  (response is bool &&
+                                                                          response ==
+                                                                              true) ||
+                                                                      (response is Map &&
+                                                                          response['success'] ==
+                                                                              true);
+
+                                                              if (isSuccess) {
                                                                 Navigator.pushNamed(
                                                                     context,
                                                                     '/successPage');

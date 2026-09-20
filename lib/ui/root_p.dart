@@ -43,17 +43,20 @@ class _RootPageState extends State<RootPage> {
   }
 
   authenticateUser(_, AuthModel authModel, ConfigModel configModel) async {
-    configModel.getApiConfig(domain: 'https://api.staging.aadab.online');
+    configModel.getApiConfig(domain: 'http://192.168.1.3:9090');
+    // configModel.getApiConfig(domain: 'https://api.staging.aadab.online');
     await configModel.fetchLoginData();
 
     String currentAppVersion = await getPackageDetails();
 
     // Check version requirements from API
     try {
-      final response = await http.get(
-        Uri.parse('${configModel.apiConfig['baseURL']}/settings/1'),
-        headers: configModel.apiConfig['headers'],
-      ).timeout(const Duration(seconds: 5));
+      final response = await http
+          .get(
+            Uri.parse('${configModel.apiConfig['baseURL']}/settings/1'),
+            headers: configModel.apiConfig['headers'],
+          )
+          .timeout(const Duration(seconds: 5));
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         final settings = responseData['data'] ?? {};
