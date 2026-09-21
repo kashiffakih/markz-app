@@ -319,6 +319,7 @@ class Order {
     data['delhivery_tracking_url'] = this.delhiveryTrackingUrl;
     data['shipping_label_url'] = this.shippingLabelUrl;
     data['expected_delivery_date'] = this.expectedDeliveryDate;
+    data['delivery_method'] = this.deliveryMethod;
     return data;
   }
 }

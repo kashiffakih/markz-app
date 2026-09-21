@@ -56,6 +56,7 @@ class _CartPageState extends State<CartPage> {
   String? quantityLoadingAction; // 'increment' or 'decrement'
   bool couponValidationLoading = false;
   double couponValue = 0;
+  String deliveryMethod = 'Regular Delivery';
   UserAddress address = UserAddress();
   Map<String, dynamic> _CartData = {
     'kindOfFlower': '',
@@ -95,14 +96,15 @@ class _CartPageState extends State<CartPage> {
         }
         if (totalWeight == 0) totalWeight = 500; // Minimum weight
 
-        var cost = await orderModel.getShippingCost(pincode, totalWeight.toDouble());
+        var cost =
+            await orderModel.getShippingCost(pincode, totalWeight.toDouble());
         var tatData = await orderModel.getExpectedTAT(originPin, pincode);
 
         setState(() {
           delhiveryShippingCost = cost;
           isDelhiveryServiceable = true;
           if (tatData != null && tatData['expected_delivery_date'] != null) {
-             expectedTAT = tatData['expected_delivery_date'];
+            expectedTAT = tatData['expected_delivery_date'];
           }
         });
       } catch (e) {
@@ -585,7 +587,8 @@ class _CartPageState extends State<CartPage> {
     // Hide delivery charges for Distributors (wholesalers)
     double deliveryCharges = _activeRole == 'Distributor'
         ? 0
-        : (delhiveryShippingCost ?? double.tryParse(
+        : (delhiveryShippingCost ??
+            double.tryParse(
                 configModel.user?.companies?[0].deliveryCharges?.toString() ??
                     '0') ??
             0);
@@ -754,28 +757,30 @@ class _CartPageState extends State<CartPage> {
     String paymentDetails = 'PhonePe Payment - Pending';
 
     final orderResponse = await orderModel.placedOrder(
-      selectedItems,
-      payload['cartTotal'],
-      payload['addressId'],
-      payload['isGift'],
-      payload['useWalletPoint'],
-      payload['couponId'],
-      paymentDetails,
-      payload['deliveryMethod'],
-      payload['couponValue'],
-      payload['gstAmount'],
-      payload['platformFee'],
-      payload['gstNumber'],
-      payload['customDeliveryAmount'],
-      'pending', // paymentStatus
-      payload['expectedDeliveryDate']
-    );
+        selectedItems,
+        payload['cartTotal'],
+        payload['addressId'],
+        payload['isGift'],
+        payload['useWalletPoint'],
+        payload['couponId'],
+        paymentDetails,
+        deliveryMethod,
+        payload['couponValue'],
+        payload['gstAmount'],
+        payload['platformFee'],
+        payload['gstNumber'],
+        payload['customDeliveryAmount'],
+        'pending', // paymentStatus
+        payload['expectedDeliveryDate']);
 
-    if (orderResponse == null || (orderResponse is bool && orderResponse == false) || (orderResponse is Map && orderResponse['success'] == false)) {
+    if (orderResponse == null ||
+        (orderResponse is bool && orderResponse == false) ||
+        (orderResponse is Map && orderResponse['success'] == false)) {
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to initialize order. Please try again.')),
+          SnackBar(
+              content: Text('Failed to initialize order. Please try again.')),
         );
       }
       return;
@@ -783,14 +788,15 @@ class _CartPageState extends State<CartPage> {
 
     int? orderId;
     if (orderResponse is Map && orderResponse['data'] != null) {
-       orderId = orderResponse['data']['id'];
+      orderId = orderResponse['data']['id'];
     }
 
     if (orderId == null) {
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to retrieve order ID. Please try again.')),
+          SnackBar(
+              content: Text('Failed to retrieve order ID. Please try again.')),
         );
       }
       return;
@@ -832,17 +838,16 @@ class _CartPageState extends State<CartPage> {
 
       // Call confirm payment
       final confirmResponse = await orderModel.confirmPayment(
-         orderId: orderId, 
-         txnId: payment!.transactionId ?? '', 
-         paymentMode: finalPaymentDetails
-      );
+          orderId: orderId,
+          txnId: payment!.transactionId ?? '',
+          paymentMode: finalPaymentDetails);
 
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
       }
-      
+
       if (confirmResponse) {
         navigator.pushNamed('/successPage');
       } else {
@@ -856,24 +861,25 @@ class _CartPageState extends State<CartPage> {
         locator<OfflineOrderService>().saveFailedOrder(orderData);
 
         if (mounted) {
-           showDialog(
-             context: context,
-             builder: (context) => AlertDialog(
-               shape: RoundedRectangleBorder(
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20)),
-               title: Text("Payment Confirmed"),
-               content: Text("Your payment was successful (Txn ID: ${payment?.transactionId}). We are finalizing your order in the background. It will appear in your orders list shortly."),
-               actions: [
-                 TextButton(
-                   onPressed: () {
-                      Navigator.pop(context);
-                      navigator.pushNamed('/successPage');
-                   },
-                   child: Text("OK", style: TextStyle(color: Colors.black)),
-                 ),
-               ],
-             ),
-           );
+              title: Text("Payment Confirmed"),
+              content: Text(
+                  "Your payment was successful (Txn ID: ${payment?.transactionId}). We are finalizing your order in the background. It will appear in your orders list shortly."),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    navigator.pushNamed('/successPage');
+                  },
+                  child: Text("OK", style: TextStyle(color: Colors.black)),
+                ),
+              ],
+            ),
+          );
         }
       }
     } else if (payment?.state == 'PENDING') {
@@ -3675,132 +3681,126 @@ class _CartPageState extends State<CartPage> {
                                               ),
                                               SizedBox(height: 16),
                                               // COD Option
-                                              if (_activeRole != 'Distributor')
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      paymentOption =
-                                                          'Cash On Delivery';
-                                                    });
-                                                  },
-                                                  child: AnimatedContainer(
-                                                    duration: Duration(
-                                                        milliseconds: 200),
-                                                    padding: EdgeInsets.all(14),
-                                                    decoration: BoxDecoration(
+                                              // if (_activeRole != 'Distributor')
+                                              GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    paymentOption =
+                                                        'Cash On Delivery';
+                                                  });
+                                                },
+                                                child: AnimatedContainer(
+                                                  duration: Duration(
+                                                      milliseconds: 200),
+                                                  padding: EdgeInsets.all(14),
+                                                  decoration: BoxDecoration(
+                                                    color: paymentOption ==
+                                                            'Cash On Delivery'
+                                                        ? Color(0xFFF5F0E0)
+                                                        : Color(0xFFF8F9FA),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12),
+                                                    border: Border.all(
                                                       color: paymentOption ==
                                                               'Cash On Delivery'
-                                                          ? Color(0xFFF5F0E0)
-                                                          : Color(0xFFF8F9FA),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                      border: Border.all(
-                                                        color: paymentOption ==
-                                                                'Cash On Delivery'
-                                                            ? Color(0xFFC7B456)
-                                                            : Color(0xFFE0E0E0),
-                                                        width: paymentOption ==
-                                                                'Cash On Delivery'
-                                                            ? 2
-                                                            : 1,
-                                                      ),
+                                                          ? Color(0xFFC7B456)
+                                                          : Color(0xFFE0E0E0),
+                                                      width: paymentOption ==
+                                                              'Cash On Delivery'
+                                                          ? 2
+                                                          : 1,
                                                     ),
-                                                    child: Row(
-                                                      children: [
-                                                        Container(
-                                                          width: 40,
-                                                          height: 40,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: Colors.green
-                                                                .withOpacity(
-                                                                    0.1),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                          ),
-                                                          child: Icon(
-                                                            Icons.money_rounded,
-                                                            color: Colors.green,
-                                                            size: 22,
-                                                          ),
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 40,
+                                                        height: 40,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.green
+                                                              .withOpacity(0.1),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
                                                         ),
-                                                        SizedBox(width: 12),
-                                                        Expanded(
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Text(
-                                                                'Cash on Delivery',
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontFamily:
-                                                                      'Urbanist',
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                  color: Color(
-                                                                      0xFF1A1A1A),
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                'Pay when you receive',
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontFamily:
-                                                                      'Urbanist',
-                                                                  fontSize: 11,
-                                                                  color: Color(
-                                                                      0xFF888888),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
+                                                        child: Icon(
+                                                          Icons.money_rounded,
+                                                          color: Colors.green,
+                                                          size: 22,
                                                         ),
-                                                        AnimatedContainer(
-                                                          duration: Duration(
-                                                              milliseconds:
-                                                                  200),
-                                                          width: 22,
-                                                          height: 22,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            shape:
-                                                                BoxShape.circle,
+                                                      ),
+                                                      SizedBox(width: 12),
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              'Cash on Delivery',
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'Urbanist',
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                color: Color(
+                                                                    0xFF1A1A1A),
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              'Pay when you receive',
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'Urbanist',
+                                                                fontSize: 11,
+                                                                color: Color(
+                                                                    0xFF888888),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      AnimatedContainer(
+                                                        duration: Duration(
+                                                            milliseconds: 200),
+                                                        width: 22,
+                                                        height: 22,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          color: paymentOption ==
+                                                                  'Cash On Delivery'
+                                                              ? Color(
+                                                                  0xFFC7B456)
+                                                              : Colors
+                                                                  .transparent,
+                                                          border: Border.all(
                                                             color: paymentOption ==
                                                                     'Cash On Delivery'
                                                                 ? Color(
                                                                     0xFFC7B456)
-                                                                : Colors
-                                                                    .transparent,
-                                                            border: Border.all(
-                                                              color: paymentOption ==
-                                                                      'Cash On Delivery'
-                                                                  ? Color(
-                                                                      0xFFC7B456)
-                                                                  : Color(
-                                                                      0xFFBDBDBD),
-                                                              width: 2,
-                                                            ),
+                                                                : Color(
+                                                                    0xFFBDBDBD),
+                                                            width: 2,
                                                           ),
-                                                          child: paymentOption ==
-                                                                  'Cash On Delivery'
-                                                              ? Icon(
-                                                                  Icons.check,
-                                                                  size: 14,
-                                                                  color: Colors
-                                                                      .white)
-                                                              : null,
                                                         ),
-                                                      ],
-                                                    ),
+                                                        child: paymentOption ==
+                                                                'Cash On Delivery'
+                                                            ? Icon(Icons.check,
+                                                                size: 14,
+                                                                color: Colors
+                                                                    .white)
+                                                            : null,
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
+                                              ),
                                               SizedBox(height: 10),
                                               // UPI/PhonePe Option
                                               GestureDetector(
@@ -4141,6 +4141,129 @@ class _CartPageState extends State<CartPage> {
                                             ),
                                           ),
                                         ),
+                                        // Delivery Method Dropdown for Distributor
+                                        if (_activeRole == 'Distributor')
+                                          Container(
+                                            margin: EdgeInsets.only(bottom: 16),
+                                            padding: EdgeInsets.all(14),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                              border: Border.all(
+                                                  color: Color(0xFFE0E0E0)),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(0.03),
+                                                  blurRadius: 8,
+                                                  offset: Offset(0, 2),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Delivery Method',
+                                                  style: TextStyle(
+                                                    fontFamily: 'Urbanist',
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: Color(0xFF1A1A1A),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 8),
+                                                DropdownButtonFormField<String>(
+                                                  value: deliveryMethod
+                                                              .isNotEmpty &&
+                                                          [
+                                                            'Regular Delivery',
+                                                            'Instant Delivery'
+                                                          ].contains(
+                                                              deliveryMethod)
+                                                      ? deliveryMethod
+                                                      : 'Regular Delivery',
+                                                  decoration: InputDecoration(
+                                                    contentPadding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 12,
+                                                            vertical: 8),
+                                                    border: OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      borderSide: BorderSide(
+                                                          color: Color(
+                                                              0xFFE0E0E0)),
+                                                    ),
+                                                    enabledBorder:
+                                                        OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      borderSide: BorderSide(
+                                                          color: Color(
+                                                              0xFFE0E0E0)),
+                                                    ),
+                                                  ),
+                                                  items: [
+                                                    'Regular Delivery',
+                                                    'Instant Delivery'
+                                                  ].map((String value) {
+                                                    return DropdownMenuItem<
+                                                        String>(
+                                                      value: value,
+                                                      child: Text(value),
+                                                    );
+                                                  }).toList(),
+                                                  onChanged: (newValue) {
+                                                    if (newValue != null) {
+                                                      setState(() {
+                                                        deliveryMethod =
+                                                            newValue;
+                                                      });
+                                                      if (newValue ==
+                                                          'Instant Delivery') {
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                                  context) =>
+                                                              AlertDialog(
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          20),
+                                                            ),
+                                                            title: Text(
+                                                                'Instant Delivery'),
+                                                            content: Text(
+                                                                'Instant delivery charges will be extra and you have to pay it.'),
+                                                            actions: [
+                                                              TextButton(
+                                                                onPressed: () {
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                                child: Text(
+                                                                    'Ok',
+                                                                    style: TextStyle(
+                                                                        color: Color(
+                                                                            0xFFC7B456))),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      }
+                                                    }
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                         // GST Input - Beautiful Card Design
                                         Padding(
                                           padding: const EdgeInsets.only(
@@ -4467,17 +4590,19 @@ class _CartPageState extends State<CartPage> {
                                                 ),
                                               SizedBox(height: 14),
                                               // Hide delivery charges row for Distributors (wholesalers)
-                                              if (_activeRole != 'Distributor' &&
+                                              if (_activeRole !=
+                                                      'Distributor' &&
                                                   (isLoadingShipping ||
-                                                  (delhiveryShippingCost ?? double.tryParse(_configModel
-                                                                  .user
-                                                                  ?.companies?[
-                                                                      0]
-                                                                  .deliveryCharges
-                                                                  ?.toString() ??
-                                                              '0') ??
-                                                          0) >
-                                                      0))
+                                                      (delhiveryShippingCost ??
+                                                              double.tryParse(_configModel
+                                                                      .user
+                                                                      ?.companies?[
+                                                                          0]
+                                                                      .deliveryCharges
+                                                                      ?.toString() ??
+                                                                  '0') ??
+                                                              0) >
+                                                          0))
                                                 Row(
                                                   children: [
                                                     Expanded(
@@ -4502,7 +4627,8 @@ class _CartPageState extends State<CartPage> {
                                                                     .orange,
                                                                 fontSize: 12))
                                                         : Text(
-                                                            delhiveryShippingCost != null
+                                                            delhiveryShippingCost !=
+                                                                    null
                                                                 ? 'RS ${delhiveryShippingCost!.toStringAsFixed(2)}'
                                                                 : 'RS ${double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ?? '0')?.toStringAsFixed(2) ?? '0'}',
                                                             textAlign:
@@ -4520,37 +4646,49 @@ class _CartPageState extends State<CartPage> {
                                                           )
                                                   ],
                                                 ),
-                                              if (_activeRole != 'Distributor' &&
-                                                  (delhiveryShippingCost ?? double.tryParse(_configModel
-                                                              .user
-                                                              ?.companies?[0]
-                                                              .deliveryCharges
-                                                              ?.toString() ??
-                                                          '0') ??
-                                                      0) >
-                                                  0)
+                                              if (_activeRole !=
+                                                      'Distributor' &&
+                                                  (delhiveryShippingCost ??
+                                                          double.tryParse(_configModel
+                                                                  .user
+                                                                  ?.companies?[
+                                                                      0]
+                                                                  .deliveryCharges
+                                                                  ?.toString() ??
+                                                              '0') ??
+                                                          0) >
+                                                      0)
                                                 SizedBox(height: 14),
-                                              if (_activeRole != 'Distributor' && expectedTAT != null) ...[
+                                              if (_activeRole !=
+                                                      'Distributor' &&
+                                                  expectedTAT != null) ...[
                                                 Row(
                                                   children: [
                                                     Expanded(
                                                       child: Text(
                                                         'Expected Delivery',
-                                                        style: MyGoogleFontStyle(
-                                                          fontFamily: 'Urbanist',
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
                                                           fontSize: 14,
-                                                          fontWeight: FontWeight.w500,
-                                                          color: Color(0xff666666),
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color:
+                                                              Color(0xff666666),
                                                         ),
                                                       ),
                                                     ),
                                                     Text(
                                                       expectedTAT!,
-                                                      textAlign: TextAlign.right,
+                                                      textAlign:
+                                                          TextAlign.right,
                                                       style: MyGoogleFontStyle(
                                                         fontFamily: 'Inter',
-                                                        fontWeight: FontWeight.w700,
-                                                        color: Color(0xff303030),
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        color:
+                                                            Color(0xff303030),
                                                       ),
                                                     )
                                                   ],
@@ -4563,11 +4701,15 @@ class _CartPageState extends State<CartPage> {
                                                     Expanded(
                                                       child: Text(
                                                         'Note: Delhivery does not service this pincode. Your order will be shipped via an alternative courier, and you will need to pay the delivery charges directly to them upon receipt.',
-                                                        style: MyGoogleFontStyle(
-                                                          fontFamily: 'Urbanist',
+                                                        style:
+                                                            MyGoogleFontStyle(
+                                                          fontFamily:
+                                                              'Urbanist',
                                                           fontSize: 12,
-                                                          fontWeight: FontWeight.w500,
-                                                          color: Colors.red[700],
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color:
+                                                              Colors.red[700],
                                                         ),
                                                       ),
                                                     ),
@@ -5075,10 +5217,10 @@ class _CartPageState extends State<CartPage> {
                                                             int cartTotal =
                                                                 _calculateSelectedItemsTotal();
                                                             // Hide delivery charges for Distributors (wholesalers)
-                                                            double
-                                                                deliveryCharges = _activeRole == 'Distributor'
-                                                                    ? 0
-                                                                    : (double.tryParse(_configModel
+                                                            double deliveryCharges = _activeRole ==
+                                                                    'Distributor'
+                                                                ? 0
+                                                                : (double.tryParse(_configModel
                                                                             .user
                                                                             ?.companies?[0]
                                                                             .deliveryCharges
@@ -5201,7 +5343,8 @@ class _CartPageState extends State<CartPage> {
                                                               0.89, 0, 0, 0),
                                                       child: TextButton(
                                                         onPressed: () async {
-                                                          if (_isLoading) return;
+                                                          if (_isLoading)
+                                                            return;
 
                                                           if (paymentOption ==
                                                               '') {
@@ -5487,7 +5630,7 @@ class _CartPageState extends State<CartPage> {
                                                                 'couponId': couponId
                                                                     .toString(),
                                                                 'deliveryMethod':
-                                                                    "deliveryMethod",
+                                                                    deliveryMethod,
                                                                 'couponValue':
                                                                     couponValue
                                                                         .toString(),
@@ -5526,11 +5669,15 @@ class _CartPageState extends State<CartPage> {
                                                                   gstAmount / 2;
 
                                                               // Hide delivery charges for Distributors (wholesalers)
-                                                              int deliveryCharges = _activeRole == 'Distributor'
+                                                              int deliveryCharges = _activeRole ==
+                                                                      'Distributor'
                                                                   ? 0
-                                                                  : (delhiveryShippingCost?.toInt() ?? double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ??
-                                                                              '0')?.toInt() ??
-                                                                          0);
+                                                                  : (delhiveryShippingCost
+                                                                          ?.toInt() ??
+                                                                      double.tryParse(_configModel.user?.companies?[0].deliveryCharges?.toString() ??
+                                                                              '0')
+                                                                          ?.toInt() ??
+                                                                      0);
                                                               int packagingCharges = _configModel
                                                                           .user!
                                                                           .companies![
@@ -5609,7 +5756,7 @@ class _CartPageState extends State<CartPage> {
                                                                 couponId
                                                                     .toString(),
                                                                 'Cash on Delivery',
-                                                                "deliveryMethod",
+                                                                deliveryMethod,
                                                                 couponValue
                                                                     .toString(),
                                                                 gstAmount
@@ -5628,13 +5775,15 @@ class _CartPageState extends State<CartPage> {
                                                                 expectedTAT,
                                                               );
 
-                                                              bool isSuccess =
-                                                                  (response is bool &&
-                                                                          response ==
-                                                                              true) ||
-                                                                      (response is Map &&
-                                                                          response['success'] ==
-                                                                              true);
+                                                              bool isSuccess = (response
+                                                                          is bool &&
+                                                                      response ==
+                                                                          true) ||
+                                                                  (response
+                                                                          is Map &&
+                                                                      response[
+                                                                              'success'] ==
+                                                                          true);
 
                                                               if (isSuccess) {
                                                                 Navigator.pushNamed(
