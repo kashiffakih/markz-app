@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Aadab</string>
+    <string name="app_name">Markz</string>
     <string name="facebook_app_id">3838120563142516</string>
     <string name="fb_login_protocol_scheme">fb3838120563142516</string>
     <string name="facebook_client_token">91ade1da68e6da8df65204048d1fb8ff</string>

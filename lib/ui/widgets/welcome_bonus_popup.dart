@@ -208,7 +208,7 @@ class _WelcomeBonusPopupState extends State<WelcomeBonusPopup>
                       SizedBox(height: 6.h),
                       // Welcome message
                       Text(
-                        'Welcome to Aadab, ${widget.userName}!',
+                        'Welcome to Markz, ${widget.userName}!',
                         textAlign: TextAlign.center,
                         style: MyGoogleFontStyle(
                           fontFamily: 'Urbanist',

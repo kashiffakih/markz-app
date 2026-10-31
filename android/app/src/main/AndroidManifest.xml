@@ -18,7 +18,7 @@
 
     <application
         android:name="${applicationName}"
-        android:label="Aadab"
+        android:label="Markz"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
 

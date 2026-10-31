@@ -65,7 +65,7 @@ class _Splash2PageState extends State<Splash2Page> {
                   const SizedBox(height: 30),
                   // Welcome Text
                   Text(
-                    'Welcome to Aadab',
+                    'Welcome to Markz',
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 26,
@@ -405,7 +405,7 @@ class _Splash2PageState extends State<Splash2Page> {
 
   // Terms & Conditions content
   String _getTermsAndConditionsContent() {
-    return '''Welcome to Aadab (RAZA TRADING CO)! These Terms & Conditions govern your use of our clothing online store and the purchase of our products. By using our services, you agree to these terms.
+    return '''Welcome to Markz! These Terms & Conditions govern your use of our clothing online store and the purchase of our products. By using our services, you agree to these terms.
 
 1. ACCEPTANCE OF TERMS
 By accessing and using this website, you accept and agree to be bound by the terms and provision of this agreement.
@@ -441,7 +441,7 @@ By accessing and using this website, you accept and agree to be bound by the ter
 • You are responsible for all activities that occur under your account
 
 7. INTELLECTUAL PROPERTY
-• All content, trademarks, and intellectual property on this site are owned by Aadab (RAZA TRADING CO)
+• All content, trademarks, and intellectual property on this site are owned by Markz
 • You may not reproduce, distribute, or create derivative works without permission
 
 8. LIABILITY LIMITATION
@@ -462,7 +462,7 @@ Last updated: ${DateTime.now().year}''';
 
   // Privacy Policy content
   String _getPrivacyPolicyContent() {
-    return '''At Aadab (RAZA TRADING CO), we respect your privacy and are committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our online clothing store.
+    return '''At Markz, we respect your privacy and are committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our online clothing store.
 
 1. INFORMATION WE COLLECT
 We collect information you provide directly to us, such as:

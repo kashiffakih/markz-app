@@ -42,7 +42,7 @@ class SuccessPage extends StatelessWidget {
                     height: 10,
                   ),
                   Text(
-                    'Your order will be delivered soon.\nThank you for choosing Aadab!',
+                    'Your order will be delivered soon.\nThank you for choosing Markz!',
                     textAlign: TextAlign.center,
                     style: MyGoogleFontStyle(
                       fontFamily: 'Urbanist',

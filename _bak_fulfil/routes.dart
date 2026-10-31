@@ -1,0 +1,48 @@
+const String root = '/';
+const String updateApp = '/updateApp';
+const String allPages = '/allPages';
+const String splashPage = '/splashPage';
+const String splash2Page = '/splash2Page';
+const String loginPage = '/loginPage';
+const String registerPage = '/registerPage';
+const String forgotPasswordPage = '/forgotPasswordPage';
+const String changePasswordPage = '/changePasswordPage';
+const String successPasswordPage = '/successPassword';
+
+const String homePage = '/homePage';
+const String productPage = '/productPage';
+const String productIdPage = '/productIdPage';
+const String cartPage = '/cartPage';
+const String checkoutPage = '/checkoutPage';
+const String successPage = '/successPage';
+
+const String profilePage = '/profilePage';
+const String notificationPage = '/notificationPage';
+const String ordersPage = '/ordersPage';
+const String orderDetailsPage = '/orderDetailsPage';
+const String addressPage = '/addressPage';
+const String wishlistPage = '/wishlistPage';
+const String reviewsPage = '/reviewsPage';
+const String shippingCreatePage = '/shippingCreatePage';
+const String shippingUpdatePage = '/shippingUpdatePage';
+const String settingsPage = '/settingsPage';
+const String settingUpdatePage = '/settingUpdatePage';
+const String rewardsPage = '/rewardsPage';
+const String contactPage = '/contactPage';
+const String menuWidget = '/menuWidget';
+const String shopsPage = '/shopsPage';
+const String reviewUpdatePage = '/reviewUpdatePage';
+const String refundPolicyPage = '/refundPolicyPage';
+const String termAndConditionPage = '/termAndConditionPage';
+
+const String multipleImages = '/multiple-images';
+const String promocodes = '/promocodes';
+const String noNetworkPage = '/noNetwork';
+const String permissionsPage = '/permissions';
+
+// Marketplace
+const String marketplacePage = '/marketplacePage';
+const String marketSellersPage = '/marketSellersPage';
+const String chatListPage = '/chatListPage';
+const String myReturnsPage = '/myReturnsPage';
+const String resellerPage = '/resellerPage';

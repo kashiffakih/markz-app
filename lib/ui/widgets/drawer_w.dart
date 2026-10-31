@@ -67,7 +67,7 @@ class DrawerWidget extends StatelessWidget {
                                     height: 100,
                                     width: 100,
                                     child: Text(
-                                      'AADAB',
+                                      'MARKZ',
                                       style: MyGoogleFontStyle(
                                         fontFamily: 'Righteous',
                                         fontSize: 25.5776882172,

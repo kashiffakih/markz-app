@@ -39,3 +39,11 @@ const String multipleImages = '/multiple-images';
 const String promocodes = '/promocodes';
 const String noNetworkPage = '/noNetwork';
 const String permissionsPage = '/permissions';
+
+// Marketplace
+const String marketplacePage = '/marketplacePage';
+const String marketSellersPage = '/marketSellersPage';
+const String chatListPage = '/chatListPage';
+const String myReturnsPage = '/myReturnsPage';
+const String resellerPage = '/resellerPage';
+const String sellerShipPage = '/sellerShipPage';

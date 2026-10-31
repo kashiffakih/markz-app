@@ -43,7 +43,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     var options = {
       'key': 'rzp_test_1234567890abcdef', // Replace with your Razorpay Key
       'amount': (amountToPay * 100).toInt(),
-      'name': 'Aadab',
+      'name': 'Markz',
       'description': 'Checkout Payment',
       'prefill': {
         'contact': contact,

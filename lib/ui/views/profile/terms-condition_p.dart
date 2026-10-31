@@ -74,7 +74,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                               children: [
                                 Text('1. '),
                                 Text(
-                                    'AADAB maintains the \nhttps://aadab.com/ Website (“Site”).'),
+                                    'MARKZ maintains the \nhttps://aadab.com/ Website (“Site”).'),
                               ],
                             ),
                             SizedBox(

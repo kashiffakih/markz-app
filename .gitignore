@@ -41,4 +41,8 @@ app.*.symbols
 app.*.map.json
 
 # FVM Version Cache
-.fvm/
+.fvm/ 
+*.bak*
+ 
+*.jks 
+key.properties

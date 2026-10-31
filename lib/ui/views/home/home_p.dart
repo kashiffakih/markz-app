@@ -1140,7 +1140,7 @@ class _HomePageState extends State<HomePage>
             child: TextButton(
               onPressed: () async {
                 final message =
-                    'Hello! Use my referral code *${configModel.user?.referralCode}* to get instant discounts on the Aadab App! 🎁\n\nDownload here: https://play.google.com/store/apps/details?id=com.crazzycode.aadab&hl=en_IN';
+                    'Hello! Use my referral code *${configModel.user?.referralCode}* to get instant discounts on the Markz App! 🎁\n\nDownload here: https://play.google.com/store/apps/details?id=com.crazzycode.aadab&hl=en_IN';
                 final whatsappUrl =
                     'whatsapp://send?text=${Uri.encodeComponent(message)}';
                 try {

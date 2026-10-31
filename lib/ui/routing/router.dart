@@ -40,6 +40,12 @@ import 'package:aadab/ui/widgets/menu-drawer.dart';
 import 'package:aadab/ui/widgets/multi_image_w.dart';
 import 'package:aadab/ui/views/network/no_network_page.dart';
 import 'package:aadab/ui/views/permissions/permissions_page.dart';
+import 'package:aadab/ui/views/market/marketplace_p.dart';
+import 'package:aadab/ui/views/market/market_sellers_p.dart';
+import 'package:aadab/ui/views/market/chat_p.dart';
+import 'package:aadab/ui/views/market/my_returns_p.dart';
+import 'package:aadab/ui/views/market/reseller_p.dart';
+import 'package:aadab/ui/views/market/seller_ship_p.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
@@ -223,6 +229,30 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case permissionsPage:
       return MaterialPageRoute(builder: (BuildContext context) {
         return PermissionsPage();
+      });
+    case marketplacePage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return const MarketplacePage();
+      });
+    case marketSellersPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return const MarketSellersPage();
+      });
+    case chatListPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return const ChatListPage();
+      });
+    case myReturnsPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return const MyReturnsPage();
+      });
+    case sellerShipPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return const SellerShipPage();
+      });
+    case resellerPage:
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return const ResellerPage();
       });
     default:
       return MaterialPageRoute(builder: (BuildContext context) {

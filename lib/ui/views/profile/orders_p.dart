@@ -11,6 +11,7 @@ import 'package:aadab/ui/views/profile/order-details-processing.dart';
 import 'package:aadab/core/services/phonepe_s.dart';
 import 'package:aadab/core/services/order_s.dart';
 import 'package:aadab/core/services/offline_order_s.dart';
+import 'package:aadab/ui/views/market/return_sheet.dart';
 
 class OrdersPage extends StatefulWidget {
   final isProfile;
@@ -686,6 +687,33 @@ class _OrdersPageState extends State<OrdersPage> {
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+                  ],
+                  if (status == 'Delivered') ...[
+                    InkWell(
+                      onTap: () => showReturnSheet(
+                        context,
+                        orderId: order.id!,
+                        paid: num.tryParse('${order.totalAmount}') ?? 0,
+                        deliveryPaid: order.deliveryAmount ?? 0,
+                      ),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.w),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20.r),
+                          border: Border.all(color: Color(0xFF0B5D3B), width: 1),
+                        ),
+                        child: Text(
+                          'Return',
+                          style: MyGoogleFontStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF0B5D3B),
                           ),
                         ),
                       ),

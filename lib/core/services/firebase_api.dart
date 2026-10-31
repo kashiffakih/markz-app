@@ -146,8 +146,8 @@ class FirebaseApi {
     // This ensures background notifications work even if _showNotification hasn't been called yet
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'aadab_notifications', // id
-      'Aadab Notifications', // title
-      description: 'Important notifications from Aadab app', // description
+      'Markz Notifications', // title
+      description: 'Important notifications from Markz app', // description
       importance: Importance.high,
       playSound: true,
       enableVibration: true,
@@ -202,7 +202,7 @@ class FirebaseApi {
   Future<void> _showNotification(RemoteMessage message) async {
     // Get title and body from notification or data payload
     final title =
-        message.notification?.title ?? message.data['title'] ?? 'Aadab';
+        message.notification?.title ?? message.data['title'] ?? 'Markz';
     final body = message.notification?.body ??
         message.data['body'] ??
         'You have a new notification';
@@ -210,8 +210,8 @@ class FirebaseApi {
     // Create notification channel for Android with default sound
     AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'aadab_notifications',
-      'Aadab Notifications',
-      channelDescription: 'Important notifications from Aadab app',
+      'Markz Notifications',
+      channelDescription: 'Important notifications from Markz app',
       importance: Importance.high,
       priority: Priority.high,
       showWhen: true,

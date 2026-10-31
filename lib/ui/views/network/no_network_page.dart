@@ -107,7 +107,7 @@ class NoNetworkPage extends StatelessWidget {
                       SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          'You need an active internet connection to use Aadab',
+                          'You need an active internet connection to use Markz',
                           style: MyGoogleFontStyle(
                             fontFamily: 'Urbanist',
                             fontSize: 14,

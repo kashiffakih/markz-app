@@ -170,7 +170,7 @@ class _ContactPageState extends State<ContactPage> {
               final emailUri = Uri(
                 scheme: 'mailto',
                 path: email,
-                query: 'subject=${Uri.encodeComponent("Hello Aadab")}',
+                query: 'subject=${Uri.encodeComponent("Hello Markz")}',
               );
               try {
                 if (!await launchUrl(emailUri)) {

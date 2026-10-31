@@ -361,6 +361,49 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
           SizedBox(height: 20.w),
+          _buildSectionTitle('Marketplace'),
+          Container(
+            decoration: _boxDecoration(),
+            child: Column(
+              children: [
+                _buildProfileItem(
+                  context: context,
+                  title: 'Markz Marketplace',
+                  icon: Icons.storefront_outlined,
+                  onTap: () => Navigator.pushNamed(context, '/marketplacePage'),
+                ),
+                _buildDivider(),
+                _buildProfileItem(
+                  context: context,
+                  title: 'My Chats',
+                  icon: Icons.chat_bubble_outline,
+                  onTap: () => Navigator.pushNamed(context, '/chatListPage'),
+                ),
+                _buildDivider(),
+                _buildProfileItem(
+                  context: context,
+                  title: 'My Returns',
+                  icon: Icons.assignment_return_outlined,
+                  onTap: () => Navigator.pushNamed(context, '/myReturnsPage'),
+                ),
+                _buildDivider(),
+                _buildProfileItem(
+                  context: context,
+                  title: 'Seller: Orders to ship',
+                  icon: Icons.local_shipping_outlined,
+                  onTap: () => Navigator.pushNamed(context, '/sellerShipPage'),
+                ),
+                _buildDivider(),
+                _buildProfileItem(
+                  context: context,
+                  title: 'Reseller Program',
+                  icon: Icons.account_balance_wallet_outlined,
+                  onTap: () => Navigator.pushNamed(context, '/resellerPage'),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 20.w),
           _buildSectionTitle('Feedback & Information'),
           Container(
             decoration: _boxDecoration(),

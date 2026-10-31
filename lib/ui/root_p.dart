@@ -43,7 +43,8 @@ class _RootPageState extends State<RootPage> {
   }
 
   authenticateUser(_, AuthModel authModel, ConfigModel configModel) async {
-    configModel.getApiConfig(domain: 'http://192.168.1.3:9090');
+    // API address: flutter run --dart-define=API_URL=http://<PC-IP>:8000   (no code edit needed)
+    configModel.getApiConfig(domain: const String.fromEnvironment('API_URL', defaultValue: 'http://192.168.1.3:8000'));
     // configModel.getApiConfig(domain: 'https://api.staging.aadab.online');
     await configModel.fetchLoginData();
 
@@ -236,7 +237,7 @@ class _RootPageState extends State<RootPage> {
                 child: Column(
                   children: [
                     Text(
-                      'Welcome to Aadab',
+                      'Welcome to Markz',
                       style: MyGoogleFontStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 14,

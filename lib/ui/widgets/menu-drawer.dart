@@ -75,7 +75,7 @@ class MenuWidget extends StatelessWidget {
                                 width: 143.0.w,
                                 height: 39.0.w,
                                 child: Text(
-                                  'Aadab',
+                                  'Markz',
                                   style: MyGoogleFontStyle(
                                     fontFamily: 'Righteous',
                                     fontSize: 25.5776882172.sp,
